@@ -1,0 +1,71 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>walk lab: chronophotograph</title>
+<link rel="stylesheet" href="lab.css">
+<script src="gait.js"></script>
+<script src="figure.js"></script>
+<script src="shade.js"></script>
+<script src="lab.js"></script>
+<script>
+/* CHRONOPHOTOGRAPH. Marey's plate, and the clip this started from: one man,
+ * exposed again and again on the same sheet as he crosses. Every tenth of
+ * a cycle a stamp of him is left behind in a pale ink, so the row of
+ * copies the reference GIF shows builds itself in front of you, each one
+ * a step further along the stride. The live man walks in front in full
+ * ink. When he leaves the frame the plate is wiped for the next pass. */
+const INK = '#1C1A17', PAPER = '#FAF9F7', CASE = '#D08A3C';
+const EVERY = 1 / 8;      // stamp interval, in cycles
+let lastStamp = -1, fade = 0;
+
+lab.start({
+  name: 'chronophotograph',
+  blurb: 'one man exposed eight times a stride on the same plate, the row from the GIF rebuilt as it happens',
+  setup(lab) { const S = lab.layer('plate'); S.ctx.clearRect(0, 0, lab.W, lab.H); lastStamp = -1; },
+  onWrap(lab) { fade = 1; lastStamp = -1; },
+  frame(lab, dt) {
+    const { ctx, W, H, walker: w } = lab;
+    const P = w.pose;
+    const S = lab.layer('plate');
+
+    // the wipe after a pass: the plate dissolves over a second
+    if (fade > 0) {
+      fade = Math.max(0, fade - dt * 1.2);
+      S.ctx.save(); S.ctx.globalCompositeOperation = 'destination-out';
+      S.ctx.fillStyle = 'rgba(0,0,0,0.12)'; S.ctx.fillRect(0, 0, W, H); S.ctx.restore();
+      if (fade === 0) S.ctx.clearRect(0, 0, W, H);
+    }
+
+    // a stamp every EVERY of the cycle, keyed on absolute phase so a change
+    // of tempo does not double up
+    const abs = w.cycles + w.t;
+    const slot = Math.floor(abs / EVERY);
+    if (slot !== lastStamp && dt > 0) {
+      lastStamp = slot;
+      const Q = w.poseAt(slot * EVERY - w.cycles, w.cycles);
+      Q.case = w.casePoints(Q, w.caseTheta);
+      S.ctx.globalAlpha = 1;
+      // Marey's way: the body barely there, the skeleton as a line, so the
+      // exposures stay legible where they overlap
+      Figure.silhouette(S.ctx, Q, 'rgba(20,23,27,0.05)');
+      Figure.drawSkeleton(S.ctx, Q, { stroke: 'rgba(20,23,27,0.34)', width: 0.9, joints: 1.4 });
+    }
+
+    ctx.fillStyle = PAPER; ctx.fillRect(0, 0, W, H);
+    ctx.drawImage(S.canvas, 0, 0, W, H);
+
+    // the floor
+    ctx.strokeStyle = 'rgba(20,23,27,.16)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, lab.ground + 0.5); ctx.lineTo(W, lab.ground + 0.5); ctx.stroke();
+
+    // the live man
+    Figure.drawFigure(ctx, P, { ink: INK, far: '#3B3733', case: CASE });
+
+    // the count of stamps so far, bottom left, like a plate number
+    ctx.font = '400 11.5px "Helvetica Neue", Helvetica, Arial, sans-serif'; ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = 'rgba(20,23,27,.5)';
+    const n = Math.max(0, Math.floor((w.hipX() + w.H * 1.2) / w.stride * 10));
+    ctx.fillText('plate ' + String(w.cycles).padStart(2, '0') + '   exposure every ' + Math.round(EVERY * w.period * 1000) + ' ms, eight to a stride', 24, H - 28);
+  },
+});
+</script>

@@ -1,0 +1,17 @@
+/* the lab's chrome: paper, Helvetica, one quiet panel */
+:root{--paper:#FAF9F7;--ink:#14171B;--ink2:rgba(20,23,27,.66);--ink3:rgba(20,23,27,.42);--hair:rgba(20,23,27,.14);--touch:#4c5be4}
+html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);font:400 13px/1.5 "Helvetica Neue",Helvetica,Arial,sans-serif;overflow:hidden}
+#stage{position:fixed;inset:0;display:block}
+.top{position:fixed;left:24px;top:20px;z-index:5;display:flex;align-items:baseline;gap:10px;pointer-events:none}
+.top a{pointer-events:auto;color:var(--ink2);text-decoration:none}
+.top a:hover{color:var(--touch)}
+.top .sep{color:var(--ink3)}
+.top .name{color:var(--ink);font-weight:500}
+.top .blurb{color:var(--ink3);margin-left:8px;max-width:46ch}
+.panel{position:fixed;right:20px;bottom:20px;z-index:5;display:grid;gap:6px;padding:12px 14px;border-radius:14px;background:#fff;box-shadow:0 1px 2px rgba(20,23,27,.04),0 6px 20px rgba(20,23,27,.08)}
+.panel label{display:grid;grid-template-columns:48px 120px 48px;align-items:center;gap:10px;font-size:12px;color:var(--ink2)}
+.panel label b{font-weight:400;color:var(--ink);font-variant-numeric:tabular-nums;text-align:right}
+.panel input[type=range]{width:120px;accent-color:var(--ink);margin:0}
+[data-dark] body{--paper:#14131A;--ink:#FAF9F7;--ink2:rgba(250,249,247,.66);--ink3:rgba(250,249,247,.42);--hair:rgba(250,249,247,.14)}
+[data-dark] .panel{background:#1E1C24;box-shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35)}
+@media(max-width:640px){.top .blurb{display:none}.panel{right:12px;bottom:12px}}

@@ -1,0 +1,121 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>probe</title></head>
+<body style="background:#111;color:#ddd;font:12px ui-monospace,Menlo,monospace">
+<pre id="out">running</pre>
+<script src="./shaders.js"></script>
+<script>
+(async () => {
+  const lines = [];
+  const say = s => lines.push(s);
+  let fails = 0;
+
+  const cv = document.createElement('canvas');
+  cv.width = 64; cv.height = 64;
+  const gl = cv.getContext('webgl2', { antialias: false, alpha: false, depth: false, stencil: false });
+  if (!gl) { document.getElementById('out').textContent = 'PROBE FAIL: no webgl2 context'; return; }
+  say('renderer: ' + gl.getParameter(gl.VERSION) + ' | ' + gl.getParameter(gl.RENDERER));
+
+  const cbf = gl.getExtension('EXT_color_buffer_float') || gl.getExtension('EXT_color_buffer_half_float');
+  say('float colour buffers: ' + (cbf ? 'yes' : 'no, the lab falls back to 8 bit'));
+
+  // a real half float render target, the format every pass writes to
+  const t = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, 64, 64, 0, gl.RGBA, 0x140B, null);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  const fb = gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
+  const st = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+  say('rgba16f target: ' + (st === gl.FRAMEBUFFER_COMPLETE ? 'complete' : 'INCOMPLETE ' + st));
+  if (st !== gl.FRAMEBUFFER_COMPLETE) fails++;
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+  // exactly the programs main.js builds, composed the same way
+  const SRC = {
+    scene: SH.SCENE,
+    gust: SH.GUST,
+    motion: SH.MOTION,
+    wash: SH.WASH,
+    bleed1: SH.frag(SH.BLUR, '#define PASS_FIRST\n'),
+    bleed2: SH.frag(SH.BLUR, ''),
+    halo1: SH.frag(SH.BLUR, '#define MODE_HALO\n#define PASS_FIRST\n'),
+    halo2: SH.frag(SH.BLUR, '#define MODE_HALO\n'),
+    print: SH.PRINT
+  };
+
+  function sh(type, src, label) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+      const log = gl.getShaderInfoLog(s);
+      say('COMPILE FAIL ' + label + '\n' + log);
+      const ls = src.split('\n');
+      const re = /ERROR:\s*\d+:(\d+)/g;
+      let m;
+      while ((m = re.exec(log)) !== null) {
+        const n = parseInt(m[1], 10);
+        for (let i = Math.max(1, n - 3); i <= Math.min(ls.length, n + 3); i++) {
+          say((i === n ? '>>> ' : '    ') + i + ' | ' + ls[i - 1]);
+        }
+      }
+      fails++;
+      return null;
+    }
+    return s;
+  }
+
+  const active = {};
+  for (const name of Object.keys(SRC)) {
+    const vs = sh(gl.VERTEX_SHADER, SH.VERT, name + ' vertex');
+    const fs = sh(gl.FRAGMENT_SHADER, SRC[name], name + ' fragment');
+    if (!vs || !fs) continue;
+    const p = gl.createProgram();
+    gl.attachShader(p, vs);
+    gl.attachShader(p, fs);
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+      say('LINK FAIL ' + name + '\n' + gl.getProgramInfoLog(p));
+      fails++;
+      continue;
+    }
+    const set = new Set();
+    const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < n; i++) set.add(gl.getActiveUniform(p, i).name.replace(/\[0\]$/, ''));
+    active[name] = set;
+    // attribute 0 must be where the layout qualifier says it is
+    const loc = gl.getAttribLocation(p, 'aPos');
+    say('link ok  ' + name.padEnd(8) + ' uniforms:' + String(n).padStart(3) + '  aPos@' + loc);
+    if (loc !== 0) { say('ATTRIB FAIL ' + name + ' aPos is not at location 0'); fails++; }
+  }
+
+  // what main.js actually sets, read from the shipped file
+  const mainSrc = await (await fetch('./main.js')).text();
+  const sets = {};
+  let cur = null;
+  for (const line of mainSrc.split('\n')) {
+    const u = line.match(/use\(PROG\.(\w+)\)/);
+    if (u) { cur = u[1]; sets[cur] = sets[cur] || new Set(); continue; }
+    if (!cur) continue;
+    const m = line.match(/^\s*(?:f|i1|tex)\('([A-Za-z_]\w*)'/);
+    if (m) sets[cur].add(m[1]);
+  }
+  say('');
+  for (const name of Object.keys(SRC)) {
+    if (!active[name]) continue;
+    const s = sets[name] || new Set();
+    for (const u of s) {
+      if (!active[name].has(u)) { say('UNIFORM FAIL ' + name + ' sets "' + u + '" which is not active'); fails++; }
+    }
+    const unset = [...active[name]].filter(u => !s.has(u));
+    if (unset.length) say('note ' + name + ' never set: ' + unset.join(', '));
+  }
+
+  say('');
+  say(fails ? 'PROBE FAIL, ' + fails + ' problems' : 'PROBE PASS, all programs compile, link and match');
+  document.getElementById('out').textContent = lines.join('\n');
+})();
+</script>
+</body></html>

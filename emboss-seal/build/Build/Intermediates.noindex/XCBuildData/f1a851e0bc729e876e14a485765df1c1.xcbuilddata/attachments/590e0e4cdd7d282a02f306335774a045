@@ -1,0 +1,49 @@
+{
+  "" : {
+    "diagnostics" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/EmbossSeal-primary.dia",
+    "emit-module-dependencies" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/EmbossSeal-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/EmbossSeal-primary-emit-module.dia",
+    "pch" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/EmbossSeal-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/EmbossSeal-primary.swiftdeps"
+  },
+  "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/Sources/EmbossSealApp.swift" : {
+    "const-values" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/EmbossSealApp.swiftconstvalues",
+    "dependencies" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/EmbossSealApp.d",
+    "diagnostics" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/EmbossSealApp.dia",
+    "index-unit-output-path" : "/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/EmbossSealApp.o",
+    "llvm-bc" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/EmbossSealApp.bc",
+    "object" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/EmbossSealApp.o",
+    "swift-dependencies" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/EmbossSealApp.swiftdeps",
+    "swiftmodule" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/EmbossSealApp~partial.swiftmodule"
+  },
+  "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/Sources/Lamp.swift" : {
+    "const-values" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/Lamp.swiftconstvalues",
+    "dependencies" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/Lamp.d",
+    "diagnostics" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/Lamp.dia",
+    "index-unit-output-path" : "/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/Lamp.o",
+    "llvm-bc" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/Lamp.bc",
+    "object" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/Lamp.o",
+    "swift-dependencies" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/Lamp.swiftdeps",
+    "swiftmodule" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/Lamp~partial.swiftmodule"
+  },
+  "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/Sources/SealCard.swift" : {
+    "const-values" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/SealCard.swiftconstvalues",
+    "dependencies" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/SealCard.d",
+    "diagnostics" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/SealCard.dia",
+    "index-unit-output-path" : "/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/SealCard.o",
+    "llvm-bc" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/SealCard.bc",
+    "object" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/SealCard.o",
+    "swift-dependencies" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/SealCard.swiftdeps",
+    "swiftmodule" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/SealCard~partial.swiftmodule"
+  },
+  "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/jazlynnkurniandra/spark/prototypes/emboss-seal/build/Build/Intermediates.noindex/EmbossSeal.build/Debug-iphonesimulator/EmbossSeal.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
+  }
+}

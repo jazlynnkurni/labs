@@ -1,0 +1,22 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>walk lab: dream, jade</title>
+<link rel="stylesheet" href="lab.css">
+<style>
+body{--paper:#E4EFE8}
+.pal{position:fixed;left:24px;bottom:20px;z-index:5;display:flex;gap:6px;padding:8px;border-radius:14px;background:#fff;box-shadow:0 1px 2px rgba(20,23,27,.04),0 6px 20px rgba(20,23,27,.08)}
+[data-dark] .pal{background:#1E1C24}
+.pal button{display:grid;gap:5px;justify-items:center;border:0;background:transparent;padding:6px 8px;border-radius:10px;cursor:pointer;font:400 11px "Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--ink2)}
+.pal button:hover{background:rgba(127,127,127,.1)}
+.pal button.on{color:var(--ink)}
+.pal i{display:flex;width:36px;height:36px;border-radius:50%;overflow:hidden;outline:2px solid transparent;outline-offset:2px;transition:outline-color .18s ease}
+.pal button.on i{outline-color:var(--touch)}
+.pal s{flex:1;display:block}
+</style>
+<script src="gait.js"></script>
+<script src="figure.js"></script>
+<script src="shade.js"></script>
+<script src="lab.js"></script>
+<script>window.DREAM_LOCK = 4;</script>
+<script src="dream.js"></script>

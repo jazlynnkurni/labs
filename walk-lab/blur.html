@@ -1,0 +1,65 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>walk lab: long exposure</title>
+<link rel="stylesheet" href="lab.css">
+<script src="gait.js"></script>
+<script src="figure.js"></script>
+<script src="shade.js"></script>
+<script src="lab.js"></script>
+<script>
+/* LONG EXPOSURE. A camera with the shutter left open: within one frame the
+ * man is drawn at sixteen moments across a shutter of 1/12 s, each at a
+ * sixteenth of the ink, so the parts moving fastest (the swinging foot,
+ * the far hand, the case) smear and the parts standing still (the planted
+ * foot) stay sharp. Behind that a slower trail: the paper is only partly
+ * repainted each frame, so where he was lingers and fades. */
+const INK = '#1C1A17', CASE = '#D08A3C', PAPER = '#FAF9F7';
+const SAMPLES = 16, SHUTTER = 1 / 12;
+
+lab.start({
+  name: 'long exposure',
+  blurb: 'sixteen moments inside an open shutter, and a trail that will not quite let go',
+  setup(lab) {
+    const T = lab.layer('trail');
+    T.ctx.fillStyle = PAPER; T.ctx.fillRect(0, 0, lab.W, lab.H);
+  },
+  onWrap(lab) { /* the trail keeps whatever is left; it will fade */ },
+  frame(lab, dt) {
+    const { ctx, W, H, walker: w } = lab;
+    const T = lab.layer('trail').ctx;
+
+    // the wake: a faint print of him every frame, forgotten at 6% a frame
+    T.fillStyle = 'rgba(250,249,247,0.06)';
+    T.fillRect(0, 0, W, H);
+    T.globalAlpha = 0.07;
+    Figure.drawFigure(T, w.pose, { ink: INK, far: '#3B3733', case: CASE });
+    T.globalAlpha = 1;
+
+    ctx.fillStyle = PAPER; ctx.fillRect(0, 0, W, H);
+    ctx.drawImage(lab.layer('trail').canvas, 0, 0, W, H);
+
+    // the shutter: moments spread back across SHUTTER seconds from now, each
+    // a sixteenth of the ink, so what moves smears and what is planted holds
+    ctx.globalAlpha = 1 / SAMPLES;
+    const tNow = w.t, cyc = w.cycles;
+    for (let i = 0; i < SAMPLES; i++) {
+      const back = (SHUTTER * i / SAMPLES) / w.period;
+      let t = tNow - back, c = cyc;
+      if (t < 0) { t += 1; c -= 1; }
+      const P = w.poseAt(t, c);
+      P.case = w.casePoints(P, w.caseTheta - w.caseOmega * SHUTTER * i / SAMPLES);
+      Figure.drawFigure(ctx, P, { ink: INK, far: '#3B3733', case: CASE });
+    }
+    ctx.globalAlpha = 1;
+
+    // the ground: a hairline, and the shadow under the planted foot
+    ctx.strokeStyle = 'rgba(20,23,27,.14)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, lab.ground + 0.5); ctx.lineTo(W, lab.ground + 0.5); ctx.stroke();
+    const P = w.pose;
+    const g = ctx.createRadialGradient(P.hip.x, lab.ground, 0, P.hip.x, lab.ground, w.H * 0.42);
+    g.addColorStop(0, 'rgba(20,23,27,.10)'); g.addColorStop(1, 'rgba(20,23,27,0)');
+    ctx.fillStyle = g; ctx.save(); ctx.scale(1, 0.12); ctx.beginPath(); ctx.arc(P.hip.x, lab.ground / 0.12, w.H * 0.42, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  },
+});
+</script>

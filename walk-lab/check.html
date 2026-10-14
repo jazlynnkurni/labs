@@ -1,0 +1,48 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>gait check</title>
+<link rel="stylesheet" href="lab.css">
+<style>body{overflow:auto}canvas{display:block;background:#fff}</style>
+<canvas id="c" width="1400" height="760"></canvas>
+<script src="gait.js"></script>
+<script src="figure.js"></script>
+<script src="shade.js"></script>
+<script>
+/* a strip of the cycle at 12 phases, plus the skeleton, plus the body path.
+   Phases are placed at their true x so the stride reads. */
+const c = document.getElementById('c'), ctx = c.getContext('2d');
+const H = 220, ground = 300;
+const w = new Gait.Walker({ H, period: 1.08, ground, x: 80 });
+ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+ctx.strokeStyle = '#ccc'; ctx.beginPath(); ctx.moveTo(0, ground); ctx.lineTo(c.width, ground); ctx.stroke();
+const N = 12;
+for (let i = 0; i < N; i++) {
+  const t = i / N;
+  // spread the phases along x by hand so they do not overlap: each at hip x + i * 110
+  const P = w.poseAt(t, 0);
+  const dx = i * 112 - (P.hip.x - 80);
+  ctx.save(); ctx.translate(dx, 0);
+  P.case = w.casePoints(P, 0);
+  Figure.drawFigure(ctx, P);
+  Figure.drawSkeleton(ctx, P, { stroke: '#4c5be4', width: 1, joints: 2 });
+  ctx.fillStyle = '#888'; ctx.font = '11px Helvetica'; ctx.fillText(Math.round(t * 100) + '%', P.hip.x - 8, ground + 16);
+  ctx.fillText('h' + Math.round(P.legR.angles.hip * 180 / Math.PI) + ' k' + Math.round(P.legR.angles.knee * 180 / Math.PI) + ' a' + Math.round(P.legR.angles.ankle * 180 / Math.PI), P.hip.x - 26, ground + 30);
+  ctx.restore();
+}
+/* second row: the true walk, poses every 1/24 s at their real x, overlapping, to see the foot stay put */
+const g2 = 650;
+const w2 = new Gait.Walker({ H: 200, period: 1.08, ground: g2, x: 60 });
+ctx.strokeStyle = '#ccc'; ctx.beginPath(); ctx.moveTo(0, g2); ctx.lineTo(c.width, g2); ctx.stroke();
+for (let i = 0; i < 54; i++) {
+  const P = w2.poseAt(i / 27, Math.floor(i / 27));
+  ctx.globalAlpha = 0.18;
+  Figure.silhouette(ctx, P, '#1C1A17', false);
+  ctx.globalAlpha = 1;
+  // mark the contact point of the stance leg
+  const L = P.stanceR ? P.legR : P.legL;
+  const cp = L.heel.y >= L.ball.y ? L.heel : L.ball;
+  ctx.fillStyle = P.stanceR ? '#e33' : '#4c5be4'; ctx.fillRect(cp.x - 1.5, g2 + 4 + (i % 2) * 5, 3, 3);
+}
+ctx.fillStyle = '#888'; ctx.font = '12px Helvetica';
+ctx.fillText('stride ' + (w2.stride / 200 * 1.75).toFixed(2) + ' m   speed ' + (w2.speed / 200 * 1.75).toFixed(2) + ' m/s   ' + Math.round(120 / 1.08) + ' steps/min', 20, c.height - 14);
+</script>

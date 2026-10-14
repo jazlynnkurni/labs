@@ -1,0 +1,42 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>probe</title></head>
+<body><pre id="out">running</pre>
+<script type="module">
+import { getContext, buildProgram } from './gl.js';
+const out = document.getElementById('out');
+const lines = [];
+try {
+  const c = document.createElement('canvas');
+  c.width = 64; c.height = 64;
+  const gl = getContext(c, true);
+  if (!gl) { lines.push('RESULT: NO_WEBGL2'); }
+  else {
+    lines.push('RENDERER: ' + gl.getParameter(gl.RENDERER));
+    const b = buildProgram(gl);
+    lines.push('RESULT: ' + (b.ok ? 'OK' : 'FAIL'));
+    lines.push('UNIFORMS(' + b.uniforms.length + '): ' + b.uniforms.join(','));
+    lines.push('LOG_START');
+    lines.push(b.log || '(empty)');
+    lines.push('LOG_END');
+    if (b.ok) {
+      gl.useProgram(b.program);
+      const need = ['uRes','uT','uRot','uExposure','uPetals','uLoopLen','uLoopWidth','uStroke','uBreathe','uSpread','uShadow','uRayLen','uHaze','uHazeH','uGrain','uTooth'];
+      const missing = need.filter(n => gl.getUniformLocation(b.program, n) === null);
+      lines.push('MISSING_UNIFORMS: ' + (missing.length ? missing.join(',') : 'none'));
+      gl.bindVertexArray(gl.createVertexArray());
+      gl.viewport(0,0,64,64);
+      gl.uniform2f(gl.getUniformLocation(b.program,'uRes'), 48, 64);
+      for (const [n,v] of [['uT',30],['uRot',0.4],['uExposure',1.18],['uPetals',15],['uLoopLen',0.335],['uLoopWidth',0.106],['uStroke',0.0072],['uBreathe',0.135],['uSpread',0.075],['uShadow',0.46],['uRayLen',0.6],['uHaze',0.92],['uHazeH',0.115],['uGrain',0.86],['uTooth',340]])
+        gl.uniform1f(gl.getUniformLocation(b.program,n), v);
+      gl.drawArrays(gl.TRIANGLES,0,3);
+      lines.push('GLERROR: ' + gl.getError());
+      const px = new Uint8Array(64*64*4);
+      gl.readPixels(0,0,64,64,gl.RGBA,gl.UNSIGNED_BYTE,px);
+      let sum=0, max=0, nz=0;
+      for (let i=0;i<px.length;i+=4){ const l=px[i]+px[i+1]+px[i+2]; sum+=l; if(l>max)max=l; if(l>6)nz++; }
+      lines.push('PIXELS: mean=' + (sum/(64*64*3)).toFixed(2) + ' max=' + max + ' lit=' + nz + '/4096');
+    }
+  }
+} catch (e) { lines.push('RESULT: THREW'); lines.push(String(e && e.stack || e)); }
+out.textContent = lines.join('\n');
+</script></body></html>

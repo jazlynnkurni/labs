@@ -1,0 +1,107 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>probe</title></head>
+<body><pre id="out">running</pre>
+<script type="module">
+import * as SH from './shaders.js';
+import { createProgram } from './glu.js';
+import { Cloth, P } from './cloth.js';
+import { drawFace } from './face.js';
+
+// Exactly what main.js sets, per program. Kept in step by hand; the point of
+// this page is to catch it drifting.
+const SETS = {
+  cloth: ['uViewProj','uCam','uLightDir','uBeige','uInk','uWallCol','uDial','uTexAspect',
+          'uHands','uWeave','uWeaveBump','uCrease','uAO','uSheen','uDebug','uFace','uFaceMix'],
+  shadow: ['uViewProj','uLightTravel','uWallZ'],
+  wall:   ['uViewProj','uRes','uWallCol','uLightDir','uShadow'],
+  blur:   ['uTex','uDir'],
+  post:   ['uScene','uTime','uExposure'],
+  line:   ['uViewProj','uColor'],
+};
+const ATTRS = { cloth: {aPos:0, aNormal:1, aUV:2, aFold:3}, shadow:{aPos:0}, wall:{aPos:0}, line:{aPos:0} };
+
+const lines = [];
+const say = s => lines.push(s);
+let bad = 0;
+
+const cv = document.createElement('canvas');
+cv.width = 64; cv.height = 64;
+const gl = cv.getContext('webgl2', { antialias:false, alpha:false });
+
+if (!gl) { say('FAIL no webgl2 context'); bad++; }
+else {
+  say('renderer: ' + gl.getParameter(gl.RENDERER));
+  say('glsl: ' + gl.getParameter(gl.SHADING_LANGUAGE_VERSION));
+  say('EXT_color_buffer_float: ' + !!gl.getExtension('EXT_color_buffer_float'));
+  say('');
+
+  for (const [name, vs, fs] of SH.PROGRAMS) {
+    try {
+      const pr = createProgram(gl, vs, fs, name);
+      const active = Object.keys(pr.u).sort();
+      say('PROGRAM ' + name + ': compiled and linked');
+      say('  active uniforms: ' + (active.join(', ') || '(none)'));
+
+      const setList = SETS[name] || [];
+      const missing = setList.filter(u => !(u in pr.u));
+      const never = active.filter(u => !setList.includes(u));
+      if (missing.length) { say('  FAIL set but not present (silent no-op): ' + missing.join(', ')); bad++; }
+      if (never.length) { say('  FAIL present but never set: ' + never.join(', ')); bad++; }
+      if (!missing.length && !never.length) say('  uniforms match what main.js sets');
+
+      const want = ATTRS[name];
+      if (want) {
+        for (const a in want) {
+          const loc = gl.getAttribLocation(pr.program, a);
+          if (loc !== want[a]) { say('  FAIL attribute ' + a + ' at ' + loc + ', expected ' + want[a]); bad++; }
+        }
+        say('  attribute locations ok: ' + Object.keys(want).join(', '));
+      }
+    } catch (e) {
+      say('PROGRAM ' + name + ': FAIL'); say('  ' + e.message); bad++;
+    }
+    say('');
+  }
+
+  // Framebuffer formats the renderer depends on.
+  for (const [label, ifmt] of [['RGBA16F', gl.RGBA16F], ['RGBA8', gl.RGBA8]]) {
+    const t = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texStorage2D(gl.TEXTURE_2D, 1, ifmt, 32, 32);
+    const fb = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
+    say('fbo ' + label + ': ' + (gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE ? 'complete' : 'INCOMPLETE'));
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  }
+  say('gl error after setup: 0x' + gl.getError().toString(16));
+  say('');
+}
+
+// Face texture draws without throwing, and actually puts ink down.
+try {
+  const f = drawFace();
+  const g = f.getContext('2d');
+  const d = g.getImageData(0, 0, f.width, f.height).data;
+  let inked = 0;
+  for (let i = 3; i < d.length; i += 4 * 37) if (d[i] > 8) inked++;
+  say('face texture: ' + f.width + 'x' + f.height + ', ' + inked + ' inked samples');
+  if (inked < 50) { say('FAIL face texture looks empty'); bad++; }
+} catch (e) { say('face texture FAIL ' + e.message); bad++; }
+
+// Solver still sane.
+try {
+  const c = new Cloth(40, 60);
+  for (let i = 0; i < 90; i++) c.step(1 / 60);
+  c.impulseAtUV(0.5, 0.8, 12, 1.35);
+  for (let i = 0; i < 60; i++) c.step(1 / 60);
+  const b = c.bounds();
+  say('sim: nan=' + c.hasNaN() + ' bounds y ' + b[1].toFixed(3) + ' to ' + b[4].toFixed(3));
+  if (c.hasNaN()) { say('FAIL sim produced NaN'); bad++; }
+} catch (e) { say('sim FAIL ' + e.message); bad++; }
+
+say('');
+say(bad === 0 ? 'PROBE OK' : 'PROBE FAILURES: ' + bad);
+document.getElementById('out').textContent = lines.join('\n');
+</script>
+</body></html>

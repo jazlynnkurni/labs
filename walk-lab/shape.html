@@ -1,0 +1,201 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>walk lab: shape him</title>
+<link rel="stylesheet" href="lab.css">
+<style>
+body{overflow:hidden}
+#stage{position:fixed;inset:0;display:block;cursor:crosshair}
+.side{position:fixed;right:20px;top:20px;width:264px;display:grid;gap:8px;padding:14px;border-radius:14px;background:#fff;box-shadow:0 1px 2px rgba(20,23,27,.04),0 6px 20px rgba(20,23,27,.08);font-size:12px;color:var(--ink2)}
+.side label{display:grid;grid-template-columns:64px 1fr 44px;align-items:center;gap:8px}
+.side label b{font-weight:400;color:var(--ink);font-variant-numeric:tabular-nums;text-align:right}
+.side input[type=range]{width:100%;accent-color:var(--ink);margin:0}
+.side .row{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.side button{font:inherit;font-size:12px;padding:7px 11px;border-radius:999px;border:1px solid var(--hair);background:#fff;color:var(--ink);cursor:pointer}
+.side button:hover{background:rgba(20,23,27,.05)}
+.side button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.side .hint{font-size:11.5px;line-height:1.5;color:var(--ink3);margin-top:6px}
+.side .msg{font-size:11.5px;color:var(--touch);min-height:16px}
+.side .parts{display:flex;gap:4px;flex-wrap:wrap}
+.side .parts button{padding:4px 9px;font-size:11px}
+</style>
+<canvas id="stage"></canvas>
+<header class="top"><a class="back" href="./">walk lab</a><span class="sep">/</span><span class="name">shape him</span><span class="blurb">drag any point of the man. Both sides share one outline. Save writes shade.json, which every page uses.</span></header>
+<div class="side">
+  <label><span>phase</span><input id="phase" type="range" min="0" max="1" step="0.005" value="0.1"><b id="phaseV">0.10</b></label>
+  <label><span>reference</span><input id="refA" type="range" min="0" max="1" step="0.02" value="0.55"><b id="refAV">55%</b></label>
+  <label><span>ref scale</span><input id="refS" type="range" min="0.6" max="1.6" step="0.005" value="1"><b id="refSV">1.00</b></label>
+  <label><span>ref frame</span><input id="refO" type="range" min="-13" max="13" step="1" value="0"><b id="refOV">+0</b></label>
+  <div class="parts" id="parts"></div>
+  <div class="row">
+    <button id="play">play</button>
+    <button id="save">save</button>
+    <button id="reset">reset to default</button>
+    <button id="copy">copy json</button>
+  </div>
+  <div class="msg" id="msg"></div>
+  <div class="hint">Drag the reference man with shift held to line him up. The outline points are in the bone's own frame, so a point you move stays put through the whole walk.</div>
+</div>
+<script src="gait.js"></script>
+<script src="figure.js"></script>
+<script src="shade.js"></script>
+<script>
+const $ = (s) => document.querySelector(s);
+const canvas = $('#stage'); let ctx, W, H, dpr;
+let phase = 0.1, playing = false, refA = 0.55, refS = 1, refO = 0, refOff = { x: 0, y: 0 };
+let walker, BODY;      // BODY: body height in px
+let sel = null;        // selected part name, or null for all
+let drag = null;
+const refs = []; for (let i = 0; i < 27; i++) { const im = new Image(); im.src = `ref/${String(i).padStart(2, '0')}.png`; refs.push(im); }
+
+const ORDER = ['torso', 'head', 'hair', 'neck', 'upperArm', 'forearm', 'hand', 'thigh', 'shank', 'shoe', 'caseBody'];
+// which frame each part is edited in (the near side)
+const FRAME = { torso: 'torso', head: 'head', hair: 'head', neck: 'neck', upperArm: 'upperArmR', forearm: 'forearmR', hand: 'handR', thigh: 'thighR', shank: 'shankR', shoe: 'footR', caseBody: 'case' };
+const ALONG = { torso: 1, neck: 1, upperArm: 1, forearm: 1, hand: 1, thigh: 1, shank: 1, head: 0, hair: 0, shoe: 0, caseBody: 0 };
+
+function resize() {
+  W = innerWidth; H = innerHeight; dpr = Math.min(2, devicePixelRatio || 1);
+  canvas.width = W * dpr; canvas.height = H * dpr; canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  BODY = H * 0.72;
+  walker = new Gait.Walker({ H: BODY, period: 1.08, ground: H * 0.88, x: 0 });
+  walker.place(W * 0.42);
+  draw();
+}
+
+function pose() {
+  const P = walker.poseAt(phase, 0);
+  P.case = walker.casePoints(P, 0);
+  return P;
+}
+
+function toWorld(F, u, v, along) {
+  const au = along ? u * F.L : u * BODY;
+  return { x: F.o.x + F.u.x * au + F.v.x * v * BODY, y: F.o.y + F.u.y * au + F.v.y * v * BODY };
+}
+function toLocal(F, x, y, along) {
+  const dx = x - F.o.x, dy = y - F.o.y;
+  const au = dx * F.u.x + dy * F.u.y, av = dx * F.v.x + dy * F.v.y;
+  return [along ? au / F.L : au / BODY, av / BODY];
+}
+
+function draw() {
+  const P = pose();
+  ctx.fillStyle = '#FAF9F7'; ctx.fillRect(0, 0, W, H);
+  // ground
+  ctx.strokeStyle = 'rgba(20,23,27,.18)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, walker.ground + 0.5); ctx.lineTo(W, walker.ground + 0.5); ctx.stroke();
+
+  // the reference man, scaled so 560 px of crop is about 1.22 body heights
+  const k = Math.round(phase * 27 + refO + 27) % 27;
+  const im = refs[k];
+  if (im.complete && im.naturalWidth) {
+    const s = (BODY * 1.27 / 560) * refS;
+    const w = 360 * s, h = 560 * s;
+    ctx.globalAlpha = refA;
+    ctx.drawImage(im, P.hip.x - w * (0.36 + (k % 27) * 0.0105) + refOff.x, walker.ground - h * 0.93 + refOff.y, w, h);
+    ctx.globalAlpha = 1;
+  }
+
+  // the man, a little transparent so the reference shows through him
+  ctx.globalAlpha = 0.78;
+  Shade.draw(ctx, P, { far: '#5A5550' });
+  ctx.globalAlpha = 1;
+  Figure.drawSkeleton(ctx, P, { stroke: 'rgba(76,91,228,.5)', width: 0.8, joints: 1.5 });
+
+  // the control points of the editable (near side) parts
+  const F = Shade.frames(P, BODY);
+  for (const name of ORDER) {
+    if (sel && sel !== name) continue;
+    const part = Shade.parts[name]; const fr = F[FRAME[name]]; if (!fr) continue;
+    const pts = part.pts;
+    ctx.strokeStyle = sel === name ? '#4c5be4' : 'rgba(76,91,228,.35)'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    pts.forEach(([u, v], i) => { const p = toWorld(fr, u, v, ALONG[name]); if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+    ctx.closePath(); ctx.stroke();
+    pts.forEach(([u, v]) => {
+      const p = toWorld(fr, u, v, ALONG[name]);
+      ctx.fillStyle = '#fff'; ctx.strokeStyle = '#4c5be4'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.arc(p.x, p.y, sel === name ? 5 : 3.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    });
+  }
+}
+
+function hit(x, y) {
+  const P = pose(); const F = Shade.frames(P, BODY);
+  let best = null, bd = 12;
+  for (const name of ORDER) {
+    if (sel && sel !== name) continue;
+    const part = Shade.parts[name]; const fr = F[FRAME[name]]; if (!fr) continue;
+    part.pts.forEach((pt, i) => {
+      const p = toWorld(fr, pt[0], pt[1], ALONG[name]);
+      const d = Math.hypot(p.x - x, p.y - y);
+      if (d < bd) { bd = d; best = { name, i }; }
+    });
+  }
+  return best;
+}
+
+canvas.addEventListener('pointerdown', (e) => {
+  const x = e.clientX, y = e.clientY;
+  if (e.shiftKey) { drag = { ref: true, x, y, ox: refOff.x, oy: refOff.y }; canvas.setPointerCapture(e.pointerId); return; }
+  const h = hit(x, y);
+  if (h) { drag = h; sel = h.name; markParts(); canvas.setPointerCapture(e.pointerId); draw(); }
+});
+canvas.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  if (drag.ref) { refOff = { x: drag.ox + e.clientX - drag.x, y: drag.oy + e.clientY - drag.y }; draw(); return; }
+  const P = pose(); const F = Shade.frames(P, BODY); const fr = F[FRAME[drag.name]];
+  Shade.parts[drag.name].pts[drag.i] = toLocal(fr, e.clientX, e.clientY, ALONG[drag.name]).map((v) => Math.round(v * 1000) / 1000);
+  draw();
+});
+canvas.addEventListener('pointerup', () => { drag = null; });
+canvas.addEventListener('dblclick', (e) => {
+  // double click on an edge inserts a point there; on a point removes it
+  const h = hit(e.clientX, e.clientY);
+  if (h && Shade.parts[h.name].pts.length > 4) { Shade.parts[h.name].pts.splice(h.i, 1); draw(); return; }
+  if (!sel) return;
+  const P = pose(); const F = Shade.frames(P, BODY); const fr = F[FRAME[sel]];
+  const pts = Shade.parts[sel].pts;
+  // nearest edge
+  let bi = 0, bd = Infinity;
+  for (let i = 0; i < pts.length; i++) {
+    const a = toWorld(fr, ...pts[i], ALONG[sel]), b = toWorld(fr, ...pts[(i + 1) % pts.length], ALONG[sel]);
+    const t = Math.max(0, Math.min(1, ((e.clientX - a.x) * (b.x - a.x) + (e.clientY - a.y) * (b.y - a.y)) / ((b.x - a.x) ** 2 + (b.y - a.y) ** 2 || 1)));
+    const d = Math.hypot(a.x + (b.x - a.x) * t - e.clientX, a.y + (b.y - a.y) * t - e.clientY);
+    if (d < bd) { bd = d; bi = i; }
+  }
+  pts.splice(bi + 1, 0, toLocal(fr, e.clientX, e.clientY, ALONG[sel]).map((v) => Math.round(v * 1000) / 1000));
+  draw();
+});
+
+function markParts() {
+  const box = $('#parts'); box.innerHTML = '';
+  const all = document.createElement('button'); all.textContent = 'all'; all.className = sel ? '' : 'on'; all.onclick = () => { sel = null; markParts(); draw(); }; box.appendChild(all);
+  for (const n of ORDER) { const b = document.createElement('button'); b.textContent = n; b.className = sel === n ? 'on' : ''; b.onclick = () => { sel = n; markParts(); draw(); }; box.appendChild(b); }
+}
+
+const bind = (id, fn, fmt) => { const i = $('#' + id); i.addEventListener('input', () => { fn(+i.value); $('#' + id + 'V').textContent = fmt(+i.value); draw(); }); };
+bind('phase', (v) => { phase = v; }, (v) => v.toFixed(2));
+bind('refA', (v) => { refA = v; }, (v) => Math.round(v * 100) + '%');
+bind('refS', (v) => { refS = v; }, (v) => v.toFixed(2));
+bind('refO', (v) => { refO = v; }, (v) => (v >= 0 ? '+' : '') + v);
+$('#play').onclick = () => { playing = !playing; $('#play').classList.toggle('on', playing); if (playing) tick(); };
+$('#save').onclick = async () => {
+  const r = await fetch('/save', { method: 'POST', body: JSON.stringify(Shade.parts, null, 1) });
+  $('#msg').textContent = r.ok ? 'saved shade.json, every page uses it now' : 'could not save';
+};
+$('#reset').onclick = () => { Shade.parts = Shade.defaults(); draw(); $('#msg').textContent = 'back to the default outlines (not saved yet)'; };
+$('#copy').onclick = async () => { await navigator.clipboard.writeText(JSON.stringify(Shade.parts)); $('#msg').textContent = 'copied'; };
+let last = 0;
+function tick(now = performance.now()) {
+  if (!playing) return;
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  phase = (phase + dt / 1.08 * 0.35) % 1;      // slow, a third speed
+  $('#phase').value = phase; $('#phaseV').textContent = phase.toFixed(2);
+  draw(); requestAnimationFrame(tick);
+}
+addEventListener('keydown', (e) => { if (e.key === ' ') { e.preventDefault(); $('#play').click(); } });
+refs.forEach((im) => im.addEventListener('load', draw));
+Shade.load().then(() => { markParts(); resize(); addEventListener('resize', resize); });
+</script>

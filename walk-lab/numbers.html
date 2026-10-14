@@ -1,0 +1,107 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>walk lab: figures</title>
+<link rel="stylesheet" href="lab.css">
+<script src="gait.js"></script>
+<script src="figure.js"></script>
+<script src="shade.js"></script>
+<script src="lab.js"></script>
+<script>
+/* FIGURES. The man is made of numbers, and the numbers are his: the hip,
+ * knee and ankle angles, the phase of the cycle, the speed, read off the
+ * gait model each frame and streamed through a fixed grid of cells. The
+ * grid stays put and he walks through it, so the digits do not travel
+ * with him; they light up as he passes. The case is the same digits in
+ * its own colour. Three readouts hang off the joints with leader lines. */
+const INK = '#14171B', CASE = '#D08A3C', PAPER = '#FAF9F7', ACC = '#4c5be4';
+let CELL = 10;
+
+function stream(P, w) {
+  const d = (v) => String(Math.abs(Math.round(v))).padStart(2, '0');
+  const R = P.legR.angles, L = P.legL.angles;
+  const deg = (r) => r * 180 / Math.PI;
+  return [
+    d(deg(R.hip)), d(deg(R.knee)), d(deg(R.ankle)),
+    d(deg(L.hip)), d(deg(L.knee)), d(deg(L.ankle)),
+    d(P.t * 100), d(w.speed / w.H * 175),   // phase %, speed cm/s
+    d(deg(P.armL.angles.shoulder)), d(deg(P.armL.angles.elbow)),
+  ].join('');
+}
+
+lab.start({
+  name: 'figures',
+  blurb: 'the man is made of his own numbers: joint angles, phase, speed, through a grid he walks across',
+  setup(lab) { CELL = Math.max(7, Math.round(lab.walker.H / 34)); },
+  frame(lab, dt) {
+    const { ctx, W, H, walker: w } = lab;
+    const P = w.pose;
+    ctx.fillStyle = PAPER; ctx.fillRect(0, 0, W, H);
+
+    const M = lab.mask(P, CELL, 4);
+    if (!M) return;
+    const s = stream(P, w);
+    ctx.font = `600 ${Math.round(CELL * 1.25)}px "SF Mono", Menlo, "Helvetica Neue", monospace`;
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+
+    // every cell of the grid near him: inside the man a strong digit,
+    // just outside a faint one, so the grid shows as a field he moves through
+    let k = Math.floor(lab.time * 7) % s.length;   // the stream scrolls
+    for (let j = 0; j < M.rows; j++) {
+      for (let i = 0; i < M.cols; i++) {
+        const v = M.at(i, j);
+        const x = M.x0 + i * CELL + CELL / 2, y = M.y0 + j * CELL + CELL / 2;
+        if (y > lab.ground + CELL) continue;
+        const ch = s[(k + i * 7 + j * 13) % s.length];
+        if (v === 0) {
+          // halo: distance to the man in cells
+          let near = false;
+          for (let dj = -2; dj <= 2 && !near; dj++) for (let di = -2; di <= 2; di++) {
+            const ii = i + di, jj = j + dj;
+            if (ii >= 0 && jj >= 0 && ii < M.cols && jj < M.rows && M.at(ii, jj)) { near = true; break; }
+          }
+          if (!near) continue;
+          ctx.fillStyle = 'rgba(20,23,27,0.10)';
+        } else {
+          ctx.fillStyle = v === 2 ? CASE : INK;
+        }
+        ctx.fillText(ch, x, y);
+      }
+    }
+
+    // the floor as a line of the phase, in tenths
+    ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(20,23,27,.22)';
+    ctx.font = `400 ${Math.round(CELL * 0.95)}px "SF Mono", Menlo, monospace`;
+    const step = CELL * 6;
+    for (let x = (P.hip.x % step) - step * 40; x < W; x += step) ctx.fillText('·', x, lab.ground + CELL);
+    ctx.strokeStyle = 'rgba(20,23,27,.14)'; ctx.beginPath(); ctx.moveTo(0, lab.ground + 0.5); ctx.lineTo(W, lab.ground + 0.5); ctx.stroke();
+
+    // three readouts with leader lines
+    const deg = (r) => Math.round(r * 180 / Math.PI);
+    const lead = (p, dx, dy, label, val) => {
+      ctx.strokeStyle = ACC; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + dx, p.y + dy); ctx.lineTo(p.x + dx + Math.sign(dx) * 18, p.y + dy); ctx.stroke();
+      ctx.fillStyle = ACC; ctx.beginPath(); ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2); ctx.fill();
+      ctx.font = '400 12px "Helvetica Neue", Helvetica, Arial, sans-serif'; ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = dx > 0 ? 'left' : 'right';
+      const tx = p.x + dx + Math.sign(dx) * 22;
+      ctx.fillStyle = 'rgba(20,23,27,.55)'; ctx.fillText(label, tx, p.y + dy - 3);
+      ctx.fillStyle = INK; ctx.font = '500 13px "SF Mono", Menlo, monospace';
+      ctx.fillText(val, tx, p.y + dy + 12);
+    };
+    const hh = w.H;
+    lead(P.legR.knee, hh * 0.34, hh * 0.06, 'right knee', deg(P.legR.angles.knee) + '°');
+    lead(P.hip, -hh * 0.40, -hh * 0.10, 'hip', deg(P.legR.angles.hip) + '°');
+    lead(P.legR.ankle, hh * 0.30, hh * 0.08, 'ankle', (deg(P.legR.angles.ankle) >= 0 ? '+' : '') + deg(P.legR.angles.ankle) + '°');
+
+    // the phase, top right, tabular
+    ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = 'rgba(20,23,27,.55)'; ctx.font = '400 12px "Helvetica Neue", Helvetica, Arial, sans-serif';
+    ctx.fillText('cycle', W - 24, 36);
+    ctx.fillStyle = INK; ctx.font = '400 28px "SF Mono", Menlo, monospace';
+    ctx.fillText((P.t).toFixed(2), W - 24, 64);
+    ctx.fillStyle = 'rgba(20,23,27,.55)'; ctx.font = '400 12px "Helvetica Neue", Helvetica, Arial, sans-serif';
+    ctx.fillText((P.loadR > 0.5 ? 'right' : 'left') + ' foot carrying', W - 24, 84);
+  },
+});
+</script>

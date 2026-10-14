@@ -1,0 +1,110 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>walk lab: lines</title>
+<link rel="stylesheet" href="lab.css">
+<script src="gait.js"></script>
+<script src="figure.js"></script>
+<script src="shade.js"></script>
+<script src="lab.js"></script>
+<script>
+/* LINES. A technical plate. The man is a stack of horizontal hatch lines
+ * that exist only where his body is, so he reads as a form cut from the
+ * ruling. Over that, the skeleton as a hairline, and the thing Marey
+ * photographed in 1883: the paths the joints actually trace as a person
+ * walks. The head barely moves; the hip bobs twice a stride; the ankle
+ * draws a looping arch; the hand and the case swing their own curves.
+ * The traces are left on the paper and fade. */
+const INK = '#14171B', PAPER = '#FAF9F7', ACC = '#4c5be4', CASE = '#D08A3C';
+const RULE = 4;                     // px between hatch lines
+const TRACKED = [
+  ['head', (P) => P.head, 'rgba(20,23,27,.55)'],
+  ['hip', (P) => P.hip, ACC],
+  ['right ankle', (P) => P.legR.ankle, ACC],
+  ['left ankle', (P) => P.legL.ankle, 'rgba(76,91,228,.45)'],
+  ['left hand', (P) => P.armL.hand, 'rgba(20,23,27,.45)'],
+  ['case', (P) => P.case ? { x: P.case.centre.x, y: P.case.centre.y + P.case.h / 2 } : P.armR.hand, CASE],
+];
+let prev = null;
+
+lab.start({
+  name: 'lines',
+  blurb: 'hatch lines where the body is, and the curves each joint draws as he walks',
+  setup(lab) {
+    const T = lab.layer('trace');
+    T.ctx.clearRect(0, 0, lab.W, lab.H);
+    prev = null;
+  },
+  onWrap() { prev = null; },
+  resized() { prev = null; },
+  frame(lab, dt) {
+    const { ctx, W, H, walker: w } = lab;
+    const P = w.pose;
+    const T = lab.layer('trace').ctx;
+
+    // the traces: extend each joint's path by one segment, and let the
+    // whole sheet fade very slowly
+    if (dt > 0) {
+      T.save(); T.globalCompositeOperation = 'destination-out';
+      T.fillStyle = 'rgba(0,0,0,0.004)'; T.fillRect(0, 0, W, H); T.restore();
+    }
+    if (prev && dt > 0) {
+      T.lineWidth = 1; T.lineCap = 'round';
+      TRACKED.forEach(([name, get, col], i) => {
+        const a = get(prev), b = get(P);
+        T.strokeStyle = col; T.beginPath(); T.moveTo(a.x, a.y); T.lineTo(b.x, b.y); T.stroke();
+      });
+    }
+    prev = P;
+
+    ctx.fillStyle = PAPER; ctx.fillRect(0, 0, W, H);
+
+    // the ruling behind, faint, so the figure is cut from it
+    ctx.strokeStyle = 'rgba(20,23,27,.045)'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let y = (lab.ground % RULE) + 0.5; y < H; y += RULE) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
+    ctx.stroke();
+
+    ctx.drawImage(lab.layer('trace').canvas, 0, 0, W, H);
+
+    // the hatch figure: scan the mask row by row, stroke the runs
+    const M = lab.mask(P, 2, 3);
+    if (M) {
+      ctx.lineWidth = 1.1; ctx.lineCap = 'butt';
+      for (let j = 0; j < M.rows; j++) {
+        const y = M.y0 + j * 2 + 0.5;
+        if (((y - 0.5 - lab.ground) % RULE + RULE) % RULE !== 0) continue;
+        let run = null;
+        for (let i = 0; i <= M.cols; i++) {
+          const v = i < M.cols ? M.at(i, j) : 0;
+          if (v && !run) run = { s: i, v };
+          else if (run && v !== run.v) {
+            ctx.strokeStyle = run.v === 2 ? CASE : INK;
+            ctx.beginPath(); ctx.moveTo(M.x0 + run.s * 2, y); ctx.lineTo(M.x0 + i * 2, y); ctx.stroke();
+            run = v ? { s: i, v } : null;
+          }
+        }
+      }
+    }
+
+    // the skeleton as a hairline over the hatching
+    Figure.drawSkeleton(ctx, P, { stroke: 'rgba(76,91,228,.9)', width: 0.8, joints: 1.6 });
+
+    // ground, with ticks every tenth of a stride, moving with the world
+    ctx.strokeStyle = 'rgba(20,23,27,.3)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, lab.ground + 0.5); ctx.lineTo(W, lab.ground + 0.5); ctx.stroke();
+    const tick = w.stride / 10;
+    ctx.beginPath();
+    for (let x = ((w.x0 % tick) + tick) % tick; x < W; x += tick) { ctx.moveTo(x + 0.5, lab.ground); ctx.lineTo(x + 0.5, lab.ground + 5); }
+    ctx.stroke();
+
+    // the legend of traces, bottom left
+    ctx.font = '400 11.5px "Helvetica Neue", Helvetica, Arial, sans-serif'; ctx.textBaseline = 'middle';
+    TRACKED.forEach(([name, , col], i) => {
+      const y = H - 28 - (TRACKED.length - 1 - i) * 18;
+      ctx.strokeStyle = col; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(24, y); ctx.lineTo(44, y); ctx.stroke();
+      ctx.fillStyle = 'rgba(20,23,27,.6)'; ctx.fillText(name, 52, y);
+    });
+  },
+});
+</script>

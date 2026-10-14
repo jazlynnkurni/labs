@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>logFormatVersion</key>
+	<integer>12</integer>
+	<key>logs</key>
+	<dict>
+		<key>0E229C0C-7ED0-44E1-8368-68283D507057</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>0E229C0C-7ED0-44E1-8368-68283D507057.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>EmbossSeal project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>EmbossSeal</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project EmbossSeal with scheme EmbossSeal</string>
+			<key>timeStartedRecording</key>
+			<real>811441394.55939698</real>
+			<key>timeStoppedRecording</key>
+			<real>811441397.59948695</real>
+			<key>title</key>
+			<string>Building project EmbossSeal with scheme EmbossSeal</string>
+			<key>uniqueIdentifier</key>
+			<string>0E229C0C-7ED0-44E1-8368-68283D507057</string>
+		</dict>
+		<key>D172E8B9-F31B-426A-B406-0798607E77F0</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>D172E8B9-F31B-426A-B406-0798607E77F0.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>EmbossSeal project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>EmbossSeal</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project EmbossSeal with scheme EmbossSeal</string>
+			<key>timeStartedRecording</key>
+			<real>811441288.71253204</real>
+			<key>timeStoppedRecording</key>
+			<real>811441316.67148602</real>
+			<key>title</key>
+			<string>Building project EmbossSeal with scheme EmbossSeal</string>
+			<key>uniqueIdentifier</key>
+			<string>D172E8B9-F31B-426A-B406-0798607E77F0</string>
+		</dict>
+	</dict>
+</dict>
+</plist>
