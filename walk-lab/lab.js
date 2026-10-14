@@ -42,9 +42,10 @@
 
   function resize() {
     const box = lab.mount ? { w: lab.mount.clientWidth, h: lab.mount.clientHeight } : { w: innerWidth, h: innerHeight };
+    const dprCap = window.LAB_DPR || 2;
     // a resize event with nothing changed (headless fires one after load) must not wipe the plates
-    if (lab.W === box.w && lab.H === box.h && lab.dpr === Math.min(2, devicePixelRatio || 1)) return;
-    lab.W = box.w; lab.H = box.h; lab.dpr = Math.min(2, devicePixelRatio || 1);
+    if (lab.W === box.w && lab.H === box.h && lab.dpr === Math.min(dprCap, devicePixelRatio || 1)) return;
+    lab.W = box.w; lab.H = box.h; lab.dpr = Math.min(dprCap, devicePixelRatio || 1);
     lab.ctx = sizeCanvas(lab.canvas);
     lab.ground = Math.round(lab.H * (window.LAB_GROUND || 0.76));
     // layers keep what they hold across a resize, stretched to the new size
@@ -124,9 +125,11 @@
     for (let k = 0; k < pre * 60; k++) {
       const dt = (1 / 60) * lab.speed; lab.time += dt; lab.walker.step(dt); lab.wrap(); style.frame(lab, dt);
     }
-    let last = performance.now();
+    let last = null;
     const loop = (now) => {
-      let dt = Math.min(0.05, (now - last) / 1000); last = now;
+      // the first frame's stamp can sit before the clock started, so the first
+      // step is zero, and a step is never negative or longer than a twentieth
+      let dt = last == null ? 0 : Math.max(0, Math.min(0.1, (now - last) / 1000)); last = now;
       if (!lab.playing) dt = 0;
       dt *= lab.speed;
       lab.time += dt;

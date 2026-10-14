@@ -210,6 +210,7 @@
     step(dt) {
       this.t += dt / this.period;
       while (this.t >= 1) { this.t -= 1; this.cycles++; }
+      while (this.t < 0) { this.t += 1; this.cycles--; }
       const P = this.poseAt(this.t);
       this.pose = P;
       this.integrateCase(P, dt);

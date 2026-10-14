@@ -1,29 +1,29 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>walk lab: work to die, footer</title>
+<title>walk lab: out of office, footer</title>
 <link rel="stylesheet" href="lab.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /* A site footer that is one frame: the line of men fills the whole footer,
    big, edge to edge, and the footer's own content (brand, columns, legal
    row, socials, the three dots) sits on top of it. No rules, no fades. */
 html,body{height:auto;overflow:auto}
+body,footer,footer a,footer button{font-family:"Plus Jakarta Sans","Plus Jakarta Sans","Helvetica Neue",Helvetica,Arial,sans-serif}
 body{display:flex;flex-direction:column;min-height:100vh;background:var(--paper);transition:background-color .5s ease,color .5s ease}
-.page{flex:1;display:flex;align-items:flex-end;padding:0 clamp(24px,6vw,96px) 56px}
-.page .label{font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);font-weight:600}
-.page h1{font:500 clamp(28px,4vw,44px)/1.12 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:-.01em;margin:12px 0 0;max-width:22ch}
-.page p{font-size:16px;line-height:1.6;color:var(--ink2);margin:16px 0 0;max-width:52ch}
 
-footer{position:relative;min-height:max(620px,78vh);display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+footer{position:relative;flex:1;min-height:max(620px,100vh);display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
 /* the band is the whole footer, behind */
 .band{position:absolute;inset:0;z-index:0}
 .cols,.bottom{position:relative;z-index:1}
 /* the columns, on the image */
 .cols{display:grid;grid-template-columns:1.6fr repeat(4,1fr);gap:32px;padding:56px clamp(24px,6vw,96px) 0}
 .brand{display:grid;gap:14px;align-content:start}
-.brand .mark{font:500 18px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:-.01em;color:var(--ink)}
+.brand .mark{font:500 18px/1 "Plus Jakarta Sans","Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:-.01em;color:var(--ink)}
 .brand p{margin:0;font-size:13px;line-height:1.55;color:var(--ink2);max-width:30ch}
-.col h4{margin:0 0 14px;font:600 10.5px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+.col h4{margin:0 0 14px;font:600 10.5px/1 "Plus Jakarta Sans","Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
 .col a{display:block;font-size:13.5px;line-height:2;color:var(--ink2);text-decoration:none;transition:color .18s ease}
 .col a:hover{color:var(--ink)}
 /* the bottom row: copyright, legal, social, and the three dots */
@@ -46,20 +46,13 @@ footer{position:relative;min-height:max(620px,78vh);display:flex;flex-direction:
 @media(max-width:480px){.cols{grid-template-columns:1fr}.bottom{justify-content:flex-start}}
 </style>
 
-<main class="page">
-  <div>
-    <div class="label">Work to Die</div>
-    <h1>The page ends. The commute does not.</h1>
-    <p>A stand-in page, so the footer sits where a footer sits. The footer is one frame: six of him walking through it, the links on top, the three dots the only control.</p>
-  </div>
-</main>
 
 <footer>
   <div class="band" id="band"></div>
   <div class="cols">
     <div class="brand">
-      <div class="mark">Work to Die</div>
-      <p>The social network for people with a job. Connect with everyone walking the same way, every morning, forever.</p>
+      <div class="mark">Out of Office</div>
+      <p>A social app for people who are never actually out of office. Keep in touch with everyone who&rsquo;s also still working.</p>
     </div>
     <div class="col"><h4>Product</h4><a href="#">Feed</a><a href="#">Jobs</a><a href="#">Endorsements</a><a href="#">Burnout tracker</a><a href="#">Premium</a></div>
     <div class="col"><h4>Company</h4><a href="#">About</a><a href="#">Careers, obviously</a><a href="#">Press</a><a href="#">Brand</a><a href="#">Contact</a></div>
@@ -67,7 +60,7 @@ footer{position:relative;min-height:max(620px,78vh);display:flex;flex-direction:
     <div class="col"><h4>Legal</h4><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a><a href="#">Accessibility</a><a href="#">Do not sell my data</a></div>
   </div>
   <div class="bottom">
-    <div class="legal"><span>&copy; 2026 Work to Die, Inc.</span><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Sitemap</a></div>
+    <div class="legal"><span>&copy; 2026 Out of Office, Inc.</span><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Sitemap</a></div>
     <div class="right">
       <div class="social" aria-label="Social">
         <a href="#" aria-label="X"><svg viewBox="0 0 24 24"><path d="M17.5 3h3l-7.1 8.1L21.7 21h-6.3l-4.9-6.4L4.8 21h-3l7.6-8.7L1.5 3H8l4.5 5.9L17.5 3zm-1.1 16.2h1.7L7 4.7H5.2l11.2 14.5z"/></svg></a>
@@ -81,7 +74,7 @@ footer{position:relative;min-height:max(620px,78vh);display:flex;flex-direction:
   </div>
 </footer>
 
-<script>window.LAB_MOUNT = '#band'; window.DREAM_SET = [1, 3, 4]; window.DREAM_FIT = 6; window.DREAM_FLAT = true; window.DREAM_HEIGHT = 0.5; window.LAB_GROUND = 0.8;</script>
+<script>window.LAB_MOUNT = '#band'; window.DREAM_SET = [1, 3, 4]; window.DREAM_FIT = 6; window.DREAM_FLAT = true; window.DREAM_HEIGHT = 0.5; window.LAB_GROUND = 0.8; window.LAB_DPR = 1;   // the frame is soft anyway; half the pixels, twice the frames</script>
 <script src="gait.js"></script>
 <script src="figure.js"></script>
 <script src="shade.js"></script>

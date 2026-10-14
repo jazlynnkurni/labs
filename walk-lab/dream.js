@@ -72,7 +72,10 @@ function buildLine(lab) {
   const lead = lab.walker;
   men = [lead];
   const spacing = spacingOf(lab);
-  const behind = window.DREAM_FIT ? window.DREAM_FIT : Math.max(BEHIND, Math.ceil((lab.W + lead.H * 2.4) / spacing));
+  // a fitted line needs enough men that the one entering is still fully off
+  // the left edge when the one leaving is fully off the right: count >= N + 2mN/W
+  const m = lead.H * 0.35;
+  const behind = window.DREAM_FIT ? Math.ceil(window.DREAM_FIT + 2 * m * window.DREAM_FIT / lab.W) : Math.max(BEHIND, Math.ceil((lab.W + lead.H * 2.4) / spacing));
   if (window.DREAM_FIT) lead.place(lab.W + lead.H * 0.3);   // the lead starts at the exit, the frame full
   for (let k = 1; k <= behind; k++) {
     const w = new Gait.Walker({ H: lead.H, period: lead.period, lean: lead.lean, life: lead.life, ground: lead.ground, t: ((lead.t - k / (BEHIND + 1)) % 1 + 1) % 1 });
@@ -87,17 +90,25 @@ function stepLine(lab, dt) {
   for (let i = 1; i < men.length; i++) men[i].step(dt);
   for (const w of men) {
     if (w.hipX() > W + m) {
+      // he leaves on the right and rejoins at the back. His echoes keep
+      // draining off the right edge from where he was (oldX0) for as long
+      // as they lag, while the new him grows a fresh trail on the left
+      w.oldX0 = w.x0; w.wrapAt = lab.time;
       const back = Math.min(...men.map((o) => o.hipX()));
       w.place(back - spacing);
     }
   }
 }
 
-function past(w, secondsBack) {
+function past(w, secondsBack, now) {
   const back = secondsBack / w.period;
   let t = w.t - back, c = w.cycles;
   while (t < 0) { t += 1; c -= 1; }
+  // an echo older than his last wrap belongs to where he was, not where he is
+  const stale = w.wrapAt != null && now != null && (now - w.wrapAt) < secondsBack;
+  const keep = w.x0; if (stale) w.x0 = w.oldX0;
   const P = w.poseAt(t, c);
+  w.x0 = keep;
   P.case = w.casePoints(P, w.caseTheta * 0.6);
   return P;
 }
@@ -120,12 +131,16 @@ lab.start({
     fx.clearRect(0, 0, W, H);
 
     stepLine(lab, dt);
-    // the echoes of the first man only, oldest first, further back and fainter
+    // every man trails his own echoes, oldest first, further back and fainter.
+    // Each depth is drawn sharp into a scratch layer and blurred once, so the
+    // cost is three blurs a frame however many men there are
+    const E = lab.layer('echo').ctx;
     for (let i = ECHOES.length - 1; i >= 0; i--) {
-      const P = past(w, ECHOES[i]);
+      E.clearRect(0, 0, W, H);
+      for (const man of men) Figure.silhouette(E, past(man, ECHOES[i], lab.time), pal.echo);
       fx.globalAlpha = 0.14 - i * 0.035;
       fx.filter = `blur(${2 + i * 3}px)`;
-      Figure.silhouette(fx, P, pal.echo);
+      fx.drawImage(lab.layer('echo').canvas, 0, 0, W, H);
     }
     fx.filter = 'none'; fx.globalAlpha = 1;
 
@@ -153,7 +168,7 @@ lab.start({
 
     ctx.save();
     ctx.globalCompositeOperation = pal.blend;
-    ctx.filter = 'blur(28px)'; ctx.globalAlpha = 0.5; ctx.drawImage(F.canvas, 0, 0, W, H);
+    ctx.filter = 'blur(22px)'; ctx.globalAlpha = 0.5; ctx.drawImage(F.canvas, 0, 0, W, H);
     ctx.filter = 'blur(9px)'; ctx.globalAlpha = 0.6; ctx.drawImage(F.canvas, 0, 0, W, H);
     ctx.filter = 'none'; ctx.globalAlpha = 1; ctx.drawImage(F.canvas, 0, 0, W, H);
     ctx.restore();

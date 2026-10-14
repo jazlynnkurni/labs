@@ -1,0 +1,21 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>walk lab: three</title>
+<link rel="stylesheet" href="lab.css">
+<style>
+/* Just the animation: three of him across the whole window, each with his
+   shadow following. No chrome, no panel, no dots. ?p=1|3|4 picks the
+   colourway (riso red, nocturne, jade); otherwise the last one chosen on
+   the dream page. */
+html,body{height:100%;overflow:hidden}
+body{background:var(--paper);transition:background-color .5s ease}
+#frame{position:absolute;inset:0}
+</style>
+<div id="frame"></div>
+<script>window.LAB_MOUNT = '#frame'; window.DREAM_SET = [1, 3, 4]; window.DREAM_FIT = 3; window.DREAM_FLAT = true; window.DREAM_HEIGHT = 0.5; window.LAB_GROUND = 0.78; window.LAB_DPR = 1;</script>
+<script src="gait.js"></script>
+<script src="figure.js"></script>
+<script src="shade.js"></script>
+<script src="lab.js"></script>
+<script src="dream.js"></script>
