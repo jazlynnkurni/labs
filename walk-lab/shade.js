@@ -178,7 +178,7 @@
     /* load shade.json next to the page if it exists; silent if not */
     async load() {
       try {
-        const r = await fetch('shade.json?' + Date.now(), { cache: 'no-store' });
+        const r = await fetch((window.SHADE_URL || 'shade.json') + '?' + Date.now(), { cache: 'no-store' });
         if (r.ok) { const j = await r.json(); if (j && j.torso) PARTS = j; }
       } catch (e) { /* no saved shape yet */ }
       return PARTS;
