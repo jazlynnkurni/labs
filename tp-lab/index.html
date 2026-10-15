@@ -1,0 +1,448 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>tp lab: toilet paper renaissance</title>
+<style>
+body.bare .top,body.bare .pats,body.bare .panel{display:none}
+/* A painting printed on embossed toilet paper. One WebGL2 shader does the
+   whole thing: the picture is softened and lifted the way ink sits on
+   tissue, striated with crepe fibre, doubled a hair by the second ply, then
+   pressed with one of five emboss patterns whose dots catch a raking light.
+   Drop any painting on it. */
+:root{--paper:#FAF9F7;--ink:#14171B;--ink2:rgba(20,23,27,.66);--ink3:rgba(20,23,27,.42);--hair:rgba(20,23,27,.14);--touch:#4c5be4}
+html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);font:400 13px/1.5 "Helvetica Neue",Helvetica,Arial,sans-serif;overflow:hidden}
+#stage{position:fixed;inset:0;display:block}
+.top{position:fixed;left:24px;top:20px;z-index:5;display:flex;align-items:baseline;gap:10px;pointer-events:none}
+.top a{pointer-events:auto;color:var(--ink2);text-decoration:none}.top a:hover{color:var(--touch)}
+.top .sep{color:var(--ink3)}.top .name{color:var(--ink);font-weight:500}.top .blurb{color:var(--ink3);margin-left:8px;max-width:46ch}
+.dock{position:fixed;left:24px;bottom:20px;z-index:5;display:flex;flex-direction:column;align-items:flex-start;gap:8px;max-width:calc(100vw - 360px)}
+.pats{display:flex;flex-wrap:wrap;gap:4px;padding:6px;border-radius:24px;background:#fff;box-shadow:0 1px 2px rgba(20,23,27,.04),0 6px 20px rgba(20,23,27,.08)}
+.pats button{font:inherit;font-size:12.5px;padding:8px 14px;border-radius:999px;border:0;background:transparent;color:var(--ink2);cursor:pointer}
+.pats button:hover{background:rgba(20,23,27,.05);color:var(--ink)}
+.pats button.on{background:var(--ink);color:#fff}
+.panel{position:fixed;right:20px;bottom:20px;z-index:5;display:grid;gap:6px;padding:12px 14px;border-radius:14px;background:#fff;box-shadow:0 1px 2px rgba(20,23,27,.04),0 6px 20px rgba(20,23,27,.08)}
+.panel label{display:grid;grid-template-columns:56px 120px 44px;align-items:center;gap:10px;font-size:12px;color:var(--ink2)}
+.panel label b{font-weight:400;color:var(--ink);font-variant-numeric:tabular-nums;text-align:right}
+.panel input[type=range]{width:120px;accent-color:var(--ink);margin:0}
+.panel .row{display:flex;gap:6px;margin-top:4px}
+.panel .row button,.panel .row label.btn{font:inherit;font-size:12px;padding:7px 11px;border-radius:999px;border:1px solid var(--hair);background:#fff;color:var(--ink);cursor:pointer;display:inline-block}
+.panel .row button:hover,.panel .row label.btn:hover{background:rgba(20,23,27,.05)}
+.panel input[type=file]{display:none}
+.drop{position:fixed;inset:0;z-index:4;display:none;place-items:center;background:rgba(250,249,247,.7);font-size:15px;color:var(--ink2);pointer-events:none}
+.drop.on{display:grid}
+</style>
+<canvas id="stage"></canvas>
+<header class="top"><a href="../walk-lab/">labs</a><span class="sep">/</span><span class="name">toilet paper renaissance</span><span class="blurb">drop a painting anywhere, drag and scroll to crop it; ten embossings; everything is a slider</span></header>
+<div class="drop" id="drop">drop the painting</div>
+<div class="dock"><div class="pats paints" id="paints"></div><div class="pats" id="pats"></div></div>
+<div class="panel" id="panel"></div>
+<script>
+/* ---------- the shader ---------- */
+const VS = `#version 300 es
+in vec2 p; out vec2 v; void main(){ v = p * 0.5 + 0.5; gl_Position = vec4(p, 0.0, 1.0); }`;
+
+const FS = `#version 300 es
+precision highp float;
+in vec2 v; out vec4 o;
+uniform sampler2D uImg;
+uniform vec2 uRes, uImgRes;
+uniform int uPattern;
+uniform float uScale, uDot, uDepth, uLight, uSoft, uGrain, uPly, uLift, uWarm, uTime, uCrease, uCreaseA, uCreaseX, uZoom;
+uniform vec2 uPan;
+
+/* ---- helpers ---- */
+float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
+  return mix(mix(hash(i), hash(i+vec2(1,0)), f.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), f.x), f.y); }
+mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
+
+/* a lattice of round dimples, pitch d (px), as a 0..1 bump field. Hex-staggered
+   so chains of dots along a curve read as beads, not a grid */
+float dots(vec2 q, float d, float r){
+  q.x += d * 0.5 * floor(mod(floor(q.y / (d * 0.866)), 2.0));
+  vec2 c = vec2(d, d * 0.866);
+  vec2 f = mod(q, c) - c * 0.5;
+  float l = length(f) / d;
+  return 1.0 - smoothstep(r - 0.08, r + 0.08, l);
+}
+
+/* ---- the five emboss curve fields: each returns a 0..1 band mask (where
+   the dots are pressed) and a soft quilt height (where the ply pillows) ---- */
+float band(float d, float w){ return 1.0 - smoothstep(w, w + 0.025, d); }
+
+/* 1 paisley: looped teardrop scrolls in a staggered lattice, domain warped */
+vec2 paisley(vec2 p){
+  vec2 w = p + 0.22 * vec2(sin(p.y * 2.1 + 0.6), cos(p.x * 1.7));
+  vec2 c = vec2(1.0, 1.0);
+  w.x += 0.5 * floor(mod(floor(w.y), 2.0));
+  vec2 f = mod(w, c) - 0.5;
+  float r = length(f * vec2(1.0, 1.35));
+  float rings = abs(fract(r * 3.2 + 0.15) - 0.5) * 2.0 / 3.2;
+  float m = band(rings, 0.028) * (1.0 - smoothstep(0.42, 0.5, r));
+  // the tail of each drop: a curl leaving the loop
+  float tail = band(abs(f.y - 0.42 - 0.18 * sin(f.x * 9.0)), 0.025) * step(abs(f.x), 0.3);
+  float quilt = 0.5 + 0.5 * cos(p.x * 3.1416) * cos(p.y * 3.1416);
+  return vec2(max(m, tail), quilt);
+}
+/* 2 quilted lozenge: a diamond lattice stitched in dots, a leaf in every cell */
+vec2 lozenge(vec2 p){
+  vec2 r = rot(0.7854) * p;
+  vec2 f = mod(r, 1.0) - 0.5;
+  float grid = min(abs(f.x), abs(f.y)) * 0.7071;
+  float m = band(grid, 0.02);
+  // a leaf: two arcs meeting, outlined
+  vec2 g = fract(p) - 0.5; g = rot(0.785) * g * 2.4;
+  float leaf = abs(length(g - vec2(0.35, 0.0)) - 0.5) - 0.0;
+  float leaf2 = abs(length(g + vec2(0.35, 0.0)) - 0.5);
+  float lf = band(min(leaf, leaf2), 0.03) * step(abs(g.y), 0.45) * step(abs(g.x), 0.22);
+  float vein = band(abs(g.y), 0.02) * step(abs(g.x), 0.2);
+  float quilt = 0.5 + 0.5 * cos(r.x * 6.2832) * cos(r.y * 6.2832);
+  return vec2(max(m, max(lf, vein)), quilt);
+}
+/* 3 stitched waves: rows of wavy running stitch with a floret between */
+vec2 waves(vec2 p){
+  float row = p.y - 0.18 * sin(p.x * 4.2);
+  float m = band(abs(fract(row) - 0.5), 0.022);
+  // floret every other cell, six petals of dots
+  vec2 c = vec2(fract(p.x * 0.5 + 0.25) - 0.5, fract(row + 0.5) - 0.5) * vec2(2.0, 1.0);
+  float a = atan(c.y, c.x), rr = length(c);
+  float fl = band(abs(rr - (0.16 + 0.07 * cos(a * 6.0))), 0.03) * step(rr, 0.32);
+  float quilt = 0.5 + 0.5 * cos(row * 6.2832);
+  return vec2(max(m, fl), quilt);
+}
+/* 4 micro honeycomb pillow: dense dimples everywhere, a big soft quilt
+   underneath, and a sparse scroll pressed through both plies */
+vec2 pillow(vec2 p){
+  vec2 w = p + 0.15 * vec2(sin(p.y * 3.0), sin(p.x * 3.3));
+  vec2 f = mod(w, 2.0) - 1.0;
+  float r = length(f);
+  float scroll = band(abs(r - 0.55), 0.03) + band(abs(r - 0.3 + 0.12 * sin(atan(f.y, f.x) * 3.0)), 0.025);
+  float quilt = 0.5 + 0.5 * cos(p.x * 3.14) * cos(p.y * 3.14);
+  return vec2(clamp(scroll, 0.0, 1.0), quilt);
+}
+/* 5 floral scroll: log spirals in a lattice, florets at the eyes */
+vec2 floral(vec2 p){
+  vec2 c = vec2(1.0);
+  vec2 p0 = p;
+  p.x += 0.5 * floor(mod(floor(p.y), 2.0));
+  vec2 f = mod(p, c) - 0.5;
+  float r = length(f), a = atan(f.y, f.x);
+  float sp = abs(fract(a / 6.2832 + log(max(r, 0.02)) * 1.1) - 0.5) * 2.0;
+  float m = band(sp * 0.12, 0.028) * smoothstep(0.08, 0.14, r) * (1.0 - smoothstep(0.42, 0.5, r));
+  float fl = band(abs(r - (0.07 + 0.03 * cos(a * 5.0))), 0.025);
+  float quilt = 0.5 + 0.5 * cos(p0.x * 6.2832) * cos(p0.y * 6.2832);
+  return vec2(max(m, fl), quilt);
+}
+
+/* 6 hearts: little hearts in a staggered lattice, a dotted diagonal between */
+float heartF(vec2 g){ float x = g.x, y = g.y; float a = x * x + y * y - 1.0; return a * a * a - x * x * y * y * y; }
+vec2 hearts(vec2 p){
+  vec2 q = p; q.x += 0.5 * floor(mod(floor(q.y), 2.0));
+  vec2 g = (fract(q) - 0.5) * 2.6; g.y = -g.y + 0.1;
+  float f = heartF(g);
+  float e = 0.01;
+  float gx = (heartF(g + vec2(e, 0.0)) - heartF(g - vec2(e, 0.0))) / (2.0 * e);
+  float gy = (heartF(g + vec2(0.0, e)) - heartF(g - vec2(0.0, e))) / (2.0 * e);
+  float d = abs(f) / max(length(vec2(gx, gy)), 0.3);
+  float m = band(d * 0.4, 0.025) * step(length(g), 1.6);
+  vec2 r = rot(0.7854) * p;
+  float diag = band(min(abs(fract(r.x) - 0.5), abs(fract(r.y) - 0.5)) * 0.7071, 0.012) * (1.0 - step(length(g), 1.5));
+  float quilt = 0.5 + 0.5 * cos(p.x * 6.2832) * cos(p.y * 6.2832);
+  return vec2(max(m, diag * 0.8), quilt);
+}
+/* 7 clover: quatrefoils in a lattice, the lattice itself a running stitch */
+vec2 clover(vec2 p){
+  vec2 q = p; q.x += 0.5 * floor(mod(floor(q.y), 2.0));
+  vec2 g = fract(q) - 0.5;
+  float rr = 0.17;
+  float d = min(min(length(g - vec2(0.15, 0.0)), length(g + vec2(0.15, 0.0))), min(length(g - vec2(0.0, 0.15)), length(g + vec2(0.0, 0.15)))) - rr;
+  float m = band(abs(d), 0.025);
+  float stem = band(length(g), 0.03);
+  float lat = band(min(abs(g.x), abs(g.y)), 0.014) * step(0.36, length(g));
+  float quilt = 0.5 + 0.5 * cos(p.x * 6.2832) * cos(p.y * 6.2832);
+  return vec2(max(max(m, stem), lat), quilt);
+}
+/* 8 honeycomb: hexagonal cells outlined in dots, the classic micro emboss */
+float hexDist(vec2 p){ p = abs(p); return max(dot(p, vec2(0.866, 0.5)), p.x); }
+vec2 honeycomb(vec2 p){
+  vec2 r = vec2(1.0, 1.732), h = r * 0.5;
+  vec2 a = mod(p, r) - h, b = mod(p - h, r) - h;
+  vec2 gv = dot(a, a) < dot(b, b) ? a : b;
+  float edge = 0.5 - hexDist(gv);
+  float m = band(edge, 0.04);
+  float quilt = 0.5 + 0.5 * cos(edge * 6.0);
+  return vec2(m, quilt);
+}
+/* 9 ribs: fine linear ribbing, the cheap single ply, with ovals scattered through */
+vec2 ribs(vec2 p){
+  float m = band(abs(fract(p.y * 5.0) - 0.5) * 0.2, 0.012);
+  vec2 q = p * vec2(0.5, 1.0); q.x += 0.5 * floor(mod(floor(q.y * 0.5), 2.0));
+  vec2 g = (fract(q * vec2(1.0, 0.5)) - 0.5) * vec2(2.0, 2.0);
+  float ov = band(abs(length(g * vec2(1.0, 1.8)) - 0.42), 0.035);
+  float quilt = 0.5 + 0.5 * cos(p.y * 3.1416);
+  return vec2(max(m * 0.9, ov), quilt);
+}
+/* 10 rings: concentric circles nested in a square quilt, Quilted Northern's grammar */
+vec2 rings(vec2 p){
+  vec2 g = fract(p) - 0.5;
+  float r = length(g);
+  float m = band(abs(fract(r * 4.0 + 0.5) - 0.5) / 4.0, 0.022) * step(r, 0.42);
+  float grid = band(min(abs(g.x), abs(g.y)), 0.014) * step(0.42, r);
+  float quilt = 0.5 + 0.5 * cos(p.x * 6.2832) * cos(p.y * 6.2832);
+  return vec2(max(m, grid), quilt);
+}
+
+vec2 field(vec2 p){
+  if (uPattern == 0) return paisley(p);
+  if (uPattern == 1) return lozenge(p);
+  if (uPattern == 2) return waves(p);
+  if (uPattern == 3) return pillow(p);
+  if (uPattern == 4) return floral(p);
+  if (uPattern == 5) return hearts(p);
+  if (uPattern == 6) return clover(p);
+  if (uPattern == 7) return honeycomb(p);
+  if (uPattern == 8) return ribs(p);
+  return rings(p);
+}
+
+/* a fold across the sheet: signed distance (px) to the crease line, which
+   runs through (uCreaseX of the width, mid height) at angle uCreaseA */
+float crease(vec2 px){
+  vec2 c = vec2(uCreaseX * uRes.x, uRes.y * 0.5);
+  vec2 nrm = vec2(cos(uCreaseA), sin(uCreaseA));
+  // the line wanders a little, a real fold is never ruled
+  float wobble = (vnoise(px * 0.004 + 7.0) - 0.5) * 18.0;
+  return dot(px - c, nrm) + wobble;
+}
+
+/* the full height map at a pixel: beads of dots along the curve, over a
+   soft quilt, pressed flat where the sheet was folded. Returns height 0..1 */
+float height(vec2 px){
+  vec2 p = px / uScale;
+  vec2 f = field(p);
+  float bead = dots(px, uDot, uPattern == 3 ? 0.34 : 0.3);
+  float micro = uPattern == 3 ? 0.35 * dots(px + 3.0, uDot * 0.5, 0.3) : 0.0;
+  float h = f.x * bead + 0.14 * f.y + micro;
+  float d = crease(px);
+  float pressed = 1.0 - 0.85 * uCrease * exp(-d * d / 180.0);   // flat is a GLSL keyword
+  return h * pressed;
+}
+
+void main(){
+  vec2 px = v * uRes;
+  // cover-fit the painting
+  float sc = max(uRes.x / uImgRes.x, uRes.y / uImgRes.y);
+  vec2 fit = uImgRes * sc;
+  vec2 uv = (px - (uRes - fit) * 0.5) / fit;
+  uv.y = 1.0 - uv.y;
+  // the crop: the print is zoomed about its centre and panned under the paper
+  uv = (uv - 0.5) / uZoom + 0.5 + uPan;
+
+  // emboss: height and its slope by finite differences
+  float e = 1.0;
+  float h = height(px);
+  float hx = (height(px + vec2(e, 0.0)) - height(px - vec2(e, 0.0))) * 0.5;
+  float hy = (height(px + vec2(0.0, e)) - height(px - vec2(0.0, e))) * 0.5;
+  vec3 n = normalize(vec3(-hx * uDepth * 14.0, -hy * uDepth * 14.0, 1.0));
+  vec3 L = normalize(vec3(cos(uLight), sin(uLight), 0.85));
+  float diff = max(dot(n, L), 0.0);
+  vec3 V = vec3(0.0, 0.0, 1.0);
+  float spec = pow(max(dot(normalize(L + V), n), 0.0), 24.0);
+
+  // the fold: the two halves meet the light differently, the valley is
+  // dark, the crest beside it catches the light, the fibres break along it,
+  // and the print buckles across it
+  float cd = crease(px);
+  vec2 cn = vec2(cos(uCreaseA), sin(uCreaseA));
+  float side = cd > 0.0 ? 1.0 : -1.0;
+  float valley = exp(-cd * cd / 14.0);
+  float crest = exp(-(cd - 6.0) * (cd - 6.0) / 30.0);
+  float nearFold = exp(-abs(cd) / 26.0);
+  // the paper stretches over the emboss, so the print warps with it
+  vec2 warp = vec2(hx, hy) * uDepth * 0.005 + cn * side * nearFold * 0.004 * uCrease;
+  vec3 img = textureLod(uImg, uv + warp, uSoft).rgb;
+  // the second ply, misregistered a hair, showing through
+  vec3 ply = textureLod(uImg, uv + warp + vec2(0.0035, -0.002) * uPly, uSoft + 1.0).rgb;
+  img = mix(img, ply, 0.35 * uPly);
+  // ink on tissue: no true black, a little less colour, a warm paper white
+  float lum = dot(img, vec3(0.299, 0.587, 0.114));
+  img = mix(vec3(lum), img, 0.9);
+  vec3 paper = mix(vec3(0.985, 0.975, 0.96), vec3(0.97, 0.93, 0.86), uWarm);
+  img = paper * (uLift + (1.0 - uLift) * img);
+  // crepe: fine fibre striations across the sheet, plus a soft mottle
+  float crepe = vnoise(vec2(px.x * 0.35, px.y * 2.6)) * 0.6 + vnoise(vec2(px.x * 1.4, px.y * 9.0)) * 0.4;
+  float mottle = vnoise(px * 0.03);
+  img *= 1.0 + uGrain * (crepe - 0.5) * 0.5 + uGrain * (mottle - 0.5) * 0.2;
+  // the emboss lit: shadow in the pits, a rim on the lit side
+  float lit = 0.7 + 0.3 * diff;
+  img *= lit;
+  img *= 1.0 + uCrease * (0.07 * side - 0.3 * valley + 0.16 * crest);
+  img *= 1.0 + uCrease * nearFold * (vnoise(vec2(px.x * 0.6, px.y * 3.0)) - 0.5) * 0.5;
+  img *= 1.0 - 0.18 * uDepth * clamp(h, 0.0, 1.0);
+  img += spec * 0.3 * uDepth * (0.4 + 0.6 * h);
+  o = vec4(clamp(img, 0.0, 1.0), 1.0);
+}`;
+
+/* ---------- the page ---------- */
+const $ = (s) => document.querySelector(s);
+const canvas = $('#stage');
+const gl = canvas.getContext('webgl2', { preserveDrawingBuffer: true, antialias: false });
+function sh(t, s) { const h = gl.createShader(t); gl.shaderSource(h, s); gl.compileShader(h); if (!gl.getShaderParameter(h, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(h)); document.title = 'SHADER ' + gl.getShaderInfoLog(h).slice(0, 120); } return h; }
+const prog = gl.createProgram(); gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(prog); gl.useProgram(prog);
+const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+const U = {}; for (const n of ['uImg', 'uRes', 'uImgRes', 'uPattern', 'uScale', 'uDot', 'uDepth', 'uLight', 'uSoft', 'uGrain', 'uPly', 'uLift', 'uWarm', 'uTime', 'uCrease', 'uCreaseA', 'uCreaseX', 'uZoom', 'uPan']) U[n] = gl.getUniformLocation(prog, n);
+
+const tex = gl.createTexture();
+let imgRes = [1, 1];
+function setImage(img) {
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+  gl.generateMipmap(gl.TEXTURE_2D);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  imgRes = [img.naturalWidth || img.width, img.naturalHeight || img.height];
+  view.zoom = 1; view.x = 0; view.y = 0; const zv = document.getElementById('zoomV'); if (zv) zv.textContent = '1.00x';
+  draw();
+}
+
+/* the five embossings, each with the numbers it looks best at */
+const PATTERNS = [
+  { name: 'paisley', scale: 150, dot: 9, depth: 1.1 },
+  { name: 'quilted', scale: 120, dot: 8, depth: 1.0, crease: 0.9 },
+  { name: 'stitch', scale: 110, dot: 8, depth: 0.9 },
+  { name: 'pillow', scale: 160, dot: 10, depth: 1.2 },
+  { name: 'floral', scale: 140, dot: 8, depth: 1.0 },
+  { name: 'hearts', scale: 90, dot: 7, depth: 1.1 },
+  { name: 'clover', scale: 100, dot: 7, depth: 1.0 },
+  { name: 'honeycomb', scale: 70, dot: 7, depth: 1.0 },
+  { name: 'ribs', scale: 120, dot: 6, depth: 0.9 },
+  { name: 'rings', scale: 110, dot: 7, depth: 1.0 },
+];
+const S = { pattern: 0, scale: 150, dot: 9, depth: 1.1, light: 2.2, soft: 1.6, grain: 0.55, ply: 0.6, lift: 0.22, warm: 0.5, crease: 0, creaseA: 0.2, creaseX: 0.58 };
+const q = new URLSearchParams(location.search); if (q.get('p')) S.pattern = +q.get('p');
+if (q.get('bare')) document.body.classList.add('bare');
+const URL_OVERRIDES = {}; for (const k of Object.keys(S)) if (q.get(k) != null && k !== 'pattern') URL_OVERRIDES[k] = +q.get(k);
+
+function resize() {
+  const dpr = Math.min(2, devicePixelRatio || 1);
+  canvas.width = Math.round(innerWidth * dpr); canvas.height = Math.round(innerHeight * dpr);
+  canvas.style.width = innerWidth + 'px'; canvas.style.height = innerHeight + 'px';
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  draw();
+}
+function draw() {
+  const dpr = canvas.width / innerWidth;
+  gl.uniform1i(U.uImg, 0);
+  gl.uniform2f(U.uRes, canvas.width, canvas.height);
+  gl.uniform2f(U.uImgRes, imgRes[0], imgRes[1]);
+  gl.uniform1i(U.uPattern, S.pattern);
+  gl.uniform1f(U.uScale, S.scale * dpr);
+  gl.uniform1f(U.uDot, S.dot * dpr);
+  gl.uniform1f(U.uDepth, S.depth);
+  gl.uniform1f(U.uLight, S.light);
+  gl.uniform1f(U.uSoft, S.soft);
+  gl.uniform1f(U.uGrain, S.grain);
+  gl.uniform1f(U.uPly, S.ply);
+  gl.uniform1f(U.uLift, S.lift);
+  gl.uniform1f(U.uWarm, S.warm);
+  gl.uniform1f(U.uCrease, S.crease);
+  gl.uniform1f(U.uCreaseA, S.creaseA);
+  gl.uniform1f(U.uCreaseX, S.creaseX);
+  gl.uniform1f(U.uZoom, view.zoom);
+  gl.uniform2f(U.uPan, view.x, view.y);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+}
+
+/* the pattern row */
+const pats = $('#pats');
+PATTERNS.forEach((p, i) => { const b = document.createElement('button'); b.textContent = p.name; b.onclick = () => pick(i); pats.appendChild(b); });
+function pick(i) {
+  S.pattern = i; Object.assign(S, { scale: PATTERNS[i].scale, dot: PATTERNS[i].dot, depth: PATTERNS[i].depth, crease: PATTERNS[i].crease || 0 });
+  Object.assign(S, URL_OVERRIDES);
+  pats.querySelectorAll('button').forEach((b, j) => b.classList.toggle('on', j === i));
+  syncPanel(); draw();
+  history.replaceState(null, '', '?p=' + i);
+}
+
+/* the panel */
+const SLIDERS = [
+  ['scale', 'pattern', 40, 320, 1, (v) => v + 'px'],
+  ['dot', 'dot pitch', 4, 20, 0.5, (v) => v + 'px'],
+  ['depth', 'emboss', 0, 2.5, 0.05, (v) => v.toFixed(2)],
+  ['light', 'light', 0, 6.283, 0.02, (v) => Math.round(v * 57.3) + '°'],
+  ['soft', 'softness', 0, 4, 0.1, (v) => v.toFixed(1)],
+  ['grain', 'crepe', 0, 1, 0.02, (v) => Math.round(v * 100) + '%'],
+  ['ply', 'second ply', 0, 1, 0.02, (v) => Math.round(v * 100) + '%'],
+  ['lift', 'ink lift', 0, 0.6, 0.01, (v) => Math.round(v * 100) + '%'],
+  ['warm', 'paper', 0, 1, 0.02, (v) => Math.round(v * 100) + '%'],
+  ['crease', 'fold', 0, 1, 0.02, (v) => Math.round(v * 100) + '%'],
+  ['creaseA', 'fold angle', -1.57, 1.57, 0.02, (v) => Math.round(v * 57.3) + '\u00b0'],
+  ['creaseX', 'fold at', 0.05, 0.95, 0.01, (v) => Math.round(v * 100) + '%'],
+];
+const panel = $('#panel');
+panel.innerHTML = SLIDERS.map(([k, label, a, b, st, fmt]) => `<label><span>${label}</span><input id="s-${k}" type="range" min="${a}" max="${b}" step="${st}" value="${S[k]}"><b id="v-${k}">${fmt(S[k])}</b></label>`).join('') +
+  `<label><span>crop</span><span style="color:var(--ink3)">drag, scroll to zoom</span><b id="zoomV">1.00x</b></label>` +
+  `<div class="row"><label class="btn" for="file">painting</label><input id="file" type="file" accept="image/*"><button id="reset">reset crop</button><button id="save">save png</button></div>`;
+SLIDERS.forEach(([k, , , , , fmt]) => { const i = $('#s-' + k); i.addEventListener('input', () => { S[k] = +i.value; $('#v-' + k).textContent = fmt(S[k]); draw(); }); });
+function syncPanel() { SLIDERS.forEach(([k, , , , , fmt]) => { $('#s-' + k).value = S[k]; $('#v-' + k).textContent = fmt(S[k]); }); }
+
+/* the crop: drag the painting under the paper, wheel or pinch to zoom about
+   the pointer, double click to reset. What is on screen is what saves. */
+const view = { zoom: 1, x: 0, y: 0 };
+function fitPx() { const dpr = canvas.width / innerWidth; const sc = Math.max(canvas.width / imgRes[0], canvas.height / imgRes[1]); return [imgRes[0] * sc / dpr, imgRes[1] * sc / dpr]; }
+function clampView() {
+  // never pan past the edge of the print
+  const lim = Math.max(0, 0.5 - 0.5 / view.zoom);
+  view.x = Math.max(-lim, Math.min(lim, view.x)); view.y = Math.max(-lim, Math.min(lim, view.y));
+}
+let dragView = null;
+canvas.addEventListener('pointerdown', (e) => { dragView = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y }; canvas.setPointerCapture(e.pointerId); canvas.style.cursor = 'grabbing'; });
+canvas.addEventListener('pointermove', (e) => {
+  if (!dragView) return;
+  const [fw, fh] = fitPx();
+  view.x = dragView.vx - (e.clientX - dragView.x) / (fw * view.zoom);
+  view.y = dragView.vy - (e.clientY - dragView.y) / (fh * view.zoom);
+  clampView(); draw();
+});
+canvas.addEventListener('pointerup', () => { dragView = null; canvas.style.cursor = 'grab'; });
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const k = Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0025));
+  const z = Math.max(1, Math.min(8, view.zoom * k));
+  // zoom about the pointer: the uv under the cursor stays put
+  const [fw, fh] = fitPx();
+  // uv.y runs 0 at the top of the screen to 1 at the bottom, same as clientY
+  const cx = (e.clientX - (innerWidth - fw) / 2) / fw - 0.5, cy = (e.clientY - (innerHeight - fh) / 2) / fh - 0.5;
+  view.x += cx * (1 / view.zoom - 1 / z);
+  view.y += cy * (1 / view.zoom - 1 / z);
+  view.zoom = z; clampView(); draw();
+  $('#zoomV').textContent = view.zoom.toFixed(2) + 'x';
+}, { passive: false });
+canvas.addEventListener('dblclick', () => { view.zoom = 1; view.x = 0; view.y = 0; draw(); $('#zoomV').textContent = '1.00x'; });
+canvas.style.cursor = 'grab';
+
+/* the painting: default, file, or dropped */
+function loadFile(f) { const img = new Image(); img.onload = () => { setImage(img); URL.revokeObjectURL(img.src); }; img.src = URL.createObjectURL(f); }
+$('#file').addEventListener('change', (e) => { if (e.target.files[0]) loadFile(e.target.files[0]); });
+addEventListener('dragover', (e) => { e.preventDefault(); $('#drop').classList.add('on'); });
+addEventListener('dragleave', () => $('#drop').classList.remove('on'));
+addEventListener('drop', (e) => { e.preventDefault(); $('#drop').classList.remove('on'); const f = e.dataTransfer.files[0]; if (f) { loadFile(f); paints.querySelectorAll('button').forEach((b) => b.classList.remove('on')); } });
+$('#reset').onclick = () => { view.zoom = 1; view.x = 0; view.y = 0; draw(); $('#zoomV').textContent = '1.00x'; };
+$('#save').onclick = () => { draw(); const a = document.createElement('a'); a.download = 'toilet-paper-' + PATTERNS[S.pattern].name + '.png'; a.href = canvas.toDataURL('image/png'); a.click(); };
+
+/* the built-in paintings, Met open access, until she drops her own */
+const PAINTINGS = [['hayez', 'hayez.jpg'], ['botticelli', 'botticelli.jpg'], ['swan', 'swan.jpg'], ['vermeer', 'painting.jpg'], ['raphael', 'raphael.jpg'], ['titian', 'titian.jpg'], ['bronzino', 'bronzino.jpg']];
+const paints = $('#paints');
+PAINTINGS.forEach(([n, f], i) => { const b = document.createElement('button'); b.textContent = n; b.onclick = () => usePainting(i); paints.appendChild(b); });
+function usePainting(i) {
+  paints.querySelectorAll('button').forEach((b, j) => b.classList.toggle('on', j === i));
+  const im = new Image(); im.onload = () => setImage(im); im.src = PAINTINGS[i][1];
+}
+usePainting(+(q.get('a') || 0));
+addEventListener('resize', resize);
+resize(); pick(S.pattern);
+</script>

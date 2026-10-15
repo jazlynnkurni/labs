@@ -3,3 +3,4 @@ __pycache__/
 *.xcuserstate
 xcuserdata/
 DerivedData/
+porcelain-lab/renders/*-quick.png
