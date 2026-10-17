@@ -1,0 +1,63 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>menu lab: orbit</title>
+<link rel="stylesheet" href="menu.css">
+<style>
+/* THE ORBIT. A glass disc in the corner. Reach it and four lenses swing
+   out around it on an arc, from the left round to below, each one an
+   angular spring so it overshoots its bearing and swings back. The lens
+   is a magnifier: the label sits under it and the glass over it, and on
+   hover the lens lifts and the label comes through. */
+.orbit{position:fixed;top:24px;right:28px;z-index:10;width:48px;height:48px}
+.orbit .hub{position:absolute;inset:0;border-radius:50%;cursor:pointer;display:grid;place-items:center}
+.orbit .hub i{width:14px;height:14px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--ink);opacity:.7;transition:transform .5s cubic-bezier(.33,1.18,.37,1)}
+.orbit.open .hub i{transform:scale(1.5);opacity:.35}
+.orbit .lens{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;display:grid;place-items:center;opacity:0;pointer-events:none;will-change:transform,opacity}
+.orbit.open .lens{pointer-events:auto}
+.orbit .lens .l{font-size:11.5px;letter-spacing:.01em;transform:translateY(0)}
+.orbit .lens:hover{background:rgba(255,255,255,.6)}
+.orbit .tip{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--jak);font-size:12.5px;font-weight:500;color:var(--ink);opacity:0;pointer-events:none;white-space:nowrap;transition:opacity .2s ease}
+</style>
+<body data-name="orbit" data-blurb="a disc in the corner; four lenses swing out around it on an arc">
+<nav class="orbit" id="orbit" aria-label="Menu">
+  <a class="lens glass" href="#"><span class="l">Projects</span></a>
+  <a class="lens glass" href="#"><span class="l">Sandbox</span></a>
+  <a class="lens glass" href="#"><span class="l">About</span></a>
+  <a class="lens glass" href="#"><span class="l">Contact</span></a>
+  <button class="hub glass" aria-label="Menu" aria-expanded="false"><i></i></button>
+</nav>
+<script src="spring.js"></script>
+<script src="page.js"></script>
+<script>
+const nav = document.getElementById('orbit'), hub = nav.querySelector('.hub');
+const lenses = [...nav.querySelectorAll('.lens')];
+const R = 112;                                   // orbit radius
+// bearings: from left (180) round to below (90), evenly, in degrees. Screen y runs down, so below is 90, not 270
+const BEAR = lenses.map((_, i) => 180 - (90 / (lenses.length - 1)) * i);
+const ang = lenses.map(() => new Spring(0, { stiffness: 120, damping: 11 }));   // loose, swings past
+const out = lenses.map(() => new Spring(0, { stiffness: 200, damping: 18 }));   // radius, firmer
+let open = false, delays = lenses.map(() => 0), clock = 0;
+function setOpen(o) {
+  if (o === open) return; open = o; nav.classList.toggle('open', o); hub.setAttribute('aria-expanded', String(o));
+  delays = lenses.map((_, i) => clock + stagger(o ? i : lenses.length - 1 - i, lenses.length, 50));
+}
+nav.addEventListener('pointerenter', () => setOpen(true));
+nav.addEventListener('pointerleave', () => setOpen(false));
+hub.addEventListener('click', () => setOpen(!open));
+addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+loop((dt, t) => {
+  clock = t;
+  lenses.forEach((el, i) => {
+    if (t >= delays[i]) { ang[i].to(open ? 1 : 0); out[i].to(open ? 1 : 0); }
+    const a = ang[i].update(dt), r = out[i].update(dt);
+    // each lens starts at the hub's bearing (pointing right, 0 deg) and swings round to its own
+    const deg = BEAR[i] * a, rad = deg * Math.PI / 180;
+    const x = Math.cos(rad) * R * r, y = Math.sin(rad) * R * r;
+    // a little tangential roll as it swings, upright when it settles
+    const roll = (a - Math.min(1, a)) * 40 + (1 - Math.min(1, r)) * -30;
+    el.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) rotate(${roll.toFixed(2)}deg) scale(${(0.6 + 0.4 * Math.min(1, r)).toFixed(3)})`;
+    el.style.opacity = Math.max(0, Math.min(1, r * 1.5)).toFixed(3);
+  });
+});
+</script>

@@ -1,0 +1,31 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>menu lab</title>
+<link rel="stylesheet" href="menu.css">
+<style>
+.wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:96px 24px 80px}
+h1{font:500 32px/1.15 var(--jak);margin:12px 0 0;letter-spacing:-.01em}
+.lede{font-size:16px;line-height:1.6;color:var(--ink2);margin:16px 0 0;max-width:52ch}
+ol{list-style:none;margin:48px 0 0;padding:0;border-top:1px solid var(--hair)}
+li a{display:grid;grid-template-columns:28px 1fr;gap:16px;padding:18px 0;border-bottom:1px solid var(--hair);align-items:baseline}
+li a:hover b{color:var(--touch)}
+li i{font-style:normal;color:var(--ink3);font-variant-numeric:tabular-nums;font-size:12.5px}
+li b{font-weight:500;display:block;font-family:var(--jak)}
+li span{color:var(--ink2);font-size:13.5px;line-height:1.5;display:block;margin-top:2px}
+.note{margin-top:40px;font-size:12.5px;line-height:1.6;color:var(--ink3);max-width:60ch}
+</style>
+<div class="field" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="wrap">
+  <div class="label">Menu lab</div>
+  <h1>Five places a menu could be when you are not looking for it.</h1>
+  <p class="lede">All liquid glass, all springs. Each one hides the same four options and answers the same question differently: where do they live, and how do they arrive.</p>
+  <ol>
+    <li><a href="bead.html"><i>01</i><div><b>Bead</b><span>A drop in the top right corner. Reach it and the options spring out of it to the left, nearest first, while the bead leans into the release.</span></div></a></li>
+    <li><a href="pour.html"><i>02</i><div><b>Pour</b><span>A drop hangs from the top edge. Reach it and it pours sideways into a bar, overshooting its width, the labels surfacing from the centre outward. A bead detaches and falls.</span></div></a></li>
+    <li><a href="orbit.html"><i>03</i><div><b>Orbit</b><span>A disc in the corner. Four lenses swing out around it on an arc, each an angular spring that overshoots its bearing and swings back.</span></div></a></li>
+    <li><a href="tide.html"><i>04</i><div><b>Tide</b><span>A film of glass along the top edge. It bulges up to meet the pointer like a meniscus and the nearest label surfaces in the bulge. Click and the whole tide comes in.</span></div></a></li>
+    <li><a href="split.html"><i>05</i><div><b>Split</b><span>One drop divides. Four droplets pull out of it, stretching liquid necks, each running its own arc to a place along the top, where it clears into glass.</span></div></a></li>
+  </ol>
+  <p class="note">The bead's circle is a shader orb; pick which in <a href="orb/">the orb lab</a>. Hover opens, leaving closes, click pins, Escape closes. Every motion is a damped spring in spring.js, so it can be retargeted mid-flight without a jump.</p>
+</div>

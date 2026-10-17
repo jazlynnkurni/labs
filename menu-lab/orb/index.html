@@ -1,0 +1,53 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>orb lab</title>
+<link rel="stylesheet" href="../menu.css">
+<style>
+/* ORB LAB. The five orbs big, side by side, each a shader sphere with depth
+   and a texture of its own. Move over one and it turns toward you and
+   wakes. Click one and it becomes the bead's circle in the menu lab. */
+body{overflow:auto}
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:96px 24px 80px}
+h1{font:500 32px/1.15 var(--jak);margin:12px 0 0;letter-spacing:-.01em}
+.lede{font-size:16px;line-height:1.6;color:var(--ink2);margin:16px 0 0;max-width:52ch}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:28px;margin-top:56px}
+.orb{display:grid;justify-items:center;gap:14px;padding:28px 12px 22px;border-radius:24px;cursor:pointer;transition:background .2s ease}
+.orb:hover{background:rgba(255,255,255,.4)}
+.orb.on{background:rgba(255,255,255,.6);box-shadow:inset 0 0 0 1px rgba(20,23,27,.08)}
+.orb .ring{width:160px;height:160px;border-radius:50%;display:grid;place-items:center;position:relative}
+.orb .ring::after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 14px 36px rgba(20,23,27,.12);pointer-events:none}
+.orb canvas{width:146px;height:146px;border-radius:50%;display:block}
+.orb b{font:500 14px var(--jak)}
+.orb span{font-size:12.5px;color:var(--ink2);text-align:center;max-width:24ch;line-height:1.45}
+.note{margin-top:40px;font-size:12.5px;line-height:1.6;color:var(--ink3);max-width:60ch}
+.note a{color:var(--ink2)}
+</style>
+<div class="field" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="back"><a href="../">menu lab</a><b>orbs</b></div>
+<div class="wrap">
+  <div class="label">Orb lab</div>
+  <h1>Five things the bead could be made of.</h1>
+  <p class="lede">Each is a sphere shaded per pixel from its own normal, so it keeps its depth from the 44px bead up to this size. Move over one and it turns toward you. Click to make it the bead.</p>
+  <div class="row" id="row"></div>
+  <p class="note">The chosen orb is remembered; <a href="../bead.html">bead.html</a> reads it. Or force one with <code>?orb=oil</code> on the bead page.</p>
+</div>
+<script src="orb.js"></script>
+<script>
+const COPY = {
+  marble: ['Marble', 'a stone turned in the hand, veins warped through it'],
+  oil: ['Oil', 'a thin film over a dark drop; the colours slide as it turns'],
+  lens: ['Lens', 'clear glass bending the light behind it, a caustic where the light lands'],
+  ink: ['Ink', 'a drop of ink turning in clear water; hovering stirs it'],
+  aurora: ['Aurora', 'light inside the glass, pastel bands marched through the volume'],
+};
+const row = document.getElementById('row');
+let chosen = localStorage.getItem('orb') || 'lens';
+for (const k of Orb.kinds) {
+  const el = document.createElement('div'); el.className = 'orb' + (k === chosen ? ' on' : ''); el.dataset.k = k;
+  el.innerHTML = `<div class="ring glass"><canvas></canvas></div><b>${COPY[k][0]}</b><span>${COPY[k][1]}</span>`;
+  row.appendChild(el);
+  Orb.attach(el.querySelector('canvas'), k, el);
+  el.addEventListener('click', () => { chosen = k; localStorage.setItem('orb', k); row.querySelectorAll('.orb').forEach((o) => o.classList.toggle('on', o.dataset.k === k)); });
+}
+</script>

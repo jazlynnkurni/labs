@@ -1,0 +1,73 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>menu lab: pour</title>
+<link rel="stylesheet" href="menu.css">
+<style>
+/* THE POUR. A drop of glass hangs from the top edge, centred, the way a
+   drop hangs from a tap. Reach it and it pours sideways into a bar: the
+   width springs open past its size and back, the height settles a beat
+   later, and the four labels surface from the centre outward. A bead of
+   it detaches and falls as it opens. Leave and it draws back up into a
+   drop. */
+.pour{position:fixed;top:0;left:50%;z-index:10;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center}
+.pour .bar{height:28px;width:56px;border-radius:0 0 999px 999px;display:flex;align-items:center;justify-content:center;gap:0;overflow:hidden;cursor:pointer;will-change:width,height}
+.pour .bar .l{position:absolute;opacity:0;will-change:transform,opacity;padding:0 14px;height:48px;line-height:48px;border-radius:999px}
+.pour .bar .l:hover{background:rgba(255,255,255,.5)}
+.pour .drip{position:absolute;top:0;left:50%;width:10px;height:10px;margin-left:-5px;border-radius:50%;opacity:0;pointer-events:none;will-change:transform,opacity}
+</style>
+<body data-name="pour" data-blurb="a drop hangs from the top edge; reach it and it pours into a bar">
+<nav class="pour" id="pour" aria-label="Menu">
+  <div class="bar glass" id="bar">
+    <a class="l" href="#">Projects</a><a class="l" href="#">Sandbox</a><a class="l" href="#">About</a><a class="l" href="#">Contact</a>
+  </div>
+  <i class="drip glass" id="drip"></i>
+</nav>
+<script src="spring.js"></script>
+<script src="page.js"></script>
+<script>
+const nav = document.getElementById('pour'), bar = document.getElementById('bar'), drip = document.getElementById('drip');
+const labels = [...bar.querySelectorAll('.l')];
+const CLOSED = { w: 56, h: 28 }, OPEN = { w: 430, h: 52 };
+const w = new Spring(CLOSED.w, { stiffness: 150, damping: 13 });     // wide and bouncy
+const h = new Spring(CLOSED.h, { stiffness: 220, damping: 20 });     // settles a beat later, calmer
+const show = labels.map(() => new Spring(0, { stiffness: 260, damping: 19 }));
+const fall = new Spring(0, { stiffness: 40, damping: 7 });
+let open = false, delays = labels.map(() => 0), clock = 0, dripT = -1;
+// label positions, spread from the centre
+function slots() { const n = labels.length, span = OPEN.w - 40, step = span / n; return labels.map((_, i) => -span / 2 + step * (i + 0.5)); }
+function setOpen(o) {
+  if (o === open) return; open = o;
+  w.to(o ? OPEN.w : CLOSED.w); h.to(o ? OPEN.h : CLOSED.h);
+  // from the centre outward: the middle two first, then the ends
+  const order = [1, 2, 0, 3];
+  delays = labels.map((_, i) => clock + 0.06 + stagger(order.indexOf(i) >> 1, 2, 70));
+  if (o) { dripT = clock; fall.set(0).to(1); }
+}
+nav.addEventListener('pointerenter', () => setOpen(true));
+nav.addEventListener('pointerleave', () => setOpen(false));
+bar.addEventListener('click', () => setOpen(!open));
+addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+loop((dt, t) => {
+  clock = t;
+  const W = w.update(dt), H = h.update(dt);
+  bar.style.width = W.toFixed(1) + 'px'; bar.style.height = H.toFixed(1) + 'px';
+  bar.style.borderRadius = `0 0 ${(H / 2 + 4).toFixed(1)}px ${(H / 2 + 4).toFixed(1)}px`;
+  const xs = slots();
+  labels.forEach((el, i) => {
+    if (t >= delays[i]) show[i].to(open ? 1 : 0);
+    const v = show[i].update(dt);
+    el.style.opacity = Math.max(0, Math.min(1, v)).toFixed(3);
+    // rises up through the surface as it appears
+    el.style.transform = `translate(${xs[i].toFixed(1)}px, ${(10 * (1 - v)).toFixed(2)}px) scale(${(0.85 + 0.15 * v).toFixed(3)})`;
+  });
+  // the drip: lets go of the bar, falls with a soft spring, fades
+  if (dripT >= 0) {
+    const age = t - dripT, f = fall.update(dt);
+    const y = H + 2 + f * 140 + age * age * 60;
+    drip.style.transform = `translateY(${y.toFixed(1)}px) scale(${(1 - 0.5 * Math.min(1, age / 0.9)).toFixed(3)})`;
+    drip.style.opacity = age < 0.9 ? (0.9 * (1 - age / 0.9)).toFixed(3) : 0;
+    if (age > 1) dripT = -1;
+  } else { fall.update(dt); drip.style.opacity = 0; }
+});
+</script>

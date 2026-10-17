@@ -1,0 +1,78 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>menu lab: split</title>
+<link rel="stylesheet" href="menu.css">
+<style>
+/* THE SPLIT. One drop in the corner divides. Press it and four droplets
+   pull out of it, stretching a neck of liquid as they go (a goo filter
+   merges anything close enough), each travelling its own bezier arc to a
+   place along the top, where it settles and clears into a glass pill with
+   a label. Press again and the pills thicken back into droplets, run home
+   along their arcs and merge into the one drop. */
+.split{position:fixed;inset:0 0 auto 0;height:120px;z-index:10;pointer-events:none}
+/* the liquid layer: solid milky blobs under a goo filter, so near blobs fuse */
+.goo{position:absolute;inset:0;filter:url(#goo)}
+.goo i{position:absolute;left:0;top:0;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:rgba(255,255,255,.92);will-change:transform}
+/* the glass layer: the real pills, faded in once a droplet has arrived */
+.pills a{position:absolute;left:0;top:0;height:44px;padding:0 18px;border-radius:999px;display:flex;align-items:center;transform:translate(-50%,-50%);opacity:0;pointer-events:none;will-change:transform,opacity}
+.split.open .pills a{pointer-events:auto}
+.pills a:hover{background:rgba(255,255,255,.55)}
+.hub{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;pointer-events:auto;cursor:pointer;display:grid;place-items:center;will-change:transform}
+.hub i{width:6px;height:6px;border-radius:50%;background:var(--ink);opacity:.7;transition:transform .4s cubic-bezier(.33,1.18,.37,1)}
+.split.open .hub i{transform:rotate(45deg) scale(1.6);border-radius:1px;opacity:.5}
+</style>
+<body data-name="split" data-blurb="one drop divides into four, each running its own arc to a place along the top">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="goo"><feGaussianBlur in="SourceGraphic" stdDeviation="7" result="b"/><feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10" result="g"/><feComposite in="SourceGraphic" in2="g" operator="atop"/></filter>
+</defs></svg>
+<nav class="split" id="split" aria-label="Menu">
+  <div class="goo" id="goo"><i></i><i></i><i></i><i></i><i class="home"></i></div>
+  <div class="pills" id="pills">
+    <a class="glass" href="#"><span class="l">Projects</span></a><a class="glass" href="#"><span class="l">Sandbox</span></a><a class="glass" href="#"><span class="l">About</span></a><a class="glass" href="#"><span class="l">Contact</span></a>
+  </div>
+  <button class="hub glass" id="hub" aria-label="Menu" aria-expanded="false"><i></i></button>
+</nav>
+<script src="spring.js"></script>
+<script src="page.js"></script>
+<script>
+const nav = document.getElementById('split'), hub = document.getElementById('hub');
+const blobs = [...document.querySelectorAll('#goo i:not(.home)')], home = document.querySelector('#goo .home');
+const pills = [...document.querySelectorAll('#pills a')];
+const HOME = () => [innerWidth - 46, 44];
+// where each one lands, along the top from the right, with its own arc
+function targets() { const [hx, hy] = HOME(); let x = hx - 44 - 14; return pills.map((p) => { const w = p.offsetWidth; const cx = x - w / 2; x -= w + 10; return [cx, hy]; }); }
+// each droplet runs a different curve: the first dips, the next lifts, and so on, so they never share a path
+const ARCS = [[0, 90], [0, -40], [0, 130], [0, -70]];
+const prog = pills.map(() => new Spring(0, { stiffness: 110, damping: 13 }));   // along its arc, with overshoot at the end
+const clear = pills.map(() => new Spring(0, { stiffness: 220, damping: 20 }));  // droplet to glass
+const hubS = new Spring(1, { stiffness: 260, damping: 12 });
+let open = false, delays = pills.map(() => 0), clock = 0;
+function setOpen(o) {
+  if (o === open) return; open = o; nav.classList.toggle('open', o); hub.setAttribute('aria-expanded', String(o));
+  delays = pills.map((_, i) => clock + stagger(o ? i : pills.length - 1 - i, pills.length, 70));
+  hubS.set(o ? 1.25 : 0.8).to(1);
+}
+hub.addEventListener('click', () => setOpen(!open));
+addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+loop((dt, t) => {
+  clock = t;
+  const [hx, hy] = HOME(); const T = targets();
+  home.style.transform = `translate(${hx}px, ${hy}px)`;
+  hub.style.transform = `translate(${hx}px, ${hy}px) scale(${hubS.update(dt).toFixed(3)})`;
+  pills.forEach((p, i) => {
+    if (t >= delays[i]) prog[i].to(open ? 1 : 0);
+    const u = Math.max(0, Math.min(1.15, prog[i].update(dt)));
+    const [tx, ty] = T[i], [ax, ay] = ARCS[i];
+    // a cubic from home to the target, bowed by the arc
+    const [x, y] = bez([hx, hy], [hx - (hx - tx) * 0.25, hy + ay], [tx + (hx - tx) * 0.25, ty + ay * 0.6], [tx, ty], Math.min(1, u));
+    blobs[i].style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${(0.5 + 0.5 * Math.min(1, u)).toFixed(3)})`;
+    // once it has arrived it clears into glass; the blob under it widens to the pill and fades
+    clear[i].to(u > 0.96 && open ? 1 : 0);
+    const c = clear[i].update(dt);
+    p.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -50%) scale(${(0.8 + 0.2 * c).toFixed(3)})`;
+    p.style.opacity = c.toFixed(3);
+    blobs[i].style.opacity = (1 - c).toFixed(3);
+  });
+});
+</script>

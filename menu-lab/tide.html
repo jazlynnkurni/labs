@@ -1,0 +1,61 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>menu lab: tide</title>
+<link rel="stylesheet" href="menu.css">
+<style>
+/* THE TIDE. A film of glass lies along the top edge, a few pixels deep,
+   like water meeting the rim. Move the pointer along it and the surface
+   bulges up to meet you, and whichever label is nearest surfaces inside
+   the bulge. Click and the whole tide comes in: the film deepens to a bar
+   and all four labels rise. The bulge follows the pointer on a spring, so
+   it lags and wobbles like a meniscus. */
+.tide{position:fixed;top:0;left:0;right:0;z-index:10;height:64px}
+.tide .film{position:absolute;top:0;left:0;right:0;height:8px;border-radius:0 0 14px 14px;transition:height .5s cubic-bezier(.2,.7,.2,1)}
+.tide.in .film{height:52px}
+.tide .bulge{position:absolute;top:0;width:150px;height:44px;margin-left:-75px;border-radius:0 0 75px 75px;will-change:transform,width,height;opacity:0}
+.tide .labels{position:absolute;top:0;left:0;right:0;height:52px;display:flex;justify-content:center;gap:48px;align-items:center;pointer-events:none}
+.tide .labels a{pointer-events:auto;font-family:var(--jak);font-weight:500;font-size:13.5px;color:var(--ink);opacity:0;transform:translateY(-14px);will-change:transform,opacity;padding:8px 10px;border-radius:999px}
+.tide .labels a:hover{background:rgba(255,255,255,.5)}
+.tide .hint{position:absolute;top:16px;left:50%;transform:translateX(-50%);font-size:11.5px;color:var(--ink3);opacity:0;transition:opacity .3s ease;pointer-events:none}
+</style>
+<body data-name="tide" data-blurb="a film of glass along the top edge; it bulges up to meet the pointer, and the nearest label surfaces">
+<nav class="tide" id="tide" aria-label="Menu">
+  <div class="film glass"></div>
+  <div class="bulge glass" id="bulge"></div>
+  <div class="labels" id="labels">
+    <a href="#">Projects</a><a href="#">Sandbox</a><a href="#">About</a><a href="#">Contact</a>
+  </div>
+</nav>
+<script src="spring.js"></script>
+<script src="page.js"></script>
+<script>
+const nav = document.getElementById('tide'), bulge = document.getElementById('bulge');
+const labels = [...document.querySelectorAll('#labels a')];
+const bx = new Spring(innerWidth / 2, { stiffness: 90, damping: 11 });     // follows the pointer, wobbly
+const bw = new Spring(0, { stiffness: 160, damping: 16 });                 // the bulge's size
+const rise = labels.map(() => new Spring(0, { stiffness: 240, damping: 18 }));
+let near = -1, inTide = false, pinned = false, clock = 0, delays = labels.map(() => 0);
+function centres() { return labels.map((el) => { const r = el.getBoundingClientRect(); return r.left + r.width / 2; }); }
+nav.addEventListener('pointermove', (e) => { bx.to(e.clientX); inTide = true; bw.to(1);
+  const cs = centres(); let bi = 0, bd = Infinity; cs.forEach((c, i) => { const d = Math.abs(c - e.clientX); if (d < bd) { bd = d; bi = i; } }); near = bd < 110 ? bi : -1; });
+nav.addEventListener('pointerleave', () => { inTide = false; near = -1; bw.to(0); if (!pinned) setIn(false); });
+nav.addEventListener('click', (e) => { if (e.target.tagName === 'A') return; pinned = !pinned; setIn(pinned); });
+addEventListener('keydown', (e) => { if (e.key === 'Escape') { pinned = false; setIn(false); } });
+let all = false;
+function setIn(o) { if (o === all) return; all = o; nav.classList.toggle('in', o); delays = labels.map((_, i) => clock + stagger(i, labels.length, 45)); }
+loop((dt, t) => {
+  clock = t;
+  const x = bx.update(dt), w = bw.update(dt);
+  bulge.style.transform = `translateX(${x.toFixed(1)}px) scale(${(0.4 + 0.6 * w).toFixed(3)}, ${w.toFixed(3)})`;
+  bulge.style.transformOrigin = '50% 0';
+  bulge.style.opacity = Math.min(1, w * 1.5).toFixed(3);
+  labels.forEach((el, i) => {
+    const want = all ? (t >= delays[i] ? 1 : 0) : (i === near && inTide ? 1 : 0);
+    rise[i].to(want);
+    const v = rise[i].update(dt);
+    el.style.opacity = Math.max(0, Math.min(1, v)).toFixed(3);
+    el.style.transform = `translateY(${(-14 + 14 * v).toFixed(2)}px)`;
+  });
+});
+</script>

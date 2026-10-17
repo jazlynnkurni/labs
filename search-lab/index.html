@@ -1,0 +1,221 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>universal search</title>
+<link rel="stylesheet" href="glass.css">
+<style>
+/* UNIVERSAL SEARCH, for Dia. One bar. You type the way you would say it
+   to a person ("the thing anthony sent about the logos", "zoom last week
+   about the hud") and the search does two jobs at once: it READS the
+   query (who, when, which kind of thing, what about) and shows that
+   reading back as chips, and it looks across everything (docs, mail,
+   meetings, files, tabs) and ranks what you probably mean, each hit with
+   the line that matched and why it is here. The reading is editable:
+   remove a chip and the results move. Press Enter on a hit to open it,
+   or Tab to turn the reading into a saved filter.
+   Data is mocked in data.js; the page only needs items with a source,
+   title, people, date and text, so real connectors drop in later. */
+html,body{overflow:auto}
+body{min-height:100vh}
+.bar{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:10;width:min(720px,calc(100vw - 48px));border-radius:22px;display:grid;grid-template-rows:auto;transition:border-radius .2s ease}
+.bar .row{display:flex;align-items:center;gap:12px;padding:0 16px;height:52px}
+.bar .k{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;color:var(--ink2)}
+.bar .k svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.bar input{flex:1;border:0;background:transparent;outline:0;font:400 16px/1 var(--hel);color:var(--ink);min-width:0}
+.bar input::placeholder{color:var(--ink3)}
+.bar .hint{font-size:11.5px;color:var(--ink3);display:flex;gap:6px;align-items:center}
+.bar .hint kbd{font:inherit;padding:2px 6px;border-radius:6px;background:rgba(20,23,27,.06);color:var(--ink2)}
+/* the reading: what the query seems to be about */
+.read{display:none;padding:0 16px 12px;gap:6px;flex-wrap:wrap;align-items:center}
+.bar.live .read{display:flex}
+.read .lead{font-size:12px;color:var(--ink3);margin-right:4px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px 0 9px;border-radius:999px;font:500 12px/1 var(--jak);color:var(--ink);background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 1px rgba(20,23,27,.08);cursor:pointer;animation:chip .36s cubic-bezier(.33,1.18,.37,1) both}
+.chip i{font-style:normal;color:var(--ink3);font-weight:400}
+.chip b{font-weight:400;color:var(--ink3);margin-left:2px}
+.chip:hover{background:rgba(255,255,255,.8)}
+.chip.p{color:#3a3fb0}.chip.t{color:#7a4a16}.chip.s{color:#1f5f4a}
+@keyframes chip{from{opacity:0;transform:translateY(6px) scale(.9)}}
+/* the results */
+.results{display:none;max-height:min(62vh,640px);overflow:auto;padding:4px 8px 10px;border-top:1px solid rgba(20,23,27,.06)}
+.bar.live .results{display:block}
+.group{padding:10px 8px 4px;font:600 10.5px/1 var(--jak);letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+.hit{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:start;padding:10px 10px;border-radius:14px;cursor:pointer;animation:hit .4s cubic-bezier(.2,.7,.2,1) both}
+.hit:hover,.hit.on{background:rgba(255,255,255,.6)}
+.hit .ic{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:rgba(20,23,27,.05);color:var(--ink2)}
+.hit .ic svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.hit .t{font:500 13.5px/1.35 var(--jak);color:var(--ink)}
+.hit .t mark{background:transparent;color:inherit;box-shadow:inset 0 -2px 0 rgba(76,91,228,.35)}
+.hit .s{font-size:12.5px;line-height:1.5;color:var(--ink2);margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hit .s mark{background:rgba(76,91,228,.12);color:inherit;border-radius:3px;padding:0 2px}
+.hit .why{font-size:11.5px;color:var(--ink3);margin-top:4px}
+.hit .m{text-align:right;font-size:11.5px;color:var(--ink3);white-space:nowrap;padding-top:2px}
+.hit .m b{display:block;font-weight:500;color:var(--ink2)}
+@keyframes hit{from{opacity:0;transform:translateY(4px)}}
+.empty{padding:22px 12px;font-size:13px;color:var(--ink3);text-align:center}
+.foot{display:none;padding:8px 16px 10px;font-size:11.5px;color:var(--ink3);border-top:1px solid rgba(20,23,27,.06);justify-content:space-between}
+.bar.live .foot{display:flex}
+.foot kbd{font:inherit;padding:1px 5px;border-radius:5px;background:rgba(20,23,27,.06);color:var(--ink2)}
+/* the page behind: a Dia-ish tab with a document, so there is context */
+.doc{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:120px 24px 120px}
+.doc .label{font-family:var(--jak);font-weight:600;font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+.doc h1{font:500 clamp(28px,4vw,40px)/1.15 var(--jak);letter-spacing:-.012em;margin:12px 0 0}
+.doc p{color:var(--ink2);max-width:58ch;margin:18px 0 0}
+.doc .try{margin-top:28px;display:flex;gap:8px;flex-wrap:wrap}
+.doc .try button{font:inherit;font-size:12.5px;padding:8px 12px;border-radius:999px;border:1px solid var(--hair);background:rgba(255,255,255,.5);color:var(--ink);cursor:pointer}
+.doc .try button:hover{background:#fff}
+</style>
+<div class="field" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<div class="bar glass" id="bar" role="search">
+  <div class="row">
+    <span class="k"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+    <input id="q" type="text" placeholder="Search everything, the way you'd say it" autocomplete="off" spellcheck="false" aria-label="Universal search">
+    <span class="hint"><kbd>⌘</kbd><kbd>K</kbd></span>
+  </div>
+  <div class="read" id="read"></div>
+  <div class="results" id="results"></div>
+  <div class="foot"><span><kbd>↑↓</kbd> move <kbd>↵</kbd> open <kbd>⇥</kbd> keep this reading as a filter</span><span id="count"></span></div>
+</div>
+
+<main class="doc">
+  <div class="label">Dia</div>
+  <h1>One search over everything you have, that tells you what it thinks you meant.</h1>
+  <p>The bar reads the question before it answers it. Say a person, a time, a kind of thing or a topic in any order and it shows that reading back as chips, then ranks docs, mail, meetings, files and open tabs against it. The chips are the control: remove one and the results move.</p>
+  <div class="try" id="try">
+    <button>the thing anthony sent about the logos</button>
+    <button>zoom last week about the hud</button>
+    <button>manus deck pdf</button>
+    <button>fostr email from abraham</button>
+    <button>what did the caseworker say about notes</button>
+    <button>that calendar reference image</button>
+  </div>
+  <p>Everything behind it is a stand-in list in <code>data.js</code>. Real connectors replace the list; the bar does not change.</p>
+</main>
+
+<script src="data.js"></script>
+<script>
+const $ = (s) => document.querySelector(s);
+const bar = $('#bar'), q = $('#q'), readEl = $('#read'), resEl = $('#results'), count = $('#count');
+
+/* ---------- reading the query ---------- */
+const SOURCES = {
+  doc: ['doc', 'docs', 'document', 'write-up', 'writeup', 'notes', 'notion', 'page', 'pages'],
+  mail: ['email', 'emails', 'mail', 'gmail', 'sent', 'inbox', 'message', 'reply', 'thread'],
+  meeting: ['zoom', 'meeting', 'call', 'meet', 'transcript', 'said', 'say', 'talked', 'interview', 'review', 'check-in', 'weekly'],
+  file: ['pdf', 'file', 'image', 'jpg', 'png', 'screenshot', 'deck', 'slides', 'figma', 'blender', 'letter'],
+  tab: ['tab', 'tabs', 'site', 'page', 'link', 'url', 'github', 'vercel'],
+};
+const TIME = [
+  [/\b(today|this morning|just now)\b/, 0, 0, 'today'], [/\byesterday\b/, 1, 1, 'yesterday'],
+  [/\b(this week|past few days)\b/, 0, 6, 'this week'], [/\blast week\b/, 3, 14, 'last week'],
+  [/\b(last month|a month ago|few weeks ago)\b/, 14, 45, 'last month'], [/\brecent(ly)?\b/, 0, 10, 'recently'],
+];
+const STOP = new Set('the a an of about on in to for from with that this what did who was were is are it its my me i and or re thing things one stuff sent send got get'.split(' '));
+const stem = (w) => w.toLowerCase().replace(/[^a-z0-9#-]/g, '').replace(/(ings?|ed|es|s)$/, (m) => (m === 's' && w.length < 4 ? m : ''));
+
+function read(text) {
+  const t = text.toLowerCase();
+  const r = { people: [], sources: [], time: null, topics: [], tokens: [] };
+  for (const [k, name] of Object.entries(PEOPLE)) if (new RegExp('\\b' + k + '\\b').test(t)) r.people.push(name);
+  for (const [src, words] of Object.entries(SOURCES)) if (words.some((w) => new RegExp('\\b' + w.replace('-', '\\-') + '\\b').test(t))) r.sources.push(src);
+  for (const [re, a, b, label] of TIME) if (re.test(t)) { r.time = { a, b, label }; break; }
+  const used = new Set([...Object.keys(PEOPLE), ...Object.values(SOURCES).flat(), 'last', 'week', 'yesterday', 'today', 'month', 'recent', 'recently', 'ago', 'this', 'past', 'few', 'days']);
+  r.tokens = t.split(/[^a-z0-9#-]+/).filter((w) => w && !STOP.has(w));
+  r.topics = r.tokens.filter((w) => !used.has(w)).map(stem).filter((w) => w.length > 1);
+  return r;
+}
+
+/* ---------- scoring ---------- */
+function score(item, r) {
+  let s = 0, why = [];
+  const hay = (item.title + ' ' + item.text + ' ' + item.app + ' ' + item.people.join(' ')).toLowerCase();
+  const words = hay.split(/[^a-z0-9#-]+/).map(stem);
+  for (const tp of r.topics) {
+    const inTitle = stem(item.title.toLowerCase()).includes(tp) || item.title.toLowerCase().split(/\W+/).map(stem).includes(tp);
+    const n = words.filter((w) => w === tp || (tp.length > 3 && w.startsWith(tp))).length;
+    if (n) { s += (inTitle ? 3 : 1.4) + Math.min(2, n) * 0.4; why.push(tp); }
+  }
+  for (const p of r.people) { if (item.people.includes(p)) { s += 2.5; why.push(p.split(' ')[0]); } else s -= 1.2; }
+  if (r.sources.length) { if (r.sources.includes(item.source)) { s += 1.5; } else s -= 1.0; }
+  if (r.time) { const d = (NOW - item.date) / DAY; if (d >= r.time.a - 0.5 && d <= r.time.b + 0.5) { s += 1.2; why.push(r.time.label); } else s -= 0.8; }
+  // recency, gently
+  s += Math.max(0, 0.6 - (NOW - item.date) / DAY / 60);
+  return { s, why };
+}
+
+/* ---------- rendering ---------- */
+const ICON = {
+  doc: '<svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg>',
+  mail: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+  meeting: '<svg viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg>',
+  file: '<svg viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg>',
+  tab: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>',
+};
+const LABEL = { doc: 'Documents', mail: 'Mail', meeting: 'Meetings', file: 'Files', tab: 'Open tabs' };
+const when = (d) => { const days = Math.floor((NOW - d) / DAY); if (days === 0) return 'today'; if (days === 1) return 'yesterday'; if (days < 7) return days + ' days ago'; if (days < 30) return Math.round(days / 7) + ' wk ago'; return Math.round(days / 30) + ' mo ago'; };
+function highlight(text, topics) {
+  if (!topics.length) return text;
+  const re = new RegExp('\\b(' + topics.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\w*', 'gi');
+  return text.replace(re, '<mark>$&</mark>');
+}
+function snippet(item, topics) {
+  const text = item.text; let at = -1;
+  for (const t of topics) { const i = text.toLowerCase().indexOf(t); if (i >= 0 && (at < 0 || i < at)) at = i; }
+  if (at < 0) return text.slice(0, 140);
+  const start = Math.max(0, text.lastIndexOf('. ', at) + 1);
+  return (start > 0 ? '…' : '') + text.slice(start, start + 170).trim();
+}
+let removed = { people: new Set(), sources: new Set(), time: false, topics: new Set() };
+let sel = 0, hits = [];
+
+function run() {
+  const text = q.value.trim();
+  if (!text) { bar.classList.remove('live'); return; }
+  bar.classList.add('live');
+  const r = read(text);
+  r.people = r.people.filter((p) => !removed.people.has(p));
+  r.sources = r.sources.filter((s) => !removed.sources.has(s));
+  if (removed.time) r.time = null;
+  r.topics = r.topics.filter((t) => !removed.topics.has(t));
+
+  // the reading
+  const chips = [];
+  for (const p of r.people) chips.push(`<span class="chip p" data-k="people" data-v="${p}"><i>with</i>${p}<b>×</b></span>`);
+  if (r.time) chips.push(`<span class="chip t" data-k="time" data-v="1"><i>when</i>${r.time.label}<b>×</b></span>`);
+  for (const s of r.sources) chips.push(`<span class="chip s" data-k="sources" data-v="${s}"><i>in</i>${LABEL[s].toLowerCase()}<b>×</b></span>`);
+  for (const t of r.topics) chips.push(`<span class="chip" data-k="topics" data-v="${t}"><i>about</i>${t}<b>×</b></span>`);
+  readEl.innerHTML = chips.length ? `<span class="lead">I read this as</span>` + chips.join('') : `<span class="lead">Looking everywhere for</span><span class="chip">${text}</span>`;
+
+  // the ranking
+  hits = ITEMS.map((it) => ({ it, ...score(it, r) })).filter((h) => h.s > 0.9).sort((a, b) => b.s - a.s).slice(0, 12);
+  if (!hits.length) { resEl.innerHTML = `<div class="empty">Nothing matches that reading. Remove a chip, or say it another way.</div>`; count.textContent = ''; return; }
+  // grouped by source, groups in order of their best hit
+  const groups = []; for (const h of hits) { let g = groups.find((g) => g.k === h.it.source); if (!g) { g = { k: h.it.source, hits: [] }; groups.push(g); } g.hits.push(h); }
+  let n = 0;
+  resEl.innerHTML = groups.map((g) => `<div class="group">${LABEL[g.k]}</div>` + g.hits.map((h) => {
+    const i = n++;
+    const why = h.why.length ? 'matches ' + [...new Set(h.why)].slice(0, 3).join(', ') : 'recent';
+    return `<div class="hit${i === sel ? ' on' : ''}" data-i="${i}" style="animation-delay:${i * 25}ms">
+      <span class="ic">${ICON[h.it.source]}</span>
+      <div><div class="t">${highlight(h.it.title, r.topics)}</div><div class="s">${highlight(snippet(h.it, r.topics), r.topics)}</div><div class="why">${why}${h.it.people.length ? ' · ' + h.it.people.join(', ') : ''}</div></div>
+      <div class="m"><b>${h.it.app}</b>${when(h.it.date)}</div></div>`;
+  }).join('')).join('');
+  count.textContent = hits.length + ' of ' + ITEMS.length;
+}
+q.addEventListener('input', () => { removed = { people: new Set(), sources: new Set(), time: false, topics: new Set() }; sel = 0; run(); });
+readEl.addEventListener('click', (e) => { const c = e.target.closest('.chip'); if (!c || !c.dataset.k) return; const k = c.dataset.k; if (k === 'time') removed.time = true; else removed[k].add(c.dataset.v); sel = 0; run(); });
+resEl.addEventListener('click', (e) => { const h = e.target.closest('.hit'); if (h) open(+h.dataset.i); });
+function open(i) { const h = hits[i]; if (!h) return; q.value = ''; bar.classList.remove('live'); alertless(`Opening ${h.it.app}: ${h.it.title}`); }
+function alertless(msg) { const t = document.createElement('div'); t.textContent = msg; t.className = 'glass'; t.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);padding:10px 16px;border-radius:999px;font-size:13px;z-index:30;animation:chip .4s cubic-bezier(.33,1.18,.37,1)'; document.body.appendChild(t); setTimeout(() => t.remove(), 1800); }
+addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); q.focus(); q.select(); return; }
+  if (document.activeElement !== q) return;
+  if (e.key === 'ArrowDown') { e.preventDefault(); sel = Math.min(hits.length - 1, sel + 1); run(); scrollSel(); }
+  if (e.key === 'ArrowUp') { e.preventDefault(); sel = Math.max(0, sel - 1); run(); scrollSel(); }
+  if (e.key === 'Enter') { e.preventDefault(); open(sel); }
+  if (e.key === 'Escape') { q.value = ''; bar.classList.remove('live'); q.blur(); }
+  if (e.key === 'Tab' && bar.classList.contains('live')) { e.preventDefault(); alertless('Saved as a filter: ' + [...readEl.querySelectorAll('.chip')].map((c) => c.textContent.replace('×', '').trim()).join(' · ')); }
+});
+function scrollSel() { const el = resEl.querySelector('.hit.on'); if (el) el.scrollIntoView({ block: 'nearest' }); }
+$('#try').addEventListener('click', (e) => { if (e.target.tagName !== 'BUTTON') return; q.value = e.target.textContent; q.focus(); removed = { people: new Set(), sources: new Set(), time: false, topics: new Set() }; sel = 0; run(); });
+</script>
