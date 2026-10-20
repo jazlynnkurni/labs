@@ -1,0 +1,131 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>pear lab: pear</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; font: 12px/1.3 -apple-system, "Helvetica Neue", sans-serif; color: #8a8a8a; }
+  canvas { display: block; width: 100%; height: 100%; cursor: default; }
+  .top { position: fixed; left: 18px; top: 14px; display: flex; gap: 8px; align-items: baseline; }
+  .top a { color: #b5b5b5; text-decoration: none; } .top .name { color: #444; } .top .blurb { color: #b5b5b5; margin-left: 10px; }
+  .parts { position: fixed; left: 18px; top: 34px; color: #b5b5b5; line-height: 1.7; max-width: 720px; }
+  .parts b { color: #444; font-weight: 500; }
+  .labels { position: fixed; left: 0; right: 0; pointer-events: none; display: grid; grid-template-columns: repeat(5, 1fr); text-align: center; letter-spacing: 0.03em; }
+  .labels span.on { color: #333; }
+  .bar { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; gap: 6px; align-items: center; }
+  .bar button { font: inherit; letter-spacing: 0.03em; color: #444; background: #f3f3f3; border: 0; border-radius: 999px; padding: 7px 13px; cursor: pointer; }
+  .bar button:hover { background: #e8e8e8; } .bar button.on { background: #222; color: #fff; }
+  .bar .gap { width: 10px; }
+  .msg { position: fixed; right: 18px; bottom: 24px; color: #b5b5b5; transition: opacity 0.5s; opacity: 0; }
+  .msg.show { opacity: 1; }
+</style>
+<body>
+<canvas id="stage"></canvas>
+<div class="top"><a href="./">pear lab</a><span>/</span><span class="name">pear</span><span class="blurb" id="blurb"></span></div>
+<div class="parts">click one of the five to work on it. <b>hollow</b> points on the edge shape the outline: double-click the edge to add one, a point to remove it. <b>bruises</b>: the filled dot moves, the hollow dots size and turn; double-click inside the pear to add one, on its dot to remove it, right-click its dot to switch tone. the stalk has a base, a bend, a tip and a width; the calyx a centre and a size.</div>
+<div class="labels" id="labels"></div>
+<div class="bar">
+  <button id="boil" class="on">boil</button>
+  <button id="handles" class="on">handles</button>
+  <span class="gap"></span>
+  <button id="reset">reset</button>
+  <button id="copy">copy</button>
+  <button id="save">save</button>
+</div>
+<div class="msg" id="msg"></div>
+<script src="pearpaint.js"></script>
+<script>
+(() => {
+  const canvas = document.getElementById('stage'), ctx = canvas.getContext('2d');
+  const labels = document.getElementById('labels'), blurb = document.getElementById('blurb'), msg = document.getElementById('msg');
+  let W, H, dpr, shape = Pear.copy(Pear.DEFAULT), tex = 'wash', boil = true, showHandles = true, t = 0, drag = null, hover = null;
+  const say = (s) => { msg.textContent = s; msg.classList.add('show'); clearTimeout(say.h); say.h = setTimeout(() => msg.classList.remove('show'), 1600); };
+  const ROW = { y: 0.09, h: 0.3 }, BIG = { y: 0.69 };
+  function resize() { W = innerWidth; H = innerHeight; dpr = Math.min(2, devicePixelRatio || 1); canvas.width = W * dpr; canvas.height = H * dpr; labels.style.top = (H * (ROW.y + ROW.h) + 10) + 'px'; }
+  addEventListener('resize', resize); resize();
+  Pear.ORDER.forEach((k) => { const s = document.createElement('span'); s.textContent = Pear.TEX[k].label; s.dataset.k = k; labels.appendChild(s); });
+  const setTex = (k) => { tex = k; blurb.textContent = Pear.TEX[k].blurb; [...labels.children].forEach((s) => s.classList.toggle('on', s.dataset.k === k)); };
+  setTex(tex);
+
+  const rowScale = () => Math.min((W / 5) / 540 * 0.95, H * ROW.h / 540 * 1.15);
+  const bigScale = () => Math.min(W / 540 * 0.6, H * 0.5 / 540 * 1.1);
+  const bigOrigin = () => { const s = bigScale(); return [W / 2 - 270 * s, H * BIG.y - 270 * s]; };
+  const toScreen = (p) => { const s = bigScale(), [ox, oy] = bigOrigin(); return [ox + p[0] * s, oy + p[1] * s]; };
+  const toPear = (x, y) => { const s = bigScale(), [ox, oy] = bigOrigin(); return [(x - ox) / s, (y - oy) / s]; };
+
+  /* every draggable point, with what it does */
+  function handles() {
+    const hs = [];
+    shape.outline.forEach((p, i) => hs.push({ id: 'o' + i, get: () => p, set: (x, y) => { p[0] = x; p[1] = y; } }));
+    const s = shape.stalk;
+    hs.push({ id: 'stalk.b', solid: true, get: () => s.b, set: (x, y) => { const dx = x - s.b[0], dy = y - s.b[1]; s.b = [x, y]; s.c = [s.c[0] + dx, s.c[1] + dy]; s.t = [s.t[0] + dx, s.t[1] + dy]; } });
+    hs.push({ id: 'stalk.c', get: () => s.c, set: (x, y) => { s.c = [x, y]; } });
+    hs.push({ id: 'stalk.t', get: () => s.t, set: (x, y) => { s.t = [x, y]; } });
+    const mid = () => [0.25 * s.b[0] + 0.5 * s.c[0] + 0.25 * s.t[0], 0.25 * s.b[1] + 0.5 * s.c[1] + 0.25 * s.t[1]];
+    const nrm = () => { const dx = s.t[0] - s.b[0], dy = s.t[1] - s.b[1], L = Math.hypot(dx, dy) || 1; return [-dy / L, dx / L]; };
+    hs.push({ id: 'stalk.w', get: () => { const m = mid(), n = nrm(); return [m[0] + n[0] * s.w / 2, m[1] + n[1] * s.w / 2]; }, set: (x, y) => { const m = mid(), n = nrm(); s.w = Math.max(3, 2 * ((x - m[0]) * n[0] + (y - m[1]) * n[1])); } });
+    const k = shape.calyx;
+    hs.push({ id: 'calyx.c', solid: true, get: () => [k.x, k.y], set: (x, y) => { k.x = x; k.y = y; } });
+    hs.push({ id: 'calyx.r', get: () => [k.x + k.halo, k.y], set: (x) => { k.halo = Math.max(6, x - k.x); k.r = k.halo * 0.25; } });
+    shape.bruises.forEach((b, i) => {
+      hs.push({ id: 'b' + i + '.c', solid: true, get: () => [b.x, b.y], set: (x, y) => { b.x = x; b.y = y; } });
+      hs.push({ id: 'b' + i + '.rx', get: () => [b.x + Math.cos(b.rot) * b.rx, b.y + Math.sin(b.rot) * b.rx], set: (x, y) => { b.rx = Math.max(6, Math.hypot(x - b.x, y - b.y)); b.rot = Math.atan2(y - b.y, x - b.x); } });
+      hs.push({ id: 'b' + i + '.ry', get: () => [b.x - Math.sin(b.rot) * b.ry, b.y + Math.cos(b.rot) * b.ry], set: (x, y) => { b.ry = Math.max(5, Math.hypot(x - b.x, y - b.y)); } });
+    });
+    return hs;
+  }
+  function nearest(x, y) { let best = null, bd = 12; for (const h of handles()) { const [hx, hy] = toScreen(h.get()); const d = Math.hypot(hx - x, hy - y); if (d < bd) { bd = d; best = h; } } return best; }
+  const inRow = (e) => e.clientY < H * (ROW.y + ROW.h);
+  /* the nearest place on the outline curve, for adding points */
+  function nearestEdge(px, py) { const pts = Pear.curve(shape.outline); let best = null, bd = 1e9; pts.forEach((p, i) => { const d = Math.hypot(p[0] - px, p[1] - py); if (d < bd) { bd = d; best = i; } }); return { d: bd, seg: Math.floor(best / 8), p: pts[best] }; }
+
+  canvas.addEventListener('pointerdown', (e) => { if (e.button !== 0) return; if (inRow(e)) { const k = Pear.ORDER[Math.floor(e.clientX / (W / 5))]; if (k) { setTex(k); say(Pear.TEX[k].label); } return; } if (!showHandles) return; const h = nearest(e.clientX, e.clientY); if (h) { drag = h; canvas.setPointerCapture(e.pointerId); } });
+  canvas.addEventListener('pointermove', (e) => { if (drag) { const [px, py] = toPear(e.clientX, e.clientY); drag.set(px, py); } else hover = showHandles ? nearest(e.clientX, e.clientY) : null; });
+  canvas.addEventListener('pointerup', () => { drag = null; });
+  canvas.addEventListener('contextmenu', (e) => { e.preventDefault(); const h = nearest(e.clientX, e.clientY); if (h && /^b\d+\.c$/.test(h.id)) { const b = shape.bruises[+h.id.slice(1, -2)]; b.c = b.c === 'bruise' ? 'bruiseLight' : 'bruise'; say(b.c === 'bruise' ? 'deeper tone' : 'lighter tone'); } });
+  canvas.addEventListener('dblclick', (e) => {
+    if (inRow(e) || !showHandles) return;
+    const h = nearest(e.clientX, e.clientY), [px, py] = toPear(e.clientX, e.clientY);
+    if (h && h.id[0] === 'o') { if (shape.outline.length > 6) { shape.outline.splice(+h.id.slice(1), 1); say('point removed'); } return; }
+    if (h && /^b\d+\.c$/.test(h.id)) { shape.bruises.splice(+h.id.slice(1, -2), 1); say('bruise removed'); return; }
+    const ne = nearestEdge(px, py);
+    if (ne.d < 12 / bigScale() * 1.5 + 6) { shape.outline.splice(ne.seg + 1, 0, [px, py]); say('point added'); return; }
+    const P = Pear.path2d(Pear.curve(shape.outline)); ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); const inside = ctx.isPointInPath(P, px, py); ctx.restore();
+    if (inside) { shape.bruises.push({ x: px, y: py, rx: 40, ry: 26, rot: 0.2, c: 'bruise', a: 0.45 }); say('bruise added'); }
+  });
+
+  document.getElementById('boil').onclick = (e) => { boil = !boil; e.target.classList.toggle('on', boil); };
+  document.getElementById('handles').onclick = (e) => { showHandles = !showHandles; e.target.classList.toggle('on', showHandles); };
+  document.getElementById('reset').onclick = () => { shape = Pear.copy(Pear.DEFAULT); say('reset'); };
+  document.getElementById('copy').onclick = () => { navigator.clipboard.writeText(JSON.stringify({ shape, texture: tex })).then(() => say('copied')); };
+  document.getElementById('save').onclick = () => { fetch('/save/pear.json', { method: 'POST', body: JSON.stringify({ shape, texture: tex }) }).then((r) => say(r.ok ? 'saved to pear.json' : 'save failed, use copy')).catch(() => say('save failed, use copy')); };
+  fetch('pear.json?' + Date.now()).then((r) => (r.ok ? r.json() : null)).then((j) => { if (j && j.shape) { shape = j.shape; if (j.texture) setTex(j.texture); say('loaded pear.json'); } }).catch(() => {});
+
+  /* each pear is painted into its own cache on the boil clock, then blitted */
+  const caches = {}; let lastF = -1;
+  function cacheFor(k, scale, f) { const key = k + '@' + scale.toFixed(3); let c = caches[key]; if (!c) { c = caches[key] = { cv: document.createElement('canvas'), f: -1 }; } const need = Math.ceil(640 * scale * dpr); if (c.cv.width !== need) { c.cv.width = c.cv.height = need; c.f = -1; }
+    if (c.f !== f) { const g = c.cv.getContext('2d'); g.setTransform(scale * dpr, 0, 0, scale * dpr, 50 * scale * dpr, 50 * scale * dpr); g.clearRect(-60, -60, 700, 700); Pear.paint(g, shape, k, { f, t, agitation: 0 }); c.f = f; } return c.cv; }
+  let last = null, dirty = 0;
+  function frame(now) {
+    const dt = last == null ? 0 : Math.min(0.05, (now - last) / 1000); last = now; t += dt;
+    const f = boil ? Math.floor(t * 12) : 0;
+    if (drag) dirty = f + 1;   // while dragging, repaint every frame so the shape follows the hand
+    const key = drag ? Math.floor(t * 60) : f;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+    const rs = rowScale();
+    Pear.ORDER.forEach((k, i) => { const cv = cacheFor(k, rs, key); const x = W / 5 * (i + 0.5) - 270 * rs, y = H * (ROW.y + ROW.h / 2) - 270 * rs; ctx.drawImage(cv, x - 50 * rs, y - 50 * rs, cv.width / dpr, cv.height / dpr); });
+    ctx.strokeStyle = '#eee'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(W * 0.06, H * (ROW.y + ROW.h) + 2); ctx.lineTo(W * 0.94, H * (ROW.y + ROW.h) + 2); ctx.stroke();
+    const bs = bigScale(), [ox, oy] = bigOrigin(); const cv = cacheFor(tex, bs, key); ctx.drawImage(cv, ox - 50 * bs, oy - 50 * bs, cv.width / dpr, cv.height / dpr);
+    if (showHandles) {
+      ctx.save(); ctx.strokeStyle = 'rgba(47,85,201,0.35)'; ctx.lineWidth = 1; ctx.setLineDash([3, 4]);
+      const pts = Pear.curve(shape.outline).map(toScreen); ctx.beginPath(); pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.closePath(); ctx.stroke();
+      shape.bruises.forEach((b) => { ctx.save(); const c = toScreen([b.x, b.y]); ctx.translate(c[0], c[1]); ctx.rotate(b.rot); ctx.beginPath(); ctx.ellipse(0, 0, b.rx * bs, b.ry * bs, 0, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); });
+      ctx.setLineDash([]);
+      for (const h of handles()) { const [x, y] = toScreen(h.get()); const on = (drag || hover) && (drag || hover).id === h.id; ctx.beginPath(); ctx.arc(x, y, on ? 7 : 5, 0, Math.PI * 2); ctx.fillStyle = h.solid ? (on ? '#2F55C9' : 'rgba(47,85,201,0.85)') : '#fff'; ctx.fill(); ctx.strokeStyle = on ? '#2F55C9' : 'rgba(47,85,201,0.7)'; ctx.lineWidth = 1.4; ctx.stroke(); }
+      ctx.restore();
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>

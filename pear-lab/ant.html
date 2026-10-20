@@ -1,0 +1,110 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>pear lab: ant</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; font: 12px/1.3 -apple-system, "Helvetica Neue", sans-serif; color: #8a8a8a; }
+  canvas { display: block; width: 100%; height: 100%; cursor: default; }
+  .top { position: fixed; left: 18px; top: 14px; display: flex; gap: 8px; align-items: baseline; }
+  .top a { color: #b5b5b5; text-decoration: none; } .top .name { color: #444; } .top .blurb { color: #b5b5b5; margin-left: 10px; }
+  .labels { position: fixed; left: 0; right: 0; pointer-events: none; display: grid; grid-template-columns: repeat(5, 1fr); text-align: center; letter-spacing: 0.03em; }
+  .labels span.on { color: #333; }
+  .bar { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; gap: 6px; align-items: center; }
+  .bar button { font: inherit; letter-spacing: 0.03em; color: #444; background: #f3f3f3; border: 0; border-radius: 999px; padding: 7px 13px; cursor: pointer; }
+  .bar button:hover { background: #e8e8e8; } .bar button.on { background: #222; color: #fff; }
+  .bar .gap { width: 10px; }
+  .msg { position: fixed; right: 18px; bottom: 24px; color: #b5b5b5; transition: opacity 0.5s; opacity: 0; }
+  .msg.show { opacity: 1; }
+  .parts { position: fixed; left: 18px; top: 34px; color: #b5b5b5; line-height: 1.7; }
+  .parts b { color: #444; font-weight: 500; }
+</style>
+<body>
+<canvas id="stage"></canvas>
+<div class="top"><a href="./">pear lab</a><span>/</span><span class="name">ant</span><span class="blurb" id="blurb"></span></div>
+<div class="labels" id="labels"></div>
+<div class="parts">drag any point. <b>filled</b> moves a segment, <b>hollow</b> stretches it; legs and the antenna mirror.</div>
+<div class="bar">
+  <button id="walk" class="on">walk</button>
+  <span class="gap"></span>
+  <button id="reset">reset</button>
+  <button id="copy">copy</button>
+  <button id="save">save</button>
+</div>
+<div class="msg" id="msg"></div>
+<script src="ant.js"></script>
+<script>
+(() => {
+  const canvas = document.getElementById('stage'), ctx = canvas.getContext('2d');
+  const labels = document.getElementById('labels'), blurb = document.getElementById('blurb'), msg = document.getElementById('msg');
+  let W, H, dpr, shape = Ant.copy(Ant.DEFAULT), tex = 'ink', walk = true, t = 0, drag = null, hover = null, pointer = null;
+  const say = (s) => { msg.textContent = s; msg.classList.add('show'); clearTimeout(say.h); say.h = setTimeout(() => msg.classList.remove('show'), 1600); };
+
+  /* the row of five on top, the big one below */
+  const ROW = { y: 0.1, h: 0.28 }, BIG = { y: 0.7 };
+  function resize() { W = innerWidth; H = innerHeight; dpr = Math.min(2, devicePixelRatio || 1); canvas.width = W * dpr; canvas.height = H * dpr; labels.style.top = (H * (ROW.y + ROW.h) + 12) + 'px'; }
+  addEventListener('resize', resize); resize();
+  Ant.ORDER.forEach((k) => { const s = document.createElement('span'); s.textContent = Ant.TEX[k].label; s.dataset.k = k; labels.appendChild(s); });
+  const setTex = (k) => { tex = k; blurb.textContent = Ant.TEX[k].blurb; [...labels.children].forEach((s) => s.classList.toggle('on', s.dataset.k === k)); };
+  setTex(tex);
+
+  const rowScale = () => Math.min((W / 5) / 24, H * ROW.h / 16);
+  const bigScale = () => Math.min(W / 26, H * 0.36 / 16);
+  const bigOrigin = () => [W / 2 - 0.6 * bigScale(), H * BIG.y];
+
+  /* handles: each knows where it is in ant units and what to do when moved */
+  function handles() {
+    const hs = [];
+    for (const k of Ant.SEGS) { const e = shape[k];
+      hs.push({ id: k + '.c', solid: true, get: () => [e.x, e.y], set: (x, y) => { e.x = x; e.y = y; } });
+      hs.push({ id: k + '.rx', get: () => [e.x + e.rx, e.y], set: (x) => { e.rx = Math.max(0.25, x - e.x); } });
+      hs.push({ id: k + '.ry', get: () => [e.x, e.y + e.ry], set: (x, y) => { e.ry = Math.max(0.2, y - e.y); } });
+    }
+    shape.legs.forEach((L, i) => { for (const p of ['b', 'k', 't']) hs.push({ id: 'leg' + i + '.' + p, solid: p === 'b', get: () => L[p], set: (x, y) => { L[p] = [x, Math.max(0.2, y)]; } }); });
+    for (const p of ['b', 'c', 't']) hs.push({ id: 'ant.' + p, solid: p === 'b', get: () => shape.antenna[p], set: (x, y) => { shape.antenna[p] = [x, Math.max(0.1, y)]; } });
+    return hs;
+  }
+  const toScreen = (p) => { const s = bigScale(), [ox, oy] = bigOrigin(); return [ox + p[0] * s, oy + p[1] * s]; };
+  const toAnt = (x, y) => { const s = bigScale(), [ox, oy] = bigOrigin(); return [(x - ox) / s, (y - oy) / s]; };
+  function nearest(x, y) { let best = null, bd = 14; for (const h of handles()) { const [hx, hy] = toScreen(h.get()); const d = Math.hypot(hx - x, hy - y); if (d < bd) { bd = d; best = h; } } return best; }
+
+  canvas.addEventListener('pointerdown', (e) => {
+    // a click on one of the five picks its texture
+    if (e.clientY < H * (ROW.y + ROW.h)) { const k = Ant.ORDER[Math.floor(e.clientX / (W / 5))]; if (k) setTex(k); return; }
+    const h = nearest(e.clientX, e.clientY); if (h) { drag = h; canvas.setPointerCapture(e.pointerId); }
+  });
+  canvas.addEventListener('pointermove', (e) => { pointer = [e.clientX, e.clientY]; if (drag) { const [ax, ay] = toAnt(e.clientX, e.clientY); drag.set(ax, ay); } else hover = nearest(e.clientX, e.clientY); });
+  canvas.addEventListener('pointerup', () => { drag = null; });
+  canvas.addEventListener('dblclick', (e) => { if (e.clientY < H * (ROW.y + ROW.h)) return; const h = nearest(e.clientX, e.clientY); if (h && h.id.startsWith('leg')) { const i = +h.id[3]; if (shape.legs.length > 1) { shape.legs.splice(i, 1); say('leg removed'); } } else if (!h) { const [ax, ay] = toAnt(e.clientX, e.clientY); if (ay > 0 && shape.legs.length < 6) { shape.legs.push({ b: [ax, 1.1], k: [ax + (ax - 0.8) * 0.4, 3.4], t: [ax + (ax - 0.8) * 0.9, 6.2] }); shape.legs.sort((a, b) => b.b[0] - a.b[0]); say('leg added'); } } });
+
+  document.getElementById('walk').onclick = (e) => { walk = !walk; e.target.classList.toggle('on', walk); };
+  document.getElementById('reset').onclick = () => { shape = Ant.copy(Ant.DEFAULT); say('reset'); };
+  document.getElementById('copy').onclick = () => { navigator.clipboard.writeText(JSON.stringify(shape)).then(() => say('copied')); };
+  document.getElementById('save').onclick = () => { fetch('/save/ant.json', { method: 'POST', body: JSON.stringify({ shape, texture: tex }) }).then((r) => say(r.ok ? 'saved to ant.json' : 'save failed, use copy')).catch(() => say('save failed, use copy')); };
+  fetch('ant.json?' + Date.now()).then((r) => (r.ok ? r.json() : null)).then((j) => { if (j && j.shape) { shape = j.shape; if (j.texture) setTex(j.texture); say('loaded ant.json'); } }).catch(() => {});
+
+  let last = null;
+  function frame(now) {
+    const dt = last == null ? 0 : Math.min(0.05, (now - last) / 1000); last = now; t += dt;
+    const f = Math.floor(t * 12), phase = walk ? t * 9 : null;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+    // the five
+    const rs = rowScale();
+    Ant.ORDER.forEach((k, i) => { ctx.save(); ctx.translate(W / 5 * (i + 0.5) - 0.6 * rs, H * (ROW.y + ROW.h * 0.5)); Ant.draw(ctx, shape, k, { phase, f, scale: rs }); ctx.restore(); });
+    // a faint ground line under the row
+    ctx.strokeStyle = '#eee'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(W * 0.06, H * (ROW.y + ROW.h) + 2); ctx.lineTo(W * 0.94, H * (ROW.y + ROW.h) + 2); ctx.stroke();
+    // the big one, in the chosen texture, with its handles
+    const bs = bigScale(), [ox, oy] = bigOrigin();
+    ctx.save(); ctx.translate(ox, oy); Ant.draw(ctx, shape, tex, { phase: null, f, scale: bs });   /* the big one holds still so the handles sit on the legs */ ctx.restore();
+    // the skeleton lines, faint
+    ctx.save(); ctx.strokeStyle = 'rgba(70,120,255,0.35)'; ctx.lineWidth = 1; ctx.setLineDash([3, 4]);
+    for (const L of shape.legs) { const b = toScreen(L.b), k = toScreen(L.k), tt = toScreen(L.t); ctx.beginPath(); ctx.moveTo(...b); ctx.lineTo(...k); ctx.lineTo(...tt); ctx.stroke(); }
+    { const A = shape.antenna; ctx.beginPath(); ctx.moveTo(...toScreen(A.b)); ctx.lineTo(...toScreen(A.c)); ctx.lineTo(...toScreen(A.t)); ctx.stroke(); }
+    ctx.setLineDash([]);
+    for (const h of handles()) { const [x, y] = toScreen(h.get()); const on = (drag || hover) && (drag || hover).id === h.id; ctx.beginPath(); ctx.arc(x, y, on ? 7 : 5, 0, Math.PI * 2); ctx.fillStyle = h.solid ? (on ? '#2F55C9' : 'rgba(47,85,201,0.85)') : '#fff'; ctx.fill(); ctx.strokeStyle = on ? '#2F55C9' : 'rgba(47,85,201,0.7)'; ctx.lineWidth = 1.4; ctx.stroke(); }
+    ctx.restore();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
