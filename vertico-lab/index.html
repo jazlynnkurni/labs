@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vertico lab</title>
+<style>
+/* MOVING VERTICO, in code. The GIF is 20 pencil drawings on punched animation paper, 60ms each: a walk
+   along a path into a dune, everything born at one vanishing point and rushing past to the lower right,
+   while the ridge and the wall corner hold still. Here the walk is real perspective (size goes as 1/z),
+   and the hand is faked by redrawing every line with fresh wobble on each 60ms tick, on a new sheet. */
+:root{--bg:#ece9e4;--ink:#14171B;--mute:#6f6b64}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif}
+.wrap{min-height:100vh;display:grid;grid-template-rows:auto 1fr;padding:18px 16px 28px;gap:16px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}
+.bar button{font:500 12px "Helvetica Neue",sans-serif;border:1px solid #d6d2ca;background:#fff;border-radius:999px;padding:7px 13px;cursor:pointer;color:var(--ink)}
+.bar button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+#modes{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:100%;margin-bottom:4px}
+#modes button.on{background:#340414;border-color:#340414}
+body:not(.m-original) #split{display:none}
+body.m-walk canvas{cursor:grab;touch-action:none}
+#cap{max-width:760px;text-align:center}
+#surfs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:100%;margin-bottom:4px}
+#surfs::before{content:"Surface";color:var(--mute);font-size:12px;align-self:center;margin-right:4px}
+#surfs button.on{background:#A99939;border-color:#A99939;color:#14171B}
+#lines{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:100%;margin-bottom:4px}
+#lines::before{content:"Lines";color:var(--mute);font-size:12px;align-self:center;margin-right:4px}
+#lines button.on{background:#1C1A17;border-color:#1C1A17}
+#grounds{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:100%;margin-bottom:4px}
+#grounds::before{content:"Ground";color:var(--mute);font-size:12px;align-self:center;margin-right:4px}
+#grounds button.on{background:#340414;border-color:#340414}
+#motions{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:100%;margin-bottom:4px}
+#motions::before{content:"Motion";color:var(--mute);font-size:12px;align-self:center;margin-right:4px}
+#motions button.on{background:#A99939;border-color:#A99939;color:#14171B}
+.stack{position:relative}
+.stack #gl{position:absolute;inset:0;box-shadow:none;filter:blur(.55px)}   /* the same softness as the painted lines over it */
+.stack #c{position:relative}
+.stage{display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:center}
+figure{margin:0;display:flex;flex-direction:column;gap:6px;align-items:center}
+figcaption{color:var(--mute);font-size:12px}
+canvas,img.gif{display:block;width:min(92vw,760px);aspect-ratio:500/379;height:auto;box-shadow:0 1px 2px rgba(0,0,0,.08),0 12px 30px -14px rgba(0,0,0,.35)}
+body.split canvas,body.split img.gif{width:min(92vw,46vw,600px)}
+/* on a wide screen the controls sit in a column on the left, so the drawing and every option fit on one screen */
+@media(min-width:1000px){
+  .wrap{grid-template-columns:300px 1fr;grid-template-rows:1fr;align-items:center;height:100vh;padding:18px 24px;gap:24px}
+  .bar{flex-direction:column;align-items:stretch;justify-content:center;gap:14px}
+  #modes,#surfs,#lines,#grounds,#motions{justify-content:flex-start;margin:0}
+  #modes::before{content:"Direction";color:var(--mute);font-size:12px;align-self:center;margin-right:4px}
+  #surfs::before,#lines::before,#grounds::before,#motions::before,#modes::before{width:100%;margin:0 0 2px}
+  .bar>button{align-self:flex-start}
+  canvas,img.gif{width:min(calc(100vw - 380px),calc((100vh - 80px)*500/379))}
+  body.split canvas,body.split img.gif{width:min(calc((100vw - 400px)/2),calc((100vh - 80px)*500/379))}
+}
+img.gif{display:none;image-rendering:auto}
+body.split img.gif{display:block}
+body.split .gfig{display:flex}.gfig{display:none}
+/* MORPHING SELECTION, after Spotify's shuffle button: a choice never snaps. Each row has one pill that slides and
+   reshapes from the old choice to the new one on a spring with a little overshoot; the labels cross-fade their
+   colour; every press gives a small springy dip. */
+#modes,#surfs,#lines,#grounds,#motions{position:relative;isolation:isolate}
+.bar button{position:relative;z-index:1;transition:color .28s ease,background-color .32s ease,border-color .32s ease,transform .38s cubic-bezier(.34,1.56,.64,1)}
+.bar button:active{transform:scale(.94)}
+#modes button,#surfs button,#lines button,#grounds button,#motions button{background:rgba(255,255,255,.55)}
+#modes button.on,#surfs button.on,#lines button.on,#grounds button.on,#motions button.on{background:transparent;border-color:transparent}
+.pill{position:absolute;left:0;top:0;z-index:0;border-radius:999px;pointer-events:none;will-change:transform,width,height;
+  transition:transform .5s cubic-bezier(.34,1.4,.5,1),width .5s cubic-bezier(.34,1.4,.5,1),height .5s cubic-bezier(.34,1.4,.5,1),background-color .4s ease}
+.pill.still{transition:none}
+#modes .pill{background:#340414}#surfs .pill{background:#A99939}#lines .pill{background:#1C1A17}#grounds .pill{background:#340414}#motions .pill{background:#A99939}
+</style></head><body>
+<div class="wrap">
+  <div class="bar">
+    <span id="modes"></span>
+    <span id="surfs"></span>
+    <span id="lines"></span>
+    <span id="grounds"></span>
+    <span id="motions"></span>
+    <button id="split">Side by side with the GIF</button>
+    <button id="step" class="on">On 60ms, like the GIF</button>
+    <button id="pause">Pause</button>
+
+  </div>
+  <div class="stage">
+    <figure><div class="stack"><canvas id="gl" width="1000" height="758"></canvas><canvas id="c" width="1000" height="758"></canvas></div><figcaption id="cap">code</figcaption></figure>
+    <figure class="gfig"><img class="gif" src="original.gif" alt="the original GIF"><figcaption>original GIF</figcaption></figure>
+  </div>
+</div>
+<script>
+const W=500,H=379, TICK=60, LOOP=20;          /* the GIF: 20 frames of 60ms */
+const VP={x:216,y:186}, F0=180; let F=F0;                  /* vanishing point and focal length, in the GIF's 500 x 379 */
+const cv=document.getElementById('c'), MAIN=cv.getContext('2d'); let ctx=MAIN; ctx.scale(2,2);
+/* Chromium can drop a 2D canvas under memory pressure; when it comes back its scale is gone, so set it again */
+cv.addEventListener('contextrestored',()=>{ ctx.setTransform(2,0,0,2,0,0); });
+
+/* seeded randomness: the same seed draws the same wobble, so a tick is one drawing */
+function rng(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const proj=(X,Y,z)=>[VP.x+X*F/z, VP.y+Y*F/z];
+
+/* ---- paper: five sheets, a new one each tick, like a stack of scanned drawings ---- */
+const SHEETS=[...Array(5)].map((_,k)=>{
+  const c=document.createElement('canvas'); c.width=W*2; c.height=H*2; const g=c.getContext('2d'); g.scale(2,2);
+  const r=rng(101+k*17);
+  g.fillStyle='#dde1e2'; g.fillRect(0,0,W,H);
+  for(let i=0;i<22;i++){ const x=r()*W,y=r()*H,rad=20+r()*110; const gr=g.createRadialGradient(x,y,0,x,y,rad);
+    gr.addColorStop(0,`rgba(110,112,128,${.06+r()*.1})`); gr.addColorStop(1,'rgba(120,125,135,0)'); g.fillStyle=gr; g.fillRect(0,0,W,H); }
+  for(let i=0;i<5;i++){ const x=r()*W,y=r()*H; g.fillStyle=`rgba(150,120,110,${.03+r()*.05})`; g.beginPath(); g.ellipse(x,y,4+r()*16,3+r()*10,r()*3,0,7); g.fill(); }
+  for(let i=0;i<2600;i++){ g.fillStyle=`rgba(${r()<.5?'255,255,255':'90,95,105'},${r()*.09})`; g.fillRect(r()*W,r()*H,1+r()*1.5,1+r()*1.5); }
+  for(let i=0;i<10;i++){ g.fillStyle='rgba(30,30,35,.5)'; g.beginPath(); g.arc(r()*W,r()*H,.4+r()*.7,0,7); g.fill(); }
+  /* the peg holes along the top */
+  for(const x of [55,245,435]){ g.fillStyle='rgba(255,255,255,.55)'; g.beginPath(); g.arc(x+r()*2,13,5.2,0,7); g.fill();
+    g.strokeStyle='rgba(60,60,70,.35)'; g.lineWidth=.7; g.beginPath(); g.arc(x+r()*2,13,5.2,.4,3.6); g.stroke(); }
+  return c;
+});
+
+/* ---- THE SURFACES, in GLSL. Every pixel is traced back into the scene: below the horizon it lands on the
+   floor, left of the corner on the wall, under the ridge on the dune, else the sky. The texture is laid in
+   that surface's own coordinates, so it foreshortens and slides past with the walk, and the tick re-seeds
+   it so it boils with the pencil. ---- */
+const GLC=document.getElementById('gl'), gl=GLC.getContext('webgl',{premultipliedAlpha:false});
+let SURF=0, GSTYLE=0;   /* GSTYLE: the ground's drawing, 0 lines, 1-5 the prototypes */   /* 0 is the plain scanned paper; 1-5 are the shader surfaces */
+const SURFS=['Paper','Graphite','Sand','Riso halftone','Watercolour','Linocut','Paper + graphite'];
+const FRAG=`precision highp float;
+uniform vec2 uRes; uniform float uTime,uTick,uD,uF,uCam,uStyle,uWind;
+uniform vec2 uVP; uniform float uGround,uWall; uniform vec2 uRidge[12]; uniform sampler2D uSheet; uniform float uGStyle; uniform float uPull; uniform vec4 uPh; uniform float uMot,uMK;
+float h21(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }
+float vn(vec2 p){ vec2 i=floor(p),f=fract(p); f=f*f*(3.-2.*f);
+  return mix(mix(h21(i),h21(i+vec2(1,0)),f.x),mix(h21(i+vec2(0,1)),h21(i+vec2(1,1)),f.x),f.y); }
+float fbm(vec2 p){ float a=.5,s=0.; for(int i=0;i<5;i++){ s+=a*vn(p); p=p*2.03+17.1; a*=.5; } return s; }
+float ridgeY(float x){ float y=uRidge[11].y;
+  for(int i=0;i<11;i++){ vec2 a=uRidge[i],b=uRidge[i+1]; if(x>=a.x&&x<=b.x){ y=mix(a.y,b.y,(x-a.x)/(b.x-a.x)); } }
+  if(x<uRidge[0].x) y=uVP.y; return y; }
+float cornerX(float y){ return y<uVP.y? mix(196.,uVP.x-2.,y/uVP.y) : mix(uVP.x-2.,160.,(y-uVP.y)/(379.-uVP.y)); }
+/* hatching: lines along v, with a pressure that wavers along u */
+float hatch(float v,float u,float dens,float w,float seed){ float f=fract(v*dens+ .35*vn(vec2(u*2.,v*dens*.5+seed))); float d=min(f,1.-f);
+  /* soft-edged and uneven in pressure, to sit with the watercolour lines drawn over it */
+  return (1.-smoothstep(w*.2,w*1.6,d))*(.7+.3*vn(vec2(u*5.,v*dens*3.+seed))); }
+/* one grass stroke per cell, drawn the way a hand draws it: the pencil lands and presses (dark, a little wide),
+   then lifts as it travels, thinning and breaking into the paper's tooth, and flicks off at the tip. The stroke
+   bends, so it is a gesture rather than a dash. */
+float segD(vec2 p,vec2 a,vec2 b,out float t){ vec2 pa=p-a,ba=b-a; t=clamp(dot(pa,ba)/dot(ba,ba),0.,1.); return length(pa-ba*t); }
+float grass(vec2 p,float lean,float seed){
+  float a=0.;
+  for(int j=0;j<4;j++) for(int i=-3;i<=1;i++){
+    vec2 cell=vec2(floor(p.x/4.4)+float(i),floor(p.y/6.)+float(j));
+    float h1=h21(cell+seed), h2=h21(cell*1.7+seed+3.), h3=h21(cell*2.3+seed+7.);
+    if(h3<.38) continue;                                   /* gaps: not every cell has a blade */
+    vec2 base=vec2((cell.x+.15+.7*h1)*4.4,(cell.y+.4+.5*h2)*6.);
+    float L=9.+h2*9.;
+    vec2 tip=base+vec2(lean*L*(.6+.7*h1),-L);
+    vec2 mid=mix(base,tip,.45)+vec2((h3-.5)*3.-lean*1.6,0.);  /* the bow of the stroke */
+    float t1,t2; float d1=segD(p,base,mid,t1), d2=segD(p,mid,tip,t2);
+    float d=d1, t=t1*.5; if(d2<d1){ d=d2; t=.5+t2*.5; }
+    /* the pressure: a quick attack, heaviest just after landing, lifting away to nothing at the tip */
+    /* lands, holds through the middle, then eases off: the release is long, the attack short */
+    float pr=smoothstep(0.,.08,t)*(1.-smoothstep(.3,1.,t))*(.7+.45*h3);
+    float wdt=.14+.42*pr;
+    float body=1.-smoothstep(wdt*.35,wdt*1.25,d);
+    /* graphite on tooth: light pressure only catches the peaks of the paper, heavy pressure fills it */
+    float tooth=.6*vn(p*6.5+seed*1.7+cell*5.1)+.4*vn(p*2.1+cell*3.3);
+    float fill=smoothstep(1.-pr-.1,1.-pr+.14,tooth);
+    a=max(a,body*fill*(.35+.65*pr));
+  }
+  return a; }
+/* a single pressured pencil stroke from base to tip, bowed through mid: lands, holds, lifts off */
+float pstroke(vec2 p,vec2 base,vec2 mid,vec2 tip,float h,vec2 cell,float seed,float wmul){
+  float t1,t2; float d1=segD(p,base,mid,t1), d2=segD(p,mid,tip,t2);
+  float d=d1, t=t1*.5; if(d2<d1){ d=d2; t=.5+t2*.5; }
+  float pr=smoothstep(0.,.08,t)*(1.-smoothstep(.3,1.,t))*(.7+.45*h);
+  float wdt=(.14+.42*pr)*wmul;
+  float body=1.-smoothstep(wdt*.35,wdt*1.25,d);
+  float tooth=.6*vn(p*6.5+seed*1.7+cell*5.1)+.4*vn(p*2.1+cell*3.3);
+  return body*smoothstep(1.-pr-.1,1.-pr+.14,tooth)*(.35+.65*pr); }
+vec2 projW(float X,float zw){ float z=zw-uD+uCam; return vec2(uVP.x+X*uF/z,uVP.y+uGround*uF/z); }
+float tri(float x){ return abs(fract(x)-.5)*4.-1.; }
+/* the contour field is made of triangle waves, so its lines run in straight runs and turn at corners */
+float Ec(vec2 w){ return tri(w.x*.35+.2)*.6+tri(w.y*.22+w.x*.1)*.8+tri((w.x-w.y)*.15+.4)*.5+w.x*.12; }
+vec2 warpG(vec2 p){
+  vec2 d=p-uVP; float r=length(d);
+  if(uMot==1.) return p+vec2(3.5*tri(p.y*.004+uPh.x),2.45*tri(p.x*.004+uPh.y));
+  if(uMot==2.){ float k=uMK*exp(-r/320.); return p-vec2(d.x*k,d.y*k*1.35); }
+  if(uMot==4.){ float a=7.*min(1.,r/70.); return p+vec2(a*(sin(p.x*.012+p.y*.006+uTime*1.3)*.7+sin(p.y*.021-uTime*.9)*.3), a*.7*sin(p.y*.013-p.x*.005+uTime*1.1)); }
+  return p; }
+/* THE GROUND, five ways, all in world coordinates so they slide past with the walk */
+float ground(vec2 bp,vec2 uv,float z,float jit,float shade){
+  float ppu=uF/z;                                       /* screen px per world unit, here */
+  float tooth=vn(bp*3.1+jit);
+  float wallShade=smoothstep(.9,-.1,uv.x-uWall);
+  float a=0.;
+  if(uGStyle<1.5){ /* FURROWS: rows toward the vanishing point, each drawn in strokes that start and stop */
+    float sp=.17, row=uv.x/sp, f=fract(row), dpx=min(f,1.-f)*sp*ppu;
+    float pr=smoothstep(.25,.6,vn(vec2(floor(row+.5)*3.1,uv.y*1.4)));
+    float w=.35+.75*pr;
+    a=(1.-smoothstep(w*.3,w*1.3,dpx))*pr*(.4+.3*(1.-shade))*smoothstep(1.-pr-.1,1.-pr+.2,tooth);
+    a+=step(.93,h21(floor(bp*1.3)+jit))*.25;                                   /* grit */
+    a+=wallShade*.12;
+  } else if(uGStyle<2.5){ /* TUFTS: clumps of the meadow's strokes on bare soil */
+    vec2 c0=floor(uv/.32);
+    for(int j=0;j<3;j++) for(int i=-1;i<=1;i++){
+      vec2 cell=c0+vec2(float(i),float(j)); float h=h21(cell*1.31+4.);
+      if(h<.5) continue;
+      vec2 wb=(cell+vec2(.2+.6*h21(cell+1.),.2+.6*h21(cell+2.)))*.32;
+      if(wb.y-uD+uCam<.3) continue;
+      vec2 b=projW(wb.x,wb.y); float zb=wb.y-uD+uCam, L=(.07+.07*h)*uF/zb;
+      for(int k=0;k<5;k++){ float hk=h21(cell*7.+float(k)); float ln=(hk-.5)*1.1;
+        vec2 bk=b+vec2((hk-.5)*L*.5,0.), tk=bk+vec2(ln*L,-L*(.6+.5*hk)), mk=mix(bk,tk,.45)+vec2(ln*L*.15,0.);
+        a=max(a,pstroke(bp,bk,mk,tk,hk,cell+float(k),jit,clamp(uF/zb*.012,.6,1.6))*(.5+.4*(1.-shade))); }
+    }
+    a=max(a,step(.95,h21(floor(bp*1.2)+jit))*.22);                             /* soil */
+    a+=wallShade*.1;
+  } else if(uGStyle<3.5){ /* STIPPLE: graphite dots, in wind-ripple bands, denser in the wall's shadow */
+    float cs=.045; vec2 cell=floor(uv/cs); float h=h21(cell+3.7);
+    float tone=.16+.13*sin(uv.y*9.+sin(uv.x*2.3)*1.6)+.3*wallShade+.15*(1.-shade);
+    if(h<tone*1.5){ vec2 wc=(cell+vec2(.2+.6*h21(cell+1.),.2+.6*h21(cell+2.)))*cs; vec2 c=projW(wc.x,wc.y);
+      float r=clamp(.014*ppu,.45,1.7)*(.7+.6*h); a=(1.-smoothstep(r*.5,r*1.2,length(bp-c)))*(.55+.35*tooth); }
+  } else if(uGStyle<4.5){ /* SMUDGE: finger-blended tone, eraser lifts streaking across, a faint contour or two */
+    float tone=.16+.22*fbm(uv*vec2(1.2,.55)+3.)+.24*wallShade+.1*(1.-shade);
+    float lift=smoothstep(.72,.95,vn(vec2(uv.y*2.6,uv.x*.35+jit*.02)));
+    tone*=1.-lift*.75;
+    tone+=hatch(Ec(uv)*3.,uv.x,1.,.06,jit)*.12;
+    a=tone*(.6+.4*tooth);
+  } else { /* CONTOURS: scribbled lines following the rise and fall of the land, drawn twice, a little off */
+    float e=Ec(uv), ex=(Ec(uv+vec2(.02,0.))-e)/.02, ey=(Ec(uv+vec2(0.,.02))-e)/.02, g=max(length(vec2(ex,ey)),.05);
+    for(int k=0;k<2;k++){ float off=float(k)*.045; float f=fract((e+off)*3.); float dw=min(f,1.-f)/3./g*ppu;
+      float pr=smoothstep(.2,.6,vn(vec2(e*9.+float(k)*5.,uv.x*1.5+uv.y*.7)));
+      float w=.35+.8*pr; a=max(a,(1.-smoothstep(w*.3,w*1.3,dw))*pr*(k==0?.6:.35)*smoothstep(1.-pr-.1,1.-pr+.2,tooth)); }
+    a+=wallShade*.1;
+  }
+  return a; }
+void main(){
+  vec2 px=vec2(gl_FragCoord.x/uRes.x*500.,(1.-gl_FragCoord.y/uRes.y)*379.);
+  float jit=uTick*7.13;                                  /* the boil: each tick a new sheet */
+  vec2 sp=2.*px-warpG(px);                               /* where this pixel came from, before the pull */
+  vec2 bp=sp+vec2(vn(px*.05+jit)-.5,vn(px*.05+jit+9.)-.5)*1.2;   /* the hand's wobble on the edges */
+  float region; vec2 uv; float shade; float far=0.; float fz=1.;
+  float cx=cornerX(bp.y), ry0=ridgeY(bp.x), fe=uVP.y-(bp.x-uVP.x)*(24./284.);
+  /* the crest is grass tips, not a line: a fine sawtooth of blades, swaying */
+  float tips=abs(sin(bp.x*2.3+sin(bp.x*.31)*3.+sin(uTime*2.1+bp.x*.06)*1.2));
+  float ry=ry0+1.2-tips*2.6-(vn(vec2(bp.x*.7,uTime*1.4))-.5)*2.;
+  if(bp.x<cx){ /* the wall, the plane X = uWall */
+    float z=uWall*uF/(min(bp.x-uVP.x,-.5)); float Y=(bp.y-uVP.y)*z/uF; region=1.; uv=vec2(z+uD-uCam,Y); shade=clamp(.55+.25*Y,0.,1.);
+  } else if(bp.y>uVP.y+.5){ /* the floor, the plane Y = uGround */
+    float z=uGround*uF/(bp.y-uVP.y); float X=(bp.x-uVP.x)*z/uF; region=0.; uv=vec2(X,z+uD-uCam); shade=clamp(1.-z*.12,0.,1.); far=smoothstep(2.5,7.,z); fz=z;   /* past here the lines are finer than a pixel: let them go */
+  } else {   /* no hill: the sky comes down to the horizon */ region=3.; uv=bp/80.; shade=0.; }
+  vec3 paper=vec3(.953,.945,.929);                       /* #F3F1ED */
+  float tooth=fbm(px*.9+jit)*.06;
+  vec3 col=paper-tooth;
+  float st=uStyle;
+  bool onSheet=st>5.5||st<.5;
+  if(onSheet) col=texture2D(uSheet,vec2(px.x/500.,px.y/379.)).rgb;   /* the scanned sheet itself */
+  if(st<.5){ /* PAPER: the sheet as it is */ }
+  else if(st<1.5||onSheet){ /* GRAPHITE, on clean paper or on the sheet */
+    vec3 g=vec3(.17,.17,.19); float a=0.;
+    if(region==0.&&uGStyle>.5){ a=ground(bp,uv,fz,jit,shade); a=mix(a,.14,far*.6); }
+    else if(region==0.){ a=hatch(uv.y,uv.x,5.,.09+.05*shade,jit)*(.35+.4*(1.-shade)); a+=hatch((uv.x+uv.y*.6)*1.,uv.y,7.,.06,jit+3.)*.25*smoothstep(.6,0.,uv.x+.2); }
+    else if(region==1.){ a=hatch(uv.x,uv.y,3.5,.08,jit)*.45+.12; a+=hatch(uv.y,uv.x,6.,.05,jit+5.)*.15; }
+    /* the hill is drawn by the meadow below */
+    if(region==0.&&uGStyle<.5) a=mix(a,.18,far);
+    a*=.75+.5*fbm(px*.15+jit);
+    if(onSheet){ a*=.62; col*=1.-clamp(a,0.,.8)*(1.-g/col.g*.9); col=mix(col,g,clamp(a*.35,0.,.4)); }   /* softer, and laid into the paper's own tone */
+    else col=mix(col,g,clamp(a,0.,.9));
+  } else if(st<2.5){ /* SAND AND PLASTER */
+    if(region==0.){ float rip=sin(uv.y*26.+sin(uv.x*3.+uv.y)*2.+fbm(uv*3.)*4.); vec3 sand=vec3(.86,.79,.66);
+      col=sand*(.9+.08*rip)+(h21(floor(px*1.7)+jit)-.5)*.08; col*=.92+.08*shade; }
+    else if(region==1.){ vec3 pl=vec3(.88,.86,.83); float stain=fbm(uv*vec2(1.2,3.)+3.); col=pl-vec3(.06,.07,.08)*smoothstep(.45,.8,stain); col-=.18*smoothstep(.2,1.,uv.y/uGround)*vec3(.6,.55,.5); col+=(h21(floor(px*2.)+jit)-.5)*.03; }
+    else if(region==2.){ vec3 du=vec3(.83,.71,.48); col=du*(.88+.15*sin(bp.x*.18+bp.y*.5+fbm(uv*2.)*3.))*(.92+.08*shade); }
+    else { col=mix(vec3(.96,.95,.92),vec3(.88,.9,.92),1.-bp.y/200.); }
+    col-=tooth*.6;
+  } else if(st<3.5){ /* RISO HALFTONE: two plates, gold and oxblood, each its own screen angle and its own slip */
+    float tA=0.,tB=0.;
+    if(region==0.){ tA=.25+.25*sin(uv.y*9.+fbm(uv*2.)*3.); tB=.15+.45*(1.-shade); }
+    else if(region==1.){ tA=.2; tB=.55+.2*fbm(uv*2.); }
+    else if(region==2.){ tA=.55+.2*shade; tB=.12+.3*shade; }
+    vec2 o1=vec2(h21(vec2(uTick,1.))-.5,h21(vec2(uTick,2.))-.5)*3.;
+    vec2 o2=vec2(h21(vec2(uTick,3.))-.5,h21(vec2(uTick,4.))-.5)*1.5;
+    mat2 r1=mat2(.966,-.259,.259,.966), r2=mat2(.707,-.707,.707,.707);
+    vec2 c1=r1*(px+o1)/3.2, c2=r2*(px+o2)/3.6;
+    float d1=length(fract(c1)-.5), d2=length(fract(c2)-.5);
+    float dot1=1.-smoothstep(sqrt(tA)*.5-.06,sqrt(tA)*.5+.06,d1), dot2=1.-smoothstep(sqrt(tB)*.5-.06,sqrt(tB)*.5+.06,d2);
+    vec3 gold=vec3(.663,.6,.224), ox=vec3(.204,.016,.078);
+    col=paper; col*=mix(vec3(1.),gold,dot1*.95); col*=mix(vec3(1.),ox*1.6+.1,dot2*.9); col-=tooth*.5;
+  } else if(st<4.5){ /* WATERCOLOUR: a wash per surface, pooled darker at its edges, grainy where the pigment settled */
+    vec3 w; float wet=fbm(uv*1.5+jit*.02);
+    if(region==0.) w=vec3(.61,.65,.61); else if(region==1.) w=vec3(.51,.48,.52); else if(region==2.) w=vec3(.79,.72,.48); else w=vec3(.78,.82,.86);
+    float amt=region==3.?.35:.55+.3*wet;
+    float edge=0.; /* distance to the surface's own boundaries, in px */
+    if(region==0.) edge=min(bp.y-uVP.y,bp.x-cx); else if(region==1.) edge=cx-bp.x; else if(region==2.) edge=min(bp.y-ry,abs(bp.y-fe)); else edge=ry-bp.y;
+    float pool=smoothstep(10.,0.,edge)*.35;
+    float gran=(vn(px*1.3+jit)-.5)*.25;
+    col=mix(paper,w,clamp(amt+pool+gran,0.,1.)); col*=1.-pool*.25;
+    col-=tooth*.8;
+  } else { /* LINOCUT: black block, white gouges; the floor's stripes narrow with distance */
+    float ink=0.;
+    if(region==0.){ float v=fract(uv.y*2.2+fbm(uv*vec2(2.,1.))*.5); ink=step(.32+.25*shade+(vn(px*.4)-.5)*.1,v)*(1.-far); }
+    else if(region==1.){ float g=fract(uv.x*1.6+vn(vec2(uv.y*3.,uv.x))*.4); ink=1.-step(.88,g)*step(.2,fbm(vec2(uv.x*4.,uv.y*2.)+jit*.01)); }
+    else if(region==2.){ float g=fract((bp.y-ry)/6.+vn(bp/30.)*.6); ink=step(.45,g)*step(4.,bp.y-ry); }
+    else { float g=fract(bp.y/9.+vn(bp/40.)*.8); ink=step(.93,g)*step(.6,vn(bp*vec2(.02,.3)))*.0; }
+    col=mix(paper,vec3(.078,.09,.106),ink); col-=tooth*.4;
+  }
+  /* THE MEADOW, in graphite: the grass is pencil strokes, short and upright, leaning over as each wave of wind
+     crosses the hill; where the wave is, the strokes lift and thin, so the gust reads as a pale band moving
+     through; at the foot the strokes crowd and cross-hatch into shadow */
+  if(region==2.){
+    float d=clamp((bp.y-ry)/max(fe-ry,8.),0.,1.);
+    float w=sin(bp.x*.042+bp.y*.03-uTime*1.8+fbm(bp*.012+vec2(uTime*.12,0.))*4.5);
+    float bend=smoothstep(.15,1.,w);
+    /* a graphite wash under the strokes, the same grey the wall carries, a touch deeper toward the foot
+       and lifting where the gust passes */
+    col=mix(col,vec3(.17,.17,.19),(.13+.07*d)*(.8+.4*fbm(bp*.03+jit*.01))*(1.-bend*.25));
+    float lean=.15+bend*.75+(vn(bp*.05)-.5)*.3;
+    float a=grass(bp,lean,jit)*(.35+.4*d)*(1.-bend*.5);
+    a+=hatch((bp.x-bp.y*.8)/5.,bp.y/30.,1.,.08,jit+4.)*.12*smoothstep(.6,1.,d);   /* a breath of shadow at the foot */
+    a*=.75+.5*fbm(px*.15+jit);
+    vec3 g=vec3(.17,.17,.19);
+    col=mix(col,g,clamp(a,0.,.85));
+  }
+  gl_FragColor=vec4(col,1.);
+}`;
+function glProg(){ if(!gl) return null;
+  const sh=(t,src)=>{ const o=gl.createShader(t); gl.shaderSource(o,src); gl.compileShader(o); if(!gl.getShaderParameter(o,gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(o)); return o; };
+  const p=gl.createProgram(); gl.attachShader(p,sh(gl.VERTEX_SHADER,'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}')); gl.attachShader(p,sh(gl.FRAGMENT_SHADER,FRAG)); gl.linkProgram(p);
+  gl.useProgram(p); const b=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,b); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+  const loc=gl.getAttribLocation(p,'a'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+  const U={}; for(const n of ['uRes','uTime','uTick','uD','uF','uCam','uStyle','uWind','uVP','uGround','uWall','uRidge','uSheet','uGStyle','uPull','uPh','uMot','uMK']) U[n]=gl.getUniformLocation(p,n); return U; }
+let GU=null; try{ GU=glProg(); }catch(e){ console.error(e); window.__err='shader: '+e.message; }
+/* the five scanned sheets, as textures, so a surface can sit on the real paper */
+const SHEETTEX=GU?SHEETS.map(c=>{ const t=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,t);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,c); return t; }):[];
+function surface(tick,D){
+  if(!GU){ GLC.style.visibility='hidden'; return; } GLC.style.visibility='visible';
+  gl.viewport(0,0,GLC.width,GLC.height);
+  gl.uniform2f(GU.uRes,GLC.width,GLC.height); gl.uniform1f(GU.uTime,T/1000); gl.uniform1f(GU.uTick,tick%997);
+  gl.uniform1f(GU.uD,D); gl.uniform1f(GU.uF,F); gl.uniform1f(GU.uCam,CAM); gl.uniform1f(GU.uStyle,SURF); gl.uniform1f(GU.uWind,WIND);
+  gl.uniform2f(GU.uVP,VP.x,VP.y); gl.uniform1f(GU.uGround,GROUND); gl.uniform1f(GU.uWall,WALL);
+  gl.uniform2fv(GU.uRidge,new Float32Array(RIDGE.flat())); gl.uniform1f(GU.uGStyle,GSTYLE); gl.uniform1f(GU.uPull,PULL); gl.uniform4f(GU.uPh,PH[0],PH[1],PH[2],PH[3]); gl.uniform1f(GU.uMot,{redrawn:1,drift:2,elastic:4}[MOTION]||0); gl.uniform1f(GU.uMK,MK);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,SHEETTEX[(tick%LOOP)%SHEETS.length]); gl.uniform1i(GU.uSheet,0);
+  gl.drawArrays(gl.TRIANGLES,0,3);
+}
+/* the 2D sheet: the scanned paper, or nothing when a shader surface is under it */
+function paper(sheet){ if(!GU) ctx.drawImage(sheet,0,0,W,H); else ctx.clearRect(0,0,W,H); }
+
+/* ---- the pencil: a line through points, each point nudged by the tick's seed, laid down twice ---- */
+/* MOTION. The GIF's movement is loose and hand-made: each sheet is redrawn, so marks sit a little differently
+   every frame and the land is re-outlined rather than bent. Five takes on that, chosen from the Motion row. */
+let MOTION='redrawn', PULL=0, MK=0, PH=[0,0,0,0], NOWARP=false;
+const MOTIONS=[['off','Off'],['redrawn','01 Redrawn'],['drift','02 Drift'],['smear','03 Smear'],['elastic','04 Elastic'],['patches','05 Patches']];
+const tri=x=>Math.abs(((x%1)+1)%1-.5)*4-1;
+const fr=v=>v-Math.floor(v);
+function setPull(tick){ const key=((tick%60)+60)%60;
+  PH=[0,1,2,3].map(i=>fr(Math.sin((key+1)*12.9898+i*78.233)*43758.5453));
+  MK=.025+.055*PH[0];                                   /* how far this sheet sags in */
+  PULL=MOTION==='off'?0:1; }
+function warp(x,y){
+  const dx=x-VP.x, dy=y-VP.y, r=Math.hypot(dx,dy);
+  if(MOTION==='redrawn'){ const m=3.5; return [x+m*tri(y*.004+PH[0]),y+m*.7*tri(x*.004+PH[1])]; }
+  if(MOTION==='drift'){ const k=MK*Math.exp(-r/320); return [x-dx*k,y-dy*k*1.35]; }
+  if(MOTION==='elastic'){ const a=7*Math.min(1,r/70), t=T/1000; return [x+a*(Math.sin(x*.012+y*.006+t*1.3)*.7+Math.sin(y*.021-t*.9)*.3), y+a*.7*Math.sin(y*.013-x*.005+t*1.1)]; }
+  return [x,y];
+}
+/* REDRAWN: each stroke as a whole gesture slips a little each sheet, about its own middle */
+function gesture(pts,r){
+  if(MOTION!=='redrawn'||NOWARP||pts.length<2) return pts;
+  let cx=0,cy=0; for(const p of pts){ cx+=p[0]; cy+=p[1]; } cx/=pts.length; cy/=pts.length;
+  const rot=(r()-.5)*.07, sc=1+(r()-.5)*.07, ox=(r()-.5)*2.6, oy=(r()-.5)*2, c=Math.cos(rot), s=Math.sin(rot);
+  return pts.map(([x,y])=>{ const u=(x-cx)*sc, v=(y-cy)*sc; return [cx+u*c-v*s+ox, cy+u*s+v*c+oy]; });
+}
+const W2=(x,y)=>NOWARP?[x,y]:warp(x,y);
+function dense(pts){ if(!PULL||NOWARP||MOTION==='smear'||MOTION==='patches') return pts; const out=[pts[0]];
+  for(let i=1;i<pts.length;i++){ const [x0,y0]=pts[i-1],[x1,y1]=pts[i], n=Math.min(40,Math.ceil(Math.hypot(x1-x0,y1-y0)/10));
+    for(let k=1;k<=n;k++) out.push([x0+(x1-x0)*k/n,y0+(y1-y0)*k/n]); } return out; }
+
+function pencil(pts,{w=1,a=.82,amp=.7,r}={}){
+  const P=dense(gesture(pts,r)).map(([x0,y0])=>{ const [x,y]=W2(x0,y0); return [x+(r()-.5)*amp*2,y+(r()-.5)*amp*2]; });
+  for(let pass=0;pass<2;pass++){
+    ctx.beginPath(); ctx.moveTo(P[0][0]+(pass?r()-.5:0),P[0][1]);
+    for(let i=1;i<P.length-1;i++){ const mx=(P[i][0]+P[i+1][0])/2,my=(P[i][1]+P[i+1][1])/2; ctx.quadraticCurveTo(P[i][0],P[i][1],mx,my); }
+    ctx.lineTo(P.at(-1)[0],P.at(-1)[1]);
+    ctx.strokeStyle=`rgba(20,20,24,${pass?a*.45:a})`; ctx.lineWidth=pass?w*.6:w; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke();
+  }
+}
+/* ink: a fat stroke with a ragged edge and a graphite sheen through it */
+function ink(pts,w,r,{grey=false}={}){
+  const P=pts.map(([x0,y0])=>{ const [x,y]=W2(x0,y0); return [x+(r()-.5)*w*.25,y+(r()-.5)*w*.25]; });
+  const path=()=>{ ctx.beginPath(); ctx.moveTo(P[0][0],P[0][1]); for(let i=1;i<P.length-1;i++){ const mx=(P[i][0]+P[i+1][0])/2,my=(P[i][1]+P[i+1][1])/2; ctx.quadraticCurveTo(P[i][0],P[i][1],mx,my);} ctx.lineTo(P.at(-1)[0],P.at(-1)[1]); };
+  ctx.lineCap='round'; ctx.lineJoin='round';
+  path(); ctx.strokeStyle=grey?'rgba(70,62,58,.78)':'rgba(14,14,16,.93)'; ctx.lineWidth=w; ctx.stroke();
+  path(); ctx.strokeStyle='rgba(14,14,16,.9)'; ctx.lineWidth=Math.max(.6,w*.12); ctx.setLineDash([w*.9,w*.5]); ctx.lineDashOffset=r()*w; ctx.stroke(); ctx.setLineDash([]);
+  path(); ctx.strokeStyle=`rgba(255,255,255,${grey?.10:.06})`; ctx.lineWidth=w*.35; ctx.stroke();
+}
+
+/* ---- shapes in ink. A ribbon is a centre line with a width at every point: the hand's pressure. ---- */
+function ribbon(C,Wd,r,{fill='rgba(12,12,14,.94)',edge=.3,sharp=false}={}){
+  C=gesture(C,r).map(p=>W2(p[0],p[1]));
+  const L=[],R=[];
+  for(let i=0;i<C.length;i++){ const a=C[Math.max(0,i-1)],b=C[Math.min(C.length-1,i+1)];
+    let nx=-(b[1]-a[1]),ny=b[0]-a[0]; const l=Math.hypot(nx,ny)||1; nx/=l; ny/=l;
+    const w=Wd[i]/2, j1=1+(r()-.5)*edge, j2=1+(r()-.5)*edge;
+    L.push([C[i][0]+nx*w*j1,C[i][1]+ny*w*j1]); R.push([C[i][0]-nx*w*j2,C[i][1]-ny*w*j2]); }
+  const P=[...L,...R.reverse()];
+  ctx.beginPath(); ctx.moveTo(P[0][0],P[0][1]);
+  for(let i=1;i<P.length;i++){ const q=P[(i+1)%P.length]; if(sharp) ctx.lineTo(P[i][0],P[i][1]); else ctx.quadraticCurveTo(P[i][0],P[i][1],(P[i][0]+q[0])/2,(P[i][1]+q[1])/2); }
+  ctx.closePath(); ctx.fillStyle=fill; ctx.fill();
+  ctx.strokeStyle='rgba(12,12,14,.8)'; ctx.lineWidth=.7; ctx.stroke();
+}
+/* graphite scumble inside a grey shape: short parallel strokes */
+function scumble(C,Wd,r){ for(let i=0;i<C.length;i+=1){ const w=Wd[i]*.4; for(let k=0;k<3;k++) pencil([[C[i][0]-w+r()*w*2,C[i][1]-2],[C[i][0]-w+r()*w*2+3,C[i][1]+3]],{w:.6,a:.35,amp:.6,r}); } }
+
+/* ---- the things on the walk. Each lives one loop: born far, gone past the camera, born again. ---- */
+/* measured off the GIF: the post's distance to the vanishing point goes 58, 106, 211px at frames 0, 8, 12, so it closes
+   about 6% of its starting distance a frame and is past the camera by frame 15; the last frames are empty of it */
+const ZF=4, ZN=-.72;
+/* ONE CONTINUOUS PATH. Nothing is born mid-path: every thing sits somewhere along a road that runs all the way
+   to the horizon, so it arrives as a speck at the vanishing point, grows as you near it, and goes past you.
+   The road repeats every SPAN, three laps long, which is far enough that its start is a dot. */
+const SPAN=3*(ZF-ZN), ZFAR=ZN+SPAN;
+let WALKED=0;
+const zAt=(p,ph)=>ZN+(((ph*SPAN-WALKED)%SPAN)+SPAN)%SPAN;
+const S=rng(7);
+const GROUND=.82;                     /* the eye is low: things slide out to the right more than they drop */
+const WALL=-.23;                      /* the wall's foot, read off the line from the corner to the bottom left */
+const THINGS=[];
+/* driftwood posts: the hero right of the path, a smaller grey one further over */
+THINGS.push({kind:'post',X:1.4,ph:0,seed:11,h:1.15});
+THINGS.push({kind:'post',X:.7,ph:.45,seed:23,h:.6,grey:true});
+/* the far huddle by the vanishing point: these barely move, creep a little each loop and snap back, as in the GIF */
+/* grass with wheat ears */
+THINGS.push({kind:'grass',X:.45,ph:.8,n:16,h:.55,seed:5});   /* the big bush: crosses the middle around frame 16, as in the GIF */
+THINGS.push({kind:'grass',X:.12,ph:.62,n:10,h:.32,seed:9});
+THINGS.push({kind:'grass',X:1.9,ph:.5,n:9,h:.45,seed:13});
+/* calligraphic scraps on the sand, and sticks lying down */
+for(let i=0;i<22;i++) THINGS.push({kind:'scrap',X:WALL+.05+S()*2,ph:S(),seed:1+i*31,s:.05+S()*.07});
+THINGS.push({kind:'spoon',X:1.6,ph:.12,seed:3});THINGS.push({kind:'spoon',X:.9,ph:.6,seed:8});
+THINGS.push({kind:'log',X:WALL+.02,ph:.4,len:.34});THINGS.push({kind:'log',X:WALL+.05,ph:.9,len:.22});
+for(let i=0;i<5;i++) THINGS.push({kind:'sand',X:-.1+S()*1.3,ph:S(),seed:300+i});
+/* tumbleweeds: tangled balls bowling across the path from the wall side, bouncing as they roll */
+THINGS.push({kind:'tumble',X:0,ph:.15,seed:61,rad:.16,spd:.9});
+THINGS.push({kind:'tumble',X:0,ph:.62,seed:71,rad:.11,spd:1.3});
+/* one seam of the wall sliding off left; the dune's edges sweeping in */
+THINGS.push({kind:'seam',ph:.15});
+THINGS.push({kind:'contour',ph:.05,lean:1.05});THINGS.push({kind:'contour',ph:.55,lean:1.3});
+
+/* three of everything along the road, so the density holds over the longer path; tumbleweeds stay few */
+{ const base=THINGS.splice(0), D=rng(3131);
+  for(const t of base){ const n=t.kind==='tumble'?1:3;
+    for(let k=0;k<n;k++) THINGS.push({...t,ph:((t.ph||0)+k)/n,seed:(t.seed||1)+k*101,X:t.X==null||k===0?t.X:t.X+(D()-.5)*.5}); } }
+THINGS.push({kind:'tumble',X:.9,ph:.4,seed:83,rad:.13,spd:1});
+
+function drawThing(t,p,r){
+  /* far things come up out of the haze rather than appearing */
+  const z=zOf(t,p), fade=Math.min(1,(ZFAR+CAM-z)/(SPAN*.35));
+  if(fade<=0) return;
+  ctx.save(); ctx.globalAlpha*=fade*fade;
+  try{ drawThing0(t,p,r); } finally { ctx.restore(); }
+}
+function drawThing0(t,p,r){
+  const z=zOf(t,p); if(z<.22) return; const k=F/z;
+  if(t.kind==='seam'){ const x=VP.x+(WALL-.12)*k; if(x<-4||x>186) return; pencil([[x+2,0],[x+1,H*.5],[x-1,H]],{w:.9,amp:.7,r}); return; }
+  if(t.kind==='contour'){
+    /* an edge of the dune: starts at the wall's foot, runs off to the right and away, so it sweeps up and across */
+    const pts=[]; for(let u=0;u<=1.001;u+=.08){ const X=WALL+u*3.2, zz=z*(1+u*t.lean), Y=GROUND*(1+.05*Math.sin(u*7+t.ph*11));
+      const q=proj(X,Y,zz); pts.push(q); if(q[0]>W+20) break; }
+    pencil(pts,{w:.85,amp:.8,r}); return; }
+  const [bx,by]=proj(xOf(t,p),GROUND,z);
+  if(bx<-80||bx>W+120||by>H+160) return;
+  const R=rng(t.seed||1);
+  if(t.kind==='post'){
+    /* twisted driftwood: a wavering trunk of uneven width, a stub arm to one side, a hook at the root */
+    const C=[],Wd=[], n=9, hh=t.h*k;
+    for(let i=0;i<=n;i++){ const u=i/n; C.push([bx+(Math.sin(u*5+t.seed)*.07+(R()-.5)*.05+u*.05)*k+WIND*u*u*hh*.22,by-u*hh]); Wd.push((.07+.05*Math.sin(u*9+t.seed)+R()*.05)*k*(t.h/1.15)*(1-u*.2)); }
+    ribbon(C,Wd,r,{fill:t.grey?'rgba(88,78,72,.82)':'rgba(12,12,14,.94)',edge:.55,sharp:true}); if(t.grey) scumble(C,Wd,r);
+    const at=C[Math.round(n*.62)], s=t.h/1.15;
+    const arm=[at,[at[0]+.12*k*s,at[1]-.02*k*s],[at[0]+.26*k*s,at[1]+.03*k*s]];
+    ribbon(arm,[.06*k*s,.05*k*s,.035*k*s],r,{fill:t.grey?'rgba(88,78,72,.82)':'rgba(12,12,14,.94)'});
+    const root=[C[0],[C[0][0]-.08*k*s,C[0][1]-.02*k*s],[C[0][0]-.13*k*s,C[0][1]-.07*k*s]];
+    ribbon(root,[.05*k*s,.04*k*s,.06*k*s],r);
+    return;
+  }
+  if(t.kind==='grass'){
+    for(let i=0;i<t.n;i++){
+      const off=(R()-.5)*.3, lean=(R()-.5)*.3+off*.5, hh=t.h*(.5+R()*.6);
+      const sway=WIND*hh*k*(.45+R()*.25)+Math.sin(T/170+i)*WIND*2; const b=[bx+off*k,by], tip=[bx+(off+lean)*k+sway,by-hh*k], mid=[bx+(off+lean*.3)*k+sway*.3,by-hh*.5*k];
+      pencil([b,mid,tip],{w:Math.min(1.6,Math.max(.7,.01*k)),amp:.4,r});
+      /* the ear: dark seed pods in pairs up the top third */
+      const pods=5+Math.round(R()*5);
+      for(let j=0;j<pods;j++){ const u=.5+j/pods*.5, x=b[0]+(tip[0]-b[0])*u, y=b[1]+(tip[1]-b[1])*u, s=Math.max(.8,.022*k*(1.1-u*.5));
+        for(const side of [-1,1]){ ctx.save(); ctx.translate(...W2(x+side*s*.7,y)); ctx.rotate(side*.6+lean); ctx.beginPath(); ctx.ellipse(0,0,s*.45,s,0,0,7); ctx.fillStyle='rgba(14,14,16,.88)'; ctx.fill(); ctx.restore(); } }
+    }
+    /* loose blades and hatching at the foot */
+    for(let i=0;i<5;i++){ const x=bx+(R()-.5)*.35*k; pencil([[x,by],[x+(R()-.3)*.15*k,by-(.08+R()*.15)*k]],{w:.7,amp:.3,r}); }
+    return;
+  }
+  if(t.kind==='tumble'){
+    /* it crosses left to right over its lap, rolling: the turn is the distance over the radius */
+    /* always on the road: it rolls with the ground going under you, drifts sideways on the breeze, and hops */
+    const X=(t.X||.3)+Math.sin(T/2600+t.seed)*.35*t.spd+WIND*.5, [cx0,cy0]=proj(X,GROUND,z), rad=t.rad*k;
+    const bounce=Math.abs(Math.sin(T/(260/t.spd)+t.seed))*rad*.45, ang=-(z+WALKED)/t.rad*.6+Math.sin(T/2600+t.seed)*2;
+    if(cx0>W+rad) return;
+    const cx=cx0, cy=cy0-rad-bounce, TR=rng(t.seed);
+    ctx.save(); ctx.translate(...W2(cx,cy)); ctx.rotate(ang); NOWARP=true;
+    for(let i=0;i<34;i++){ const a0=TR()*6.28, a1=a0+1+TR()*2.4, rr=rad*(.45+TR()*.55), pts=[];
+      for(let u=0;u<=1;u+=.25){ const a=a0+(a1-a0)*u, w=rr*(1+(TR()-.5)*.35); pts.push([Math.cos(a)*w,Math.sin(a)*w]); }
+      pencil(pts,{w:Math.max(.5,Math.min(1.3,.006*k)),a:.75,amp:.35,r}); }
+    NOWARP=false; ctx.restore();
+    /* its shadow on the sand, flattened */
+    ctx.fillStyle='rgba(20,20,24,.12)'; ctx.beginPath(); ctx.ellipse(...W2(cx0,cy0),rad*.9*(1-bounce/rad*.6),rad*.18,0,0,7); ctx.fill();
+    return;
+  }
+  if(t.kind==='scrap'){ if(z<.7) return;
+    /* a calligraphic mark: fat where the pen landed, thin where it lifted */
+    const s=t.s*k, C=[],Wd=[]; let x=bx,y=by-s*.4, ang=R()*6.28;
+    for(let i=0;i<5;i++){ C.push([x,y]); Wd.push(Math.max(1.2,s*(.45-i*.07))); ang+=(R()-.5)*2.2; x+=Math.cos(ang)*s*.45; y+=Math.sin(ang)*s*.45; }
+    ribbon(C,Wd,r); return;
+  }
+  if(t.kind==='spoon'){ const C=[[bx,by],[bx+.1*k,by-.04*k],[bx+.2*k,by-.07*k],[bx+.27*k,by-.1*k]];
+    ribbon(C,[.05*k,.018*k,.016*k,.012*k],r); ctx.beginPath(); ctx.ellipse(...W2(bx-.015*k,by+.005*k),.035*k,.025*k,-.3,0,7); ctx.fillStyle='rgba(12,12,14,.94)'; ctx.fill(); return; }
+  if(t.kind==='log'){ const [ex,ey]=proj(t.X+t.len,GROUND,z*1.05);
+    ribbon([[bx,by],[(bx+ex)/2,(by+ey)/2],[ex,ey]],[.03*k,.034*k,.026*k],r);
+    pencil([[ex,ey],[ex+.03*k,ey-.04*k]],{w:1,amp:.3,r}); return; }
+  if(t.kind==='sand'){ ctx.fillStyle='rgba(20,20,24,.8)';
+    for(let i=0;i<22;i++){ const [x,y]=proj(t.X+(R()-.5)*.3,GROUND,z*(1+(R()-.5)*.3)); { const [wx,wy]=W2(x,y); ctx.beginPath(); ctx.arc(wx+(r()-.5),wy+(r()-.5),Math.max(.45,Math.min(1.5,.005*k)),0,7); ctx.fill(); } }
+  }
+}
+
+/* ---- the still part: the ridge with its fence, the corner of the wall, the far edge of the path ---- */
+const RIDGE=[[VP.x+6,VP.y-4],[248,170],[272,158],[300,143],[330,128],[356,114],[380,105],[404,103],[428,110],[452,116],[476,121],[500,124]];
+function still(r){
+  /* the hill is the shader's meadow now; only the path's far edge and the wall stay drawn */
+  pencil([[VP.x+4,VP.y],[330,VP.y+.5],[500,VP.y]],{w:.7,a:.55,amp:.6,r});        /* the horizon, level and light */
+  pencil([[196,0],[204,80],[VP.x-2,VP.y-2]],{w:.95,amp:.8,r});                     /* the wall's corner */
+  pencil([[VP.x-2,VP.y-2],[188,270],[160,H]],{w:.95,amp:.8,r});                    /* the wall's foot */
+}
+
+let paused=false, stepped=true, t0=performance.now(), tPause=0;
+/* ---- the five directions share the drawing; each changes what moves ---- */
+let MODE='original', WIND=0, CAM=0, T=0, DRIVE=0, VEL=0;
+const MODES=[
+ ['original','Original','The GIF rebuilt: the walk, the far huddle, the boil.'],
+ ['vertigo','01 Vertigo','A dolly zoom. The camera backs away while the lens closes in, so the post holds its size and the dune and the wall stretch away behind it.'],
+ ['riso','02 Riso','Printed in two plates, gold and oxblood on #F3F1ED, the plates slipping out of register on every drawing.'],
+ ['onion','03 Light table','Onion skin on a lightbox: the drawings either side show through, earlier in red, next in blue.'],
+ ['gust','04 Gust','The walk stops and the wind moves instead: the grass and the posts bend in gusts, sand streaks across, the sheet shivers.'],
+ ['walk','05 Your walk','You walk it. Scroll or drag to go forward or back; the path keeps making new things, so it never repeats.']];
+const zOf=(t,p)=>zAt(p,t.ph||0)+CAM;
+/* on your walk the loop is only a rhythm: each lap re-deals where things stand */
+const xOf=(t,p)=>{ if(MODE!=='walk'||t.X==null) return t.X; const lap=Math.floor((WALKED-(t.ph||0)*SPAN)/SPAN); return t.X+(rng((t.seed||7)*977+lap*131)()-.5)*.9; };
+const PATCHES=[]; { const R=rng(4711); for(let i=0;i<16;i++) PATCHES.push({X:WALL+.15+R()*2.6,ph:R(),rad:.25+R()*.5,n:5+Math.floor(R()*3),seed:900+i}); }
+function patches(r){
+  for(const pa of PATCHES){ const z=zAt(0,pa.ph)+CAM; if(z<.35) continue;
+    const fade=Math.min(1,(ZFAR+CAM-z)/(SPAN*.35)); if(fade<=0) continue;
+    const R=rng(pa.seed), pts=[];
+    for(let i=0;i<pa.n;i++){ const a=i/pa.n*6.283+(R()-.5)*.7, rr=pa.rad*(.65+.35*R())*(1+(r()-.5)*.35);
+      pts.push(proj(pa.X+Math.cos(a)*rr*1.7,GROUND,Math.max(.3,z+Math.sin(a)*rr))); }
+    pts.push(pts[0]);
+    ctx.save(); ctx.globalAlpha*=fade*fade; pencil(pts,{w:.85,amp:.9,r}); ctx.restore(); }
+}
+function scene(p,r){ const order=[...THINGS].sort((a,b)=>zOf(b,p)-zOf(a,p)); still(r); if(MOTION==='patches') patches(r); for(const th of order) drawThing(th,p,r); }
+/* a drawing on its own transparent sheet, for the modes that print or stack them */
+const OFF=document.createElement('canvas'); OFF.width=W*2; OFF.height=H*2;
+const CACHE=new Map();
+function sheetOf(tick){ const CY=LOOP*3, key=((tick%CY)+CY)%CY; if(CACHE.has(key)) return CACHE.get(key); const wOld=WALKED; WALKED=key/LOOP*(ZF-ZN); setPull(key);
+  const c=document.createElement('canvas'); c.width=W*2; c.height=H*2; const g=c.getContext('2d'); g.setTransform(2,0,0,2,0,0);
+  const old=ctx; ctx=g; try{ lines(()=>scene((key%LOOP)/LOOP,rng(9000+(key%LOOP)*131)),key); } finally { ctx=old; WALKED=wOld; } CACHE.set(key,c); return c; }
+const TINT=document.createElement('canvas'); TINT.width=W*2; TINT.height=H*2; const tg=TINT.getContext('2d');
+function tinted(src,col){ tg.setTransform(1,0,0,1,0,0); tg.globalCompositeOperation='source-over'; tg.clearRect(0,0,TINT.width,TINT.height); tg.drawImage(src,0,0);
+  tg.globalCompositeOperation='source-in'; tg.fillStyle=col; tg.fillRect(0,0,TINT.width,TINT.height); tg.globalCompositeOperation='source-over'; return TINT; }
+/* riso grain: speckles knocked out of a plate */
+const GRAIN=document.createElement('canvas'); GRAIN.width=W*2; GRAIN.height=H*2; { const g=GRAIN.getContext('2d'), R=rng(55); for(let i=0;i<26000;i++){ g.fillStyle=`rgba(0,0,0,${.25+R()*.6})`; g.fillRect(R()*W*2,R()*H*2,1+R()*1.6,1+R()*1.6); } }
+
+/* WATERCOLOUR LINES. The drawing is made crisp on its own sheet, then laid down as paint: a wide pale bleed
+   where the water carried pigment out, a soft body, and grain where the pigment settled in the paper's tooth. */
+let LINE='wash';
+const CRISP=document.createElement('canvas'); CRISP.width=W*2; CRISP.height=H*2; const cg=CRISP.getContext('2d');
+const PIG=document.createElement('canvas'); PIG.width=W*2; PIG.height=H*2; const pg=PIG.getContext('2d');
+/* blotches: big soft patches where the pigment dried thinner, knocked out of the stroke */
+const BLOTCH=document.createElement('canvas'); BLOTCH.width=W*2; BLOTCH.height=H*2;
+{ const g=BLOTCH.getContext('2d'), R=rng(808); for(let i=0;i<140;i++){ const x=R()*W*2,y=R()*H*2,rad=14+R()*70, gr=g.createRadialGradient(x,y,0,x,y,rad);
+  gr.addColorStop(0,`rgba(0,0,0,${.25+R()*.45})`); gr.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=gr; g.fillRect(x-rad,y-rad,rad*2,rad*2); } }
+function wash(src,dst,seed){
+  const R=rng(seed);
+  /* the stroke as wet pigment: patchy density first */
+  pg.setTransform(1,0,0,1,0,0); pg.globalCompositeOperation='source-over'; pg.clearRect(0,0,PIG.width,PIG.height);
+  pg.drawImage(tinted(src,'#221e28'),0,0);
+  pg.globalCompositeOperation='destination-out'; pg.globalAlpha=.8; pg.drawImage(BLOTCH,(R()-.5)*120,(R()-.5)*120); pg.globalAlpha=1; pg.globalCompositeOperation='source-over';
+  dst.save(); dst.setTransform(1,0,0,1,0,0);
+  /* the bleed: water carried the colour out past the line */
+  dst.globalAlpha=.3; dst.filter='blur(11px)'; dst.drawImage(tinted(src,'#5a4f63'),0,0);
+  /* the body: soft, patchy */
+  dst.globalAlpha=.85; dst.filter='blur(3.2px)'; dst.drawImage(PIG,0,0);
+  /* the rim: pigment pools where the wet edge dried, a touch darker and tighter */
+  dst.globalAlpha=.35; dst.filter='blur(1.2px)'; dst.drawImage(tinted(src,'#17141b'),0,0);
+  dst.filter='none';
+  /* granulation: the settled grains, speckled */
+  pg.globalCompositeOperation='source-over'; pg.clearRect(0,0,PIG.width,PIG.height); pg.drawImage(tinted(src,'#120f16'),0,0);
+  pg.globalCompositeOperation='destination-out'; pg.globalAlpha=.85; pg.drawImage(GRAIN,(R()-.5)*60,(R()-.5)*60); pg.globalAlpha=1; pg.globalCompositeOperation='source-over';
+  dst.globalAlpha=.22; dst.filter='blur(.6px)'; dst.drawImage(PIG,0,0); dst.filter='none';
+  dst.restore();
+}
+/* draw fn's lines either straight onto the page, or onto the crisp sheet and then paint them on */
+function lines(fn,seed){
+  if(LINE!=='wash'){ fn(); return; }
+  const old=ctx; cg.setTransform(1,0,0,1,0,0); cg.clearRect(0,0,CRISP.width,CRISP.height); cg.setTransform(2,0,0,2,0,0);
+  ctx=cg; try{ fn(); } finally { ctx=old; }
+  wash(CRISP,ctx,seed);
+}
+
+const SMEAR=[0,1].map(()=>{ const c=document.createElement('canvas'); c.width=W*2; c.height=H*2; return c; }); let smearTick=-1;
+function frame(now){
+  requestAnimationFrame(frame);                 /* ask for the next frame first, so one bad frame can never stop the loop */
+  try{ ctx=MAIN; ctx.setTransform(2,0,0,2,0,0); draw(now);
+    if(MOTION==='smear'&&GU){ const tk=Math.floor((paused?tPause:now-t0)/TICK);
+      ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.globalCompositeOperation='destination-over';
+      for(const [c,k,a] of [[SMEAR[0],.965,.32],[SMEAR[1],.93,.16]]){ ctx.globalAlpha=a; const vx=VP.x*2,vy=VP.y*2; ctx.drawImage(c,vx-vx*k,vy-vy*k,c.width*k,c.height*k); }
+      ctx.restore();
+      if(tk!==smearTick){ smearTick=tk; const g1=SMEAR[1].getContext('2d'); g1.clearRect(0,0,W*2,H*2); g1.drawImage(SMEAR[0],0,0);
+        const g0=SMEAR[0].getContext('2d'); g0.clearRect(0,0,W*2,H*2); g0.drawImage(cv,0,0); } } }
+  catch(e){ window.__err=e.message+' '+(e.stack||'').split('\n')[1]; console.error(e); ctx=MAIN;
+    /* say it on the canvas rather than leave it blank */
+    ctx.setTransform(2,0,0,2,0,0); ctx.fillStyle='#dde1e2'; ctx.fillRect(0,0,W,H); ctx.fillStyle='#14171B'; ctx.font='12px Helvetica'; ctx.fillText('Error: '+e.message,16,24); }
+}
+function draw(now){
+  const t=paused?tPause:now-t0; T=t;
+  const tick=Math.floor(t/TICK);
+  let p=stepped?(tick%LOOP)/LOOP:(t/(TICK*LOOP))%1;
+  let r=rng(9000+tick%LOOP*131);               /* the boil repeats with the loop, as the GIF does */
+  CAM=0; F=F0; WIND=0; setPull(tick);
+  const sheet=SHEETS[(tick%LOOP)%SHEETS.length];
+
+  /* how far the walk has gone, for the surfaces: steps with the ticks like everything else */
+  const LAPD=ZF-ZN, walked=stepped?tick/LOOP*LAPD:t/(TICK*LOOP)*LAPD;
+  WALKED=walked;
+  if(MODE==='original'){ surface(tick,walked); paper(sheet); lines(()=>scene(p,r),tick); return; }
+
+  if(MODE==='vertigo'){
+    /* the walk holds at one moment; the camera dollies back while the focal length grows to keep the post the same size */
+    p=.25; const u=(Math.sin(t/1900-Math.PI/2)+1)/2, e=u*u*(3-2*u); CAM=e*7;
+    WALKED=SPAN-3.32; const zs=2.6; F=F0*(zs+CAM)/zs;   /* held with the post 2.6 away */
+    surface(tick,p*LAPD); paper(sheet);
+    /* the ridge and the corner are far: they shrink toward the vanishing point as the lens closes */
+    const ZR=10, sc=(F/(ZR+CAM))/(F0/ZR);
+    lines(()=>{ ctx.save(); ctx.translate(VP.x,VP.y); ctx.scale(sc,sc); ctx.translate(-VP.x,-VP.y); still(r); ctx.restore();
+      const order=[...THINGS].sort((a,b)=>zOf(b,p)-zOf(a,p)); for(const th of order) drawThing(th,p,r); },tick);
+    return;
+  }
+
+  if(MODE==='riso'){
+    GLC.style.visibility='hidden';
+    const src=sheetOf(tick);
+    ctx.fillStyle='#F3F1ED'; ctx.fillRect(0,0,W,H);
+    ctx.save(); ctx.globalAlpha=.16; ctx.globalCompositeOperation='multiply'; ctx.drawImage(sheet,0,0,W,H); ctx.restore();
+    const R=rng(tick*7+3), d1=[(R()-.5)*5,(R()-.5)*4], d2=[(R()-.5)*2,(R()-.5)*2];
+    /* gold plate under, grain knocked out of it; oxblood plate over, each slipped its own way */
+    const gold=tinted(src,'#A99939'); tg.globalCompositeOperation='destination-out'; tg.drawImage(GRAIN,(R()-.5)*40,(R()-.5)*40); tg.globalCompositeOperation='source-over';
+    ctx.save(); ctx.globalCompositeOperation='multiply'; ctx.globalAlpha=.95; ctx.drawImage(gold,3+d1[0],2+d1[1],W,H); ctx.restore();
+    const ox=tinted(src,'#340414');
+    ctx.save(); ctx.globalCompositeOperation='multiply'; ctx.globalAlpha=.92; ctx.drawImage(ox,d2[0],d2[1],W,H); ctx.restore();
+    return;
+  }
+
+  if(MODE==='onion'){
+    /* the lightbox: paper lit from underneath, the neighbouring drawings faint through it */
+    surface(tick,walked); paper(sheet);
+    const g=ctx.createRadialGradient(W*.5,H*.55,20,W*.5,H*.55,W*.7); g.addColorStop(0,'rgba(255,253,240,.55)'); g.addColorStop(1,'rgba(255,253,240,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    for(const [dt,col,a] of [[-3,'#c2362b',.12],[-2,'#c2362b',.2],[-1,'#c2362b',.32],[1,'#2f5bd3',.28],[2,'#2f5bd3',.14]]){
+      ctx.save(); ctx.globalAlpha=a; ctx.drawImage(tinted(sheetOf(tick+dt),col),0,0,W,H); ctx.restore(); }
+    ctx.drawImage(sheetOf(tick),0,0,W,H);
+    return;
+  }
+
+  if(MODE==='gust'){
+    p=.6; WALKED=SPAN-3.6;      /* held where the big grass and the post are both close enough to see them bend */
+    /* gusts: two slow swells and a quick flutter, mostly blowing to the right */
+    WIND=.55+.35*Math.sin(t/900)+.25*Math.sin(t/370+1.3)+.08*Math.sin(t/90);
+    ctx.save(); ctx.translate((r()-.5)*WIND*1.2,(r()-.5)*WIND*.8);
+    surface(tick,p*LAPD); if(!GU) ctx.drawImage(sheet,-4,-4,W+8,H+8); else ctx.clearRect(-10,-10,W+20,H+20);
+    lines(()=>{ scene(p,r);
+    /* sand carried across in streaks */
+    const R=rng(4242);
+    for(let i=0;i<70;i++){ const y=VP.y+10+R()*(H-VP.y), sp=.25+R()*.6, x=((R()*W+t*sp*WIND*.35)%(W+40))-20, len=4+WIND*10*R();
+      pencil([[x,y],[x+len,y-len*.12]],{w:.6+R()*.5,a:.55,amp:.3,r}); } },tick);
+    ctx.restore();
+    return;
+  }
+
+  if(MODE==='walk'){
+    /* you drive: the scroll or the drag is the walk; it eases to a stop when you let go */
+    DRIVE+=VEL; VEL*=.9; if(Math.abs(VEL)<1e-5) VEL=0;
+    p=((DRIVE%1)+1)%1; WALKED=DRIVE*(ZF-ZN);
+    surface(tick,DRIVE*LAPD); paper(sheet); lines(()=>scene(p,r),tick);
+    if(Math.abs(VEL)<1e-4&&DRIVE===0){ ctx.fillStyle='rgba(20,20,24,.55)'; ctx.font='12px Helvetica'; ctx.fillText('scroll or drag to walk',W-150,H-16); }
+    return;
+  }
+}
+requestAnimationFrame(frame);
+
+const $=id=>document.getElementById(id);
+$('split').onclick=e=>{ document.body.classList.toggle('split'); e.target.classList.toggle('on'); };
+$('step').onclick=e=>{ stepped=!stepped; e.target.classList.toggle('on',stepped); e.target.textContent=stepped?'On 60ms, like the GIF':'Smooth'; };
+$('pause').onclick=e=>{ paused=!paused; if(paused) tPause=performance.now()-t0; else t0=performance.now()-tPause; e.target.textContent=paused?'Play':'Pause'; };
+addEventListener('keydown',e=>{ if(e.code==='Space'){ e.preventDefault(); $('pause').click(); } });
+/* one pill per row; it travels to the chosen button and takes its size */
+function movePill(id,instant){
+  const row=$(id); if(!row) return; let p=row.querySelector('.pill');
+  if(!p){ p=document.createElement('span'); p.className='pill still'; row.prepend(p); instant=true; }
+  const b=row.querySelector('button.on'); if(!b){ p.style.opacity='0'; return; } p.style.opacity='1';
+  if(instant) p.classList.add('still');
+  p.style.transform=`translate(${b.offsetLeft}px,${b.offsetTop}px)`; p.style.width=b.offsetWidth+'px'; p.style.height=b.offsetHeight+'px';
+  if(instant){ p.offsetWidth; requestAnimationFrame(()=>p.classList.remove('still')); }
+}
+const ROWS=['modes','surfs','lines','grounds','motions'];
+addEventListener('resize',()=>ROWS.forEach(r=>movePill(r,true)));
+$('motions').innerHTML=MOTIONS.map(m=>`<button data-mo="${m[0]}">${m[1]}</button>`).join('');
+function setMotion(m){ MOTION=m; CACHE.clear(); document.querySelectorAll('#motions button').forEach(b=>b.classList.toggle('on',b.dataset.mo===m)); movePill('motions'); try{localStorage.setItem('vertico-motion',m)}catch(e){} }
+$('motions').onclick=e=>{ const b=e.target.closest('button'); if(b) setMotion(b.dataset.mo); };
+let mo0='redrawn'; try{ mo0=localStorage.getItem('vertico-motion')||'redrawn'; }catch(e){} setMotion(MOTIONS.some(x=>x[0]===mo0)?mo0:'redrawn');
+$('grounds').innerHTML=['Lines','01 Furrows','02 Tufts','03 Stipple','04 Smudge','05 Contours'].map((n,i)=>`<button data-g="${i}">${n}</button>`).join('');
+function setGround(i){ GSTYLE=i; document.querySelectorAll('#grounds button').forEach(b=>b.classList.toggle('on',+b.dataset.g===i)); movePill('grounds'); try{localStorage.setItem('vertico-ground',i)}catch(e){} }
+$('grounds').onclick=e=>{ const b=e.target.closest('button'); if(b) setGround(+b.dataset.g); };
+let g0=0; try{ g0=+localStorage.getItem('vertico-ground')||0; }catch(e){} setGround(g0);
+$('lines').innerHTML=['Pencil','Watercolour'].map((n,i)=>`<button data-l="${i?'wash':'pencil'}">${n}</button>`).join('');
+function setLine(l){ LINE=l; CACHE.clear(); document.querySelectorAll('#lines button').forEach(b=>b.classList.toggle('on',b.dataset.l===l)); movePill('lines'); try{localStorage.setItem('vertico-line',l)}catch(e){} }
+$('lines').onclick=e=>{ const b=e.target.closest('button'); if(b) setLine(b.dataset.l); };
+let l0='wash'; try{ l0=localStorage.getItem('vertico-line')||'wash'; }catch(e){} setLine(l0);
+$('surfs').innerHTML=SURFS.map((n,i)=>`<button data-s="${i}">${n}</button>`).join('');
+function setSurf(i){ SURF=i; document.querySelectorAll('#surfs button').forEach(b=>b.classList.toggle('on',+b.dataset.s===i)); movePill('surfs'); try{localStorage.setItem('vertico-surf',i)}catch(e){} }
+$('surfs').onclick=e=>{ const b=e.target.closest('button'); if(b) setSurf(+b.dataset.s); };
+let s0=0; try{ s0=+localStorage.getItem('vertico-surf')||0; }catch(e){} setSurf(s0);
+$('modes').innerHTML=MODES.map(m=>`<button data-m="${m[0]}">${m[1]}</button>`).join('');
+function setMode(m){ MODE=m; CACHE.clear(); document.body.className=document.body.className.replace(/\bm-\S+/g,'').trim()+' m-'+m;
+  document.querySelectorAll('#modes button').forEach(b=>b.classList.toggle('on',b.dataset.m===m)); movePill('modes');
+  $('cap').textContent=MODES.find(x=>x[0]===m)[2]; try{localStorage.setItem('vertico-mode',m)}catch(e){} }
+$('modes').onclick=e=>{ const b=e.target.closest('button'); if(b) setMode(b.dataset.m); };
+let m0='original'; try{ m0=localStorage.getItem('vertico-mode')||'original'; }catch(e){} setMode(MODES.some(x=>x[0]===m0)?m0:'original');
+/* your walk: the wheel and a drag both push the walk */
+cv.addEventListener('wheel',e=>{ if(MODE!=='walk') return; e.preventDefault(); VEL+=e.deltaY*.00012; },{passive:false});
+let dragY=null; cv.addEventListener('pointerdown',e=>{ if(MODE!=='walk') return; dragY=e.clientY; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove',e=>{ if(dragY==null) return; VEL+=(dragY-e.clientY)*.0006; dragY=e.clientY; });
+cv.addEventListener('pointerup',()=>{ dragY=null; });
+document.fonts&&document.fonts.ready.then(()=>ROWS.forEach(r=>movePill(r,true)));
+setTimeout(()=>ROWS.forEach(r=>movePill(r,true)),300);
+</script>
+</body></html>
