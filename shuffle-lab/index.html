@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shuffle lab</title>
+<style>
+/* THE SHUFFLE BUTTON, after Spotify's: off, on, smart shuffle. A click never swaps one icon for another; the
+   same arrows carry through every state. On: they re-draw themselves along their own paths in green and a dot
+   grows in under them. Smart: they slide down and right and shrink to make room, and a sparkle turns in at the
+   top left. Off: the sparkle turns out, the arrows glide home and grey, the dot goes. Every move is a spring. */
+:root{--bg:#ffffff;--grey:#b3b3b3;--green:#1ed760;--mute:#6a6a6a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:#121212;font:13px/1.4 -apple-system,"Helvetica Neue",sans-serif}
+body{display:grid;place-items:center}
+.wrap{display:flex;flex-direction:column;align-items:center;gap:36px}
+button.sh.big{width:260px;height:260px;border-radius:56px;background:linear-gradient(180deg,#232323,#181818);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 0 1px rgba(255,255,255,.04),0 24px 50px -22px rgba(0,0,0,.45);transition:transform .45s cubic-bezier(.34,1.8,.5,1),color .35s ease,background .4s ease}
+.big svg{width:50%!important;height:50%!important}   /* the icon box is half the button: a quarter padding each side */
+button.sh.big.on,button.sh.big.smart{background:linear-gradient(180deg,#1f2a22,#161c18)}   /* the tile takes a breath of green when it is on */
+button.sh.mid,button.sh.small{background:#1f1f1f;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.mid{width:64px!important;height:64px!important;border-radius:16px}.mid svg{width:50%!important;height:50%!important}
+.small{width:32px!important;height:32px!important;border-radius:8px}.small svg{width:50%!important;height:50%!important}   /* Spotify's own: 16 in 32 */
+.row{display:flex;gap:28px;align-items:center}
+button.sh{position:relative;display:grid;place-items:center;background:none;border:0;padding:0;cursor:pointer;color:var(--grey);-webkit-tap-highlight-color:transparent;
+  transition:transform .45s cubic-bezier(.34,1.8,.5,1),color .35s ease}
+button.sh:hover{color:#e6e6e6}
+button.sh.on,button.sh.smart{color:var(--green)}
+button.sh.on:hover,button.sh.smart:hover{color:#3be477}
+button.sh:active{transform:scale(.86);transition-duration:.12s}
+button.sh svg{display:block;width:100%;height:100%;overflow:visible}
+/* the arrows: one group that moves between the states */
+.arrows{transform-origin:12px 12px;transition:transform .55s cubic-bezier(.34,1.5,.5,1)}
+.arrows path{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+/* the sparkle: turns in from nothing */
+.spark{fill:currentColor;transform-origin:4.4px 2.47px;transform:scale(0) rotate(-120deg);opacity:0;
+  transition:transform .55s cubic-bezier(.34,1.7,.5,1),opacity .25s ease}
+.smart .spark{transform:scale(1) rotate(0deg);opacity:1}
+/* the dot: grows in under the arrows */
+.dot{fill:currentColor;transform-origin:12px 22.4px;transform:scale(0);transition:transform .45s cubic-bezier(.34,1.9,.5,1)}
+.on .dot,.smart .dot{transform:scale(1)}
+.big .dot{transition-delay:.05s}
+.cap{color:var(--mute);font-size:12px;text-align:center;min-height:1.4em;transition:color .3s ease}
+.ctl{display:flex;gap:8px}
+.ctl button{font:500 12px -apple-system,sans-serif;color:#121212;background:#f0f0f0;border:0;border-radius:999px;padding:8px 14px;cursor:pointer;transition:background .25s ease}
+.ctl button.on{background:#121212;color:#fff}
+body.slow *{transition-duration:2.4s!important}
+</style></head><body>
+<div class="wrap">
+  <button class="sh big" id="b0" aria-label="Shuffle"></button>
+  <div class="cap" id="cap">Off. Click to shuffle.</div>
+  <div class="row"><button class="sh mid" id="b1" aria-label="Shuffle"></button><button class="sh small" id="b2" aria-label="Shuffle"></button></div>
+  <div class="ctl"><button id="slow">Slow motion</button></div>
+</div>
+<script>
+const ICON=`<svg viewBox="0 0 24 24" aria-hidden="true">
+  <path class="spark" d="M4.4 0C4.63 1.42 5.45 2.24 6.87 2.47 5.45 2.7 4.63 3.52 4.4 4.94 4.17 3.52 3.35 2.7 1.93 2.47 3.35 2.24 4.17 1.42 4.4 0Z"/>
+  <g class="arrows">
+    <path class="a1" d="M3 7h3.4c2 0 3.3.9 4.4 2.5l3.3 5c1.1 1.6 2.4 2.5 4.4 2.5H21"/>
+    <path class="h1" d="M18.6 14.6 21 17l-2.4 2.4"/>
+    <path class="a2" d="M3 17h3.4c2 0 3.3-.9 4.4-2.5l3.3-5c1.1-1.6 2.4-2.5 4.4-2.5H21"/>
+    <path class="h2" d="M18.6 4.6 21 7l-2.4 2.4"/>
+  </g>
+  <circle class="dot" cx="12" cy="22.4" r="1.15"/>
+</svg>`;
+const STATES=['off','on','smart'], CAPS=['Off. Click to shuffle.','Shuffle on.','Smart shuffle: adds recommendations.'];
+let st=0;
+const btns=[...document.querySelectorAll('button.sh')];
+btns.forEach(b=>b.innerHTML=ICON);
+/* on the way to "on", the arrows re-draw along their own paths: line first, then its head */
+function redraw(b){
+  b.querySelectorAll('.arrows path').forEach((p,i)=>{
+    const L=p.getTotalLength(), head=i%2===1;
+    p.animate([{strokeDasharray:L,strokeDashoffset:L},{strokeDasharray:L,strokeDashoffset:0}],
+      {duration:document.body.classList.contains('slow')?2400:(head?260:520),delay:(head?380:0)+(i>1?70:0),easing:'cubic-bezier(.3,.7,.2,1)',fill:'backwards'});
+  });
+}
+function set(n){
+  const prev=st; st=n;
+  btns.forEach(b=>{ b.classList.toggle('on',STATES[st]==='on'); b.classList.toggle('smart',STATES[st]==='smart'); b.setAttribute('aria-pressed',st>0); if(prev===0&&st===1) redraw(b); });
+  const c=document.getElementById('cap'); c.textContent=CAPS[st]; c.style.color=st?'#3a3a3a':'';
+}
+btns.forEach(b=>b.addEventListener('click',()=>set((st+1)%3)));
+document.getElementById('slow').onclick=e=>{ document.body.classList.toggle('slow'); e.target.classList.toggle('on'); };
+</script>
+</body></html>
