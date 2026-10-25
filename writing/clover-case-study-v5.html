@@ -1,0 +1,178 @@
+<html><head><meta charset="utf-8"><title>Clover case study</title></head>
+<body style="font-family:Arial,Helvetica,sans-serif;font-size:11pt;color:#111;line-height:1.45">
+
+<h1 style="font-size:26pt;font-weight:bold;margin:0 0 6pt">Clover smart glasses</h1>
+
+<hr style="border:0;border-top:1px solid #999;margin:14pt 0 4pt">
+<p style="font-size:10pt;color:#7a8a99;margin:0 0 6pt">Summary</p>
+<h2 style="font-size:18pt;font-weight:bold;line-height:1.25;margin:0 0 8pt">Clover is not an interface that users navigate. It is an agent that negotiates how much interface the user needs at any given moment.</h2>
+<p>Clover is Eden's first product: a personal AI agent in a pair of camera-free smart glasses, with an iPhone app beside it. I joined as the founding product designer and design engineer, July to October 2026, before there was a settled interaction model, a design system or a brand, on a team of about ten across the US and China. <span style="background:#FFF3B0">[confirm headcount]</span></p>
+<p>I owned the whole experience: the HUD interaction architecture, the iOS companion app, the design system and the early brand system. I prototyped and implemented, including the app in SwiftUI and voice-interactive prototypes of the glasses. The work moved the product from an app-first HUD, which failed at the first question of the day, to <b>an intent-led model with three levels of interface support</b>, <b>a proposed orchestration, recovery and interruption architecture</b>, <b>a rendering system of six primitives and a fit rule</b>, and <b>a companion app with Modes shipped</b>.</p>
+<p>These are design and build outcomes. There is no market data yet, and this document does not claim any. <span style="background:#FFF3B0">[Add verified usability or live-feedback results here if they exist.]</span></p>
+<p style="color:#B23A2E;font-weight:bold">INSERT HERO VIDEO HERE: the orb waking on the HUD and answering "what do I have today?", recorded in a real browser or on the glasses</p>
+
+<hr style="border:0;border-top:1px solid #999;margin:14pt 0 4pt">
+<p style="font-size:10pt;color:#7a8a99;margin:0 0 6pt">Context</p>
+<h2 style="font-size:18pt;font-weight:bold;line-height:1.25;margin:0 0 8pt">Smart glasses promise less time on your phone, and most of them deliver one more thing that interrupts you.</h2>
+<p>We entered a category whose assumptions were already set by Meta: technical, intrusive, camera first, made for enthusiasts. Clover has no camera, which answers the privacy objection, but nobody had decided how a person should talk to the glasses. One co-founder believed in an intention model with voice, giving the wearer full control by speaking. The other believed in a ring-based, app-like model where you scroll through the glasses the way Rokid does. I owned the experience, so the decision landed on me.</p>
+<p>The job was to decide what to display, where each interaction should live, and how the whole thing should feel, and to do it without a brand, because branding kept losing to hardware on the priority list.</p>
+<p style="color:#B23A2E;font-weight:bold">INSERT IMAGE HERE: competitor grid, Rokid, RayNeo, Even Realities, with their HUDs side by side and the audience each signals</p>
+
+<hr style="border:0;border-top:1px solid #999;margin:14pt 0 4pt">
+<p style="font-size:10pt;color:#7a8a99;margin:0 0 6pt">Opportunity</p>
+<h2 style="font-size:18pt;font-weight:bold;line-height:1.25;margin:0 0 8pt">Making the first thing a person puts on in the morning work for people who do not yet know what they want from it.</h2>
+<p>I compared Rokid, RayNeo, Even Realities and <span style="background:#FFF3B0">[others]</span> on interaction mechanism, glanceability, information density and what the visual language signalled about the buyer. The shape of the HUD and the branding had shaped each company's audience: utilitarian, technical, usually founders or people far enough into their careers to want a secretary of their own. One detail mattered later. None of the successful brands imposes a fixed navigation scheme on the HUD.</p>
+<p>Eyewear is the most accessible wearable there is, and that cuts both ways. Everyone can put on glasses, so the market is open. But when the glasses are the first thing you use in the day, you do not want to think, and there is no intent yet. A phone is picked up with a purpose. Glasses are put on before the purpose exists. <b>The opportunity was to help people form their intent, not to assume it.</b> We also had use cases for people who are visually impaired or colour-blind, for whom the technology matters more than it does to anyone in tech, which is why one design had to hold both audiences.</p>
+<p style="color:#B23A2E;font-weight:bold">INSERT IMAGE HERE: assets/intent-first/page-01.png, the app-first mental model, beside page-02.png, the agent-mediated flow</p>
+
+<hr style="border:0;border-top:1px solid #999;margin:14pt 0 4pt">
+<p style="font-size:10pt;color:#7a8a99;margin:0 0 6pt">Discovery</p>
+<h2 style="font-size:18pt;font-weight:bold;line-height:1.25;margin:0 0 8pt">What do people actually want from a screen on their face?</h2>
+<p>I ran usability sessions with eight participants, split on purpose between technical and non-technical backgrounds, and a competitive audit. Three of the sessions are documented below. <span style="background:#FFF3B0">[Add the other five session notes before any claim about all eight; confirm the professor's name.]</span></p>
+<p style="margin-bottom:2pt">☞ Non-technical users... <b>wanted a device nobody would notice and a structure for their day, not a feature list.</b></p>
+<ul style="margin-top:0">
+<li>Preferred an unobtrusive, analog-feeling device, and deliberately avoided anything that labelled him a technologist. Chose a timeline he could check off as his ideal configuration, with the memory layer first, then an ask function, then settings. Disliked anything overwhelming, overly technological, or showing unnecessary information such as the time. <i>Anthony Fox, data scientist, session of 6 August 2026, paraphrased from notes</i></li>
+<li>Kept a paper to-do book alongside a digital calendar because writing things down worked better. Kept notifications off for the apps that pulled at him and on for transport and fitness. <i>Jonathan Henry Oliver, trainee solicitor, 14 August 2026, paraphrased from notes</i></li>
+</ul>
+<p style="margin-bottom:2pt">☞ Technical users... <b>wanted the utilitarian version, and still asked for summaries and control.</b></p>
+<ul style="margin-top:0">
+<li>"The UI is innovative, the UX is easy and intuitive." Would use it teaching his class or in meetings. Disliked notifications that need scrolling through in full and would prefer summaries. Found the RayNeo viewing distance tiring, "like chasing to read the display", and wanted it at middle eye level. Wanted to choose which apps show on his display, and liked the idea of customisable modes set from the phone. "If this is done right, you would be doing it better than Google Glass." <i>Columbia design professor, formerly at frog and MIT, close to verbatim</i> <span style="background:#FFF3B0">[name and date]</span></li>
+</ul>
+<p style="margin-bottom:2pt">☞ Across both groups... <b>everyone limited notifications on purpose and still checked compulsively, and everyone split the glasses from the phone the same way.</b></p>
+<ul style="margin-top:0">
+<li>Glasses for immediate, high-priority moments. Phone for the high-level calendar, settings, music, photos and messaging. <i>Anthony Fox; the professor's request for app control from the phone</i></li>
+<li>Limited Slack and mail notifications to keep technology from taking over, then opened them anyway for fear of missing a client. <i>Anthony Fox</i></li>
+</ul>
+<p style="margin-bottom:2pt">☞ And one person... <b>did not believe in the product, which shaped the positioning more than the compliments did.</b></p>
+<ul style="margin-top:0">
+<li>Sceptical that already-organised professionals need it, worried it would swap one screen for another, protective of his data, and agreed the strongest case is accessibility. <i>Jonathan Henry Oliver</i></li>
+</ul>
+<p>I treated the fun-versus-plain split as a hypothesis rather than proof that we needed two products. The signals that held across everyone, control over interruption and a clear division between immediate and deeper tasks, were worth more than taste. That gave me two design questions. How does a HUD help someone form an intent they do not have yet? And how does one design system serve both the people who want nothing and the people who want more?</p>
+<p style="color:#B23A2E;font-weight:bold">INSERT IMAGE HERE: the three interview cards, and the two session notes from research/usability</p>
+
+<hr style="border:0;border-top:1px solid #999;margin:14pt 0 4pt">
+<p style="font-size:10pt;color:#7a8a99;margin:0 0 6pt">Deliverables</p>
+<h2 style="font-size:18pt;font-weight:bold;line-height:1.25;margin:0 0 8pt">So, how do we build glasses that decide for themselves when a screen is worth showing?</h2>
+<p>I proposed <b>an intent-led HUD</b> in which Notes, Calendar, Maps and Messages are services the agent invokes rather than places the wearer goes. The wearer speaks naturally, the agent interprets intent and context, routes to the capability, and answers in whatever form fits: a spoken line, a glanceable card, a full view, or an action. Underneath it sit <b>three levels of interface support</b>, a <b>task orchestration layer kept separate from presentation</b>, a <b>task-state model for interruptions</b>, and <b>a rendering system</b> of six information primitives with one rule for what fits on the panel.</p>
+<p>What made this interesting to design is proactivity. A phone waits to be asked, so its designer only has to design for behaviour. Clover speaks first, so I could not stop at what people do; I had to infer what they prefer from what they do, because every unasked-for moment is a bet on a preference the wearer never stated. <b>Designing for behaviour was the floor. Inferring preference from behaviour was the job.</b></p>
+<p>Beside the glasses, <b>the iPhone app</b> owns what the glass physically cannot: onboarding, configuration, Modes with drag-and-drop ordering of the apps that reach the glasses, a search-shaped AI surface for deeper questions, summaries, and error recovery. Across both runs one agent identity and one memory.</p>
+<p style="color:#B23A2E;font-weight:bold">INSERT DIAGRAM HERE: assets/intent-first/page-08.png, conversational intent above task orchestrator above presentation controller</p>
+
+<hr style="border:0;border-top:1px solid #999;margin:14pt 0 4pt">
+<p style="font-size:10pt;color:#7a8a99;margin:0 0 6pt">Listening and empathising with our users</p>
+<h2 style="font-size:18pt;font-weight:bold;line-height:1.25;margin:0 0 8pt">How the design answers what we heard, in both groups.</h2>
+<p><b>For non-technical users</b></p>
+<p style="margin:4pt 0 0">Pain point: a feature list is overwhelming; they want structure and not to look like a technologist.</p>
+<p style="margin:2pt 0 0">✓ Nothing shows on the glass until it is worth the glance. The default is Level 1, a spoken line, and the memory layer leads when a visual is needed.</p>
+<p style="margin:8pt 0 0">Pain point: notifications are limited on purpose and checked compulsively anyway.</p>
+<p style="margin:2pt 0 0">✓ Summaries instead of scrolling, and every long-running task reports what it understood, what it completed and what still needs attention, so there is nothing to go and check.</p>
+<p style="margin:8pt 0 0">Pain point: the app felt capable and cold.</p>
+<p style="margin:2pt 0 0">✓ The garden direction carries the emotional side of the product on the phone, where there is room for it, while the HUD stays restrained.</p>
+<p style="margin-top:10pt"><b>For technical users</b></p>
+<p style="margin:4pt 0 0">Pain point: wanted control over what appears on the display without digging through menus on the glasses.</p>
+<p style="margin:2pt 0 0">✓ Modes in the app, with drag-and-drop ordering, so priority is expressed directly and the HUD stays simple.</p>
+<p style="margin:8pt 0 0">Pain point: wanted the utilitarian version and no decoration on the glass.</p>
+<p style="margin:2pt 0 0">✓ The HUD is minimal by rule, not taste. Level 3 has to be earned by context and intent.</p>
+<p style="margin-top:10pt"><b>What stays the same for both</b></p>
+<p style="margin:4pt 0 0">✓ The glass owns the moment; the phone owns the record and the repair.</p>
+<p style="margin:2pt 0 0">✓ The wearer keeps control: every long task is interruptible, and anything that reaches another person asks first.</p>
+
+<hr style="border:0;border-top:1px solid #999;margin:14pt 0 4pt">
+<p style="font-size:10pt;color:#7a8a99;margin:0 0 6pt">Interaction principles</p>
+<h2 style="font-size:18pt;font-weight:bold;line-height:1.25;margin:0 0 8pt">Five rules the glasses follow, written before the screens.</h2>
+<p><b>Speak naturally, not in app commands.</b> Nobody should have to say Calendar, Notes or Inbox to reach them.</p>
+<p><b>Complexity stays behind the interface.</b> A command with five actions can still receive a one-sentence acknowledgement.</p>
+<p><b>Only surface actionable information.</b> No progress card for every internal operation.</p>
+<p><b>Errors are recoverable locally.</b> Clarify or retry the failed step, never restart the workflow.</p>
+<p><b>The user retains control.</b> Every long-running task is interruptible, and external actions get appropriate confirmation.</p>
+
+<hr style="border:0;border-top:1px solid #999;margin:14pt 0 4pt">
+<p style="font-size:10pt;color:#7a8a99;margin:0 0 6pt">HUD // Design iterations</p>
+<h2 style="font-size:18pt;font-weight:bold;line-height:1.25;margin:0 0 8pt">I chose app-first on purpose, loaded it on the glasses, and watched it fail at the first question of the day.</h2>
+<p>Voice or intent-led interaction can feel fluid, and it also hides what the product can do. An app-first structure is familiar and predictable. I proposed judging the models on learnability, predictability and cognitive load, then prototyped app-first as an explicit hypothesis. The first HUD followed the phone's mental model: the user has a task, navigates to an app or widget, issues a command, the AI answers inside that context.</p>
+<p style="color:#B23A2E;font-weight:bold">INSERT IMAGE HERE: assets/hud/flow-dashboard.png and flow-cal.png, the app-first HUD on the glasses</p>
+<p>On the glasses that model inherited every assumption of a smartphone. It assumes you know what you want, know which application does it, and deliberately enter that environment. The first question of the day is "what do I have today?", and the app-first HUD had no answer to a question that names no app. Live feedback from wearers said the same thing: being forced to arrive with an intent already formed was friction. <span style="background:#FFF3B0">[The 86 percent figure stays qualitative until the denominator and the measurement are on record.]</span> So I pushed back on my own decision and moved to the hybrid.</p>
+
+<h3 style="font-size:13pt;font-weight:bold;margin:14pt 0 4pt">Three levels of interface support</h3>
+<p>I stopped designing interfaces around application categories and started designing them around the amount of attention a task requires.</p>
+<ul>
+<li><b>Level 1, ambient.</b> Quick retrieval, lightweight capture, acknowledgement. One to five seconds, nothing opens. "When is my next meeting?" "Design sync at three."</li>
+<li><b>Level 2, glanceable.</b> A compact visual to verify, compare or decide. Five to twenty seconds. "What does my afternoon look like?" gets the next three events, condensed.</li>
+<li><b>Level 3, expanded.</b> A persistent surface for sustained workflows, editing, navigation or continuous guidance. "Help me rehearse my presentation" gets a teleprompter with live feedback.</li>
+</ul>
+<p>The durations are design targets, and the levels describe the interface support a task needs, not the length of the spoken request. One capability lives at all three. "How far is the nearest pharmacy?" is a spoken distance; "navigate me to the pharmacy" is a persistent map. Treating them as the same interaction is the smartphone assumption again. <b>Level 3 has to be earned by context and intent, never assumed because the task is complicated.</b></p>
+<p style="color:#B23A2E;font-weight:bold">INSERT IMAGE HERE: assets/intent-first/page-02.png and page-03.png, the levels table and the capability-by-level grid</p>
+
+<h3 style="font-size:13pt;font-weight:bold;margin:14pt 0 4pt">Multi-action orchestration</h3>
+<p>"Research stem cells, turn the findings into flashcards, and send them to Nita's mom." Three dependent actions in one breath, and the instinct is to show three steps. I separated orchestration from presentation instead. A task layer coordinates the work in the background and the HUD shows only the milestones that mean something to the wearer: the acknowledgement, a sense of progress, the result, and any confirmation that needs her. If she wants to inspect or edit the flashcards, the display earns Level 3. At any point she can say "hide this", "show me more" or "go back" and set the amount of interface herself. <b>Task complexity should not become interface complexity</b>, and on a display this small it physically cannot.</p>
+<p style="color:#B23A2E;font-weight:bold">INSERT DIAGRAM HERE: assets/intent-first/page-04.png, the multi-action flow and the three displays the user sees</p>
+
+<h3 style="font-size:13pt;font-weight:bold;margin:14pt 0 4pt">Trust, partial success and consequential actions</h3>
+<p>"Put in my to-do for the product launch today at three, update my calendar, and text Rita to be ready." The first two actions are reversible, so the agent executes them when the details are clear and the user has authorised it. The third reaches another person, so it asks: "Your launch to-do and calendar event are set for 3 PM. I have drafted Rita's message. Ready to send?" One confirmation where the consequence is external, none where it is not.</p>
+<p>Then the harder case: the calendar write fails while the to-do succeeds. The interface has to represent partial success plainly. Hiding a failure on a wearable is how trust ends, and so is "sorry, something went wrong", which leaves the wearer with no idea whether the earlier steps happened. Drawing on Microsoft's Guidelines for Human-AI Interaction, which ask systems to support efficient correction, communicate uncertainty and make their behaviour understandable, I reduced system state to three questions the HUD must answer at any moment: <b>what did you understand, what did you complete, and what still needs my attention.</b> Recovery happens locally, by clarifying or retrying the failed step. <span style="background:#FFF3B0">[The 88 percent abandonment statistic from the working document has no traceable source and is left out. The three questions are my own distillation, not a quotation.]</span></p>
+<p style="color:#B23A2E;font-weight:bold">INSERT DIAGRAM HERE: assets/intent-first/page-05.png, the dependency-aware flow, and page-06.png, the three failure types</p>
+
+<h3 style="font-size:13pt;font-weight:bold;margin:14pt 0 4pt">Interruption without losing the thread</h3>
+<p>Clover is mid-way through the research and the wearer says "actually, never mind, what is the weather?" A new utterance is not a cancellation. It might be a quick aside, a correction to the running task, a pause, or a genuine stop, and each wants a different next move. I drafted a task-state model to tell them apart: answer the weather, keep the research running if that is appropriate, and never auto-resume a long spoken response while the wearer is busy.</p>
+<p>Underneath it is the architectural decision I think matters most in the project. <b>Task state lives separately from whatever is visible.</b> A task can run while the display is completely clear. A task can fail while the wearer is in another interaction. Conversational intent, the task orchestrator and the presentation controller are three different things, and keeping them apart is what makes the experience fluid rather than an app with voice commands bolted on. This is proposed architecture, explored and diagrammed, not built end to end. <span style="background:#FFF3B0">[Confirm which behaviours were prototyped in flow-lab or the voice prototype and which stayed on paper.]</span></p>
+<p style="color:#B23A2E;font-weight:bold">INSERT DIAGRAM HERE: assets/intent-first/page-07.png, the task-state model, and page-09.png, the interaction-level explorer with its four dimensions</p>
+
+<hr style="border:0;border-top:1px solid #999;margin:14pt 0 4pt">
+<p style="font-size:10pt;color:#7a8a99;margin:0 0 6pt">HUD // Rendering system</p>
+<h2 style="font-size:18pt;font-weight:bold;line-height:1.25;margin:0 0 8pt">From designing individual interfaces to designing the rules that generate them.</h2>
+<p>Once the agent answers any request in any of three forms, a bespoke card for every capability stops scaling. So I looked at what Clover actually displays and found that almost all of it fits <b>six ways of describing information: value, list, fields, series, comparison and matrix.</b> These are not six apps or six card designs. A weather forecast and a stock price are both a series, so there is one reusable series component and the two capabilities share it.</p>
+<p>The second half is a proposed rule, <code>fit(primitive, data, priority)</code>, which returns the level of support that is appropriate, what should be shown, and what overflows, weighing the information's priority against the available space. "Show me my next twenty calendar events" is the test case: twenty do not fit, and instead of a calendar-specific solution there is one rule for what fits on the HUD. The exploration used a working area of about 448 by 328 pixels as its constraint, a design assumption rather than a verified hardware specification. <span style="background:#FFF3B0">[Confirm whether any primitive or the fit rule was implemented in a lab.]</span></p>
+<p style="color:#B23A2E;font-weight:bold">INSERT DIAGRAM HERE: assets/intent-first/page-12.png, the six primitives, and page-13.png, the fit function and the measurement table</p>
+
+<hr style="border:0;border-top:1px solid #999;margin:14pt 0 4pt">
+<p style="font-size:10pt;color:#7a8a99;margin:0 0 6pt">Companion app // Design iterations</p>
+<h2 style="font-size:18pt;font-weight:bold;line-height:1.25;margin:0 0 8pt">The app did not start in a garden. It started as spheres.</h2>
+<p>The founders wanted to defer the app to protect the hardware schedule, and their reasoning was sound: prototype cycles, supplier coordination and physical revisions cost real money. I argued that deferring it only moved the risk, because a customer does not experience a product along team boundaries. She wears the glasses on the commute, adjusts notifications on her phone, and reads the day's summary at night with the glasses off. I did not ask for equal engineering capacity. I asked that we define the cross-device experience early enough to find the gaps before the glasses were built.</p>
+<p style="color:#B23A2E;font-weight:bold">INSERT IMAGE HERE: V1, the interactive spheres</p>
+<p>My first direction for the app was as utilitarian as the rest of the category, because the team assumed smart-glasses users valued function above everything. Version one was an interface of interactive spheres, each standing for an action or capability of the agent.</p>
+<p style="color:#B23A2E;font-weight:bold">INSERT IMAGE HERE: V2, the function-first layouts</p>
+<p>Version two set that aside for conventional, function-first layouts. Both communicated what the product could do, and in testing neither did much more than that; with the non-technical participants in particular they read as capable and cold. <span style="background:#FFF3B0">[Add dates, who saw V1 and V2, and what they said.]</span> That sent me back under the screens. Were we designing for the people who already buy smart glasses, or for the larger group we said we wanted? Rather than a third round of the same layouts I went back to positioning.</p>
+<p style="color:#B23A2E;font-weight:bold">INSERT IMAGE HERE: V3, the garden, and the AI search surface in it</p>
+<p>Version three is the garden, drawn from the brand work below. Its job is specific: the app carries the emotional side of the product, approachability and a sense of care, because the HUD, by its constraints, cannot. Utility stayed where it was. The phone's AI became a search and exploration surface, longer questions and richer answers, rather than a second copy of the glasses' chat. I would not call the garden better because it is more expressive. It is a hypothesis with a clearer audience than the first two, and it still needs validation with first-time, non-technical users, including whether the calmer treatment costs anything in scan speed.</p>
+<p style="color:#B23A2E;font-weight:bold">INSERT IMAGE HERE: assets/phone/modes-lab.png, Modes and the drag-and-drop ordering, with the result on the glasses</p>
+<p>Participants wanted control over what appears on the glasses without digging through menus in the HUD. That became <b>Modes</b> in the app, focus configurations plus Do Not Disturb and Sleep, with drag-and-drop ordering of the apps shown on the glasses. A minimal default for first-time wearers, deeper control on the phone for people who want it, and no separate HUDs for confident and less confident users. Modes shipped in the production app. <span style="background:#FFF3B0">[Verify which Mode types and drag-and-drop capabilities shipped.]</span></p>
+<p style="color:#B23A2E;font-weight:bold">INSERT IMAGE HERE: assets/phone/notch-fit-ruler.png and notch-formats.png, the Dynamic Island explorations</p>
+<p>Some updates do not deserve a screen. For a lightweight status, I designed concepts that use the Dynamic Island as a compact, well-timed entry point, where the constraints did the designing: very little width, truncation, timing, and staying useful at a glance. <span style="background:#FFF3B0">[Confirm whether Live Activities support shipped or stayed a prototype.]</span></p>
+
+<hr style="border:0;border-top:1px solid #999;margin:14pt 0 4pt">
+<p style="font-size:10pt;color:#7a8a99;margin:0 0 6pt">Brand</p>
+<h2 style="font-size:18pt;font-weight:bold;line-height:1.25;margin:0 0 8pt">Building the brand without a brand team, and testing every mark against the interface it had to live in.</h2>
+<p>The company had been using Spark without an articulated brand story, and without a brand there was no basis for consistent choices in the app. I produced 36 logo explorations and judged each by how it translated into interface elements. <span style="background:#FFF3B0">[confirm 36]</span> The direction came from an ordinary moment: wearing the glasses in a garden, I noticed a four-leaf clover and read it as a good start to the day. <b>Eden</b> became the umbrella identity, with nature-based names for future hardware and <b>Clover</b> for the first product, built on my own reading of ikigai and the habit of noticing slower, ordinary moments, set deliberately against an industry that sells maximum speed.</p>
+<p style="color:#B23A2E;font-weight:bold">INSERT IMAGE HERE: the 36-logo grid and the chosen mark</p>
+<p>Two of my own choices failed in context and I changed them. The clean editorial typeface <span style="background:#FFF3B0">[Kyoto, confirm]</span> that worked at phone scale was not legible as glanceable text on the glasses, so expressive brand type and functional display type were separated, with shared proportions and iconography. The first muted palette read as muddy across the whole iOS interface, so the app moved to a brighter palette with selective accents while the HUD stayed restrained. When internal feedback called the garden visuals too feminine for a male-skewing category, I brought the question back to whether the system communicated trust, approachability and difference to the audience we wanted. The nature-led direction was approved.</p>
+<p style="color:#B23A2E;font-weight:bold">INSERT IMAGE HERE: brand type against HUD type; muted palette against revised palette</p>
+
+<hr style="border:0;border-top:1px solid #999;margin:14pt 0 4pt">
+<p style="font-size:10pt;color:#7a8a99;margin:0 0 6pt">Design engineering</p>
+<h2 style="font-size:18pt;font-weight:bold;line-height:1.25;margin:0 0 8pt">I learned to prototype the behaviour of an interaction, not just its appearance.</h2>
+<p>A conversational product has problems a Figma file cannot show: how people phrase a request, how the interface acknowledges speech, what happens in a pause or when the turn changes hands, how transcription should appear, how the visuals should move while someone is still talking, and how a wearer knows whether the agent is listening, processing or answering. So I taught myself <b>Soniox</b>, a real-time voice platform with speech-to-text and text-to-speech APIs, and wired it into the HUD explorations. That turned them into prototypes I could speak to, and made exploring the orb's conversational states far faster than drawing each one. A prototype should be as real as the uncertainty it is testing, and for conversation the timing and the feedback are the experience. Soniox handled voice processing only; it is not the model behind the agent's reasoning, and the voice prototype is a design tool, separate from production. <span style="background:#FFF3B0">[Confirm what it included: synthesised replies, state animations, real or scripted responses.]</span></p>
+<p style="color:#B23A2E;font-weight:bold">INSERT VIDEO HERE: the voice-interactive prototype, transcription appearing and the orb changing state as you speak</p>
+<p>On the phone I wrote the app in <b>SwiftUI</b>, a framework I did not know when the work started, learning the platform while making product decisions in it. I joined the engineers' technical discussions, learned the codebase, used AI-assisted tools to move faster, and worked on branches with pull requests. One lesson cost us time: I had built the first HUD in vanilla CSS, and loading it on the glasses showed the chips needed their own SDK, so merging my prototype into the engineers' codebase was slow. <span style="background:#FFF3B0">[Confirm the stack you rebuilt in.]</span> A prototype is not fast if it leaves a large integration job behind it, so I now settle platform constraints and architecture with engineers before refining an interaction visually.</p>
+<p style="color:#B23A2E;font-weight:bold">INSERT IMAGE HERE: the Modes screen in the Xcode simulator, and a merged PR if shareable</p>
+
+<hr style="border:0;border-top:1px solid #999;margin:14pt 0 4pt">
+<p style="font-size:10pt;color:#7a8a99;margin:0 0 6pt">Measuring</p>
+<h2 style="font-size:18pt;font-weight:bold;line-height:1.25;margin:0 0 8pt">What exists now, and how the next round would be judged.</h2>
+<p>An intent-led HUD with three levels of support and a proposed orchestration, recovery and interruption model; a proposed rendering system of six primitives and a fit rule; a companion app with Modes shipped in SwiftUI; one nature-led visual system; and a voice-interactive prototype of the glasses' conversation. These are design and build outcomes, not evidence of market impact.</p>
+<p>The next validation round would measure <b>task completion rate</b>, <b>recovery success</b> after a failed step, <b>unnecessary clarification turns</b>, <b>time spent looking at the display</b>, and <b>whether wearers correctly understand which actions Clover completed</b>. Alongside those, first-attempt task success on equivalent glasses and phone scenarios, and whether the app reduces or adds avoidable phone pickups, since every tester told us they wanted less screen time, not more. <span style="background:#FFF3B0">[Insert any verified results. No A/B test or percentage is claimed without records.]</span></p>
+
+<hr style="border:0;border-top:1px solid #999;margin:14pt 0 4pt">
+<p style="font-size:10pt;color:#7a8a99;margin:0 0 6pt">Key takeaways and next steps</p>
+<h2 style="font-size:18pt;font-weight:bold;line-height:1.25;margin:0 0 8pt">Design the rule, not the screen.</h2>
+<p><b>Design the rule, not the screen.</b> Three levels and six primitives did more for the product than any single interface, because they decide every interface that follows.</p>
+<p><b>Hold convictions lightly.</b> I argued for app-first and revised it on evidence. I changed my palette and typography once I saw them in context. Revising a decision matters as much as the reasoning that led to it.</p>
+<p><b>Challenge the scope without ignoring the business.</b> The founders were right about manufacturing risk. I learned to argue for a second risk, an incoherent end-to-end experience, while respecting the first.</p>
+<p><b>Match the prototype to the uncertainty.</b> Static screens could not test a conversation, so I learned the tool that could.</p>
+<p><b>Sync with engineering earlier than feels necessary.</b> The most important conversations hide in the back of everyone's head. Align early and keep asking until everything is set out, rather than revisited.</p>
+<p style="margin-top:10pt"><b>Next steps</b></p>
+<p style="margin:4pt 0 0">01. Prototype the orchestration, recovery and interruption behaviours end to end on the V2 logic, in the voice prototype first and then on the glasses.</p>
+<p style="margin:2pt 0 0">02. Run the validation round above with the same technical and non-technical split, one week of real wear.</p>
+<p style="margin:2pt 0 0">03. Ship the first primitives and the fit rule into the HUD so every new capability arrives already rendered.</p>
+
+<p style="font-size:9pt;color:#888;margin-top:24pt">Sources for every INSERT line, the rendered HUD scenarios, the session notes and the earlier drafts are in the shared repo clover-doordash-deck. Yellow marks what only you can confirm.</p>
+</body></html>
