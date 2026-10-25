@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Water lab</title>
+<style>
+/* DON'T FORGET TO DRINK WATER, five ways. One sheet of simulated water under your cursor (each cell is pulled
+   toward the average of its neighbours and remembers where it was, so ripples travel, cross and settle), laid
+   over five different worlds: a clear drop, a koi pond, a lake with a kayak, a rain puddle at night, a pool.
+   Each world is drawn in a shader; the water bends it by the slope of the waves and lights its crests. */
+html,body{margin:0;height:100%;background:#000;overflow:hidden;font:500 12px -apple-system,"Helvetica Neue",sans-serif}
+canvas{display:block;width:100vw;height:100vh;touch-action:none}
+.tabs{position:fixed;left:50%;top:16px;transform:translateX(-50%);display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(20,20,22,.55);
+  -webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);box-shadow:0 0 0 .5px rgba(255,255,255,.12)}
+.tabs button{position:relative;z-index:1;font:inherit;color:rgba(255,255,255,.62);background:none;border:0;border-radius:999px;padding:8px 14px;cursor:pointer;transition:color .3s ease}
+.tabs button.on{color:#111}
+.tabs .pill{position:absolute;top:4px;left:4px;height:calc(100% - 8px);border-radius:999px;background:#fff;transition:transform .5s cubic-bezier(.34,1.4,.5,1),width .5s cubic-bezier(.34,1.4,.5,1)}
+.hint{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);color:rgba(255,255,255,.4);font:500 11px ui-monospace,"SF Mono",Menlo,monospace;letter-spacing:.28em;text-transform:uppercase;pointer-events:none;text-align:center}
+</style></head><body>
+<canvas id="c"></canvas>
+<div class="tabs" id="tabs"><span class="pill" id="pill"></span></div>
+<div class="hint" id="hint"></div>
+<script>
+const cv=document.getElementById('c');
+const gl=cv.getContext('webgl2',{antialias:false,premultipliedAlpha:false,alpha:false});
+if(!gl){ document.body.innerHTML='<p style="color:#fff;padding:24px">This needs WebGL2.</p>'; throw new Error('webgl2'); }
+gl.getExtension('EXT_color_buffer_float');
+
+const SCENES=[
+  {id:'drop', name:'01 Drop',     hint:'move across it'},
+  {id:'koi',  name:'02 Koi pond', hint:'the koi keep their distance'},
+  {id:'kayak',name:'03 Kayak',    hint:'it paddles to your cursor'},
+  {id:'rain', name:'04 Rain',     hint:'it keeps raining'},
+  {id:'pool', name:'05 Pool',     hint:'touch the water'}];
+let MODE=0;
+
+const VS=`#version 300 es
+in vec2 a; out vec2 vUv; void main(){ vUv=a*.5+.5; gl_Position=vec4(a,0.,1.); }`;
+
+/* THE WATER. r: height now, g: height a step ago. The cursor pushes along the segment it travelled; up to
+   eight more point sources (fish tails, paddle blades, a bow, rain) push wherever they are. */
+const SIM=`#version 300 es
+precision highp float; in vec2 vUv; out vec4 o;
+uniform sampler2D uPrev; uniform vec2 uTexel,uA,uB; uniform float uR,uS,uAspect,uDamp; uniform vec4 uSrc[8];
+void main(){
+  vec4 c=texture(uPrev,vUv);
+  float n=(texture(uPrev,vUv+vec2(uTexel.x,0.)).r+texture(uPrev,vUv-vec2(uTexel.x,0.)).r
+          +texture(uPrev,vUv+vec2(0.,uTexel.y)).r+texture(uPrev,vUv-vec2(0.,uTexel.y)).r)*.5;
+  float h=(n-c.g)*uDamp;
+  vec2 k=vec2(uAspect,1.), q=vUv*k, a=uA*k, b=uB*k, pa=q-a, ba=b-a;
+  float t=clamp(dot(pa,ba)/max(dot(ba,ba),1e-7),0.,1.);
+  h+=uS*smoothstep(uR,0.,length(pa-ba*t));
+  for(int i=0;i<8;i++){ vec4 s=uSrc[i]; if(s.w!=0.) h+=s.w*smoothstep(s.z,0.,length(q-s.xy*k)); }
+  o=vec4(h,c.r,0.,1.);
+}`;
+
+/* THE WORLDS UNDER THE WATER */
+const SCENE=`#version 300 es
+precision highp float; in vec2 vUv; out vec4 o;
+uniform float uTime,uAspect,uMode; uniform sampler2D uText; uniform vec4 uFish[6];
+float h21(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }
+float vn(vec2 p){ vec2 i=floor(p),f=fract(p); f=f*f*(3.-2.*f); return mix(mix(h21(i),h21(i+vec2(1,0)),f.x),mix(h21(i+vec2(0,1)),h21(i+vec2(1,1)),f.x),f.y); }
+float fbm(vec2 p){ float a=.5,s=0.; for(int i=0;i<5;i++){ s+=a*vn(p); p=p*2.03+17.1; a*=.5; } return s; }
+vec2 vor(vec2 p){ vec2 i=floor(p),f=fract(p); float d1=9.,d2=9.; for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){ vec2 g=vec2(x,y), r=g+vec2(h21(i+g),h21(i+g+7.3))-f; float d=dot(r,r); if(d<d1){d2=d1;d1=d;}else if(d<d2)d2=d; } return vec2(sqrt(d1),sqrt(d2)); }
+float txt(vec2 uv){ return texture(uText,uv).r; }
+/* a koi, in its own frame: x along the body, a tail that sweeps, a body that flexes with the stroke */
+vec4 koi(vec2 p,vec4 f,float seed){
+  vec2 d=p-f.xy; float c=cos(-f.z), s=sin(-f.z); vec2 q=vec2(c*d.x-s*d.y,s*d.x+c*d.y);
+  float L=.055, Wd=.016;
+  q.y+=sin(f.w-q.x*55.)*.006*clamp((L*.4-q.x)/L,0.,1.5);
+  float u=q.x/L;
+  float w=Wd*sqrt(max(0.,1.-u*u))*(u>0.?1.:1.+u*.45);
+  float body=smoothstep(.0015,-.0015,abs(q.y)-w)*step(abs(u),1.);   /* only between nose and tail root */
+  vec2 tq=q-vec2(-L*.95,0.); float tw=clamp(-tq.x/.03,0.,1.);
+  float tail=step(tq.x,0.)*step(-.03,tq.x)*smoothstep(.002,-.002,abs(tq.y-sin(f.w)*.012*tw)-.004-tw*.012);
+  float m=max(body,tail*.8);
+  /* kohaku: white with red-orange patches; some are all gold */
+  float spots=step(.5,vn(q*90.+seed*13.));
+  vec3 col=seed>.6?vec3(.98,.6,.12):mix(vec3(.96,.94,.9),vec3(.92,.32,.08),spots);
+  col*=.75+.35*smoothstep(-Wd,Wd,q.y*-.6+.004);
+  return vec4(col,m);
+}
+void main(){
+  vec2 uv=vUv, p=(uv-.5)*vec2(uAspect,1.);
+  float t=uTime; vec3 col=vec3(0.);
+  if(uMode<.5){ /* DROP: black, the line of text */
+    col=vec3(txt(uv))*vec3(.93,.95,.97);
+  } else if(uMode<1.5){ /* KOI POND: pebbles in the dark, the line set into the floor, koi and their shadows */
+    vec2 v=vor(p*14.); float peb=smoothstep(.0,.25,v.y-v.x);
+    vec3 floorC=mix(vec3(.03,.07,.06),vec3(.09,.15,.11)*(.7+.6*h21(floor(p*14.))),peb);
+    floorC*=.75+.5*fbm(p*3.);
+    col=floorC+vec3(.45,.55,.45)*txt(uv)*.35;
+    for(int i=0;i<6;i++){ vec4 sh=koi(p+vec2(-.012,.016),uFish[i],float(i)); col*=1.-sh.a*.45; }
+    col=mix(col,vec3(.02,.09,.08),.35);
+    for(int i=0;i<6;i++){ vec4 k=koi(p,uFish[i],fract(float(i)*.37)); col=mix(col,k.rgb*.92,k.a*.9); }
+  } else if(uMode<2.5){ /* KAYAK: a lake at golden hour, the sky in it, the line resting on the bed */
+    float y=uv.y;
+    vec3 sky=mix(vec3(.98,.72,.45),vec3(.33,.45,.62),smoothstep(.0,1.,y));
+    sky=mix(sky,vec3(1.,.85,.6),exp(-pow(length((uv-vec2(.72,.82))*vec2(1.,1.6)),2.)*14.)*.7);
+    float depth=fbm(p*2.+vec2(0.,t*.01));
+    col=mix(vec3(.05,.17,.22),sky,.55+.25*depth);
+    col+=vec3(.8,.95,1.)*txt(uv)*.18;
+  } else if(uMode<3.5){ /* RAIN: a night puddle full of reflected signs */
+    col=vec3(.01,.012,.02)+vec3(.02,.025,.04)*fbm(p*4.);
+    for(int i=0;i<5;i++){ float x=-.7+float(i)*.35+.05*sin(float(i)*3.1); float w=.03+.02*h21(vec2(float(i),3.));
+      vec3 neon=i%2==0?vec3(1.,.23,.5):vec3(.2,.85,1.); if(i==3) neon=vec3(1.,.75,.2);
+      float bar=exp(-pow((p.x-x)/w,2.)*2.)*smoothstep(-.5,.45,p.y)*(.55+.45*sin(t*.7+float(i)));
+      col+=neon*bar*.55; }
+    float tx=txt(uv); col+=vec3(1.,.27,.55)*tx*1.1+vec3(1.,.5,.75)*smoothstep(.0,.8,textureLod(uText,uv,4.).r)*.6;
+    col*=.85+.3*fbm(p*20.);
+  } else { /* POOL: tiles, a lane line, the line in navy mosaic, caustics */
+    vec2 tp=p*26.; vec2 cell=floor(tp), f=fract(tp);
+    float grout=smoothstep(.0,.07,min(min(f.x,f.y),min(1.-f.x,1.-f.y)));
+    /* the letters are laid in finer tiles, three to a floor tile, the way depth markers are */
+    vec2 tq=p*78.; vec2 c3=floor(tq), f3=fract(tq);
+    float mosaic=step(.45,txt((c3+.5)/78./vec2(uAspect,1.)+.5));
+    float grout3=smoothstep(.0,.12,min(min(f3.x,f3.y),min(1.-f3.x,1.-f3.y)));
+    vec3 tile=mix(vec3(.62,.86,.92),vec3(.55,.8,.9),h21(cell));
+    tile=mix(tile,vec3(.1,.2,.42),step(abs(p.y+.33),.022));
+    col=mix(vec3(.82,.93,.96),tile,grout);
+    col=mix(col,mix(vec3(.82,.93,.96),vec3(.07,.15,.35)*(.85+.3*h21(c3)),grout3),mosaic);
+    vec2 q=p*7.; float c=0.;
+    for(int i=0;i<3;i++){ q+=vec2(sin(q.y*1.3+t*.9+float(i)*1.7),cos(q.x*1.2-t*.8+float(i)*2.3))*.55; c+=pow(1.-abs(sin(q.x)*sin(q.y)),9.); }
+    col*=.82; col+=vec3(.9,1.,1.)*c*.16;
+    col=mix(col,vec3(.2,.62,.78),.22);
+  }
+  o=vec4(col,1.);
+}`;
+
+/* THE WATER OVER THE WORLD: bend by the slope, light on the crests; floating things drawn on top */
+const SHOW=`#version 300 es
+precision highp float; in vec2 vUv; out vec4 o;
+uniform sampler2D uScene,uH; uniform vec2 uTexel; uniform float uMode,uTime,uAspect; uniform vec4 uPads[7]; uniform vec4 uBoat; uniform float uPaddle;
+float sdSeg(vec2 p,vec2 a,vec2 b){ vec2 pa=p-a,ba=b-a; float t=clamp(dot(pa,ba)/dot(ba,ba),0.,1.); return length(pa-ba*t); }
+/* the drop: a teardrop's height at p (0 outside) */
+float dropH(vec2 p){ vec2 q=p-vec2(0.,.06); float R=.17, Ry=.27; float y=clamp(q.y/Ry,-1.,1.);
+  float w=max(R*sqrt(max(0.,1.-y*y))*pow((1.-y)*.5,.9)*1.35,1e-4); float A=pow(q.x/w,2.), B=pow(length(q/vec2(R,Ry)),4.);
+  return sqrt(max(0.,1.-pow(pow(A,3.)+pow(B,3.),1./3.))); }
+void main(){
+  float hc=texture(uH,vUv).r;
+  float hr=texture(uH,vUv+vec2(uTexel.x,0.)).r, hl=texture(uH,vUv-vec2(uTexel.x,0.)).r, hu=texture(uH,vUv+vec2(0.,uTexel.y)).r, hd=texture(uH,vUv-vec2(0.,uTexel.y)).r;
+  vec2 g=vec2(hr-hl,hu-hd); float sl=length(g); float lap=hr+hl+hu+hd-4.*hc;
+  bool drop=uMode<.5, koi=uMode>.5&&uMode<1.5, kay=uMode>1.5&&uMode<2.5, rain=uMode>2.5&&uMode<3.5, pool=uMode>3.5;
+  float refr=drop?.13:koi?.07:kay?.05:rain?.1:.11;
+  vec2 off=g*refr; float film=(drop||rain)?1.:.35;
+  vec3 col=vec3(texture(uScene,vUv+off).r,texture(uScene,vUv+off*(1.+.22*film)).g,texture(uScene,vUv+off*(1.+.46*film)).b);
+  vec3 n=normalize(vec3(-g*14.,1.));
+  vec3 L=kay?normalize(vec3(.45,.65,.6)):normalize(vec3(-.35,.55,.75));
+  float spec=pow(max(dot(reflect(-L,n),vec3(0.,0.,1.)),0.),kay?90.:48.);
+  float lit=dot(col,vec3(.33));
+  vec3 sc=kay?vec3(1.,.86,.62):vec3(1.);
+  col+=sc*spec*smoothstep(.003,.03,sl)*(drop?.35+.9*lit:.7);
+  col+=(.5+.5*cos(6.283*(sl*28.+vec3(0.,.33,.67))))*smoothstep(.012,.06,sl)*(drop?.06+.5*lit:.04)*film;
+  if(pool) col+=vec3(.9,1.,1.)*clamp(-lap*60.,0.,1.)*.35;               /* ripples gather light onto the tiles */
+  if(rain) col*=1.+.5*smoothstep(.01,.05,sl);
+  vec2 p=(vUv-.5)*vec2(uAspect,1.);
+
+  if(drop){ /* clear water over the text: the letters swell and bend inside it; a dark rim, a bright edge */
+    float e=.003, z=dropH(p);
+    if(z>0.){
+      vec3 dn=normalize(vec3(-(dropH(p+vec2(e,0.))-z)/e*.1,-(dropH(p+vec2(0.,e))-z)/e*.1,1.));
+      vec2 lens=(vUv-.5)*.93+.5-dn.xy*.045*z+off;                                           /* a gentle lens */
+      vec3 inside=vec3(texture(uScene,lens).r,texture(uScene,lens-dn.xy*.004).g,texture(uScene,lens-dn.xy*.008).b)*vec3(.92,.98,1.);
+      float rim=smoothstep(.55,.0,z);
+      inside*=1.-rim*.6;
+      inside+=vec3(.75,.85,.9)*pow(rim,3.)*smoothstep(.0,.08,z)*.5;
+      vec3 r=reflect(vec3(0.,0.,-1.),dn);
+      inside+=vec3(1.)*pow(max(dot(r,normalize(vec3(-.4,.7,.6))),0.),60.)*1.2;
+      inside+=vec3(.6,.75,.85)*pow(max(dot(r,normalize(vec3(.5,-.5,.7))),0.),20.)*.25;
+      col=mix(col,inside,smoothstep(.0,.04,z));
+    }
+    col+=vec3(.04)*exp(-pow(length((p-vec2(0.,-.24))*vec2(.6,3.)),2.)*6.);
+  }
+  if(koi){ /* lily pads riding the ripples, a flower or two */
+    for(int i=0;i<7;i++){ vec4 pd=uPads[i]; vec2 q=p-pd.xy-g*.6; float r=pd.z;
+      float a=atan(q.y,q.x)-pd.w, notch=step(abs(mod(a+3.1416,6.2832)-3.1416),.22);
+      float d=length(q)-r; float m=smoothstep(.002,-.002,d)*(1.-notch*step(length(q),r));
+      col*=1.-.35*smoothstep(.012,-.004,length(q+vec2(-.008,.01))-r)*(1.-m);                  /* its shadow */
+      if(m>0.){ float vein=pow(abs(sin(a*9.)),40.)*smoothstep(.0,r,length(q))*.25;
+        vec3 pc=mix(vec3(.17,.36,.14),vec3(.33,.54,.22),.5+.5*sin(length(q)/r*3.+pd.w))*(1.-vein);
+        pc+=pow(max(0.,1.-length(q-vec2(-r*.3,r*.35))/r),3.)*.15;
+        col=mix(col,pc,m); }
+      if(i==1||i==4){ vec2 fq=q-vec2(r*.15,-r*.1); float fa=atan(fq.y,fq.x); float fl=length(fq)-(.018+.01*pow(abs(sin(fa*3.5)),.5));
+        col=mix(col,mix(vec3(1.,.72,.82),vec3(1.,.95,.97),smoothstep(.02,.0,length(fq))),smoothstep(.002,-.002,fl)); }
+    }
+  }
+  if(kay){ /* the hull, the paddler, the paddle mid-stroke */
+    vec2 d=p-uBoat.xy; float c=cos(-uBoat.z), s=sin(-uBoat.z); vec2 q=vec2(c*d.x-s*d.y,s*d.x+c*d.y);
+    float L=.095, W=.017, u=q.x/L;
+    col*=1.-.35*smoothstep(.02,-.02,abs(q.y)-W*1.6*pow(max(0.,1.-u*u),.7)-.004);
+    float hull=smoothstep(.0012,-.0012,abs(q.y)-W*pow(max(0.,1.-u*u),.75));
+    vec3 hcol=mix(vec3(.85,.22,.12),vec3(1.,.42,.25),smoothstep(-W,W,q.y));
+    hcol*=1.-.25*smoothstep(.6,1.,abs(u));
+    col=mix(col,hcol,hull);
+    col=mix(col,vec3(.08,.07,.08),smoothstep(.001,-.001,length((q-vec2(-.008,0.))*vec2(.55,1.))-.0095));
+    col=mix(col,vec3(.16,.28,.36),smoothstep(.001,-.001,length(q-vec2(-.006,0.))-.0075));
+    col=mix(col,vec3(.12,.09,.07),smoothstep(.001,-.001,length(q-vec2(-.002,0.))-.0045));
+    float ang=sin(uPaddle)*.55; vec2 pd=vec2(sin(ang),cos(ang));
+    vec2 a=vec2(-.004,0.)+pd*.045, b=vec2(-.004,0.)-pd*.045;
+    col=mix(col,vec3(.92,.9,.85),smoothstep(.0012,.0,sdSeg(q,a,b)-.0006));
+    col=mix(col,vec3(.95,.85,.25),max(smoothstep(.0012,.0,length((q-a)*vec2(1.,.45))-.004),smoothstep(.0012,.0,length((q-b)*vec2(1.,.45))-.004)));
+  }
+  o=vec4(col,1.);
+}`;
+
+function prog(fs){ const p=gl.createProgram();
+  for(const [t,s] of [[gl.VERTEX_SHADER,VS],[gl.FRAGMENT_SHADER,fs]]){ const sh=gl.createShader(t); gl.shaderSource(sh,s); gl.compileShader(sh);
+    if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh)); gl.attachShader(p,sh); }
+  gl.bindAttribLocation(p,0,'a'); gl.linkProgram(p); if(!gl.getProgramParameter(p,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+  const U=new Proxy({},{get:(o,k)=>o[k]??(o[k]=gl.getUniformLocation(p,k))}); return {p,U}; }
+const P={sim:prog(SIM),scene:prog(SCENE),show:prog(SHOW)};
+const vb=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,vb); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+function target(w,h,half){ const t=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,t);
+  gl.texImage2D(gl.TEXTURE_2D,0,half?gl.RGBA16F:gl.RGBA8,w,h,0,gl.RGBA,half?gl.HALF_FLOAT:gl.UNSIGNED_BYTE,null);
+  for(const [k,v] of [[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D,k,v);
+  const f=gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER,f); gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,t,0); return {t,f}; }
+
+/* the line, as a white mask each world colours its own way; mipmapped so the rain's sign can glow */
+const TXT=document.createElement('canvas'), tx=TXT.getContext('2d'), textTex=gl.createTexture();
+const TEXTSTYLE=[ {size:.019,y:.6,weight:500,track:.85}, {size:.03,y:.5,weight:700,track:.5}, {size:.022,y:.62,weight:600,track:.7},
+                  {size:.034,y:.32,weight:700,track:.35}, {size:.043,y:.47,weight:800,track:.12} ];
+function drawText(W,H){
+  const st=TEXTSTYLE[MODE]; TXT.width=W; TXT.height=H; tx.fillStyle='#000'; tx.fillRect(0,0,W,H);
+  const line="DON'T FORGET TO DRINK WATER", size=Math.max(12,Math.min(W*st.size,H*st.size*2));
+  tx.font=`${st.weight} ${size}px ui-monospace,"SF Mono",Menlo,monospace`; tx.textBaseline='middle';
+  const track=size*st.track, ws=[...line].map(c=>tx.measureText(c).width+track), total=ws.reduce((a,b)=>a+b,0)-track;
+  let x=(W-total)/2; const y=H*st.y;
+  if(MODE===0){ tx.shadowColor='rgba(255,255,255,.55)'; tx.shadowBlur=size*.35; }
+  tx.fillStyle='#fff'; [...line].forEach((c,i)=>{ tx.fillText(c,x,y); x+=ws[i]; });
+  gl.bindTexture(gl.TEXTURE_2D,textTex); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,TXT); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
+  gl.generateMipmap(gl.TEXTURE_2D); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+}
+
+let W=0,H=0,SW=0,SH=0,sims=[],scene=null,AS=1;
+function calm(){ for(const s of sims){ gl.bindFramebuffer(gl.FRAMEBUFFER,s.f); gl.clearColor(0,0,0,1); gl.clear(gl.COLOR_BUFFER_BIT); } }
+function size(){
+  const dpr=Math.min(2,devicePixelRatio||1); W=Math.round(innerWidth*dpr); H=Math.round(innerHeight*dpr); cv.width=W; cv.height=H; AS=innerWidth/innerHeight;
+  const k=Math.min(1,900/Math.max(innerWidth,innerHeight)); SW=Math.round(innerWidth*k); SH=Math.round(innerHeight*k);
+  sims=[target(SW,SH,true),target(SW,SH,true)]; scene=target(W,H,false); calm(); drawText(W,H); }
+size(); addEventListener('resize',size);
+
+/* the cursor, in water coordinates (0..1, y up); scene coordinates are centred with x scaled by the aspect */
+const M={x:-1,y:-1,px:-1,py:-1,moved:false,v:0,in:false};
+const at=e=>[e.clientX/innerWidth,1-e.clientY/innerHeight];
+addEventListener('pointermove',e=>{ const [x,y]=at(e); if(M.x<0){ M.px=x; M.py=y; } M.x=x; M.y=y; M.moved=true; M.in=true; });
+document.documentElement.addEventListener('pointerleave',()=>{ M.x=M.px=-1; M.in=false; });
+cv.addEventListener('pointerdown',e=>{ const [x,y]=at(e); SRC.push([x,y,.03,.12]); });
+const toS=(x,y)=>[(x-.5)*AS,y-.5], toW=(sx,sy)=>[sx/AS+.5,sy+.5];
+let SRC=[];
+
+/* KOI: each fish wanders toward its own drifting goal, turns smoothly, and swerves away from the cursor */
+const FISH=[...Array(6)].map(()=>({x:(Math.random()-.5)*AS*.8,y:(Math.random()-.5)*.7,a:Math.random()*6.28,ph:Math.random()*6.28,sp:.05,gx:0,gy:0,gt:0}));
+const PADS=[[-.62,.26,.07,.4],[-.44,.33,.05,2.2],[.5,-.28,.08,1.1],[.66,-.12,.05,3.9],[.38,.3,.06,5.1],[-.55,-.3,.06,.7],[.12,.4,.04,2.9]];
+function koiStep(dt){
+  for(const f of FISH){
+    f.gt-=dt; if(f.gt<=0){ f.gx=(Math.random()-.5)*AS*.85; f.gy=(Math.random()-.5)*.75; f.gt=3+Math.random()*4; }
+    let tx=f.gx-f.x, ty=f.gy-f.y, want=.05;
+    if(M.in){ const [cx,cy]=toS(M.x,M.y), dx=f.x-cx, dy=f.y-cy, d=Math.hypot(dx,dy)+1e-4; if(d<.2){ tx+=dx/d*(.2-d)*12; ty+=dy/d*(.2-d)*12; want=.16; } }
+    const ta=Math.atan2(ty,tx); let da=((ta-f.a+Math.PI*3)%(Math.PI*2))-Math.PI;
+    f.a+=Math.max(-2.6*dt,Math.min(2.6*dt,da)); f.sp+=(want-f.sp)*Math.min(1,dt*2.5);
+    f.x+=Math.cos(f.a)*f.sp*dt; f.y+=Math.sin(f.a)*f.sp*dt;
+    const lim=AS*.5-.04; if(Math.abs(f.x)>lim){ f.x=Math.sign(f.x)*lim; f.gt=0; } if(Math.abs(f.y)>.46){ f.y=Math.sign(f.y)*.46; f.gt=0; }
+    f.ph+=dt*(4+f.sp*40);
+    if(Math.random()<dt*(f.sp>.1?6:1.2)){ const [wx,wy]=toW(f.x-Math.cos(f.a)*.05,f.y-Math.sin(f.a)*.05); SRC.push([wx,wy,.01,.006+f.sp*.04]); }
+  }
+}
+/* KAYAK: it steers for the cursor (or wanders), paddles in a rhythm that follows its speed, each blade that bites
+   drops a ripple, and the moving bow draws the V of its own wake */
+const BOAT={x:-.3,y:-.1,a:.3,v:0,ph:0,gx:0,gy:0,gt:0};
+function kayakStep(dt){
+  const B=BOAT; let gx,gy;
+  if(M.in){ [gx,gy]=toS(M.x,M.y); } else { B.gt-=dt; if(B.gt<=0){ B.gx=(Math.random()-.5)*AS*.7; B.gy=(Math.random()-.5)*.6; B.gt=6; } gx=B.gx; gy=B.gy; }
+  const dx=gx-B.x, dy=gy-B.y, d=Math.hypot(dx,dy), ta=Math.atan2(dy,dx); let da=((ta-B.a+Math.PI*3)%(Math.PI*2))-Math.PI;
+  B.a+=Math.max(-1.2*dt,Math.min(1.2*dt,da*1.5));
+  const want=d>.08?Math.min(.13,.04+d*.25):0; B.v+=(want-B.v)*Math.min(1,dt*1.2);
+  B.x+=Math.cos(B.a)*B.v*dt; B.y+=Math.sin(B.a)*B.v*dt;
+  const prev=Math.sin(B.ph); B.ph+=dt*(1.5+B.v*30); const now=Math.sin(B.ph);
+  if(B.v>.01&&Math.sign(prev)!==Math.sign(now)){ const side=now>0?1:-1, nx=-Math.sin(B.a), ny=Math.cos(B.a), [wx,wy]=toW(B.x+nx*.045*side,B.y+ny*.045*side); SRC.push([wx,wy,.012,.05]); }
+  if(B.v>.01){ const [bx,by]=toW(B.x+Math.cos(B.a)*.09,B.y+Math.sin(B.a)*.09); SRC.push([bx,by,.008,B.v*.12]); }
+}
+/* RAIN: a few drops every frame, of different weights */
+function rainStep(dt){ const n=Math.floor(dt*55+Math.random()); for(let i=0;i<n;i++) SRC.push([Math.random(),Math.random(),.004+Math.random()*.006,.04+Math.random()*.08]); }
+
+let cur=0,last=performance.now(),idle=0;
+function step(A,B,S,srcs,damp){
+  const a=sims[cur], b=sims[1-cur];
+  gl.bindFramebuffer(gl.FRAMEBUFFER,b.f); gl.viewport(0,0,SW,SH); gl.useProgram(P.sim.p);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,a.t); gl.uniform1i(P.sim.U.uPrev,0);
+  gl.uniform2f(P.sim.U.uTexel,1/SW,1/SH); gl.uniform2f(P.sim.U.uA,A[0],A[1]); gl.uniform2f(P.sim.U.uB,B[0],B[1]);
+  gl.uniform1f(P.sim.U.uR,.022); gl.uniform1f(P.sim.U.uS,S); gl.uniform1f(P.sim.U.uAspect,AS); gl.uniform1f(P.sim.U.uDamp,damp);
+  const arr=new Float32Array(32); srcs.slice(0,8).forEach((s,i)=>arr.set(s,i*4)); gl.uniform4fv(P.sim.U.uSrc,arr);
+  gl.drawArrays(gl.TRIANGLES,0,3); cur=1-cur;
+}
+function frame(now){
+  requestAnimationFrame(frame);
+  const dt=Math.min(.05,(now-last)/1000); last=now; const t=now/1000;
+  const id=SCENES[MODE].id;
+  if(id==='koi') koiStep(dt); if(id==='kayak') kayakStep(dt); if(id==='rain') rainStep(dt);
+  let A=[-9,-9],B=[-9,-9],S=0;
+  if(M.x>=0&&M.px>=0){ const v=Math.hypot(M.x-M.px,M.y-M.py)/Math.max(dt,1e-3); M.v+=(v-M.v)*.35;
+    if(M.moved){ A=[M.px,M.py]; B=[M.x,M.y]; S=Math.min(.14,.03+M.v*.07)*(id==='kayak'?.5:1); idle=0; }
+    M.px=M.x; M.py=M.y; M.moved=false; }
+  idle+=dt; if(id!=='rain'&&idle>2.6&&Math.random()<dt*.9){ SRC.push([.2+Math.random()*.6,.25+Math.random()*.5,.018,.03]); idle=1.4; }
+  const damp=id==='pool'?.988:id==='kayak'?.991:.986;
+  step(A,B,S,SRC.splice(0,8),damp); step([-9,-9],[-9,-9],0,SRC.splice(0,8),damp);
+  if(SRC.length>40) SRC.length=0;
+  gl.bindFramebuffer(gl.FRAMEBUFFER,scene.f); gl.viewport(0,0,W,H); gl.useProgram(P.scene.p);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,textTex); gl.uniform1i(P.scene.U.uText,0);
+  gl.uniform1f(P.scene.U.uTime,t); gl.uniform1f(P.scene.U.uAspect,AS); gl.uniform1f(P.scene.U.uMode,MODE);
+  gl.uniform4fv(P.scene.U.uFish,new Float32Array(FISH.flatMap(f=>[f.x,f.y,f.a,f.ph])));
+  gl.drawArrays(gl.TRIANGLES,0,3);
+  gl.bindFramebuffer(gl.FRAMEBUFFER,null); gl.viewport(0,0,W,H); gl.useProgram(P.show.p);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,scene.t); gl.uniform1i(P.show.U.uScene,0);
+  gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,sims[cur].t); gl.uniform1i(P.show.U.uH,1);
+  gl.uniform2f(P.show.U.uTexel,1/SW,1/SH); gl.uniform1f(P.show.U.uMode,MODE); gl.uniform1f(P.show.U.uTime,t); gl.uniform1f(P.show.U.uAspect,AS);
+  gl.uniform4fv(P.show.U.uPads,new Float32Array(PADS.flat()));
+  gl.uniform4f(P.show.U.uBoat,BOAT.x,BOAT.y,BOAT.a,BOAT.v); gl.uniform1f(P.show.U.uPaddle,BOAT.ph);
+  gl.drawArrays(gl.TRIANGLES,0,3);
+}
+requestAnimationFrame(frame);
+
+/* the tabs, with a pill that slides between them */
+const tabs=document.getElementById('tabs'), pill=document.getElementById('pill');
+SCENES.forEach((s,i)=>{ const b=document.createElement('button'); b.textContent=s.name; b.onclick=()=>setMode(i); tabs.appendChild(b); });
+function setMode(i){ MODE=i; const bs=[...tabs.querySelectorAll('button')]; bs.forEach((b,k)=>b.classList.toggle('on',k===i));
+  pill.style.transform=`translateX(${bs[i].offsetLeft-4}px)`; pill.style.width=bs[i].offsetWidth+'px';
+  document.getElementById('hint').textContent=SCENES[i].hint; calm(); drawText(W,H); try{ localStorage.setItem('water-mode',i); }catch(e){} }
+let m0=0; try{ m0=+localStorage.getItem('water-mode')||0; }catch(e){} setMode(Math.min(4,Math.max(0,m0)));
+</script>
+</body></html>

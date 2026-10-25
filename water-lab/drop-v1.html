@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Water lab</title>
+<style>
+/* DON'T FORGET TO DRINK WATER. A chrome drop and a line of spaced capitals on black, seen through a sheet of
+   water your cursor disturbs. Three passes in WebGL2: a wave simulation (each cell is pulled toward the average
+   of its neighbours and remembers where it was, so ripples travel, cross and die away); the scene (the drop,
+   shaded as polished metal, and the line of text); and the water over it, which bends the scene by the slope
+   of the waves, splits the colours a little on the steep parts, and catches a glint on every crest. */
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+canvas{display:block;width:100vw;height:100vh;cursor:default;touch-action:none}
+.hint{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);color:rgba(255,255,255,.28);font:500 11px ui-monospace,"SF Mono",Menlo,monospace;letter-spacing:.3em;text-transform:uppercase;pointer-events:none;transition:opacity 1.2s ease}
+.hint.gone{opacity:0}
+</style></head><body>
+<canvas id="c"></canvas>
+<div class="hint" id="hint">move across it</div>
+<script>
+const cv=document.getElementById('c');
+const gl=cv.getContext('webgl2',{antialias:false,premultipliedAlpha:false,alpha:false});
+if(!gl){ document.body.innerHTML='<p style="color:#fff;font:14px sans-serif;padding:24px">This needs WebGL2.</p>'; throw new Error('no webgl2'); }
+gl.getExtension('EXT_color_buffer_float');
+
+const VS=`#version 300 es
+in vec2 a; out vec2 vUv; void main(){ vUv=a*.5+.5; gl_Position=vec4(a,0.,1.); }`;
+
+/* the water: height now in r, height a step ago in g */
+const SIM=`#version 300 es
+precision highp float; in vec2 vUv; out vec4 o;
+uniform sampler2D uPrev; uniform vec2 uTexel,uA,uB; uniform float uR,uS,uAspect;
+void main(){
+  vec4 c=texture(uPrev,vUv);
+  float n=(texture(uPrev,vUv+vec2(uTexel.x,0.)).r+texture(uPrev,vUv-vec2(uTexel.x,0.)).r
+          +texture(uPrev,vUv+vec2(0.,uTexel.y)).r+texture(uPrev,vUv-vec2(0.,uTexel.y)).r)*.5;
+  float h=(n-c.g)*.986;                                   /* the wave step, with a little loss so it settles */
+  /* the cursor: a push along the whole segment it travelled this frame, so a fast stroke is one long wake */
+  vec2 k=vec2(uAspect,1.), q=vUv*k, a=uA*k, b=uB*k, pa=q-a, ba=b-a;
+  float t=clamp(dot(pa,ba)/max(dot(ba,ba),1e-7),0.,1.), d=length(pa-ba*t);
+  h+=uS*smoothstep(uR,0.,d);
+  o=vec4(h,c.r,0.,1.);
+}`;
+
+/* the scene under the water: a chrome drop, and the line of text */
+const SCENE=`#version 300 es
+precision highp float; in vec2 vUv; out vec4 o;
+uniform float uTime,uAspect; uniform sampler2D uText;
+float shape(vec2 p){
+  /* a teardrop: half-width sqrt(1-y^2) for a round belly, times ((1-y)/2) so it narrows to a point at the top;
+     it breathes and sways a very little, like a drop about to fall */
+  vec2 q=p-vec2(.004*sin(uTime*.7),0.); float R=.2, Ry=.31;
+  q.x+=.012*sin(q.y*6.+uTime*1.1)*(.5+.5*q.y/Ry);
+  float y=clamp(q.y/Ry,-1.,1.);
+  float w=R*sqrt(max(0.,1.-y*y))*pow((1.-y)*.5,.9)*1.35;
+  float side=(abs(q.x)-w)*.85;
+  float belly=(length(q/vec2(R,Ry))-1.)*R;
+  /* a soft max, so the belly and the taper meet without a crease */
+  float k=.05, h=clamp(.5-.5*(belly-side)/k,0.,1.); return mix(belly,side,h)+k*h*(1.-h); }
+/* the drop's surface: a round cross-section at every height (no ridge down the middle), rising from its outline */
+float height(vec2 p){
+  vec2 q=p-vec2(.004*sin(uTime*.7),0.); float R=.2, Ry=.31;
+  q.x+=.012*sin(q.y*6.+uTime*1.1)*(.5+.5*q.y/Ry);
+  float y=clamp(q.y/Ry,-1.,1.);
+  float w=max(R*sqrt(max(0.,1.-y*y))*pow((1.-y)*.5,.9)*1.35,1e-4);
+  float a=q.x/w, b=length(q/vec2(R,Ry));
+  float A=a*a, B=b*b*b*b;
+  float s2=pow(pow(A,3.)+pow(B,3.),1./3.);               /* a smooth blend: the taper sets the sides, the belly the bottom, no seam */
+  return sqrt(max(0.,1.-s2)); }
+vec3 env(vec3 r){
+  /* a dark studio: a soft key light overhead, a strip light to the left, a faint floor bounce */
+  float key=pow(max(r.y*.9+.15,0.),3.)*1.1;
+  float strip=smoothstep(.22,.0,abs(r.x+.42+r.y*.15))*smoothstep(-.6,.4,r.y)*.9;
+  float rim=smoothstep(.0,.35,-r.y)*.32;   /* light coming back up off the floor into the belly */
+  return vec3(.015)+vec3(key+strip+rim);
+}
+void main(){
+  vec2 p=(vUv-vec2(.5,.56))*vec2(uAspect,1.)/.95;
+  float d=shape(p), inside=smoothstep(.003,-.003,d);
+  vec3 col=vec3(0.);
+  if(d<.01){
+    float e=.002, z=height(p);
+    vec3 n=normalize(vec3(-(height(p+vec2(e,0.))-z)/e*.09,-(height(p+vec2(0.,e))-z)/e*.09,1.));
+    vec3 r=reflect(vec3(0.,0.,-1.),n);
+    col=env(r)*inside;
+    col+=pow(max(dot(r,normalize(vec3(-.3,.7,.65))),0.),70.)*1.2*inside;   /* the hot spot */
+    col*=.92+.08*sin(uTime*.6+p.y*4.);
+  }
+  /* a breath of light on the floor under it */
+  col+=vec3(.035)*exp(-pow(length((p-vec2(0.,-.36))*vec2(.6,3.)),2.)*6.);
+  vec3 t=texture(uText,vUv).rgb;
+  col=max(col,t);
+  o=vec4(col,1.);
+}`;
+
+/* the water over it: refraction by the slope, the colours parted on steep water, a glint on each crest */
+const SHOW=`#version 300 es
+precision highp float; in vec2 vUv; out vec4 o;
+uniform sampler2D uScene,uH; uniform vec2 uTexel;
+void main(){
+  float hx=texture(uH,vUv+vec2(uTexel.x,0.)).r-texture(uH,vUv-vec2(uTexel.x,0.)).r;
+  float hy=texture(uH,vUv+vec2(0.,uTexel.y)).r-texture(uH,vUv-vec2(0.,uTexel.y)).r;
+  vec2 g=vec2(hx,hy); float sl=length(g);
+  vec2 off=g*.14;
+  vec3 col=vec3(texture(uScene,vUv+off).r, texture(uScene,vUv+off*1.22).g, texture(uScene,vUv+off*1.46).b);
+  vec3 n=normalize(vec3(-g*14.,1.));
+  float spec=pow(max(dot(reflect(-normalize(vec3(-.35,.55,.75)),n),vec3(0.,0.,1.)),0.),48.);
+  float lit=dot(col,vec3(.33));
+  col+=spec*smoothstep(.003,.03,sl)*(.35+.9*lit);          /* glints, brightest where there is something to catch */
+  col+=(.5+.5*cos(6.283*(sl*28.+vec3(0.,.33,.67))))*smoothstep(.012,.06,sl)*(.06+.5*lit);   /* a thin film of colour on steep water */
+  col*=1.+.6*smoothstep(.01,.05,sl)*lit;
+  o=vec4(col,1.);
+}`;
+
+function prog(fs){ const p=gl.createProgram();
+  for(const [t,s] of [[gl.VERTEX_SHADER,VS],[gl.FRAGMENT_SHADER,fs]]){ const sh=gl.createShader(t); gl.shaderSource(sh,s); gl.compileShader(sh);
+    if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh)); gl.attachShader(p,sh); }
+  gl.bindAttribLocation(p,0,'a'); gl.linkProgram(p); if(!gl.getProgramParameter(p,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+  const U=new Proxy({},{get:(o,k)=>o[k]??(o[k]=gl.getUniformLocation(p,k))}); return {p,U}; }
+const P={sim:prog(SIM),scene:prog(SCENE),show:prog(SHOW)};
+const vb=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,vb); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+
+function target(w,h,half){ const t=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,t);
+  gl.texImage2D(gl.TEXTURE_2D,0,half?gl.RGBA16F:gl.RGBA8,w,h,0,gl.RGBA,half?gl.HALF_FLOAT:gl.UNSIGNED_BYTE,null);
+  for(const [k,v] of [[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D,k,v);
+  const f=gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER,f); gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,t,0);
+  return {t,f,w,h}; }
+
+/* the line of text, drawn once per size on a 2D canvas: spaced capitals, a little soft, like the reference */
+const TXT=document.createElement('canvas'), tx=TXT.getContext('2d'); let textTex=gl.createTexture();
+function drawText(W,H){
+  TXT.width=W; TXT.height=H; tx.clearRect(0,0,W,H); tx.fillStyle='#000'; tx.fillRect(0,0,W,H);
+  const line="DON'T FORGET TO DRINK WATER", size=Math.max(12,Math.min(W*.017,H*.04));
+  tx.font=`500 ${size}px ui-monospace,"SF Mono",Menlo,monospace`; tx.textBaseline='middle';
+  const track=size*.85, widths=[...line].map(ch=>tx.measureText(ch).width+track), total=widths.reduce((a,b)=>a+b,0)-track;
+  let x=(W-total)/2; const y=H*.76;
+  tx.shadowColor='rgba(255,255,255,.55)'; tx.shadowBlur=size*.35; tx.fillStyle='#ececec';
+  [...line].forEach((ch,i)=>{ tx.fillText(ch,x,y); x+=widths[i]; });
+  gl.bindTexture(gl.TEXTURE_2D,textTex); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,TXT); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+}
+
+let W=0,H=0,SW=0,SH=0,sims=[],scene=null;
+function size(){
+  const dpr=Math.min(2,devicePixelRatio||1); W=Math.round(innerWidth*dpr); H=Math.round(innerHeight*dpr);
+  cv.width=W; cv.height=H;
+  /* the water runs at about half the screen's resolution: ripples are soft, and it stays fast */
+  const k=Math.min(1,900/Math.max(innerWidth,innerHeight)); SW=Math.round(innerWidth*k); SH=Math.round(innerHeight*k);
+  sims=[target(SW,SH,true),target(SW,SH,true)]; scene=target(W,H,false);
+  for(const s of sims){ gl.bindFramebuffer(gl.FRAMEBUFFER,s.f); gl.clearColor(0,0,0,1); gl.clear(gl.COLOR_BUFFER_BIT); }
+  drawText(W,H);
+}
+size(); addEventListener('resize',size);
+
+/* the cursor, in the water's coordinates (0..1, y up); its speed sets how hard it pushes */
+let M={x:-1,y:-1,px:-1,py:-1,moved:false,v:0};
+function at(e){ return [e.clientX/innerWidth,1-e.clientY/innerHeight]; }
+addEventListener('pointermove',e=>{ const [x,y]=at(e); if(M.x<0){ M.px=x; M.py=y; } M.x=x; M.y=y; M.moved=true; document.getElementById('hint').classList.add('gone'); });
+addEventListener('pointerleave',()=>{ M.x=M.px=-1; });
+addEventListener('pointerdown',e=>{ const [x,y]=at(e); drops.push([x,y,.12,.03]); });
+let drops=[], idleT=0;
+
+let cur=0, t0=performance.now(), last=t0;
+function step(A,B,R,S){
+  const a=sims[cur], b=sims[1-cur];
+  gl.bindFramebuffer(gl.FRAMEBUFFER,b.f); gl.viewport(0,0,SW,SH); gl.useProgram(P.sim.p);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,a.t); gl.uniform1i(P.sim.U.uPrev,0);
+  gl.uniform2f(P.sim.U.uTexel,1/SW,1/SH); gl.uniform2f(P.sim.U.uA,A[0],A[1]); gl.uniform2f(P.sim.U.uB,B[0],B[1]);
+  gl.uniform1f(P.sim.U.uR,R); gl.uniform1f(P.sim.U.uS,S); gl.uniform1f(P.sim.U.uAspect,innerWidth/innerHeight);
+  gl.drawArrays(gl.TRIANGLES,0,3); cur=1-cur;
+}
+function frame(now){
+  requestAnimationFrame(frame);
+  const dt=Math.min(.05,(now-last)/1000); last=now; const t=(now-t0)/1000;
+  /* the push: a stroke the length of the cursor's travel, its strength eased up from its speed */
+  let A=[-9,-9],B=[-9,-9],S=0;
+  if(M.x>=0&&M.px>=0){ const v=Math.hypot(M.x-M.px,M.y-M.py)/Math.max(dt,1e-3); M.v+=(v-M.v)*.35;
+    if(M.moved){ A=[M.px,M.py]; B=[M.x,M.y]; S=Math.min(.14,.03+M.v*.07); idleT=0; }
+    M.px=M.x; M.py=M.y; M.moved=false; }
+  /* now and then, with nobody touching it, a single drop falls */
+  idleT+=dt; if(idleT>2.6&&Math.random()<dt*.9){ drops.push([.2+Math.random()*.6,.25+Math.random()*.5,.045,.012]); idleT=1.4; }
+  step(A,B,.022,S);
+  const d=drops.shift(); step(d?[d[0],d[1]]:[-9,-9],d?[d[0],d[1]]:[-9,-9],d?d[2]*.4:.01,d?d[3]:0);
+  /* the scene */
+  gl.bindFramebuffer(gl.FRAMEBUFFER,scene.f); gl.viewport(0,0,W,H); gl.useProgram(P.scene.p);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,textTex); gl.uniform1i(P.scene.U.uText,0);
+  gl.uniform1f(P.scene.U.uTime,t); gl.uniform1f(P.scene.U.uAspect,W/H);
+  gl.drawArrays(gl.TRIANGLES,0,3);
+  /* the water over it */
+  gl.bindFramebuffer(gl.FRAMEBUFFER,null); gl.viewport(0,0,W,H); gl.useProgram(P.show.p);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,scene.t); gl.uniform1i(P.show.U.uScene,0);
+  gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,sims[cur].t); gl.uniform1i(P.show.U.uH,1);
+  gl.uniform2f(P.show.U.uTexel,1/SW,1/SH);
+  gl.drawArrays(gl.TRIANGLES,0,3);
+}
+requestAnimationFrame(frame);
+</script>
+</body></html>
