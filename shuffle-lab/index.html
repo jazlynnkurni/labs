@@ -41,13 +41,26 @@ button.sh svg{display:block;width:100%;height:100%;overflow:visible}
 .ctl{display:flex;gap:8px}
 .ctl button{font:500 12px -apple-system,sans-serif;color:#121212;background:#f0f0f0;border:0;border-radius:999px;padding:8px 14px;cursor:pointer;transition:background .25s ease}
 .ctl button.on{background:#121212;color:#fff}
-body.slow *{transition-duration:2.4s!important}
+body.slow .morph *{transition-duration:2.4s!important}
+/* side by side: Spotify's as it is today (each state swapped in, no motion) and ours (one icon morphing) */
+.pair{display:flex;gap:72px;align-items:flex-start;justify-content:center;flex-wrap:wrap}
+.col{display:flex;flex-direction:column;align-items:center;gap:22px}
+.label{font:600 12px -apple-system,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#121212}
+.label small{display:block;margin-top:4px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--mute);text-align:center}
+.static *,.static{transition:none!important}
+.static button.sh:active{transform:none}
 </style></head><body>
 <div class="wrap">
-  <button class="sh big" id="b0" aria-label="Shuffle"></button>
-  <div class="cap" id="cap">Off. Click to shuffle.</div>
-  <div class="row"><button class="sh mid" id="b1" aria-label="Shuffle"></button><button class="sh small" id="b2" aria-label="Shuffle"></button></div>
-  <div class="ctl"><button id="slow">Slow motion</button></div>
+  <div class="pair">
+    <div class="col static" data-g="0">
+      <button class="sh big" aria-label="Shuffle"></button>
+      <div class="row"><button class="sh mid" aria-label="Shuffle"></button><button class="sh small" aria-label="Shuffle"></button></div>
+    </div>
+    <div class="col morph" data-g="1">
+      <button class="sh big" aria-label="Shuffle"></button>
+      <div class="row"><button class="sh mid" aria-label="Shuffle"></button><button class="sh small" aria-label="Shuffle"></button></div>
+    </div>
+  </div>
 </div>
 <script>
 const ICON=`<svg viewBox="0 0 24 24" aria-hidden="true">
@@ -61,9 +74,8 @@ const ICON=`<svg viewBox="0 0 24 24" aria-hidden="true">
   <circle class="dot" cx="12" cy="22.4" r="1.15"/>
 </svg>`;
 const STATES=['off','on','smart'], CAPS=['Off. Click to shuffle.','Shuffle on.','Smart shuffle: adds recommendations.'];
-let st=0;
-const btns=[...document.querySelectorAll('button.sh')];
-btns.forEach(b=>b.innerHTML=ICON);
+const GROUPS=[...document.querySelectorAll('.col')].map(col=>({col,st:0,btns:[...col.querySelectorAll('button.sh')],morph:col.classList.contains('morph')}));
+GROUPS.forEach(g=>g.btns.forEach(b=>b.innerHTML=ICON));
 /* on the way to "on", the arrows re-draw along their own paths: line first, then its head */
 function redraw(b){
   b.querySelectorAll('.arrows path').forEach((p,i)=>{
@@ -72,12 +84,16 @@ function redraw(b){
       {duration:document.body.classList.contains('slow')?2400:(head?260:520),delay:(head?380:0)+(i>1?70:0),easing:'cubic-bezier(.3,.7,.2,1)',fill:'backwards'});
   });
 }
-function set(n){
-  const prev=st; st=n;
-  btns.forEach(b=>{ b.classList.toggle('on',STATES[st]==='on'); b.classList.toggle('smart',STATES[st]==='smart'); b.setAttribute('aria-pressed',st>0); if(prev===0&&st===1) redraw(b); });
-  const c=document.getElementById('cap'); c.textContent=CAPS[st]; c.style.color=st?'#3a3a3a':'';
+function set(g,n){
+  const prev=g.st; g.st=n;
+  g.btns.forEach(b=>{ b.classList.toggle('on',STATES[n]==='on'); b.classList.toggle('smart',STATES[n]==='smart'); b.setAttribute('aria-pressed',n>0); if(g.morph&&prev===0&&n===1) redraw(b); });
+  const c=g.col.querySelector('.cap'); if(c){ c.textContent=CAPS[n]; c.style.color=n?'#3a3a3a':''; }
 }
-btns.forEach(b=>b.addEventListener('click',()=>set((st+1)%3)));
-document.getElementById('slow').onclick=e=>{ document.body.classList.toggle('slow'); e.target.classList.toggle('on'); };
+/* one press drives both: whichever button you push, the two step to the same next state together,
+   Spotify's snapping and ours morphing */
+GROUPS.forEach(g=>g.btns.forEach(b=>b.addEventListener('click',()=>{ const n=(g.st+1)%3; GROUPS.forEach(x=>set(x,n)); })));
+/* both at once, from the same state, so the difference is only the motion */
+if(document.getElementById('both')) document.getElementById('both').onclick=()=>{ const n=(GROUPS[1].st+1)%3; GROUPS.forEach(g=>set(g,n)); };
+if(document.getElementById('slow')) document.getElementById('slow').onclick=e=>{ document.body.classList.toggle('slow'); e.target.classList.toggle('on'); };
 </script>
 </body></html>
