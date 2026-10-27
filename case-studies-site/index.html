@@ -1,0 +1,84 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Case Studies · Jazlynn Kurniandra</title>
+<style>
+:root{--ink3:rgba(20,23,27,.42);--hair:rgba(20,23,27,.16);--flick-a:#A99939;--flick-b:#340414;--ease:cubic-bezier(.22,1,.36,1)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#fff}
+/* the two covers, nothing else. They are always whole: 16:9, never cropped. */
+.stage{min-height:100vh;display:flex;align-items:center;justify-content:center;gap:2.2vw;padding:0 4vw}
+.c{display:block;flex:0 0 auto;width:44.9vw;border-radius:22px;overflow:hidden;background:#fff;cursor:pointer;
+  box-shadow:0 0 0 1px rgba(20,23,27,.07),0 2px 6px rgba(20,23,27,.05),0 30px 56px -28px rgba(52,4,20,.32)}
+.c img{display:block;width:100%;aspect-ratio:16/9;height:auto;pointer-events:none;user-select:none}
+/* phones and touch screens have no pointer to lean on: the covers stack */
+@media(max-width:760px),(hover:none){.stage{flex-direction:column;gap:20px;padding:40px 16px}.c{width:100%!important;max-width:760px}}
+
+/* the jazlynnwashere.com loader */
+#load{position:fixed;inset:0;z-index:200;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;opacity:0;animation:ld-in .3s ease forwards}
+#load .ld{position:relative;display:flex;height:40px;width:min(300px,70vw)}
+#load .ld i{position:absolute;left:0;right:0;height:1px;background:var(--hair);transform:scaleX(0);transform-origin:left center;animation:ld-rule 560ms var(--ease) forwards}
+#load .ld i.head{top:0}#load .ld i.foot{bottom:0;animation-delay:120ms}
+#load .lc{flex:0 0 auto;height:40px;position:relative;transition:background 160ms ease}
+#load .lc::before{content:"";position:absolute;left:0;top:0;bottom:0;width:1px;background:var(--hair);transform:scaleY(0);transform-origin:top;animation:ld-stem 420ms var(--ease) forwards;animation-delay:var(--d)}
+#load .lc:last-child::after{content:"";position:absolute;right:0;top:0;bottom:0;width:1px;background:var(--hair);transform:scaleY(0);transform-origin:top;animation:ld-stem 420ms var(--ease) forwards;animation-delay:calc(var(--d) + 70ms)}
+#load .lc.on{background:var(--flick-b)}#load .lc.on.g{background:var(--flick-a)}
+#load span{font:300 12.5px "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.08em;color:var(--ink3)}
+@keyframes ld-in{to{opacity:1}}@keyframes ld-rule{to{transform:scaleX(1)}}@keyframes ld-stem{to{transform:scaleY(1)}}
+@media(prefers-reduced-motion:reduce){#load,#load .ld i,#load .lc::before,#load .lc:last-child::after{animation:none;transform:none;opacity:1}}
+</style></head><body>
+<main class="stage" id="st">
+  <a class="c a" href="/clover/deck.html" aria-label="Eden: designing proactive AI for smartglasses"><img src="/cover-clover.jpg" alt="Eden case study cover" width="1600" height="900"></a>
+  <a class="c b" href="/manus/deck.html" aria-label="Manus AI: redesigning the community so new users stay"><img src="/cover-manus.jpg" alt="Manus AI case study cover" width="1600" height="900"></a>
+</main>
+<script>
+const st=document.getElementById('st'), A=st.querySelector('.a'), B=st.querySelector('.b');
+const fine=matchMedia('(min-width:761px) and (hover:hover)');
+let busy=false;
+
+/* LEAN. The split follows the pointer on a spring: s is the left cover's share of the row,
+   the pointer's x sets where s wants to be, and the spring carries it there with a little give. */
+const lean=(()=>{ let raf=0, s=.5, v=0, target=.5, prev=0;
+  function frame(now){ const dt=Math.min(.033,(now-prev)/1000||.016); prev=now;
+    v+=(90*(target-s)-14*v)*dt; s+=v*dt;
+    const W=innerWidth*.898; A.style.width=(W*s).toFixed(1)+'px'; B.style.width=(W*(1-s)).toFixed(1)+'px';
+    raf=requestAnimationFrame(frame); }
+  function move(e){ if(busy) return; const x=e.clientX/innerWidth; target=.5-Math.max(-1,Math.min(1,(x-.5)*2.2))*.17; }
+  function out(){ target=.5; }
+  return { start(){ cancelAnimationFrame(raf); prev=performance.now(); addEventListener('pointermove',move); document.addEventListener('pointerleave',out); raf=requestAnimationFrame(frame); },
+           stop(){ cancelAnimationFrame(raf); removeEventListener('pointermove',move); document.removeEventListener('pointerleave',out); A.style.width=B.style.width=''; } };
+})();
+const sync=()=>fine.matches?lean.start():lean.stop();
+fine.addEventListener('change',sync); sync();
+
+/* THE CLICK. The chosen cover grows to the whole screen, the other leaves the way it was losing,
+   then the loader inks while the deck is fetched, and the page goes. */
+[A,B].forEach(c=>c.addEventListener('click',e=>{
+  if(busy||e.metaKey||e.ctrlKey||e.shiftKey) return; e.preventDefault(); busy=true;
+  const other=c===A?B:A, r=c.getBoundingClientRect(), href=c.href;
+  fetch(href,{credentials:'same-origin'}).catch(()=>{});
+  const W=Math.min(innerWidth,innerHeight*16/9), H=W*9/16;
+  const clone=c.cloneNode(true); Object.assign(clone.style,{position:'fixed',left:r.left+'px',top:r.top+'px',width:r.width+'px',margin:0,zIndex:100});
+  document.body.appendChild(clone); c.style.visibility='hidden';
+  other.style.transition='transform .7s var(--ease),opacity .45s ease'; other.style.opacity='0'; other.style.transform=`translateX(${other===A?-12:12}vw)`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    clone.style.transition='left .8s var(--ease),top .8s var(--ease),width .8s var(--ease),border-radius .8s var(--ease),box-shadow .8s ease';
+    Object.assign(clone.style,{left:(innerWidth-W)/2+'px',top:(innerHeight-H)/2+'px',width:W+'px',borderRadius:'0px',boxShadow:'none'}); }));
+  setTimeout(()=>loader(href),850);
+}));
+function loader(href){
+  const host=document.createElement('div'); host.id='load'; host.innerHTML='<div class="ld"><i class="head"></i><i class="foot"></i></div><span>loading</span>'; document.body.appendChild(host);
+  const row=host.querySelector('.ld'); const N=7, cells=[];
+  for(let i=0;i<N;i++){ const c=document.createElement('span'); c.className='lc'; c.style.setProperty('--d',(120+i*60)+'ms'); row.appendChild(c); cells.push(c); }
+  let deal; do{ deal=cells.map(()=>Math.random()<.5); }while(deal.filter(Boolean).length<2||deal.filter(x=>!x).length<2);
+  deal.forEach((g,i)=>{ if(g) cells[i].classList.add('g'); });
+  const t0=performance.now(); let inked=-1;
+  (function frame(now){ const t=(now-t0)/1000; const W=row.clientWidth; let sum=0; const ws=[];
+    for(let i=0;i<N;i++){ const k=.5+.5*Math.sin(t*.9*Math.PI+i*1.258); const w=1+k*k*1.6; ws.push(w); sum+=w; }
+    for(let i=0;i<N;i++) cells[i].style.width=(ws[i]/sum*W).toFixed(1)+'px';
+    const want=Math.min(N-1,Math.floor((t-.45)/.11)); while(inked<want){ inked++; cells[inked].classList.add('on'); }
+    if(t<1.6) requestAnimationFrame(frame); })(t0);
+  setTimeout(()=>{ location.href=href; },1250);
+}
+/* back from a deck: the browser may restore this page mid-click, so put it back as it was */
+addEventListener('pageshow',e=>{ if(!e.persisted) return; document.querySelectorAll('#load,body>.c').forEach(n=>n.remove());
+  [A,B].forEach(c=>{ c.style.visibility=''; c.style.opacity=''; c.style.transform=''; c.style.transition=''; }); busy=false; sync(); });
+</script>
+</body></html>

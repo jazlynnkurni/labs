@@ -1,0 +1,5 @@
+.vercel
+.env*
+# the decks are copied in from their own private repos before each deploy; they never go in this public repo
+clover/
+manus/
