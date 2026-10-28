@@ -4,3 +4,13 @@ __pycache__/
 xcuserdata/
 DerivedData/
 porcelain-lab/renders/*-quick.png
+
+# intro deck: her own photographs and the class video stay out of this public repo
+intro-lab/aster/pics/me1.jpg
+intro-lab/aster/pics/me2.jpg
+intro-lab/aster/pics/core.jpg
+intro-lab/aster/pics/columbia.mp4
+intro-lab/aster/pics/slide3.jpg
+intro-lab/aster/pics/c[0-9].jpg
+intro-lab/aster/pics/portrait.jpg
+intro-lab/aster/about/

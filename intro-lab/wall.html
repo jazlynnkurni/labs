@@ -1,0 +1,37 @@
+<!doctype html><meta charset="utf-8"><title>intro · breathing wall</title><link rel="stylesheet" href="common.css">
+<style>
+/* BREATHING WALL. The site's own hero: every word of the title sits in a cell that breathes, and
+   one cell at a time flicks gold or plum. Advancing is a shutter: the cells close left to right,
+   the next slide's open the same way, and the pictures are cells too. */
+.s{position:absolute;inset:0;padding:64px 110px 40px;display:none}.s.on{display:block}
+.wall{display:flex;flex-wrap:wrap;align-items:stretch;max-width:1060px;padding:1px 0 0 1px}
+.cell{border:1px solid var(--hair);margin:-1px 0 0 -1px;display:flex;align-items:center;height:78px;padding:0 16px;transform-origin:left center;transition:background .14s ease,color .14s ease;
+  animation:open .55s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 55ms)}
+.cell .w{font:500 46px/1 var(--jak);letter-spacing:-.025em;color:var(--ink);white-space:nowrap;padding:0 calc(var(--b,0) * 18px);transition:padding 1.6s ease-in-out}
+.cell.lit{background:var(--c)}.cell.lit .w{color:var(--paper)}
+.cell.pic{padding:0;height:156px;width:210px;overflow:hidden}.cell.pic .ph{width:100%;height:100%;border-radius:0}
+.s.closing .cell{animation:close .4s cubic-bezier(.6,0,.8,.2) both;animation-delay:calc(var(--i) * 40ms)}
+@keyframes open{from{transform:scaleX(0)}to{transform:scaleX(1)}}@keyframes close{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.s .under{display:grid;grid-template-columns:1.2fr 1fr;gap:32px;margin-top:20px;max-width:1060px;align-items:start}
+.s .lines{display:grid;gap:8px}.s .lines p{font-size:15.5px}.s .chips{margin-top:16px}.s .label{margin-bottom:14px}.s .dict{margin-bottom:12px}
+.s .under .ph{height:130px}.s .dict .word{font-size:40px}.s .dict .pron{font-size:16px;margin-top:4px}
+</style>
+<body><div id="stage"></div>
+<div class="top"><a href="./">intro lab</a><span>/</span><b>breathing wall</b></div>
+<script src="content.js"></script><script src="engine.js"></script>
+<script>
+(()=>{
+  const stage=Intro.stage; let els=[], cells=[];
+  function build(slides){ slides.forEach((s,i)=>{ const el=document.createElement('section'); el.className='s'+(i?'':' on');
+      const words=s.title.replace(/<[^>]+>/g,'').split(' ');
+      const wall=words.map((w,k)=>`<div class="cell" style="--i:${k}"><span class="w">${w}</span></div>`).join('')+s.pics.slice(0,2).map(([c,l],k)=>`<div class="cell pic" style="--i:${words.length+k}"><figure class="ph ${c}"><span>${l}</span></figure></div>`).join('');
+      const dict=s.dict?`<div class="dict"><div class="word">${s.dict.word}</div><div class="pron">${s.dict.pron} <span class="pos">${s.dict.pos}</span></div></div>`:'';
+      el.innerHTML=`<div class="label">${s.eyebrow}</div>${dict}<div class="wall">${wall}</div><div class="under"><div><div class="lines">${s.lines.map(l=>`<p class="body">${l}</p>`).join('')}</div><div class="chips">${s.chips.map(c=>`<span>${c}</span>`).join('')}</div></div><div class="pics" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${s.pics.slice(2).map(([c,l])=>`<figure class="ph ${c}"><span>${l}</span></figure>`).join('')}</div></div>`;
+      stage.appendChild(el); els.push(el); }); breathe(); }
+  function breathe(){ const all=()=>[...document.querySelectorAll('.s.on .cell:not(.pic)')]; let t=0;
+    setInterval(()=>{ t+=1; all().forEach((c,k)=>c.querySelector('.w').style.setProperty('--b',(.5+.5*Math.sin(t*.8+k*.9)).toFixed(2))); },1600);
+    setInterval(()=>{ const cs=all(); cs.forEach(c=>c.classList.remove('lit')); const c=cs[Math.floor(Math.random()*cs.length)]; if(c){ c.style.setProperty('--c',Math.random()<.5?'var(--gold)':'var(--oxblood)'); c.classList.add('lit'); setTimeout(()=>c.classList.remove('lit'),600+Math.random()*700);} },2200); }
+  function show(i){ els.forEach((e,k)=>{ e.classList.toggle('on',k===i); e.classList.remove('closing'); }); }
+  Intro.start({ build, go(a,b){ els[a].classList.add('closing'); return new Promise(r=>setTimeout(()=>{ show(b); r(); },520)); }, jump:show });
+})();
+</script></body>

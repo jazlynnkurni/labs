@@ -1,0 +1,63 @@
+<!doctype html><meta charset="utf-8"><title>intro · rabbit hole</title><link rel="stylesheet" href="common.css">
+<style>
+/* RABBIT HOLE. Every slide is nested inside the one before it, 2.6x smaller, parked in a portal off
+   the text. Advancing is one camera dolly into the portal. The zoom is exponential at constant speed,
+   the way falling feels, so the current slide's pictures fly past the edges while the next slide
+   grows to fill the frame. The first slide is a dark cover: white text, right aligned, text only. */
+#tunnel{position:absolute;left:640px;top:360px;width:0;height:0;will-change:transform}
+.s{position:absolute;left:-640px;top:-360px;width:1280px;height:720px;transform-origin:0 0;background:var(--paper)}
+.s .tx{position:absolute;left:120px;top:110px;width:560px}
+.s .lines{margin-top:14px;display:grid;gap:8px;max-width:60ch}.s .lines p{font-size:15.5px;line-height:1.45}.s .chips{margin-top:14px}
+.s .pics .ph{position:absolute}
+.s .p0{left:840px;top:70px;width:300px;height:200px}.s .p1{left:900px;top:285px;width:220px;height:125px}.s .p2{left:120px;top:596px;width:200px;height:108px}.s .p3{left:340px;top:608px;width:180px;height:96px}
+.s .portal{position:absolute;border:2px solid var(--purple);border-radius:20px;pointer-events:none}
+/* the cover */
+.s.dark{background:var(--charcoal);color:#fff}
+.s.dark .tx{left:auto;right:110px;top:120px;width:640px;text-align:right}
+.s.dark .label{display:none}
+.s.dark .dict .word{font:500 76px/1 var(--jak);letter-spacing:-.03em;color:#fff}
+.s.dark .dict .word em{font:300 28px/1 var(--hel);font-style:normal;color:rgba(255,255,255,.6);margin-left:10px;vertical-align:14px}
+.s.dark .dict .pron{font:300 20px/1.4 var(--hel);color:rgba(255,255,255,.7);margin-top:14px}
+.s.dark .dict .pos{font:italic 400 17px var(--bask);color:var(--gold)}
+.s.dark .dict .def{font:300 17px/1.5 var(--hel);color:rgba(255,255,255,.7);margin:6px 0 0 auto;max-width:40ch}
+.s.dark .title{color:#fff;margin-top:40px;font-size:40px}
+.s.dark .lines{margin:16px 0 0 auto;max-width:100%}.s.dark .lines p{font-size:17px;line-height:1.5;color:rgba(255,255,255,.78)}
+.s.dark .portal{border-color:var(--gold)}
+.s.dark .pics{display:none}
+</style>
+<body><div id="stage"><div id="tunnel"></div></div>
+<div class="top"><a href="./">intro lab</a><span>/</span><b>rabbit hole</b></div>
+<script src="content.js"></script><script src="engine.js"></script>
+<script>
+(()=>{
+  const K=2.6, tunnel=document.getElementById('tunnel');
+  /* where the next slide lives, in each slide's own 1280x720 space */
+  const PORTAL=[[286,536],[960,560],[960,560],[960,560],[960,560]];
+  const W=1280/K, H=720/K; let T=[], S=[], els=[], raf=0;
+  function build(slides, markup){
+    let tx=0, ty=0, sc=1;
+    slides.forEach((s,i)=>{
+      T.push([tx,ty]); S.push(sc);
+      const el=document.createElement('section'); el.className='s'+(s.dark?' dark':''); el.innerHTML=markup(s,i);
+      if(i<slides.length-1){ const [px,py]=PORTAL[i]; const ring=document.createElement('div'); ring.className='portal'; ring.style.cssText=`left:${px-W/2}px;top:${py-H/2}px;width:${W}px;height:${H}px`; el.appendChild(ring); }
+      el.style.transform=`translate(${tx+640*(1-sc)}px,${ty+360*(1-sc)}px) scale(${sc})`; tunnel.appendChild(el); els.push(el);
+      if(i<slides.length-1){ const [px,py]=PORTAL[i]; tx+=(px-640)*sc; ty+=(py-360)*sc; sc/=K; }
+    });
+    set(0,0,0);
+  }
+  /* the camera between slide a and b at progress p: log-interpolated zoom, linear travel */
+  function set(a,b,p){
+    const za=1/S[a], zb=1/S[b]; const z=Math.exp(Math.log(za)*(1-p)+Math.log(zb)*p);
+    const x=T[a][0]+(T[b][0]-T[a][0])*p, y=T[a][1]+(T[b][1]-T[a][1])*p;
+    tunnel.style.transform=`scale(${z}) translate(${-x}px,${-y}px)`;
+    els.forEach((e,k)=>{ const on=z*S[k];           /* how big slide k is on screen, 1 = fills the frame */
+      const blur=on>1? Math.min(14,(on-1)*9) : (on<.3? Math.min(6,(0.3-on)*30):0);
+      e.style.filter=blur>.2?`blur(${blur.toFixed(1)}px)`:''; e.style.opacity=on>2.2?Math.max(0,1-(on-2.2)/0.6):1; e.style.visibility=on>3.2||on<.05?'hidden':'visible'; });
+  }
+  const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  function dolly(a,b){ return new Promise(res=>{ cancelAnimationFrame(raf); const t0=performance.now(), D=1500;
+    (function f(now){ const p=Math.min(1,(now-t0)/D); set(a,b,ease(p)); if(p<1) raf=requestAnimationFrame(f); else res(); })(t0); }); }
+  const q=new URLSearchParams(location.search); const freeze=parseFloat(q.get('p'));
+  Intro.start({ build, go:dolly, jump(i){ if(!isNaN(freeze)&&i<els.length-1) set(i,i+1,ease(freeze)); else set(i,i,0); } });
+})();
+</script></body>

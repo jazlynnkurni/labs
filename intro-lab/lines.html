@@ -1,0 +1,25 @@
+<!doctype html><meta charset="utf-8"><title>intro · five lines</title><link rel="stylesheet" href="common.css">
+<style>
+/* FIVE LINES. The line through the places, in five textures, each seen up close at the second place and from above at the
+   look-back. Click a column to open the deck with that line. */
+html,body{height:auto;overflow:auto;background:#0E0D0C}
+.g{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;padding:70px 18px 40px}
+.c{display:grid;gap:8px;text-decoration:none;color:inherit}
+.c h3{font:500 15px var(--jak);color:#fff;letter-spacing:-.01em;margin:0}.c p{font:300 12.5px/1.45 var(--hel);color:rgba(255,255,255,.55);margin:0 0 4px;min-height:54px}
+.f{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:var(--paper);border-radius:4px}
+.f iframe{position:absolute;left:0;top:0;width:1280px;height:720px;border:0;transform-origin:0 0;pointer-events:none}
+.k{font:600 10.5px var(--jak);letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+</style>
+<div class="top"><a href="./">intro lab</a><span>/</span><b>five lines</b></div>
+<div class="g" id="g"></div>
+<script>
+const L=[['marker','Flat marker','The highlighter exactly as it is in the case study decks: two even passes of gold, multiplied over the paper.'],
+ ['dry','Dry felt tip','The same marker on its last legs: the ink streaks along the stroke and the edges fray where the felt drags.'],
+ ['riso','Riso grain','Printed, not drawn: the gold carries the grain of the discs, with an oxblood pass a touch out of register.'],
+ ['pressure','Pressure','One swipe per move: wide across the middle, tapering where the tip lands and lifts, the edge slightly frayed.'],
+ ['pencil','Pencil','A thin graphite line, wobbled and gone over twice like a sketch; it stays one pixel at any height.']];
+const g=document.getElementById('g');
+L.forEach(([k,t,d])=>{const a=document.createElement('a');a.className='c';a.href=`sheet.html?line=${k}`;a.target='_blank';
+  a.innerHTML=`<h3>${t}</h3><p>${d}</p><div class="k">up close</div><div class="f"><iframe src="sheet.html?line=${k}&r=3&nodiscs=1" loading="lazy"></iframe></div><div class="k">from above</div><div class="f"><iframe src="sheet.html?line=${k}&r=12&nodiscs=1" loading="lazy"></iframe></div>`;g.appendChild(a);});
+const fit=()=>{document.querySelectorAll('.f').forEach(f=>{const s=f.clientWidth/1280;f.querySelector('iframe').style.transform=`scale(${s})`;});};addEventListener('resize',fit);fit();setTimeout(fit,300);
+</script>

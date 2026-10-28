@@ -1,0 +1,313 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="aster/flip/flip.css">
+<title>intro · slides</title><link rel="stylesheet" href="common.css">
+<style>
+/* SLIDES. White frames that push left and right. The frames are the ones settled on the sheet: the breathing name wall with
+   her three discs on the cover, the dictionary entry, each bold line of her script, the stack as stamps, the artworks row,
+   the riso-printed photographs, the lab prints, the two cases. One rule holds the whole deck:
+     every sentence sits at the exact centre of the frame, 30px Jakarta, on a 920px measure;
+     whatever accompanies it (marks, stamps, a row of prints) starts 90px below the centre line;
+     labels are the site's small caps; nothing else moves on the page. */
+:root{--ease:cubic-bezier(.45,0,.15,1);--mid:360px;--below:calc(var(--mid) + 90px)}
+#stage{background:var(--paper);color:var(--ink);overflow:hidden}
+.sl{position:absolute;inset:0;display:none}.sl.on{display:block}
+.sl.labs{display:block;transform:translateX(1280px);pointer-events:none}.sl.labs.on{transform:none;pointer-events:auto}
+#deck{position:absolute;inset:0}
+.sl>*{position:absolute}
+.h{font-family:var(--jak);font-weight:500;letter-spacing:-.015em;color:var(--ink);text-wrap:balance;line-height:1.4}
+.lab{font-family:var(--jak);font-weight:600;font-size:10.5px;line-height:1.5;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+.note{font:300 17px/1.5 var(--hel);color:var(--ink2)}
+/* the highlighter from the case study decks, drawn in after the sentence */
+.hl{color:var(--oxblood);font-weight:600;padding:0 .08em;margin:0 -.08em;box-decoration-break:clone;-webkit-box-decoration-break:clone;mix-blend-mode:multiply;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M6 6 C 60 2, 140 9, 200 5 S 330 3, 394 7 L 397 32 C 340 37, 250 30, 190 35 S 70 38, 4 33 Z' fill='%23A99939' opacity='.42'/><path d='M12 9 C 90 4, 180 12, 260 8 S 360 6, 390 10 L 392 29 C 320 33, 230 27, 150 31 S 60 34, 10 30 Z' fill='%23A99939' opacity='.2'/></svg>") no-repeat 0 55%/0% 1.08em}
+.sl.on .hl{animation:mkdraw .8s cubic-bezier(.3,.7,.2,1) .7s both}
+@keyframes mkdraw{from{background-size:0% 1.08em}to{background-size:100% 1.08em}}
+/* arrivals: sentences fade; prints and photographs are laid down; stamps are stamped; marks turn */
+.sl.on>.say,.sl.on>.dict,.sl.on>.sub,.sl.on>.lab,.sl.on>.note,.sl.on>.cap{animation:fadein .7s ease both}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.mat{background:var(--paper);outline:1px solid var(--hair);padding:8px 8px 10px;transform:rotate(var(--r,0deg));box-shadow:0 1px 2px rgba(20,23,27,.06)}
+.mat img,.mat canvas{display:block}.mat img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.sl.on .mat,.sl.on .row .pr{animation:lay .8s var(--ease) both}
+@keyframes lay{0%{opacity:0;transform:translate(0,-36px) rotate(calc(var(--r,0deg) + 5deg)) scale(1.03);box-shadow:0 24px 40px rgba(20,23,27,.2)}100%{opacity:1;transform:rotate(var(--r,0deg));box-shadow:0 1px 2px rgba(20,23,27,.06)}}
+.sl.on .stamp{animation:stampin .45s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes stampin{0%{opacity:0;transform:rotate(var(--r,0deg)) scale(1.35)}100%{opacity:1;transform:rotate(var(--r,0deg)) scale(1)}}
+@keyframes turn{0%{opacity:0;transform:rotateY(90deg)}100%{opacity:1;transform:none}}
+.sl.on .stamp:nth-child(1){animation-delay:.5s}.sl.on .stamp:nth-child(2){animation-delay:.62s}.sl.on .stamp:nth-child(3){animation-delay:.74s}.sl.on .stamp:nth-child(4){animation-delay:.86s}
+.sl.on .mat:nth-of-type(2),.sl.on .row .pr:nth-child(2){animation-delay:.08s}.sl.on .mat:nth-of-type(3),.sl.on .row .pr:nth-child(3){animation-delay:.16s}.sl.on .mat:nth-of-type(4),.sl.on .row .pr:nth-child(4){animation-delay:.24s}.sl.on .mat:nth-of-type(5),.sl.on .row .pr:nth-child(5){animation-delay:.32s}.sl.on .mat:nth-of-type(6),.sl.on .row .pr:nth-child(6){animation-delay:.4s}
+/* the cover */
+#discs{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+/* a shared element: the green disc sits at the right of the cover and rides the push to rest half-visible at the left edge of Salam Kenal; the purple one leaves with the cover */
+.wall{display:flex;flex-direction:column;gap:calc(52px * .2)}
+.line{display:flex;align-items:stretch}
+.cell{flex:0 0 auto;height:52px;transition:background 140ms ease;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);border-left:1px solid var(--hair);display:flex;align-items:center;overflow:hidden;will-change:width}
+.cell:last-child{border-right:1px solid var(--hair)}
+.ch{font-family:var(--hel);font-weight:400;font-size:46.8px;line-height:1;color:var(--ink);position:relative;transition:color 140ms ease;padding-left:1.5px;white-space:pre}
+.cov .wall{left:0;right:0;top:300px;align-items:center}
+.cov .sub{left:0;right:0;top:262px;text-align:center}
+/* slide 03: the title at the top and one picture holding the middle. Fixed paddings: the title sits 84px from the top, the
+   picture starts 56px under it and ends 56px above the foot, 20px corners, the rest of the frame is paper. */
+/* the rule for a title with a picture: the two are one group, centred in the frame, with a fixed 40px between them */
+.hi,.fore,.stack,.care{display:none;flex-direction:column;align-items:center;justify-content:center;gap:40px}
+.hi.on,.fore.on,.stack.on,.care.on{display:flex}
+.hi>*,.fore>*,.stack>*{position:static}
+.hi .say,.fore .say,.stack .say{height:auto;padding:0 160px}
+.hi .pic{height:480px;width:368px;border-radius:20px;overflow:hidden;background:#EFEDE8;box-shadow:0 0 0 1px rgba(20,23,27,.06),0 30px 60px -30px rgba(20,23,27,.5)}
+.hi .pic img{display:block;width:100%;height:100%;object-fit:cover}
+.hi .pic.flip{width:560px;height:508px;border-radius:0;background:transparent;box-shadow:none;overflow:visible;position:relative;transform-origin:50% 60%}
+/* the phone arrives like a call: up from below the stage, a ring's worth of rattling where it lands, then it settles into place */
+@keyframes ringin{0%{transform:translateY(680px);animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+  26%{transform:translateY(84px) rotate(0);animation-timing-function:ease-in-out}
+  30%{transform:translateY(84px) rotate(-5deg)}34%{transform:translateY(84px) rotate(5deg)}38%{transform:translateY(84px) rotate(-5deg)}42%{transform:translateY(84px) rotate(5deg)}
+  46%{transform:translateY(84px) rotate(-4deg)}50%{transform:translateY(84px) rotate(4deg)}54%{transform:translateY(84px) rotate(-2.5deg)}58%{transform:translateY(84px) rotate(1.5deg)}
+  62%{transform:translateY(84px) rotate(0);animation-timing-function:cubic-bezier(.45,0,.15,1)}
+  72%{transform:translateY(84px);animation-timing-function:cubic-bezier(.45,0,.15,1)}100%{transform:none}}
+.hi.on .pic.flip{animation:ringin 2.6s .15s both}
+.hi .pic.flip .flip-stage{position:absolute;left:50%;top:12px;width:400px;height:472px;transform:translate(calc(-50% + var(--fx,0px)),var(--fy,0px)) scale(var(--fs,1.15));transform-origin:50% 0}
+/* EDIT MODE for slide 3 (?edit=1): drag the phone anywhere, past the edges too, scroll over it to resize; Save keeps it in
+   this browser and prints the values to bake in. */
+body.edit3 .hi .pic.flip{cursor:grab;outline:1px dashed rgba(52,4,20,.35);outline-offset:6px}body.edit3 .hi .pic.flip:active{cursor:grabbing}
+body.edit3 .hi .pic.flip .flip-stage{pointer-events:none}
+#ebar{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:50;display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:999px;background:#fff;box-shadow:0 10px 30px -12px rgba(0,0,0,.35),0 0 0 1px rgba(20,23,27,.08);font:400 13px var(--hel);color:var(--ink)}
+#ebar b{font-weight:600}#ebar button{font:500 12px var(--jak);padding:6px 12px;border-radius:999px;border:0;background:var(--ink);color:#fff;cursor:pointer}#ebar button.g{background:#EFEDE8;color:var(--ink)}
+#ebar code{font:12px ui-monospace,Menlo,monospace;color:var(--ink2);background:#F6F5F2;padding:4px 8px;border-radius:8px}
+.hi.on .pic{animation:picin .9s var(--ease) .15s both}
+@keyframes picin{from{opacity:0;transform:translateY(28px) scale(.97)}to{opacity:1;transform:none}}
+/* the sentence, always at the centre */
+.say{left:0;right:0;top:0;height:720px;display:grid;place-items:center;text-align:center;font-size:30px;padding:0 180px}
+/* the entry in the site's own type: Jakarta for the headword, Helvetica for the pronunciation, no serif anywhere */
+.salam .dict{left:0;right:0;top:0;height:720px;display:grid;align-content:center;justify-content:center;text-align:left}
+.salam .dict .word{font:500 46px/1.1 var(--jak);letter-spacing:-.025em;color:var(--ink);white-space:nowrap;display:flex;justify-content:flex-start;align-items:baseline;gap:.3em}
+.salam .dict .word span{font:400 .6em var(--hel);letter-spacing:0;color:var(--ink3)}
+.salam .dict .word span.w{font:inherit;letter-spacing:inherit;color:inherit}
+.salam .dict .pron{font:300 19px/1.5 var(--hel);font-style:normal;color:var(--ink2);margin-top:10px}
+.salam .dict .pos{font:600 11px var(--jak);letter-spacing:.14em;text-transform:uppercase;color:var(--oxblood);font-style:normal;margin-left:10px}
+/* slide 04: the title at the top on the same paddings as slide 03, and two big app tiles in the middle, tilted toward each
+   other: Manus on the left, black with the white hand, Second Self (YHacks) on the right, the figure on white. Each mark
+   keeps its own proportions inside its tile; nothing is stretched. */
+.fore .apps{display:flex;gap:70px;padding:20px 0}
+.fore .app{position:relative;width:270px;height:270px;border-radius:58px;display:grid;place-items:center;overflow:hidden;box-shadow:0 0 0 1px rgba(20,23,27,.08),0 34px 60px -30px rgba(20,23,27,.55)}
+.fore .app img{width:62%;height:62%;object-fit:contain;display:block}
+.fore .app.manus{background:#fff;transform:rotate(-7deg)}
+.fore .app.self{background:#fff;transform:rotate(6deg)}
+.fore .app.self img{width:52%;height:72%}
+/* the tiles roll in, Manus from the left, Second Self from the right, settling on their own tilt */
+.fore.on .app.manus{animation:rollL 1.7s cubic-bezier(.25,.7,.2,1) .2s both}
+.fore.on .app.self{animation:rollR 1.7s cubic-bezier(.25,.7,.2,1) .5s both}
+@keyframes rollL{from{opacity:0;transform:translateX(-560px) rotate(-187deg)}to{opacity:1;transform:translateX(0) rotate(-7deg)}}
+@keyframes rollR{from{opacity:0;transform:translateX(560px) rotate(186deg)}to{opacity:1;transform:translateX(0) rotate(6deg)}}
+.stack .lab.t{left:0;right:0;top:calc(var(--below) - 4px);text-align:center}
+/* the stack: the four tools as their own app icons, iOS tiles, names beneath */
+.stack .tools{display:flex;justify-content:center;align-items:flex-start;gap:34px;padding:8px 0}
+.stack .tool{display:flex;flex-direction:column;align-items:center;gap:12px;width:120px}
+.stack .tool .icon{width:112px;height:112px;border-radius:26px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px rgba(20,23,27,.08),0 18px 36px -20px rgba(20,23,27,.45)}
+.stack .tool .icon img{display:block;width:100%;height:100%;object-fit:cover}
+.stack .tool span{font:400 13.5px var(--hel);color:var(--ink2)}
+.stack.on .tool{animation:toolin .7s var(--ease) both}
+.stack.on .tool:nth-child(1){animation-delay:.4s}.stack.on .tool:nth-child(2){animation-delay:.55s}.stack.on .tool:nth-child(3){animation-delay:.7s}.stack.on .tool:nth-child(4){animation-delay:.85s}
+@keyframes toolin{from{opacity:0;transform:translateY(22px) scale(.92)}to{opacity:1;transform:none}}
+.stamp{position:relative;transform:rotate(var(--r,0deg))}.stamp .label{color:var(--oxblood)}.stamp p{margin:4px 0 0}
+.stack .note{text-align:center;font-weight:400;color:var(--ink)}
+/* the artworks: a carousel under the sentence that never stops. The row holds the twelve prints twice and glides left by
+   half its width on a loop, so the join is seamless; it keeps moving for as long as the slide is up. */
+.art .say{padding:0 120px;font-size:28px}
+.art .rowclip{left:0;right:0;top:var(--below);height:280px;overflow:hidden}
+.art .row{position:absolute;left:0;top:0;display:flex;align-items:flex-start;gap:34px;height:280px;width:max-content;padding-left:34px;animation:glide 56s linear infinite;will-change:transform}
+@keyframes glide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.art .row .pr{--r:0deg;height:260px;flex:0 0 auto;background:var(--paper);outline:1px solid var(--hair);padding:7px 7px 9px;box-shadow:0 1px 2px rgba(20,23,27,.06);border-radius:4px}
+.art .row .pr img{height:100%;width:auto;display:block}.art .row .pr.s{height:210px;align-self:center}
+.sl.on .art .row .pr,.art.on .row .pr{animation:none}
+/* the X slide: one picture, untouched, in a rounded card with depth */
+.xp .one{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px}
+.xp .one>*{position:static}.xp .shot{border-radius:20px;overflow:hidden;background:#EFEDE8;box-shadow:0 0 0 1px rgba(20,23,27,.08),0 24px 48px -24px rgba(20,23,27,.5)}
+.xp .shot img{display:block;max-width:900px;max-height:520px;width:auto;height:auto}
+.xp.on .one{animation:fadein .7s ease both}
+/* the photographs of her, and the two lines she marked */
+.care .say{position:static;height:auto;padding:0 120px}
+.care .deal{position:static;display:flex;align-items:flex-end;justify-content:center;gap:56px}
+.care .one{position:static;display:flex;flex-direction:column;align-items:center;gap:22px;opacity:0}
+.care .one>*{position:static}.care .cap{text-align:center;max-width:300px;line-height:1.7}
+.care .ph{padding:0;display:block;border-radius:20px;overflow:hidden;background:#EFEDE8;box-shadow:0 0 0 1px rgba(20,23,27,.08),0 24px 48px -24px rgba(20,23,27,.5);transform:rotate(var(--r,0deg))}
+@keyframes dealup{0%{opacity:0;transform:translateY(420px)}60%{opacity:1}100%{opacity:1;transform:none}}
+.care.on .one{animation:dealup 1s cubic-bezier(.2,.8,.2,1) both}.care.on .one:nth-child(1){animation-delay:.4s}.care.on .one:nth-child(2){animation-delay:1.3s}.care.on .one:nth-child(3){animation-delay:2.2s}
+.pile .two{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:64px}
+.pile .one{position:static;display:flex;flex-direction:column;align-items:center;gap:28px}
+.pile .one>*{position:static}.pile .cap{width:auto;max-width:380px;text-align:center;line-height:1.7}
+.pile .ph2{border-radius:20px;overflow:hidden;background:#EFEDE8;box-shadow:0 0 0 1px rgba(20,23,27,.08),0 24px 48px -24px rgba(20,23,27,.5);transform:rotate(var(--r,0deg))}
+.pile.on .one{animation:fadein .7s ease both}.pile.on .one:nth-child(2){animation-delay:.25s}
+/* the labs: ten of her sandbox pieces, live, each a 1280x800 page scaled into a small card. The cards sit on one ring
+   around the sentence and the whole ring drifts round slowly, every card upright and bobbing a little, so the formation
+   is the circle and the pieces inside keep playing. */
+.labs .say{z-index:3;text-shadow:0 0 24px var(--paper),0 0 10px var(--paper),0 0 6px var(--paper)}
+.labs .ring{left:0;top:0;width:1280px;height:720px}
+.labs .orb{position:absolute;left:0;top:0;width:220px;height:138px;contain:layout paint;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px rgba(20,23,27,.08),0 18px 36px -20px rgba(20,23,27,.45);will-change:transform;opacity:0}
+.labs .orb .frame{width:800px;height:500px;border:0;transform:scale(.275);transform-origin:0 0;pointer-events:none;display:block;background:#fff}
+.labs .orb.vid{height:auto}.labs .orb.vid video{display:block;width:220px;height:auto}
+@keyframes orbin{from{opacity:0}to{opacity:1}}
+.labs.on .orb{animation:orbin .6s ease both}
+/* the two cases */
+.cases .say{height:240px;align-items:end}
+.cases .mat{width:560px}.cases .mat img{aspect-ratio:560/346}
+.cases .cap{display:flex;justify-content:space-between;font:400 13.5px var(--hel);color:var(--ink)}.cases .cap i{font:300 13px var(--hel);color:var(--ink3);font-style:normal}
+.missing{background:#EFEDE8}.mat.missing::before{content:"";display:block;aspect-ratio:4/3;background:#EFEDE8}.cases .mat.missing::before{aspect-ratio:560/346}.pile .mat.missing::before{display:none}
+html,body{background:#0E0D0C}.dots{display:none}
+html.arrive,html.arrive body{background:#fff}html.arrive #stage,html.arrive #bar,html.arrive .top{opacity:0}
+html.arrive.ready,html.arrive.ready body{background:#0E0D0C;transition:background .9s ease}html.arrive.ready #stage,html.arrive.ready #bar,html.arrive.ready .top{opacity:1;transition:opacity .9s ease}
+#bar{position:fixed;left:0;right:0;bottom:0;height:2px;background:rgba(255,255,255,.08);z-index:9}#bar i{display:block;height:100%;background:var(--gold);transition:width .3s cubic-bezier(.2,.7,.2,1)}
+.dots i{background:rgba(20,23,27,.15)}.top,.top a,.top b{color:var(--ink3)}.top b{color:var(--ink)}.hint{color:var(--ink3)}
+</style>
+<body><div id="stage"><canvas id="discs"></canvas><div id="deck"></div></div>
+<div class="top"><a href="./">intro lab</a><span>/</span><b>slides</b></div><div class="dots"></div><div id="bar"><i></i></div><div class="hint">click, space or → to advance · ← back</div>
+<script>
+(()=>{
+const NEXT_DECK=document.querySelector('meta[name="next-deck"]')?.content||null;
+const $=(h)=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild};
+const stage=document.getElementById('stage'),deck=document.getElementById('deck');
+const fit=()=>stage.style.setProperty('--k',Math.min(innerWidth/1280,innerHeight/720));addEventListener('resize',fit);fit();
+const img=(src,alt='')=>`<img src="${src}" onerror="this.parentElement.classList.add('missing');this.remove()" alt="${alt}">`;
+const mat=(src,style,r)=>`<div class="mat" style="${style};--r:${r}deg">${img(src)}</div>`;
+const stamp=(name,rot)=>`<div class="stamp" style="--r:${rot}deg"><div class="label">Tool</div><p>${name}</p></div>`;
+const WORKS=[['w-sunflower',''],['art1',''],['art2',''],['w-goggle',''],['art3',''],['w-spider',''],['art6','s'],['w-izakaya',''],['art5',''],['w-metropolis',''],['w-police','']];
+
+/* ---------- the frames, in her order; the words are only her bold lines ---------- */
+const S=[
+ {cls:'cov',html:`<div class="wall" id="wall"></div><div class="sub lab">Portfolio presentation</div>`},
+ {cls:'salam',html:`<div class="dict"><div class="word"><span class="w">Salam Kenal</span><span>(Hello!)</span></div><div class="pron">/sa·lam kə·nal/ <span class="pos">interjection, Indonesian</span></div></div>`},
+ {cls:'hi',html:`<div class="say h">Hi, I’m Jazlynn. I make <span class="hl">AI products charming.</span></div>
+   <div class="pic flip"><div class="flip-stage" id="fstage" aria-label="A flip phone open on six photographs"><div class="phone" id="fphone">
+    <div class="base"><div class="slab"></div><div class="shell"></div><div class="hinge"></div>
+      <div class="keys"><div class="nav">
+        <div class="soft" id="fprev"><svg viewBox="0 0 26 18"><path d="M11.5 2.6 3.4 9l8.1 6.4V2.6ZM22.6 2.6 14.5 9l8.1 6.4V2.6Z"/></svg></div>
+        <div class="ring"><i></i><i></i><i></i><i></i><b id="fplay"></b></div>
+        <div class="soft" id="fnext"><svg viewBox="0 0 26 18"><path d="M3.4 2.6 11.5 9l-8.1 6.4V2.6ZM14.5 2.6 22.6 9l-8.1 6.4V2.6Z"/></svg></div>
+      </div><div class="pad"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>*</span><span>0</span><span>#</span></div></div>
+    </div>
+    <div class="lid" id="flid">
+      <div class="face in shell"><div class="screen" id="fscreen"><img id="ffallback" src="aster/flip/photos/camera.jpg" alt=""><div class="glare"></div></div><div class="brand">JAZLYNN</div></div>
+      <div class="face out shell"><div class="ext" id="fext">--:--</div><div class="cam"></div></div>
+    </div>
+  </div></div></div>`},
+ {cls:'fore',html:`<div class="say h">I’ve always somehow found myself at the <span class="hl">forefront of innovation</span> right before they become the next big thing.</div>
+   <div class="apps"><div class="app manus" aria-label="Manus">${img('aster/marks/manus-glyph.svg','Manus')}</div><div class="app self" aria-label="Second Self, YHacks">${img('aster/marks/second-self-fit.svg','Second Self')}</div></div>`},
+ {cls:'knack',html:`<div class="say h">I have a knack for recognizing what people might want <span class="hl">before they even realize they need it.</span></div>`},
+ {cls:'stack',html:`<div class="say h">Design comes to me <span class="hl">instinctively</span>, but coding is something I’ve grown to <span class="hl">love.</span></div>
+   <div class="tools">${[['Claude Code','claude'],['Cursor','cursor'],['Cognition','cognition'],['Blackbox AI','blackbox']].map(t=>`<div class="tool"><div class="icon">${img('aster/pics/tool-'+t[1]+'.png',t[0])}</div><span>${t[0]}</span></div>`).join('')}</div>
+   <div class="note">+ my own custom AI tools</div>`},
+ {cls:'art',html:`<div class="say h">I had my artworks <span class="hl">exhibited, auctioned, and sold</span> when I was 15 years old.</div>
+   <div class="rowclip"><div class="row">${WORKS.concat(WORKS).map(w=>`<div class="pr ${w[1]}">${img('aster/pics/'+w[0]+'.jpg')}</div>`).join('')}</div></div>`},
+ {cls:'pile',html:`<div class="two">
+   <div class="one"><div class="ph2 vid" data-src="aster/pics/columbia.mp4" data-ink="plum" data-w="500" data-h="400" style="--r:-2deg"></div><div class="cap lab">Co-President at Design@Columbia</div></div>
+   <div class="one"><div class="ph2" data-src="aster/pics/core.jpg" data-ink="black" data-w="500" data-h="400" style="--r:1.5deg"></div><div class="cap lab">CORE PM Lead at Columbia’s best Startup Entrepreneurship Club</div></div></div>`},
+ {cls:'care',html:`<div class="say h">Constantly understanding and learning new forms of knowledge with <span class="hl">empathy, care, and intent</span> is a key quality that I carry in my work.</div>
+   <div class="deal"><div class="one"><div class="ph ph2" data-src="aster/pics/me1.jpg" data-ink="black" data-w="270" data-h="360" data-fit="cover" style="width:270px;height:360px;--r:-3deg"></div><div class="cap lab">Django bar</div></div><div class="one"><div class="ph ph2" data-src="aster/pics/me2.jpg" data-ink="plum" data-w="400" data-h="300" data-fit="cover" style="width:400px;height:300px;--r:2deg"></div><div class="cap lab">Sapar Contemporary</div></div><div class="one"><div class="ph ph2" data-src="aster/pics/snow.jpg" data-ink="black" data-w="300" data-h="300" data-fit="cover" style="width:300px;height:300px;--r:-2deg"></div><div class="cap lab">ripped my ACL from this lol</div></div></div>`},
+ {cls:'xp',html:`<div class="one"><div class="shot">${img('aster/pics/xpost.jpg')}</div><div class="cap lab">chronic poster on X</div></div>`},
+ {cls:'labs',html:`<div class="ring" id="ring">${[['out-of-office'],['v','oranges'],['billiards'],['tin-toggle'],['v','rad'],['bubbles'],['pear'],['v','directions'],['skier-slope'],['v','parallax']].map(c=>c[0]==='v'
+     ?`<div class="orb vid"><video src="aster/pics/motion-${c[1]}.mp4" muted loop playsinline preload="auto"></video></div>`
+     :`<div class="orb"><iframe class="frame" data-src="https://portfolio-experiments.vercel.app/experiments/${c[0]}" title="${c[0]}" allow="autoplay" scrolling="no"></iframe></div>`).join('')}</div>
+   <div class="say h">I can’t seem to stop creating.</div>`},
+ {cls:'adv',html:`<div class="say h">I’m an <span class="hl">adventurer at heart.</span></div>`},
+];
+const secs=S.map(s=>{const el=$(`<section class="sl ${s.cls}">${s.html}</section>`);el.querySelectorAll('.say').forEach(e=>{e.innerHTML=`<span class="tx">${e.innerHTML}</span>`;});deck.appendChild(el);return el;});
+
+/* ---------- the letter wall, from the home page, never settling ---------- */
+(function(){
+  const WORDS=['JAZLYNN','KURNIANDRA'], SPEED=.23, DRIFT=.74, ROW=52, FS=ROW*.9, STRETCH=FS;
+  const gauge=document.createElement('canvas').getContext('2d'); gauge.font=`400 ${FS}px "Helvetica Neue",Helvetica,Arial,sans-serif`;
+  const wall=document.getElementById('wall'); const FLICK=['var(--gold)','var(--oxblood)']; let lit=0, t0=0;
+  const lines=WORDS.map((w,li)=>{const el=$('<div class="line"></div>');const cells=[...w].map((ch,ci)=>{const c=$('<span class="cell"></span>'),s=$('<span class="ch"></span>');s.textContent=ch;c.appendChild(s);el.appendChild(c);
+    const m=gauge.measureText(ch),ink=-(m.actualBoundingBoxLeft||0),pad=Math.max(0,FS*.1-ink);s.style.paddingLeft=pad.toFixed(1)+'px';
+    return {cell:c,glyph:s,base:Math.ceil(m.width+pad)+4,ci,next:2+Math.random()*22,until:0,lit:false,col:FLICK[(Math.random()*2)|0]};});wall.appendChild(el);return {cells,seed:li};});
+  const ink=(c,on)=>{if(c.lit===on)return;c.lit=on;c.cell.style.background=on?c.col:'transparent';c.glyph.style.color=on?'var(--paper)':'';};
+  (function tick(now){const t=now/1000; if(!t0)t0=t; const age=t-t0, arriving=age<2.6, front=age*46;
+    for(const L of lines){let x=0;const cy=L.seed*(ROW*1.2)+ROW/2;
+      for(const c of L.cells){const k=.5+.5*Math.sin(t*SPEED*Math.PI*2+L.seed*DRIFT+c.ci*DRIFT*1.7);const w=c.base+k*k*STRETCH;c.cell.style.width=w.toFixed(1)+'px';
+        if(arriving){const d=x+w/2+cy*.6;ink(c,d<front&&d>front-130);x+=w;continue;}
+        if(c.lit&&t>c.until){ink(c,false);lit--;c.next=t+6+Math.random()*26;} else if(!c.lit&&t>c.next){ if(lit>=3){c.next=t+1+Math.random()*4;} else {ink(c,true);lit++;c.until=t+.25+Math.random()*.9;} }
+        x+=w;}}
+    requestAnimationFrame(tick);})(performance.now());
+})();
+
+/* ---------- the cover's three discs, where she placed them, drawn by the home page's shader ---------- */
+const SWATCH=['#9ba69c','#827a85']; /* the site's signature green on the right, its purple on the left */
+const COVER=[{x:1199,y:380,r:260},{x:76,y:386,r:260}];
+const LAY=i=>i<=0?COVER:i===1?[{x:0,y:380,r:260},{x:76-1280,y:386,r:260}]:[{x:-1280,y:380,r:260},{x:76-2560,y:386,r:260}];
+const cv=document.getElementById('discs'); let H=null, cur=COVER.map(d=>({...d})), tw=null;
+const easeIO=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+function placeDiscs(set){ cur=set.map(d=>({...d})); if(!H) return; const rc=cv.getBoundingClientRect(), W=rc.width, Hh=rc.height, U=650;
+  H.discs.forEach((d,i)=>{const p=set[i]; d.ux=p.x/1280; d.uy=p.y/720; d.ur=p.r/1280; d.x=d.tx=(d.ux*W-W/2)/U; d.y=d.ty=(Hh/2-d.uy*Hh)/U; d.r=p.r*W/1280/U; d.vx=d.vy=0; d.alive=(p.x+p.r>-10&&p.x-p.r<1290)?1:0; d.moved=true;}); H.draw(); }
+function tweenDiscs(to,dur=700,freeze){ const from=cur.map(d=>({...d})); if(tw) cancelAnimationFrame(tw); const t0=performance.now();
+  const at=p=>{const e=easeIO(p); placeDiscs(from.map((f,i)=>({x:f.x+(to[i].x-f.x)*e,y:f.y+(to[i].y-f.y)*e,r:f.r+(to[i].r-f.r)*e})));};
+  if(freeze!=null){ at(Math.min(1,freeze/dur)); return; }
+  (function f(now){const p=Math.min(1,(now-t0)/dur); at(p); if(p<1) tw=requestAnimationFrame(f);})(t0); }
+const ARRIVE=new URLSearchParams(location.search).get('intro')==='1'||!!NEXT_DECK; if(ARRIVE) document.documentElement.classList.add('arrive');
+let readied=false; const ready=()=>{ if(readied) return; readied=true; (document.fonts?document.fonts.ready:Promise.resolve()).then(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>document.documentElement.classList.add('ready')))); };
+setTimeout(ready,1800);
+import('./aster/sheets-gl.js').then(m=>{ H=m.mountSheets(cv,COVER.map(d=>({x:d.x/1280,y:d.y/720,r:d.r/1280})),SWATCH,{paper:'#FAF9F7',ground:'#1C1A17',bleed:0,clear:()=>0}); if(!H){ ready(); return; } placeDiscs(cur); addEventListener('resize',()=>placeDiscs(cur)); ready(); }).catch(ready);
+
+/* ---------- the photographs of her, printed in one riso ink ---------- */
+const INKS={oxblood:[52,4,20],charcoal:[28,26,23]}, PAPER=[250,249,247];
+const BAYER=[[0,32,8,40,2,34,10,42],[48,16,56,24,50,18,58,26],[12,44,4,36,14,46,6,38],[60,28,52,20,62,30,54,22],[3,35,11,43,1,33,9,41],[51,19,59,27,49,17,57,25],[15,47,7,39,13,45,5,37],[63,31,55,23,61,29,53,21]];
+function dither(im,inkName,cssW){ const ink=INKS[inkName]||INKS.oxblood, Sc=2, DOT=2, w=Math.round(cssW*Sc), nw=im.naturalWidth||im.videoWidth, nh=im.naturalHeight||im.videoHeight, h=Math.round(w*nh/nw);
+  const cw=Math.ceil(w/DOT), chh=Math.ceil(h/DOT), src=document.createElement('canvas'); src.width=cw; src.height=chh; const sc=src.getContext('2d'); sc.drawImage(im,0,0,cw,chh);
+  const d=sc.getImageData(0,0,cw,chh).data, out=document.createElement('canvas'); out.width=w; out.height=h; const oc=out.getContext('2d'); const o=oc.createImageData(w,h), p=o.data;
+  for(let y=0;y<h;y++){const cy=(y/DOT)|0; for(let x=0;x<w;x++){const cx=(x/DOT)|0, i=(cy*cw+cx)*4; let L=(.299*d[i]+.587*d[i+1]+.114*d[i+2])/255; L=Math.min(1,Math.max(0,(L-.5)*1.1+.5)); L=Math.pow(L,.9);
+      const q=Math.min(1,Math.max(0,Math.floor(L*3+BAYER[cy&7][cx&7]/64)/3)); const j=(y*w+x)*4; p[j]=ink[0]+(PAPER[0]-ink[0])*q; p[j+1]=ink[1]+(PAPER[1]-ink[1])*q; p[j+2]=ink[2]+(PAPER[2]-ink[2])*q; p[j+3]=255; }}
+  oc.putImageData(o,0,0); out.style.width=cssW+'px'; out.style.height=(h/Sc)+'px'; return out; }
+const INKRGB={plum:[52,4,20],oxblood:[52,4,20],black:[20,23,27],charcoal:[20,23,27]};
+const RISO=import('./aster/riso-gl.js');
+document.querySelectorAll('.ph2').forEach((el,i)=>{ const W=+el.dataset.w||[300,280,300,230][i%4], Hh=+el.dataset.h||0, video=el.classList.contains('vid')||/\.mp4$/.test(el.dataset.src);
+  const miss=()=>{el.classList.add('missing');el.innerHTML=`<div class="lab" style="width:${W}px;height:${Hh||Math.round(W*.62)}px;display:grid;place-items:center">${el.dataset.src.split('/').pop()}</div>`;};
+  RISO.then(m=>m.mountPrint(el,{src:el.dataset.src,video,ink:INKRGB[el.dataset.ink]||INKRGB.plum,w:W,h:Hh||undefined,fit:el.dataset.fit||'contain'}))
+    .catch(()=>{ if(video) return miss(); const im=new Image(); im.onload=()=>{el.appendChild(dither(im,el.dataset.ink==='black'?'charcoal':'oxblood',W));}; im.onerror=miss; im.src=el.dataset.src; }); });
+
+/* ---------- slide 3: the phone's saved place and size, and the editor that sets them ---------- */
+{ const fp=document.querySelector('.hi .pic.flip'); if(fp){ const DEF={x:0,y:0,s:1.15}; let F={...DEF};
+  try{ const sv=JSON.parse(localStorage.getItem('intro.flip3')||'null'); if(sv) F={...DEF,...sv}; }catch(e){}
+  const apply=()=>{ fp.style.setProperty('--fx',F.x+'px'); fp.style.setProperty('--fy',F.y+'px'); fp.style.setProperty('--fs',F.s); if(bar) bar.querySelector('code').textContent=`x ${Math.round(F.x)}  y ${Math.round(F.y)}  scale ${F.s.toFixed(3)}`; };
+  let bar=null; apply();
+  if(new URLSearchParams(location.search).get('edit')==='1'){ document.body.classList.add('edit3');
+    bar=$(`<div id="ebar"><b>Slide 3</b><span>drag the phone, past the edge too · scroll over it to resize · ↑↓←→ nudge</span><code></code><button class="g" data-a="reset">Reset</button><button data-a="save">Save</button></div>`);
+    document.body.appendChild(bar); apply();
+    bar.addEventListener('click',e=>{ e.stopPropagation(); const a=e.target.dataset.a; if(a==='reset'){ F={...DEF}; localStorage.removeItem('intro.flip3'); apply(); }
+      if(a==='save'){ localStorage.setItem('intro.flip3',JSON.stringify({x:Math.round(F.x),y:Math.round(F.y),s:+F.s.toFixed(3)})); e.target.textContent='Saved'; setTimeout(()=>e.target.textContent='Save',1200); console.log('flip3',JSON.stringify(F)); } });
+    const k=()=>parseFloat(getComputedStyle(stage).getPropertyValue('--k'))||1;
+    let drag=null;
+    fp.addEventListener('pointerdown',e=>{ e.stopPropagation(); drag={x:e.clientX,y:e.clientY,fx:F.x,fy:F.y}; fp.setPointerCapture(e.pointerId); });
+    fp.addEventListener('pointermove',e=>{ if(!drag) return; F.x=drag.fx+(e.clientX-drag.x)/k(); F.y=drag.fy+(e.clientY-drag.y)/k(); apply(); });
+    fp.addEventListener('pointerup',()=>drag=null); fp.addEventListener('click',e=>e.stopPropagation());
+    fp.addEventListener('wheel',e=>{ e.preventDefault(); e.stopPropagation(); F.s=Math.min(4,Math.max(.3,F.s*(e.deltaY<0?1.03:0.97))); apply(); },{passive:false});
+    addEventListener('keydown',e=>{ const d=e.shiftKey?10:1; if(e.key==='ArrowUp'){F.y-=d;} else if(e.key==='ArrowDown'){F.y+=d;} else if(e.key==='ArrowLeft'&&e.altKey){F.x-=d;} else if(e.key==='ArrowRight'&&e.altKey){F.x+=d;} else return; e.preventDefault(); e.stopImmediatePropagation(); apply(); },true);
+  } } }
+/* ---------- the ring of sandbox pieces: one slow turn a minute, cards upright, a small bob each ---------- */
+{ const ring=document.getElementById('ring'); if(ring){ const orbs=[...ring.querySelectorAll('.orb')], N=orbs.length, RX=462, RY=258, CX=640, CY=360;
+  let armed=false; const arm=()=>{ if(armed) return; armed=true; orbs.forEach(o=>{const f=o.querySelector('.frame'); if(f) f.src=f.dataset.src;}); };
+  const sec=ring.closest('.sl');
+  (function tick(now){ const t=now/1000, on=sec.classList.contains('on'); if(on) arm();
+    orbs.forEach((o,i)=>{ if(on) o.style.animationDelay=(.15+i*.08)+'s'; const v=o.querySelector('video'); if(v){ if(on&&v.paused) v.play().catch(()=>{}); if(!on&&!v.paused) v.pause(); }
+      if(!on&&o.style.transform) return; const a=-Math.PI/2+i*2*Math.PI/N+t*2*Math.PI/60; const x=CX+RX*Math.cos(a)-o.offsetWidth/2, y=CY+RY*Math.sin(a)-o.offsetHeight/2+Math.sin(t*1.3+i*1.7)*5; o.style.transform=`translate(${x}px,${y}px)`; });
+    requestAnimationFrame(tick); })(0);
+  /* the pages start loading a moment after the deck opens, so they are playing by the time the slide comes up */
+  setTimeout(arm,800); } }
+/* ---------- the push: the frame leaves to one side, the next comes in from the other ---------- */
+const EASE='cubic-bezier(.45,0,.15,1)';
+const anim=(el,frames,o)=>el.animate(frames,{fill:'both',easing:EASE,...o}).finished;
+function push(a,b,dir){ const ps=[]; const out=-dir*1280, inn=dir*1280;
+  ps.push(anim(secs[a],[{transform:'translateX(0)'},{transform:`translateX(${out}px)`}],{duration:700}));
+  ps.push(anim(secs[b],[{transform:`translateX(${inn}px)`},{transform:'translateX(0)'}],{duration:700}));
+  return Promise.all(ps); }
+
+/* ---------- control ---------- */
+let s=0,step=0,busy=false; const dots=document.querySelector('.dots'); S.forEach(()=>dots.appendChild(document.createElement('i')));
+const DECK_N=38; function paint(){ [...dots.children].forEach((d,i)=>d.classList.toggle('on',i===s)); document.querySelector('#bar i').style.width=((s+1)/(S.length+(NEXT_DECK?DECK_N:0))*100)+'%'; secs.forEach((el,i)=>{ el.className='sl '+S[i].cls+(el.classList.contains('on')?' on':'')+(i===s&&step?' f'+step:''); }); }
+async function go(b){ if(busy||b<0||b>=S.length) return; busy=true; const a=s; secs[b].classList.add('on'); s=b; step=0; paint(); tweenDiscs(LAY(b),700,FR); await push(a,b,b>a?1:-1); secs[a].classList.remove('on'); busy=false; }
+let leaving=false;
+function next(){ if(S[s].steps&&step<S[s].steps){ step++; paint(); return; }
+  if(s===S.length-1&&NEXT_DECK){ if(leaving||busy) return; leaving=true; anim(secs[s],[{transform:'translateX(0)'},{transform:'translateX(-1280px)'}],{duration:700}).then(()=>{ location.href=NEXT_DECK; }); return; }
+  go(s+1); }
+function prev(){ if(step){ step--; paint(); return; } go(s-1); }
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next();}else if(e.key==='ArrowLeft'){e.preventDefault();prev();}});
+stage.addEventListener('click',e=>{ (e.clientX>innerWidth*.2?next:prev)(); });
+const q=new URLSearchParams(location.search); const FR=q.get('t')?parseFloat(q.get('t')):null; s=Math.max(0,Math.min(S.length-1,(parseInt(q.get('s'))||1)-1)); step=parseInt(q.get('step'))||0; secs[s].classList.add('on'); paint(); cur=LAY(s).map(d=>({...d})); setTimeout(()=>placeDiscs(cur),50);
+if(q.get('go')){ setTimeout(()=>{ next(); if(FR!=null) setTimeout(()=>document.getAnimations().forEach(a=>{a.pause();a.currentTime=FR;}),40); },900); }
+})();
+</script>
+<script src="aster/flip/flip.js"></script>
+</body>

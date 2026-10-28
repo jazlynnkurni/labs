@@ -1,0 +1,446 @@
+<!doctype html><meta charset="utf-8"><title>intro · the sheet</title><link rel="stylesheet" href="common.css">
+<style>
+/* THE SHEET. Her about page says it: by fifteen her work was exhibited, auctioned and sold, and most of it began
+   as something picked up off the beach, sea glass, driftwood, shells, carried home to be given a second life.
+   So the intro is one large sheet of paper with her found things laid out on it, each at its own slight angle,
+   and a pencil line drawn through them in the order she tells it. The camera travels along that line, drawing
+   it ahead of itself, turning to meet each thing square on: long moves lift high and dive, short moves stay low
+   and whip. The frosted riso discs are the sea glass lying in the gaps. Photographs of her are printed in one
+   riso ink; her artworks stay in their own colour. The words are only the lines she marked bold. At the end the
+   camera lifts off the sheet and the whole winding line is visible, which is the point of the adventurer beat. */
+:root{--ease:cubic-bezier(.45,0,.15,1)}
+#stage{background:var(--paper);color:var(--ink)}
+#discs{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+#world{position:absolute;left:0;top:0;width:0;height:0;transform-origin:0 0;will-change:transform,filter}
+#trail{position:absolute;overflow:visible;pointer-events:none}
+/* THE LINE THROUGH THE PLACES. Five directions, chosen with ?line=: marker (the deck's gold stabilo, two even passes),
+   pressure (the same marker swiped, thick mid-stroke and tapering where the tip lands and lifts), pencil (a thin graphite
+   line with the wobble and doubled strokes of a quick sketch, always one pixel at any height), stitch (an oxblood running
+   stitch sewn through the sheet, gotong royong), pebbles (a trail of small frosted pieces, the sea glass dropped along the
+   way). All of them are revealed by one mask that follows the camera. */
+#trail{mix-blend-mode:multiply}
+#trail path,#trail polygon{stroke-linecap:round;stroke-linejoin:round}
+.rg{position:absolute;width:1280px;height:720px;transform:rotate(var(--rot,0deg))}
+.rg>*{position:absolute;opacity:0}
+.rg.on>*,.rg.seen>*{opacity:1}
+.h{font-family:var(--jak);font-weight:500;letter-spacing:-.015em;color:var(--ink);text-wrap:balance;line-height:1.38}
+.lab{font-family:var(--jak);font-weight:600;font-size:10.5px;line-height:1.5;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+.note{font:italic 400 17px/1.5 var(--bask);color:var(--ink2)}
+/* THE HIGHLIGHTER, from the case study decks: the marked words are run over with a real marker, the stroke covers the
+   word height, its ends ragged and skewed the way a felt tip lands and lifts, multiplied over the type so the oxblood
+   stays crisp inside the gold. It is drawn in after the sentence has printed. */
+.hl{color:var(--oxblood);font-weight:600;padding:0 .08em;margin:0 -.08em;box-decoration-break:clone;-webkit-box-decoration-break:clone;mix-blend-mode:multiply;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M6 6 C 60 2, 140 9, 200 5 S 330 3, 394 7 L 397 32 C 340 37, 250 30, 190 35 S 70 38, 4 33 Z' fill='%23A99939' opacity='.42'/><path d='M12 9 C 90 4, 180 12, 260 8 S 360 6, 390 10 L 392 29 C 320 33, 230 27, 150 31 S 60 34, 10 30 Z' fill='%23A99939' opacity='.2'/></svg>") no-repeat 0 55%/100% 1.08em}
+.rg.on .hl{animation:mkdraw .8s cubic-bezier(.3,.7,.2,1) .75s both}
+.rg.seen .hl{background-size:100% 1.08em}
+@keyframes mkdraw{from{background-size:0% 1.08em}to{background-size:100% 1.08em}}
+/* ARRIVALS, by kind. Sentences print: a gold pass first, a touch off register, then the ink settles. Photographs
+   and prints are laid down on the paper from a little height. Stamps are stamped. Marks turn over. */
+.rg.on>.say,.rg.on>.dict,.rg.on>.note{animation:fadein .8s ease both}
+/* small labels, and the cover's, simply fade: the print pass reads as a glitch at that size */
+.rg.on>.sub,.rg.on>.lab{animation:fadein .9s ease both}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes print{0%{opacity:0;filter:blur(1.5px);transform:translate(0,6px);text-shadow:3px 2px 0 var(--gold)}60%{opacity:1;filter:blur(0);text-shadow:2px 1px 0 var(--gold)}100%{transform:none;text-shadow:0 0 0 transparent}}
+.mat{background:var(--paper);outline:1px solid var(--hair);padding:8px 8px 10px;transform:rotate(var(--r,0deg));box-shadow:0 1px 2px rgba(20,23,27,.06)}
+.mat img,.mat canvas{display:block}
+.mat img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.rg.on>.mat{animation:lay .85s var(--ease) both}
+@keyframes lay{0%{opacity:0;transform:translate(0,-40px) rotate(calc(var(--r,0deg) + 6deg)) scale(1.04);box-shadow:0 26px 40px rgba(20,23,27,.22)}100%{opacity:1;transform:rotate(var(--r,0deg));box-shadow:0 1px 2px rgba(20,23,27,.06)}}
+.rg.on .stamp{animation:stampin .45s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes stampin{0%{opacity:0;transform:rotate(var(--r,0deg)) scale(1.35)}100%{opacity:1;transform:rotate(var(--r,0deg)) scale(1)}}
+.rg.on .marks .tile{animation:turn .7s var(--ease) both}
+@keyframes turn{0%{opacity:0;transform:rotateY(90deg)}100%{opacity:1;transform:none}}
+.rg.on .row .pr{animation:lay .7s var(--ease) both}
+.rg.on>*:nth-child(2),.rg.on .stamp:nth-child(2),.rg.on .marks .tile:nth-child(2),.rg.on .row .pr:nth-child(2){animation-delay:.1s}
+.rg.on>*:nth-child(3),.rg.on .stamp:nth-child(3),.rg.on .row .pr:nth-child(3){animation-delay:.2s}
+.rg.on>*:nth-child(4),.rg.on .stamp:nth-child(4),.rg.on .row .pr:nth-child(4){animation-delay:.3s}
+.rg.on>*:nth-child(5),.rg.on .row .pr:nth-child(5){animation-delay:.4s}.rg.on>*:nth-child(6),.rg.on .row .pr:nth-child(6){animation-delay:.5s}.rg.on>*:nth-child(7),.rg.on .row .pr:nth-child(7){animation-delay:.6s}.rg.on>*:nth-child(8){animation-delay:.7s}
+.rg.on .stamp:nth-child(1){animation-delay:.5s}.rg.on .stamp:nth-child(2){animation-delay:.62s}.rg.on .stamp:nth-child(3){animation-delay:.74s}.rg.on .stamp:nth-child(4){animation-delay:.86s}
+/* the cover: the home page's letter wall, breathing, and nothing else */
+.wall{display:flex;flex-direction:column;gap:calc(52px * .2)}
+.line{display:flex;align-items:stretch}
+.cell{flex:0 0 auto;height:52px;transition:background 140ms ease;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);border-left:1px solid var(--hair);display:flex;align-items:center;overflow:hidden;will-change:width}
+.cell:last-child{border-right:1px solid var(--hair)}
+.ch{font-family:var(--hel);font-weight:400;font-size:46.8px;line-height:1;color:var(--ink);position:relative;transition:color 140ms ease;padding-left:1.5px;white-space:pre}
+.cov .wall{left:0;right:0;top:300px;align-items:center}
+.cov .sub{left:0;right:0;top:262px;text-align:center}
+/* salam kenal: the entry, in the deck's own dictionary type */
+.salam .dict{left:0;right:0;top:0;height:720px;display:flex;flex-direction:column;justify-content:center;text-align:center}
+.salam .dict .def{margin:14px auto 0}
+/* the lines */
+.say{left:0;right:0;top:0;height:720px;display:grid;place-items:center;text-align:center;font-size:34px;padding:0 180px}
+.fore .say{padding:0 150px;font-size:30px}
+.fore .marks{left:0;right:0;top:450px;display:flex;justify-content:center;gap:22px;perspective:600px}
+.fore .marks .tile{width:84px;height:84px;border-radius:18px;background:#fff;outline:1px solid var(--hair);display:grid;place-items:center;overflow:hidden}
+.fore .marks .tile img{width:58%;height:58%;object-fit:contain}
+.knack .say{font-size:30px;padding:0 320px}
+/* the stack: tools collected as postage stamps, the deck's own stamp component */
+.stack .say{font-size:28px}
+.stack .lab.t{left:0;right:0;top:446px;text-align:center}
+.stack .stamps{left:0;right:0;top:482px;display:flex;justify-content:center;align-items:flex-start;gap:18px}
+.stamp{position:relative;transform:rotate(var(--r,0deg))}
+.stamp .label{color:var(--oxblood)}
+.stamp p{margin:4px 0 0}
+.stack .note{left:0;right:0;top:656px;text-align:center}
+/* the artworks: a row of prints along the foot of the sheet; the camera walks it */
+.art .say{font-size:28px;padding:0 120px}
+.art .row{left:60px;top:430px;display:flex;align-items:flex-start;gap:34px;height:300px;width:2860px}
+.art .row .pr{--r:0deg;height:260px;flex:0 0 auto;background:var(--paper);outline:1px solid var(--hair);padding:7px 7px 9px;box-shadow:0 1px 2px rgba(20,23,27,.06)}
+.art .row .pr img{height:100%;width:auto;display:block}
+.art .row .pr.s{height:210px;align-self:center}
+/* the pile: photographs of her in one riso ink, with the two lines she marked */
+.pile .lab.c{width:260px;line-height:1.7}
+/* the labs: the side projects, six prints laid down in a fan, the line over them */
+.labs .say{font-size:30px;z-index:3;text-shadow:0 0 24px var(--paper),0 0 10px var(--paper),0 0 6px var(--paper)}
+.labs .mat{width:300px}
+/* the two cases */
+.cases .mat{width:560px}
+.cases .mat img{aspect-ratio:560/346}
+.cases .cap{position:absolute;left:0;right:0;top:362px;display:flex;justify-content:space-between;font:400 13.5px var(--hel);color:var(--ink)}
+.cases .cap i{font:300 13px var(--hel);color:var(--ink3);font-style:normal}
+.cases .say{height:150px;font-size:30px;align-items:end}
+.missing{background:#EFEDE8}
+.mat.missing::before{content:"";display:block;aspect-ratio:4/3;background:#EFEDE8}
+.cases .mat.missing::before{aspect-ratio:560/346}
+/* the look back: the whole sheet from above, her line over it */
+#over{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;opacity:0;transition:opacity .6s var(--ease)}
+#over.on{opacity:1}
+#over .h{font-size:40px;background:var(--paper);padding:10px 22px;box-shadow:0 0 0 1px var(--hair)}
+.dots i{background:rgba(20,23,27,.15)}.top,.top a,.top b{color:var(--ink3)}.top b{color:var(--ink)}.hint{color:var(--ink3)}
+</style>
+<body><div id="stage"><canvas id="discs"></canvas><div id="world"><svg id="trail"></svg></div><div id="over"><div class="h">And that’s why</div></div></div>
+<div class="top"><a href="./">intro lab</a><span>/</span><b>the sheet</b></div><div class="dots"></div><div class="hint">click, space or → to advance · ← back</div>
+<script>
+(()=>{
+const $=(h)=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild};
+const stage=document.getElementById('stage'),world=document.getElementById('world'),over=document.getElementById('over');
+const fit=()=>stage.style.setProperty('--k',Math.min(innerWidth/1280,innerHeight/720)*0.96);addEventListener('resize',fit);fit();
+const img=(src,alt='')=>`<img src="${src}" onerror="this.parentElement.classList.add('missing');this.remove()" alt="${alt}">`;
+const mat=(src,style,r)=>`<div class="mat" style="${style};--r:${r}deg">${img(src)}</div>`;
+const stamp=(name,rot)=>`<div class="stamp" style="--r:${rot}deg"><div class="label">Tool</div><p>${name}</p></div>`;
+const WORKS=[['w-sunflower',''],['art1',''],['art2',''],['art4','s'],['w-goggle',''],['art3',''],['w-spider',''],['art6','s'],['w-izakaya',''],['art5',''],['w-metropolis',''],['w-police','']];
+
+/* ---------- the places on the sheet: x,y the centre, rot the angle it lies at, z the camera height over it ---------- */
+const R=[
+ {cls:'cov',x:0,y:-100,rot:0,z:1,html:`<div class="wall" id="wall"></div><div class="sub lab">Portfolio presentation</div>`},
+ {cls:'salam',x:1700,y:-100,rot:-3,z:1,html:`<div class="dict"><div class="word">Salam kenal</div><div class="pron">/sa·lam kə·nal/ <span class="pos">interjection, Indonesian</span></div><div class="def">Hello!</div></div>`},
+ {cls:'hi',x:3400,y:-100,rot:5,z:1.12,html:`<div class="say h">I’m Jazlynn, and I make <span class="hl">charming designs.</span></div>`},
+ {cls:'fore',x:2700,y:1100,rot:-6,z:1,html:`<div class="say h">I’ve always somehow found myself at the <span class="hl">forefront of innovation</span> right before they become the next big thing.</div>
+   <div class="marks"><div class="tile">${img('aster/marks/manus-glyph.svg')}</div><div class="tile">${img('aster/marks/second-self.svg')}</div></div>`},
+ {cls:'knack',x:1000,y:1100,rot:2,z:1,html:`<div class="say h">I have a knack for recognizing what people might want <span class="hl">before they even realize they need it.</span></div>`},
+ {cls:'stack',x:-700,y:1100,rot:-8,z:1,html:`<div class="say h">Design comes to me instinctively, but coding is something I’ve grown to love.</div>
+   <div class="lab t">Here’s my stack</div>
+   <div class="stamps">${stamp('Claude Code',-2)}${stamp('Cursor',1.5)}${stamp('Cognition',-1)}${stamp('Blackbox AI',2)}</div>
+   <div class="note">+ my own custom AI tools</div>`},
+ {cls:'art',x:-1500,y:2300,rot:0,z:.92,steps:3,pan:[0,760,1520,2280],html:`<div class="say h">I had my artworks <span class="hl">exhibited, auctioned, and sold</span> when I was 15 years old.</div>
+   <div class="row">${WORKS.map(w=>`<div class="pr ${w[1]}">${img('aster/pics/'+w[0]+'.jpg')}</div>`).join('')}</div>`},
+ {cls:'care',x:-1500,y:-100,rot:7,z:1.1,html:`<div class="say h">Constantly understanding and learning new forms of knowledge with <span class="hl">empathy, care, and intent</span> is a key quality that I carry in my work.</div>`},
+ {cls:'pile',x:250,y:-1300,rot:-4,z:1,html:`<div class="mat ph2" data-src="aster/pics/c1.jpg" data-ink="oxblood" style="left:150px;top:230px;--r:-3deg"></div>
+   <div class="mat ph2" data-src="aster/pics/c3.jpg" data-ink="charcoal" style="left:470px;top:270px;--r:2deg"></div>
+   <div class="mat ph2" data-src="aster/pics/c5.jpg" data-ink="oxblood" style="left:800px;top:220px;--r:-1.5deg"></div>
+   <div class="mat ph2" data-src="aster/pics/c2.jpg" data-ink="charcoal" style="left:480px;top:430px;--r:4deg;z-index:2"></div>
+   <div class="lab c" style="left:150px;top:600px">Co-President at Design@Columbia</div>
+   <div class="lab c" style="left:800px;top:600px;width:340px">CORE PM Lead at Columbia’s best Startup Entrepreneurship Club</div>`},
+ {cls:'labs',x:1950,y:-1300,rot:6,z:.95,html:`${mat('aster/pics/lab-vertico.png','left:70px;top:70px',-5)}${mat('aster/pics/lab-pear.png','left:420px;top:40px',3)}${mat('aster/pics/lab-water.png','left:790px;top:90px',-2)}${mat('aster/pics/lab-shuffle.png','left:120px;top:380px',4)}${mat('aster/pics/lab-boxing.png','left:840px;top:400px',-4)}${mat('aster/pics/lab-porcelain.png','left:470px;top:430px',1.5)}
+   <div class="say h">I can’t seem to stop creating.</div>`},
+ {cls:'adv',x:3650,y:-1300,rot:-5,z:1.12,html:`<div class="say h">I’m an <span class="hl">adventurer at heart.</span></div>`},
+ {cls:'look',x:1300,y:500,rot:0,z:.15,look:true,html:``},
+ {cls:'cases',x:4400,y:1100,rot:0,z:1,noline:true,html:`<div class="say h">And that’s why</div>
+   ${mat('aster/pics/case-eden.png','left:64px;top:200px',-1)}${mat('aster/pics/case-manus.png','left:656px;top:200px',1.2)}
+   <div class="cap" style="left:64px;width:576px;top:586px"><span>Eden, the glasses that think on your phone</span><i>2026</i></div>
+   <div class="cap" style="left:656px;width:576px;top:586px"><span>Manus community platform</span><i>2026</i></div>`},
+];
+const secs=R.map(r=>{const el=$(`<section class="rg ${r.cls}" style="left:${r.x-640}px;top:${r.y-360}px;--rot:${r.rot}deg">${r.html}</section>`);el.querySelectorAll('.say').forEach(e=>{e.innerHTML=`<span class="tx">${e.innerHTML}</span>`;});world.appendChild(el);return el;});
+const KNACK=R.findIndex(r=>r.cls==='knack'), LOOK=R.findIndex(r=>r.look);
+
+/* ---------- the letter wall, from the home page, never settling ---------- */
+(function(){
+  const WORDS=['JAZLYNN','KURNIANDRA'], SPEED=.23, DRIFT=.74, ROW=52, FS=ROW*.9, STRETCH=FS;
+  const gauge=document.createElement('canvas').getContext('2d'); gauge.font=`400 ${FS}px "Helvetica Neue",Helvetica,Arial,sans-serif`;
+  const wall=document.getElementById('wall'); const FLICK=['var(--gold)','var(--oxblood)']; let lit=0, t0=0;
+  const lines=WORDS.map((w,li)=>{const el=$('<div class="line"></div>');const cells=[...w].map((ch,ci)=>{const c=$('<span class="cell"></span>'),s=$('<span class="ch"></span>');s.textContent=ch;c.appendChild(s);el.appendChild(c);
+    const m=gauge.measureText(ch),ink=-(m.actualBoundingBoxLeft||0),pad=Math.max(0,FS*.1-ink);s.style.paddingLeft=pad.toFixed(1)+'px';
+    return {cell:c,glyph:s,base:Math.ceil(m.width+pad)+4,ci,next:2+Math.random()*22,until:0,lit:false,col:FLICK[(Math.random()*2)|0]};});wall.appendChild(el);return {cells,seed:li};});
+  const ink=(c,on)=>{if(c.lit===on)return;c.lit=on;c.cell.style.background=on?c.col:'transparent';c.glyph.style.color=on?'var(--paper)':'';};
+  (function tick(now){const t=now/1000; if(!t0)t0=t; const age=t-t0, arriving=age<2.6, front=age*46;
+    for(const L of lines){let x=0;const cy=L.seed*(ROW*1.2)+ROW/2;
+      for(const c of L.cells){const k=.5+.5*Math.sin(t*SPEED*Math.PI*2+L.seed*DRIFT+c.ci*DRIFT*1.7);const w=c.base+k*k*STRETCH;c.cell.style.width=w.toFixed(1)+'px';
+        if(arriving){const d=x+w/2+cy*.6;ink(c,d<front&&d>front-130);x+=w;continue;}
+        if(c.lit&&t>c.until){ink(c,false);lit--;c.next=t+6+Math.random()*26;} else if(!c.lit&&t>c.next){ if(lit>=3){c.next=t+1+Math.random()*4;} else {ink(c,true);lit++;c.until=t+.25+Math.random()*.9;} }
+        x+=w;}}
+    requestAnimationFrame(tick);})(performance.now());
+})();
+
+/* ---------- the photographs of her, printed in one riso ink: an 8x8 Bayer dither, three tones ---------- */
+const INKS={oxblood:[52,4,20],charcoal:[28,26,23],gold:[169,153,57]}, PAPER=[250,249,247];
+const BAYER=[[0,32,8,40,2,34,10,42],[48,16,56,24,50,18,58,26],[12,44,4,36,14,46,6,38],[60,28,52,20,62,30,54,22],[3,35,11,43,1,33,9,41],[51,19,59,27,49,17,57,25],[15,47,7,39,13,45,5,37],[63,31,55,23,61,29,53,21]];
+function dither(im,inkName,cssW){ const ink=INKS[inkName]||INKS.oxblood, S=2, DOT=2, w=Math.round(cssW*S), h=Math.round(w*im.naturalHeight/im.naturalWidth);
+  const cw=Math.ceil(w/DOT), chh=Math.ceil(h/DOT), src=document.createElement('canvas'); src.width=cw; src.height=chh; const sc=src.getContext('2d'); sc.drawImage(im,0,0,cw,chh);
+  const d=sc.getImageData(0,0,cw,chh).data, out=document.createElement('canvas'); out.width=w; out.height=h; const oc=out.getContext('2d'); const o=oc.createImageData(w,h), p=o.data;
+  for(let y=0;y<h;y++){const cy=(y/DOT)|0; for(let x=0;x<w;x++){const cx=(x/DOT)|0, i=(cy*cw+cx)*4; let L=(.299*d[i]+.587*d[i+1]+.114*d[i+2])/255; L=Math.min(1,Math.max(0,(L-.5)*1.1+.5)); L=Math.pow(L,.9);
+      const q=Math.min(1,Math.max(0,Math.floor(L*3+BAYER[cy&7][cx&7]/64)/3)); const j=(y*w+x)*4; p[j]=ink[0]+(PAPER[0]-ink[0])*q; p[j+1]=ink[1]+(PAPER[1]-ink[1])*q; p[j+2]=ink[2]+(PAPER[2]-ink[2])*q; p[j+3]=255; }}
+  oc.putImageData(o,0,0); out.style.width=cssW+'px'; out.style.height=(h/S)+'px'; return out; }
+document.querySelectorAll('.ph2').forEach((el,i)=>{const im=new Image(); im.onload=()=>{el.appendChild(dither(im,el.dataset.ink,[300,280,300,230][i%4]));}; im.onerror=()=>{el.classList.add('missing');el.innerHTML=`<div class="lab" style="width:260px;height:200px;display:grid;place-items:center">${el.dataset.src.split('/').pop()}</div>`;}; im.src=el.dataset.src;});
+
+/* ---------- the line through the places, and the camera that travels it ----------
+   Nodes are the places in her order (the artworks row contributes one node per pan stop); a Catmull-Rom curve
+   through them is the pencil line on the sheet. The camera's position on a move is a point along that curve, so it
+   swings into each place rather than crossing straight to it, and the line is drawn to exactly where it stands. */
+const NODES=[]; R.forEach((r,i)=>{ if(r.look) return; (r.pan||[0]).forEach((dx,k)=>NODES.push({i,k,x:r.x+dx,y:r.y})); });
+const nodeAt=(i,k=0)=>NODES.findIndex(n=>n.i===i&&n.k===k);
+const LINE=(new URLSearchParams(location.search)).get('line')||'none'; /* she cut the drawn line; the textures stay behind ?line= */
+const NS='http://www.w3.org/2000/svg', mkel=(t,at)=>{const e=document.createElementNS(NS,t);for(const k in at)e.setAttribute(k,at[k]);return e;};
+const svg=document.getElementById('trail'); svg.setAttribute('viewBox','-4000 -3000 10000 7000'); svg.style.left='-4000px'; svg.style.top='-3000px'; svg.style.width='10000px'; svg.style.height='7000px';
+/* the camera's own curve through the place centres (never drawn) */
+let CD='M'+NODES[0].x+' '+NODES[0].y; const SEG=[];
+for(let i=0;i<NODES.length-1;i++){const p0=NODES[Math.max(0,i-1)],p1=NODES[i],p2=NODES[i+1],p3=NODES[Math.min(NODES.length-1,i+2)]; const T=.5;
+  const c1={x:p1.x+(p2.x-p0.x)*T/3,y:p1.y+(p2.y-p0.y)*T/3}, c2={x:p2.x-(p3.x-p1.x)*T/3,y:p2.y-(p3.y-p1.y)*T/3};
+  CD+=` C${c1.x} ${c1.y} ${c2.x} ${c2.y} ${p2.x} ${p2.y}`;}
+const cpath=mkel('path',{d:CD,fill:'none',stroke:'none'}); svg.appendChild(cpath); const CTOTAL=cpath.getTotalLength();
+{ let L=0; SEG.push(0); for(let i=1;i<NODES.length;i++){ let best=1e18,at=L; for(let l=L;l<=CTOTAL;l+=6){const p=cpath.getPointAtLength(l);const d=(p.x-NODES[i].x)**2+(p.y-NODES[i].y)**2; if(d<best){best=d;at=l;} if(best<36&&d>best*4) break;} L=at; SEG.push(L);} }
+
+/* THE DRAWN LINE'S ROUTE. It never crosses a word. Each place's text is measured (its children, rotated with the place),
+   and the line keeps a fixed clearance PAD above the top of that box. Between places it runs level at that clearance,
+   and when it has to change rows it does so in a free lane between columns, never over anything. Corners are rounded
+   so the marker sweeps rather than turns. The camera does not follow this line; the line is drawn to each place as the
+   camera arrives there. */
+const PAD=120, LANE=70; const T0=performance.now(); const TM={};
+const localBox=(el,root)=>{let x=0,y=0,e=el; while(e&&e!==root){x+=e.offsetLeft;y+=e.offsetTop;e=e.offsetParent;} return {x,y,w:el.offsetWidth,h:el.offsetHeight};};
+const BOX=R.map((r,i)=>{ if(r.look) return null; const el=secs[i]; let xs=[],ys=[]; const th=r.rot*Math.PI/180, c=Math.cos(th), sn=Math.sin(th);
+  [...el.children].forEach(ch=>{ const t=ch.querySelector('.tx')||ch; const b=localBox(t,el); if(!b.w||!b.h) return;
+    [[b.x,b.y],[b.x+b.w,b.y],[b.x,b.y+b.h],[b.x+b.w,b.y+b.h]].forEach(([lx,ly])=>{const dx=lx-640,dy=ly-360; xs.push(r.x+dx*c-dy*sn); ys.push(r.y+dx*sn+dy*c);}); });
+  if(!xs.length){xs=[r.x-300,r.x+300];ys=[r.y-100,r.y+100];}
+  return {l:Math.min(...xs),r:Math.max(...xs),t:Math.min(...ys),b:Math.max(...ys)}; });
+const hits=(x1,y1,x2,y2,skip)=>{ const lo=Math.min(y1,y2),hi=Math.max(y1,y2),xl=Math.min(x1,x2),xr=Math.max(x1,x2), m=LANE;
+  return BOX.some((b,i)=>b&&!skip.includes(i)&&xr>b.l-m&&xl<b.r+m&&hi>b.t-m&&lo<b.b+m); };
+/* targets: for each node, the point above its place's text, at the end of the text nearest to where the line arrives */
+/* places in one row share one clearance height, the highest of them, so a move along a row is level */
+BOX.forEach(b=>{ if(b) b.ct=b.t; });
+/* The strokes. Each place is reached along its clearance line, then the pen takes a small cornered bend and runs straight
+   toward the words, stopping GAP short of them. There it lifts; the next stroke starts again from the bend. So the route is
+   a list of runs (pen-down polylines), and the path between them is a move, not a line. */
+const GAP=34, CORNER=28;
+const sgn=v=>v>1?1:v<-1?-1:0;
+const centreOf=n=>R[n.i].pan?n.x:(BOX[n.i].l+BOX[n.i].r)/2;
+const runs=[]; let cur=null; const T=[]; let pts=[]; let prevBend=null, prevFirst=false; const DROP=[];
+const put=(pt)=>{cur.push(pt); pts.push(pt);};
+/* does the straight segment a->b pass over any text (with a margin), other than the places it joins? */
+const crosses=(a,b,skip)=>{ const n=Math.ceil(Math.hypot(b.x-a.x,b.y-a.y)/18)||1; for(let i=0;i<=n;i++){ const x=a.x+(b.x-a.x)*i/n, y=a.y+(b.y-a.y)*i/n; if(BOX.some((bb,j)=>bb&&!skip.includes(j)&&x>bb.l-LANE&&x<bb.r+LANE&&y>bb.t-LANE&&y<bb.b+LANE)) return true; } return false; };
+NODES.forEach((n,k)=>{ const b=BOX[n.i]; const x=centreOf(n); const first=n.k===0;
+  /* the bend sits PAD above the words, but never above the top of the frame; where the content fills the frame there is no room
+     for the drop and the stroke simply ends over the content's edge */
+  const hh=360/R[n.i].z; const y=Math.max(b.ct-PAD, n.y-hh+90); const drop=(b.t-GAP)-y>24; const bend={x,y};
+  if(k===0){ cur=[]; runs.push(cur); put({x,y:b.t-GAP}); put(bend); T.push(0); DROP.push(true); prevBend=bend; prevFirst=true; return; } /* the cover: the first stroke leaves the name upward */
+  if(R[n.i].noline){ /* the last place stands on its own, no stroke leads into it */ T.push(pts.length-1); DROP.push(false); prevBend=bend; prevFirst=first; return; }
+  if(n.k>0){ /* along a row of prints: the same stroke carries on */ put(bend); }
+  else { /* a new stroke into this place: straight from the last bend if that way is clear of every text; else the clear part of that
+            way; else a short approach from whichever direction near it is clear, nearest to where the camera comes from */
+    let start=null; const far=Math.hypot(prevBend.x-bend.x,prevBend.y-bend.y);
+    if(!crosses(prevBend,bend,[])) start=prevBend;
+    else { let t=0; for(let tt=.06;tt<=1;tt+=.03){ const q={x:bend.x+(prevBend.x-bend.x)*tt,y:bend.y+(prevBend.y-bend.y)*tt}; if(crosses(q,bend,[])) break; t=tt; }
+      if(t*far>=260) start={x:bend.x+(prevBend.x-bend.x)*t,y:bend.y+(prevBend.y-bend.y)*t};
+      else { const a0=Math.atan2(prevBend.y-bend.y,prevBend.x-bend.x), D=Math.min(760,Math.max(420,far*.4));
+        for(const da of [0,.35,-.35,.7,-.7,1.05,-1.05,1.4,-1.4,1.75,-1.75,2.1,-2.1,2.45,-2.45,2.8,-2.8,Math.PI]){ const q={x:bend.x+Math.cos(a0+da)*D,y:bend.y+Math.sin(a0+da)*D}; if(!crosses(q,bend,[])){ start=q; break; } }
+        if(!start) start={x:bend.x+Math.cos(a0)*D,y:bend.y+Math.sin(a0)*D}; } }
+    cur=[]; runs.push(cur); put(start); put(bend); }
+  if(first&&drop){ put({x,y:b.t-GAP}); T.push(pts.length-1); } else T.push(pts.length-1);
+  DROP.push(first&&drop); prevBend=bend; prevFirst=first; });
+/* the path: each run with small cornered bends, runs joined by moves */
+let D=''; const DR=[]; runs.forEach(run=>{ if(run.length<2) return; const d0=D.length; D+=' M'+run[0].x+' '+run[0].y; for(let i=1;i<run.length-1;i++){const a=run[i-1],b=run[i],c=run[i+1]; const la=Math.hypot(b.x-a.x,b.y-a.y)||1,lc=Math.hypot(c.x-b.x,c.y-b.y)||1; const r=Math.min(CORNER,la/2,lc/2);
+    D+=` L${b.x+(a.x-b.x)/la*r} ${b.y+(a.y-b.y)/la*r} Q${b.x} ${b.y} ${b.x+(c.x-b.x)/lc*r} ${b.y+(c.y-b.y)/lc*r}`;} const e=run[run.length-1]; D+=` L${e.x} ${e.y}`; DR.push(D.slice(d0).trim()); }); D=D.trim();
+const trail=mkel('path',{d:D,fill:'none',stroke:'none'}); svg.appendChild(trail); const TOTAL=trail.getTotalLength();
+/* the route sampled once: position, unit normal and length every 7 units; every texture is built from this array */
+const SMP=[]; for(let l=0;l<=TOTAL;l+=7){const p=trail.getPointAtLength(l),q=trail.getPointAtLength(Math.min(TOTAL,l+3)); const tx=q.x-p.x,ty=q.y-p.y,n=Math.hypot(tx,ty)||1; SMP.push({x:p.x,y:p.y,nx:-ty/n,ny:tx/n,l});}
+const PIECES=[]; { let cur=[SMP[0]]; for(let i=1;i<SMP.length;i++){ if(Math.hypot(SMP[i].x-SMP[i-1].x,SMP[i].y-SMP[i-1].y)>16){ PIECES.push(cur); cur=[]; } cur.push(SMP[i]); } PIECES.push(cur); }
+const LSEG=[]; { /* the length along the route at each node's target point, walked once and forward only */ let j=0; T.forEach(ti=>{ const P=pts[ti]; let best=1e18,at=SMP[j].l,bj=j; for(let k=j;k<SMP.length;k++){const p=SMP[k]; const d=(p.x-P.x)**2+(p.y-P.y)**2; if(d<best){best=d;at=p.l;bj=k;} if(best<2500&&d>best*4+400) break;} j=bj; LSEG.push(at); }); }
+/* the reveal: a wide white stroke in a mask, dashed to the camera's length */
+const defs=mkel('defs',{}); const mask=mkel('mask',{id:'reveal',maskUnits:'userSpaceOnUse',x:-4000,y:-3000,width:10000,height:7000});
+/* one mask piece per stroke, each dashed by its own length from where it starts along the whole route; a dash on a path with
+   pen lifts in it restarts at every lift, which would show the next stroke before its turn */
+const MP=[]; { let L0=0; DR.forEach((d,i)=>{ const m=mkel('path',{d,fill:'none',stroke:'#fff','stroke-width':90,'stroke-linecap':'butt','stroke-linejoin':'round'}); mask.appendChild(m); const len=m.getTotalLength(); m.style.strokeDasharray=len;
+  const own=mkel('mask',{id:'rev'+i,maskUnits:'userSpaceOnUse',x:-4000,y:-3000,width:10000,height:7000}); const m2=m.cloneNode(); own.appendChild(m2); defs.appendChild(own); MP.push({m,m2,L0,len}); L0+=len; }); }
+defs.appendChild(mask); svg.appendChild(defs);
+const drawTo=l=>{ MP.forEach(({m,m2,L0,len})=>{ m.style.strokeDashoffset=m2.style.strokeDashoffset=len-Math.max(0,Math.min(len,l-L0)); }); };
+const G=mkel('g',{mask:'url(#reveal)'}); svg.appendChild(G); if(LINE==='none') svg.style.display='none';
+let GP=null; /* per-stroke groups, made once the samples exist */ TM.route=performance.now()-T0;
+const segOf=l=>{let i=0; while(i<LSEG.length-2&&l>LSEG[i+1]) i++; return (l-LSEG[i])/Math.max(1,LSEG[i+1]-LSEG[i]);};
+/* grain and raggedness, as filters: alpha from noise, composited into the stroke */
+const grain=(id,fx,fy,oct,gain,bias,seed,disp)=>{const f=mkel('filter',{id,x:'-5%',y:'-5%',width:'110%',height:'110%'}); f.innerHTML=(disp?`<feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="${seed+7}" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="${disp}" xChannelSelector="R" yChannelSelector="G" result="src"/>`:'<feOffset in="SourceGraphic" dx="0" dy="0" result="src"/>')+`<feTurbulence type="fractalNoise" baseFrequency="${fx} ${fy}" numOctaves="${oct}" seed="${seed}" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 ${gain} ${bias}" result="a"/><feComposite in="src" in2="a" operator="in"/>`; defs.appendChild(f); return `url(#${id})`;};
+const ribbon=(wmax,wmin,dy,op,extra={})=>{const g=mkel('g',Object.assign({fill:'#A99939',opacity:op},extra)); PIECES.forEach(pc=>{const L=[],Rr=[]; pc.forEach(p=>{const u=segOf(p.l); const w=wmin+(wmax-wmin)*Math.pow(Math.sin(Math.PI*Math.min(1,Math.max(0,u))),.55)+Math.sin(p.l*.037)*1.5; L.push((p.x+p.nx*w)+','+(p.y+p.ny*w+dy)); Rr.push((p.x-p.nx*w)+','+(p.y-p.ny*w+dy));}); g.appendChild(mkel('polygon',{points:L.concat(Rr.reverse()).join(' ')}));}); return g;};
+/* noise as paint: the ink's alpha from a seamless turbulence tile, so nothing filters the whole sheet; ribbons taper where the tip lands and lifts */
+const noisePaint=(id,fx,fy,gain,bias,seed,col='#A99939',oct=2)=>{ const f=mkel('filter',{id:id+'f',x:0,y:0,width:1,height:1}); f.innerHTML=`<feTurbulence type="fractalNoise" baseFrequency="${fx} ${fy}" numOctaves="${oct}" seed="${seed}" stitchTiles="stitch" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 ${gain} ${bias}" result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/>`; defs.appendChild(f);
+  const pat=mkel('pattern',{id,patternUnits:'userSpaceOnUse',width:256,height:256}); pat.appendChild(mkel('rect',{width:256,height:256,fill:col,filter:`url(#${id}f)`})); defs.appendChild(pat); return `url(#${id})`; };
+const prof=l=>{const u=Math.min(1,Math.max(0,segOf(l))); return Math.pow(Math.sin(Math.PI*u),.45);}; /* 0 at a place, 1 mid-move */
+if(PIECES.length===MP.length){ GP=PIECES.map((_,i)=>{const g=mkel('g',{mask:`url(#rev${i})`}); svg.appendChild(g); return g;}); }
+const rib=(wmax,wmin,dy,paint,op,tf)=>{const g=mkel('g',{fill:paint,opacity:op}); if(tf) g.setAttribute('transform',tf); PIECES.forEach((pc,i)=>{const L=[],Rr=[]; pc.forEach(p=>{const w=wmin+(wmax-wmin)*prof(p.l)+Math.sin(p.l*.031)*.6; L.push((p.x+p.nx*w).toFixed(1)+','+(p.y+p.ny*w+dy).toFixed(1)); Rr.push((p.x-p.nx*w).toFixed(1)+','+(p.y-p.ny*w+dy).toFixed(1));});
+  const poly=mkel('polygon',{points:L.concat(Rr.reverse()).join(' ')}); if(GP){ const h=mkel('g',{fill:paint,opacity:op}); if(tf) h.setAttribute('transform',tf); h.appendChild(poly); GP[i].appendChild(h); } else g.appendChild(poly);}); return g;};
+const edge=(side,dash)=>{const g=mkel('g',{}); PIECES.forEach((pc,i)=>{let d=''; pc.forEach((p,j)=>{const w=(1.5+7.5*prof(p.l))*side; d+=(j?' L':'M')+(p.x+p.nx*w).toFixed(1)+' '+(p.y+p.ny*w).toFixed(1);}); const path=mkel('path',{d,fill:'none',stroke:'#A99939','stroke-width':1.4,opacity:.3,'stroke-dasharray':dash,'stroke-linecap':'butt'}); (GP?GP[i]:g).appendChild(path);}); return g;};
+if(LINE==='marker'){ /* 1. flat: the highlighter as it is in the decks, two even passes */
+  G.appendChild(mkel('path',{d:D,fill:'none',stroke:'#A99939','stroke-width':16,opacity:.42})); G.appendChild(mkel('path',{d:D,fill:'none',stroke:'#A99939','stroke-width':9,opacity:.22,transform:'translate(0,3)'})); }
+else if(LINE==='dry'){ /* 2. dry felt tip: stretched noise, fine across the stroke and long along it, three passes */
+  G.appendChild(rib(8.5,1.2,0,noisePaint('dry1',.9,.05,2.4,-.55,2),.5));
+  G.appendChild(rib(5.5,.8,3,noisePaint('dry2',.7,.04,2.2,-.5,9),.34));
+  G.appendChild(rib(2.5,.5,-3,noisePaint('dry3',.5,.06,2.6,-.7,4),.4));
+  G.appendChild(rib(1.6,.5,0,'#A99939',.3));
+  G.appendChild(edge(1,'7 11 3 15')); G.appendChild(edge(-1,'5 13 9 17')); }
+else if(LINE==='riso'){ /* 3. riso: the gold printed with the discs' grain, an oxblood pass a touch out of register */
+  G.appendChild(rib(8,1.2,0,noisePaint('ris0',.5,.5,2.6,-.6,21,'#340414',3),.13,'translate(4,3)'));
+  G.appendChild(rib(8,1.2,0,noisePaint('ris1',.6,.6,2.8,-.7,5,'#A99939',3),.58));
+  G.appendChild(rib(8,1.2,0,noisePaint('ris2',.25,.25,2.2,-.5,13,'#A99939',2),.3));
+  G.appendChild(rib(1.4,.5,0,'#A99939',.28)); }
+else if(LINE==='pressure'){ /* 4. pressure: the same marker swiped, wide across the middle of a move, tapering where the tip lands and lifts, the edge frayed */
+  G.appendChild(ribbon(11,1.5,0,.42,{filter:grain('pr1',.8,.8,1,0,1,3,4)})); G.appendChild(ribbon(6,.8,3,.22,{filter:grain('pr2',.8,.8,1,0,1,8,3)})); }
+else if(LINE==='pencil'){ /* 5. graphite: thin at any height, wobbled by noise, gone over twice the way a sketch line is */
+  const f1=mkel('filter',{id:'wob',x:'-5%',y:'-5%',width:'110%',height:'110%'}); f1.innerHTML='<feTurbulence type="fractalNoise" baseFrequency=".012" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="9" xChannelSelector="R" yChannelSelector="G"/>'; defs.appendChild(f1);
+  const f2=mkel('filter',{id:'wob2',x:'-5%',y:'-5%',width:'110%',height:'110%'}); f2.innerHTML='<feTurbulence type="fractalNoise" baseFrequency=".016" numOctaves="2" seed="11"/><feDisplacementMap in="SourceGraphic" scale="12" xChannelSelector="R" yChannelSelector="G"/>'; defs.appendChild(f2);
+  G.appendChild(mkel('path',{d:D,fill:'none',stroke:'#2B2A27','stroke-width':1.3,opacity:.62,'vector-effect':'non-scaling-stroke',filter:'url(#wob)'}));
+  G.appendChild(mkel('path',{d:D,fill:'none',stroke:'#2B2A27','stroke-width':1,opacity:.28,'vector-effect':'non-scaling-stroke',filter:'url(#wob2)',transform:'translate(4,-3)'})); }
+
+TM.style=performance.now()-T0; let cam={x:0,y:-100,z:1,rot:0}, FR=null; const q=new URLSearchParams(location.search); if(q.get('t')) FR=parseFloat(q.get('t'));
+let lastPos=null, lastT=0;
+function place(){ world.style.transform=`translate(640px,360px) rotate(${-cam.rot}deg) scale(${cam.z}) translate(${-cam.x}px,${-cam.y}px)`; drawDiscs(); }
+const easeIO=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+let tw=null, ringP=0, drawn=0;
+/* a move: from node a to node b along the line, the height arcing up with the distance, the angle turning to the
+   place's own; the pencil line draws to the camera's position; on quick low moves the sheet blurs with the speed */
+function travel(a,b,opts={}){ return new Promise(res=>{ if(tw) cancelAnimationFrame(tw); const from={...cam}; const la=SEG[a], lb=SEG[b], dist=Math.abs(lb-la);
+  const rb=R[NODES[b].i], zTo=rb.z, rotTo=rb.rot; const lift=opts.lift!=null?opts.lift:Math.min(.6,dist/5200); const dur=opts.dur||(700+dist*.16); const t0=performance.now();
+  const tail=(NODES[b].k===0&&b>a&&DROP[b])?PAD-GAP+CORNER:0; /* the drop toward the words is left for the landing */
+  const at=(p,now)=>{const e=easeIO(p); const l=la+(lb-la)*e; const pt=cpath.getPointAtLength(Math.max(0,Math.min(CTOTAL,l))); const dl=LSEG[a]+(LSEG[b]-tail-LSEG[a])*e;
+    const z=Math.exp(Math.log(from.z)+(Math.log(zTo)-Math.log(from.z))*e)*(1-lift*Math.sin(Math.PI*e));
+    cam={x:pt.x,y:pt.y,z,rot:from.rot+(rotTo-from.rot)*e}; if(b>a&&dl>drawn){ drawn=dl; drawTo(drawn); } /* the stroke keeps pace with the camera */ if(NODES[b].i===KNACK) ringP=e; else if(NODES[a].i===KNACK&&b<a) ringP=1-e;
+    /* speed blur */ if(now!=null&&lastPos){const dt=Math.max(1,now-lastT); const sp=Math.hypot((cam.x-lastPos.x)*cam.z,(cam.y-lastPos.y)*cam.z)/dt; const bl=Math.max(0,Math.min(4.5,(sp-1.4)*1.3)); world.style.filter=bl>.15?`blur(${bl.toFixed(2)}px)`:'';} lastPos={x:cam.x,y:cam.y}; lastT=now||0;
+    place();};
+  if(FR!=null){ at(Math.min(1,FR/dur),null); return res(); }
+  (function f(now){const p=Math.min(1,(now-t0)/dur); at(p,now); if(p<1) tw=requestAnimationFrame(f); else {world.style.filter='';res();}})(t0); }); }
+/* the stroke: once the camera has landed, the line draws itself from where it left off to just short of the words */
+function draw(l0,l1){ return new Promise(res=>{ l0=Math.max(l0,drawn); const d=Math.max(0,l1-l0); if(d<1) return res(); const dur=Math.max(220,Math.min(900,120+d*1.6)); const t0=performance.now();
+  const at=p=>{const e=1-Math.pow(1-p,3); drawn=Math.max(drawn,l0+d*e); drawTo(drawn);};
+  if(FR!=null){ at(1); return res(); }
+  (function f(now){const p=Math.min(1,(now-t0)/dur); at(p); if(p<1) requestAnimationFrame(f); else res();})(t0); }); }
+/* the look: straight up off the sheet to see the whole line, and back down to the cases */
+function hover(to,dur=1700){ return new Promise(res=>{ if(tw) cancelAnimationFrame(tw); const from={...cam}; const t0=performance.now();
+  const at=p=>{const e=easeIO(p); cam={x:from.x+(to.x-from.x)*e,y:from.y+(to.y-from.y)*e,z:Math.exp(Math.log(from.z)+(Math.log(to.z)-Math.log(from.z))*e),rot:from.rot+(to.rot-from.rot)*e}; place();};
+  if(FR!=null){ at(Math.min(1,FR/dur)); return res(); }
+  (function f(now){const p=Math.min(1,(now-t0)/dur); at(p); if(p<1) tw=requestAnimationFrame(f); else res();})(t0); }); }
+
+/* ---------- the sea glass: the home page's frosted discs, lying on the sheet ---------- */
+const SWATCH=['#dfddc8','#c7c7c7','#827a85','#9ba69c','#c4c1c8','#dfddc8','#c2beb3','#dfdac8'];
+/* THE DISCS, as she placed them in edit mode on 2026-10-27 (three on the cover, the ring around the knack line, the rest in the
+   gaps). cov: shown on the cover from the start; ring: gathers from a scatter as the camera arrives at the knack line. */
+const DISCS=[
+ {"x":559,"y":-80,"r":260,"cov":1},
+ {"x":7,"y":-330,"r":101,"cov":1},
+ {"x":-564,"y":-74,"r":260,"cov":1},
+ {"x":1843,"y":175,"r":230},
+ {"x":2234,"y":-331,"r":260},
+ {"x":1290,"y":-69,"r":166},
+ {"x":3841,"y":170,"r":202},
+ {"x":4039,"y":253,"r":89},
+ {"x":2901,"y":-367,"r":159},
+ {"x":2108,"y":918,"r":208},
+ {"x":3081,"y":1405,"r":179},
+ {"x":3230,"y":784,"r":222},
+ {"x":-1230,"y":815,"r":260},
+ {"x":-72,"y":1316,"r":260},
+ {"x":-1221,"y":1451,"r":143},
+ {"x":-2137,"y":1973,"r":141},
+ {"x":-2114,"y":2033,"r":37},
+ {"x":-1449,"y":2731,"r":115},
+ {"x":-624,"y":2700,"r":90},
+ {"x":-47,"y":1920,"r":70},
+ {"x":653,"y":1920,"r":85},
+ {"x":-986,"y":-401,"r":70},
+ {"x":-1450,"y":311,"r":116},
+ {"x":-967,"y":252,"r":79},
+ {"x":-326,"y":-1613,"r":95},
+ {"x":194,"y":-1721,"r":116},
+ {"x":206,"y":-885,"r":115},
+ {"x":2556,"y":-1608,"r":82},
+ {"x":1939,"y":-869,"r":98},
+ {"x":1332,"y":-1620,"r":107},
+ {"x":4285,"y":-947,"r":80},
+ {"x":4227,"y":-1629,"r":95},
+ {"x":3657,"y":-1668,"r":117},
+ {"x":3863,"y":1460,"r":71},
+ {"x":4966,"y":1423,"r":80},
+ {"x":4987,"y":783,"r":82},
+ {"x":1000,"y":800,"r":62,"ring":1},
+ {"x":1276,"y":857,"r":62,"ring":1},
+ {"x":1447,"y":1007,"r":62,"ring":1},
+ {"x":1447,"y":1193,"r":62,"ring":1},
+ {"x":1276,"y":1343,"r":62,"ring":1},
+ {"x":1000,"y":1400,"r":62,"ring":1},
+ {"x":724,"y":1343,"r":62,"ring":1},
+ {"x":553,"y":1193,"r":62,"ring":1},
+ {"x":553,"y":1007,"r":62,"ring":1},
+ {"x":724,"y":857,"r":62,"ring":1},
+ {"x":2571,"y":-11,"r":90},
+ {"x":2977,"y":440,"r":114},
+ {"x":1799,"y":1091,"r":130},
+ {"x":135,"y":1135,"r":119},
+ {"x":-1121,"y":1683,"r":83},
+ {"x":-1554,"y":1162,"r":129},
+ {"x":-695,"y":-615,"r":105},
+ {"x":1024,"y":-1358,"r":110},
+ {"x":2734,"y":-1384,"r":94}
+];
+{ let sd=7; const rnd=()=>{sd=(sd*16807)%2147483647;return sd/2147483647;}; DISCS.forEach(w=>{ if(w.ring){ w.fx=w.x+(rnd()-.5)*900; w.fy=w.y+(rnd()-.5)*700; } }); }
+/* she cut the discs everywhere but the cover */
+for(let i=DISCS.length-1;i>=0;i--) if(!DISCS[i].cov) DISCS.splice(i,1);
+if(false) /* every frame has at least one disc: where her layout leaves a view empty, one is added in the corner farthest from the words */
+NODES.forEach(n=>{ const r=R[n.i], hw=640/r.z, hh=360/r.z, b=BOX[n.i]; const seen=DISCS.some(w=>!w.gone&&Math.abs(w.x-n.x)<hw+w.r*.4&&Math.abs(w.y-n.y)<hh+w.r*.4); if(seen) return;
+  const RR=110; const cands=[[n.x+hw-180,n.y-hh+160],[n.x-hw+180,n.y+hh-160],[n.x+hw-180,n.y+hh-160],[n.x-hw+180,n.y-hh+160]];
+  const ok=cands.find(([cx,cy])=>cx+RR<b.l-40||cx-RR>b.r+40||cy+RR<b.t-40||cy-RR>b.b+40); if(ok) DISCS.push({x:ok[0],y:ok[1],r:RR}); });
+/* EDIT MODE (?edit=1): drag a disc to move it, roll the wheel over it to resize, C copies the layout, R resets. Placements are
+   kept in this browser and applied on every load, so what she sets stays until it is baked into DISCS. */
+const EDIT=!!q.get('edit'); const SAVEKEY='sheet.discs';
+try{ const saved=JSON.parse(localStorage.getItem(SAVEKEY)||'{}'); Object.entries(saved).forEach(([i,v])=>{ if(DISCS[i]){ if(v.gone){DISCS[i].gone=1;return;} DISCS[i].x=v.x; DISCS[i].y=v.y; DISCS[i].r=v.r; if(DISCS[i].ring){DISCS[i].fx=v.x+(DISCS[i].fx-DISCS[i].x);DISCS[i].fy=v.y+(DISCS[i].fy-DISCS[i].y);} } }); }catch(e){}
+const cv=document.getElementById('discs'); let H=null, arrive=null;
+if(!q.get('nodiscs')) import('./aster/sheets-gl.js').then(m=>{ H=m.mountSheets(cv,DISCS.map(d=>({x:.5,y:.5,r:.05})),SWATCH,{paper:'#FAF9F7',ground:'#1C1A17',bleed:0,clear:()=>0}); if(H){ H.discs.forEach(d=>d.moved=true); drawDiscs(); } });
+function drawDiscs(){ if(!H) return; const r=cv.getBoundingClientRect(), W=r.width, Hh=r.height, U=650, now=performance.now(); const cr=Math.cos(-cam.rot*Math.PI/180), sr=Math.sin(-cam.rot*Math.PI/180);
+  H.discs.forEach((d,i)=>{const w=DISCS[i]; let lift=0, up=arrive==null?1:0; if(arrive!=null&&!w.cov){const el=arrive<0?1e9:(FR!=null?FR:now-arrive); const p=Math.max(0,Math.min(1,el/900-i*.045)); up=p; lift=(1-easeIO(p))*900;}
+    let wx=w.x, wy=w.y+lift; if(w.ring){const e=easeIO(ringP); wx=w.fx+(w.x-w.fx)*e; wy=w.fy+(w.y-w.fy)*e+lift;}
+    const dx=(wx-cam.x)*cam.z, dy=(wy-cam.y)*cam.z; const sx=640+dx*cr-dy*sr, sy=360+dx*sr+dy*cr, rad=w.r*cam.z;
+    w.sx=sx; w.sy=sy; w.sr=rad; d.ux=sx/1280; d.uy=sy/720; d.ur=rad/1280; d.x=d.tx=(d.ux*W-W/2)/U; d.y=d.ty=(Hh/2-d.uy*Hh)/U; d.r=rad*W/1280/U; d.vx=d.vy=0;
+    d.alive=(!w.gone&&sx>-rad-20&&sx<1300+rad&&sy>-rad-20&&sy<740+rad&&(w.cov||(arrive==null?s>0:up>0)))?1:0; if(w.gone){w.sx=w.sy=0;} });
+  H.draw(); }
+(function keep(){ if(arrive!=null&&arrive>0&&performance.now()-arrive<2400) drawDiscs(); requestAnimationFrame(keep); })();
+
+/* ---------- control ---------- */
+let s=0,step=0,busy=false; const dots=document.querySelector('.dots'); R.forEach(()=>dots.appendChild(document.createElement('i')));
+function paint(land){ [...dots.children].forEach((d,i)=>d.classList.toggle('on',i===s)); secs.forEach((el,i)=>{ if(i!==s) el.classList.remove('on'); if(i<s) el.classList.add('seen'); }); if(land) secs[s].classList.add('on'); over.classList.toggle('on',!!R[s].look); }
+async function go(b){ if(busy||b<0||b>=R.length) return; busy=true; const a=s; if(a===0&&b>0&&arrive==null) arrive=performance.now(); s=b; step=0; paint();
+  if(R[b].look) await hover({x:R[b].x,y:R[b].y,z:R[b].z,rot:0});
+  else if(R[a].look){ const na=nodeAt(a-1,(R[a-1].pan?R[a-1].pan.length-1:0)), nb=nodeAt(b); await hover({x:NODES[na].x,y:NODES[na].y,z:.5,rot:R[a-1].rot},900); await travel(na,nb,{lift:.3}); await draw(LSEG[na],LSEG[nb]); }
+  else { const na=nodeAt(a,R[a].pan?(b>a?R[a].pan.length-1:0):0), nb=nodeAt(b,(b<a&&R[b].pan)?R[b].pan.length-1:0); await travel(na,nb); if(b>a) await draw(LSEG[na],LSEG[nb]); }
+  paint(true); busy=false; }
+async function next(){ if(busy) return; if(R[s].steps&&step<R[s].steps){ step++; busy=true; await travel(nodeAt(s,step-1),nodeAt(s,step),{lift:0,dur:900}); await draw(LSEG[nodeAt(s,step-1)],LSEG[nodeAt(s,step)]); busy=false; return; } go(s+1); }
+async function prev(){ if(busy) return; if(step){ step--; busy=true; await travel(nodeAt(s,step+1),nodeAt(s,step),{lift:0,dur:900}); busy=false; return; } go(s-1); }
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next();}else if(e.key==='ArrowLeft'){e.preventDefault();prev();}});
+let dragging=null;
+stage.addEventListener('click',e=>{ if(dragging||e.target.closest('#edit')) return; (e.clientX>innerWidth*.2?next:prev)(); });
+if(EDIT){
+  const panel=$('<div id="edit" style="position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:20;font:500 12px var(--jak);color:var(--ink);background:#fff;padding:8px 14px;border-radius:999px;box-shadow:0 0 0 1px var(--hair)">drag a disc · wheel over it to resize · Backspace over it deletes · C copies the layout · R resets</div>'); document.body.appendChild(panel);
+  const under=e=>{ const r=stage.getBoundingClientRect(), k=parseFloat(getComputedStyle(stage).getPropertyValue('--k'))||1; const x=(e.clientX-r.left)/k, y=(e.clientY-r.top)/k; let best=null,bd=1e9; DISCS.forEach((w,i)=>{ if(!w.sx||!w.sr) return; const d=Math.hypot(w.sx-x,w.sy-y); if(d<w.sr&&d<bd){bd=d;best=i;} }); return {i:best,x,y}; };
+  const save=()=>{ const o={}; DISCS.forEach((w,i)=>{ if(w.gone) o[i]={gone:1}; else if(w.moved) o[i]={x:Math.round(w.x),y:Math.round(w.y),r:Math.round(w.r)}; }); localStorage.setItem(SAVEKEY,JSON.stringify(o)); };
+  let hover={i:null}; stage.addEventListener('pointermove',e=>{ if(!dragging) hover=under(e); });
+  stage.addEventListener('pointerdown',e=>{ const u=under(e); if(u.i==null) return; e.preventDefault(); e.stopPropagation(); const w=DISCS[u.i]; dragging={i:u.i,x0:u.x,y0:u.y,wx:w.x,wy:w.y}; stage.setPointerCapture(e.pointerId); },true);
+  stage.addEventListener('pointermove',e=>{ if(!dragging) return; const u=under(e); const w=DISCS[dragging.i]; const cr=Math.cos(cam.rot*Math.PI/180), sr=Math.sin(cam.rot*Math.PI/180); const dx=(u.x-dragging.x0)/cam.z, dy=(u.y-dragging.y0)/cam.z;
+    w.x=dragging.wx+dx*cr-dy*sr; w.y=dragging.wy+dx*sr+dy*cr; w.moved=true; drawDiscs(); });
+  stage.addEventListener('pointerup',e=>{ if(!dragging) return; save(); setTimeout(()=>dragging=null,0); });
+  stage.addEventListener('wheel',e=>{ const u=under(e); if(u.i==null) return; e.preventDefault(); const w=DISCS[u.i]; w.r=Math.max(20,Math.min(260,w.r*(e.deltaY<0?1.04:.96))); w.moved=true; drawDiscs(); save(); },{passive:false});
+  addEventListener('keydown',e=>{ if(e.key==='c'||e.key==='C'){ const out=DISCS.map((w,i)=>({i,x:Math.round(w.x),y:Math.round(w.y),r:Math.round(w.r),cov:w.cov?1:0,gone:w.gone?1:0})); navigator.clipboard.writeText(JSON.stringify(out)); panel.textContent='layout copied'; setTimeout(()=>panel.textContent='drag a disc · wheel over it to resize · Backspace over it deletes · C copies the layout · R resets',1200); }
+    if(e.key==='r'||e.key==='R'){ localStorage.removeItem(SAVEKEY); location.reload(); }
+    if((e.key==='Backspace'||e.key==='Delete')&&hover.i!=null){ e.preventDefault(); DISCS[hover.i].gone=1; hover={i:null}; drawDiscs(); save(); } });
+}
+const start=Math.max(0,Math.min(R.length-1,(parseInt(q.get('r'))||1)-1));
+s=start; step=parseInt(q.get('step'))||0; if(start>0) arrive=-1e6;
+{ if(!R[s].pan) step=0; const n=R[s].look?nodeAt(LOOK-1,R[LOOK-1].pan?R[LOOK-1].pan.length-1:0):nodeAt(s,step); drawn=LSEG[n]; drawTo(drawn); ringP=s>=KNACK?1:0;
+  cam=R[s].look?{x:R[s].x,y:R[s].y,z:R[s].z,rot:0}:{x:NODES[n].x,y:NODES[n].y,z:R[s].z,rot:R[s].rot}; }
+secs.forEach((el,i)=>{ if(i<s) el.classList.add('seen'); }); paint(true); place();
+if(q.get('dbg')) setInterval(()=>{document.title=JSON.stringify({TM,s,step,cam:Object.fromEntries(Object.entries(cam).map(([k,v])=>[k,+v.toFixed(2)])),drawn:drawn|0,H:!!H,TOTAL:TOTAL|0,pts:pts.length,MPL:MP.map(m=>[m.L0|0,m.len|0]),PC:PIECES.length,GP:!!GP,LSEG:LSEG.map(v=>v|0),BOX:BOX.map(b=>b&&[b.l|0,b.r|0,b.t|0,b.b|0,b.ct|0])});},200);
+if(q.get('go')){ setTimeout(()=>{ next(); if(FR!=null) setTimeout(()=>document.getAnimations().forEach(a=>{a.pause();a.currentTime=FR;}),40); },900); }
+})();
+</script>
+</body>

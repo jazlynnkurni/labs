@@ -1,0 +1,39 @@
+<!doctype html><meta charset="utf-8"><title>intro · garden walk</title><link rel="stylesheet" href="common.css">
+<style>
+/* GARDEN WALK. One long landscape, five scenes wide, drawn in the Eden language: a low sun, soft
+   hills, a ground of clover grains. Advancing walks the camera one scene to the right; the far
+   hills move slowly, the ground quickly, so the walk has depth. The text sits in an outlined
+   card at each scene; the photographs stand on posts beside it. */
+.layer{position:absolute;left:0;top:0;height:720px;transition:transform 1.3s cubic-bezier(.65,0,.2,1);will-change:transform}
+#sky{width:1280px;height:720px;position:absolute;inset:0;background:linear-gradient(180deg,#F3F0E6 0%,#EDE9DC 55%,#E3E6D9 100%);transition:background 1.3s ease}
+#sun{position:absolute;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#E9D88A,#C9B04A 70%);opacity:.9;filter:blur(1px);transition:transform 1.3s cubic-bezier(.65,0,.2,1)}
+#far{width:6400px}#far i{position:absolute;bottom:230px;border-radius:50% 50% 0 0/100% 100% 0 0;background:#DADFD0}
+#mid{width:6400px}#mid i{position:absolute;bottom:200px;border-radius:50% 50% 0 0/100% 100% 0 0;background:#C9D3C0}
+#ground{width:6400px;bottom:0;top:auto;height:240px}#ground canvas{position:absolute;left:0;top:0}
+#near{width:6400px}
+.scene{position:absolute;top:0;width:1280px;height:720px}
+.scene .tx{position:absolute;left:90px;top:64px;width:560px}.scene .tx .box{background:rgba(255,255,255,.92)}
+.scene .lines{margin-top:10px;display:grid;gap:6px}.scene .lines p{font-size:15px;line-height:1.45}.scene .chips{margin-top:14px}.scene .dict{margin-bottom:12px}.scene .title{font-size:30px}.scene .dict .word{font-size:40px}.scene .dict .pron{font-size:15px;margin-top:4px}.scene .dict .def{display:none}
+.scene .pics{position:absolute;left:720px;top:120px;width:480px;height:480px}
+.scene .ph{position:absolute;width:220px;height:150px;box-shadow:0 14px 30px -18px rgba(20,23,27,.5)}
+.scene .ph::after{content:"";position:absolute;left:50%;top:100%;width:4px;height:200px;background:var(--oxblood);opacity:.5;transform:translateX(-50%)}
+.scene .p0{left:0;top:40px;transform:rotate(-2deg)}.scene .p1{left:250px;top:110px;transform:rotate(2deg)}.scene .p2{left:60px;top:260px;width:200px;height:136px;transform:rotate(1deg)}.scene .p3{left:290px;top:320px;width:180px;height:124px;transform:rotate(-1.5deg)}
+</style>
+<body><div id="stage"><div id="sky"></div><div id="sun"></div><div class="layer" id="far"></div><div class="layer" id="mid"></div><div class="layer" id="ground"><canvas width="6400" height="240"></canvas></div><div class="layer" id="near"></div></div>
+<div class="top"><a href="./">intro lab</a><span>/</span><b>garden walk</b></div>
+<script src="content.js"></script><script src="engine.js"></script>
+<script>
+(()=>{
+  const far=document.getElementById('far'), mid=document.getElementById('mid'), near=document.getElementById('near'), sun=document.getElementById('sun'), sky=document.getElementById('sky');
+  const SKIES=['linear-gradient(180deg,#F3F0E6,#EDE9DC 55%,#E3E6D9)','linear-gradient(180deg,#EFEFE3,#E9ECDF 55%,#DDE6DC)','linear-gradient(180deg,#F1EDE8,#ECE6E0 55%,#E2E4DC)','linear-gradient(180deg,#EEEEEC,#E6E8E6 55%,#DEE3E0)','linear-gradient(180deg,#F3F0E6,#EDE9DC 55%,#E3E6D9)'];
+  function hills(el,n,seed,h0,h1){ for(let k=0;k<n;k++){ const r=Math.abs(Math.sin(seed+k*7.3)); const i=document.createElement('i'); const w=360+r*520, h=h0+r*(h1-h0); i.style.cssText=`left:${k*(6400/n)-w*.3}px;width:${w}px;height:${h}px`; el.appendChild(i);} }
+  function clovers(){ const c=document.querySelector('#ground canvas').getContext('2d'); c.fillStyle='#CFD8C5'; c.fillRect(0,0,6400,240);
+    for(let k=0;k<5200;k++){ const x=Math.random()*6400, y=40+Math.pow(Math.random(),.7)*200, r=1.2+Math.random()*2.2*(y/240); c.fillStyle=Math.random()<.85?'#9ba69c':'#8f9484'; c.globalAlpha=.35+.5*(y/240);
+      for(let q=0;q<4;q++){ const a=q*Math.PI/2+.4; c.beginPath(); c.arc(x+Math.cos(a)*r,y+Math.sin(a)*r,r,0,Math.PI*2); c.fill(); } } c.globalAlpha=1; }
+  function build(slides,markup){ hills(far,9,1.3,120,260); hills(mid,12,4.1,60,150); clovers();
+    slides.forEach((s,i)=>{ const sc=document.createElement('section'); sc.className='scene'; sc.style.left=(i*1280)+'px'; sc.innerHTML=markup(s,i).replace('<div class="tx">','<div class="tx box">'); near.appendChild(sc); }); place(0); }
+  function place(i){ const x=i*1280; far.style.transform=`translateX(${-x*.25}px)`; mid.style.transform=`translateX(${-x*.55}px)`; document.getElementById('ground').style.transform=`translateX(${-x*.9}px)`; near.style.transform=`translateX(${-x}px)`;
+    sun.style.transform=`translate(${980-i*140}px,${90+Math.sin(i*.9)*60}px)`; sky.style.background=SKIES[i]; }
+  Intro.start({ build, go(a,b){ place(b); return new Promise(r=>setTimeout(r,1300)); }, jump(i){ document.querySelectorAll('.layer,#sun').forEach(l=>l.style.transition='none'); place(i); requestAnimationFrame(()=>document.querySelectorAll('.layer,#sun').forEach(l=>l.style.transition='')); } });
+})();
+</script></body>

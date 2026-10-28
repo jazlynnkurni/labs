@@ -1,0 +1,95 @@
+<!doctype html><meta charset="utf-8"><title>bubble · 01 instrument</title><link rel="stylesheet" href="bubble.css">
+<style>
+/* 01 INSTRUMENT. A flight instrument in white: hairline rings, ticks, and large light numerals. Blue is reserved for the
+   needle, the live value and the one primary action. Everything is on a 28px side margin and a 54px status bar. */
+.scr{font-feature-settings:"tnum"}
+.hd{position:absolute;left:28px;right:28px;top:84px;display:flex;justify-content:space-between;align-items:baseline}
+.hd .lab{color:var(--ink2)}
+.ring{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;box-shadow:inset 0 0 0 1px var(--hair)}
+.grid{position:absolute;left:28px;right:28px;top:150px;display:grid;grid-template-columns:1fr 1fr;gap:28px 20px}
+.grid .lab{margin-bottom:10px}
+.grid .num{font-size:44px}
+.cta{position:absolute;left:28px;right:28px;bottom:112px;display:grid;gap:12px}
+.dial{position:absolute;left:50%;top:252px;width:300px;height:300px;transform:translateX(-50%);border-radius:50%}
+.dial svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.dial .needle{position:absolute;left:50%;top:50%;width:2px;height:118px;background:var(--prussian);transform-origin:50% 100%;transform:translate(-50%,-100%) rotate(0deg);border-radius:1px}
+.dial .needle::after{content:"";position:absolute;left:50%;top:-5px;width:10px;height:10px;border-radius:50%;background:var(--prussian);transform:translateX(-50%)}
+.dial .hub{position:absolute;left:50%;top:50%;width:10px;height:10px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px var(--prussian);transform:translate(-50%,-50%)}
+.dial .ro{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;margin-top:62px}
+.dial .ro b{font:300 40px/1 var(--ui);letter-spacing:-.03em;display:block}
+.dial .ro span{font:500 11px var(--ui);letter-spacing:.14em;color:var(--ink3)}
+.alt{position:absolute;right:28px;top:252px;width:44px;height:300px}
+.alt .tr{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--hair);transform:translateX(-50%)}
+.alt .fill{position:absolute;left:50%;bottom:0;width:1px;background:var(--prussian);transform:translateX(-50%)}
+.alt .kn{position:absolute;left:50%;width:28px;height:28px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px var(--prussian);transform:translate(-50%,-50%)}
+.alt .tk{position:absolute;left:12px;right:12px;height:1px;background:var(--hair)}
+.alt .v{position:absolute;right:52px;font:300 15px var(--ui);color:var(--ink);white-space:nowrap;transform:translateY(-50%)}
+.list{position:absolute;left:28px;right:28px;top:150px}
+.it{display:grid;grid-template-columns:18px 1fr auto;align-items:center;gap:14px;height:64px;border-bottom:1px solid var(--hair)}
+.it .dot{opacity:0}.it.on .dot{opacity:1}
+.it b{font:500 16px var(--ui);display:block;letter-spacing:-.01em}.it small{font:400 12.5px var(--ui);color:var(--ink3)}
+.it .eta{font:300 18px var(--ui)}
+.land .num{font-size:96px}
+.land .bar{position:absolute;left:28px;right:28px;top:470px;height:1px;background:var(--hair)}
+.land .bar i{position:absolute;left:0;top:0;height:1px;width:34%;background:var(--prussian)}
+</style>
+<div class="top"><a href="./">bubble</a><span>/</span><b>01 instrument</b></div>
+<div class="brief">drag the dial to set a heading · drag the scale for altitude · tap a destination</div>
+<div class="row" id="row"></div>
+<script src="bubble.js"></script>
+<script>
+const $=h=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild};
+const sb=`<div class="sb"><span>9:41</span><div class="isl"></div><span style="font-weight:500;color:var(--ink3)">●●●</span></div>`;
+const hb=`<div class="hb"></div>`;
+const tabs=(on)=>`<div class="tabbar">${['Home','Fly','Route','Bubble'].map(t=>`<span class="${t===on?'on':''}"><i></i>${t}</span>`).join('')}</div>`;
+const ph=(name,inner,cls='')=>$(`<div class="ph"><div class="nm">${name}</div><div class="scr ${cls}">${sb}${inner}${hb}</div></div>`);
+const row=document.getElementById('row');
+/* pair */
+row.appendChild(ph('01 · Pair',`
+  <div class="hd"><span class="lab">Bubble</span><span class="lab">Searching</span></div>
+  <div class="ring" style="width:300px;height:300px"></div><div class="ring" style="width:200px;height:200px"></div><div class="ring" style="width:100px;height:100px"></div>
+  <div class="ring" style="width:14px;height:14px;background:var(--prussian);box-shadow:none" ></div>
+  <div class="pad" style="top:604px"><div class="d1">Bubble 7 is nearby.</div><div style="margin-top:8px;color:var(--ink2)">120 ft, over Amsterdam Avenue.</div></div>
+  <div class="cta" style="bottom:48px"><button class="btn">Connect</button></div>`));
+/* home */
+row.appendChild(ph('02 · Home',`
+  <div class="hd"><span class="lab">Bubble 7</span><span class="lab" style="color:var(--prussian)">● Connected</span></div>
+  <div class="grid">
+    <div><div class="lab">Altitude</div><div class="num">412<small>ft</small></div></div>
+    <div><div class="lab">Shimmer</div><div class="num">84<small>%</small></div></div>
+    <div><div class="lab">Heading</div><div class="num">032<small>NE</small></div></div>
+    <div><div class="lab">Wind</div><div class="num">6<small>kn</small></div></div>
+    <div style="grid-column:1/-1"><div class="lab">Over</div><div class="d2">Morningside Heights</div></div>
+  </div>
+  <div class="cta"><button class="btn">Summon</button><button class="btn ghost">Plan a route</button></div>
+  ${tabs('Home')}`));
+/* fly */
+const fly=ph('03 · Fly',`
+  <div class="hd"><span class="lab">Heading</span><span class="lab">Altitude</span></div>
+  <div class="dial" id="dial"><svg viewBox="0 0 300 300">${Array.from({length:72},(_,i)=>{const a=i*5*Math.PI/180, R=150, l=i%18===0?16:i%6===0?10:5; return `<line x1="${150+Math.sin(a)*(R-l)}" y1="${150-Math.cos(a)*(R-l)}" x2="${150+Math.sin(a)*R}" y2="${150-Math.cos(a)*R}" stroke="${i%18===0?'#0E1B26':'rgba(14,27,38,.3)'}" stroke-width="1"/>`;}).join('')}
+    ${['N','E','S','W'].map((c,i)=>{const a=i*90*Math.PI/180;return `<text x="${150+Math.sin(a)*118}" y="${150-Math.cos(a)*118+5}" text-anchor="middle" font-family="Inter" font-size="13" font-weight="500" fill="#0E1B26">${c}</text>`;}).join('')}</svg>
+    <div class="needle" id="needle"></div><div class="hub"></div>
+    <div class="ro"><b id="hv">032°</b><span id="hc">NE</span></div></div>
+  <div class="alt" id="alt"><div class="tr"></div>${[0,.25,.5,.75,1].map(t=>`<div class="tk" style="top:${(1-t)*100}%"></div>`).join('')}<div class="fill" id="afill"></div><div class="kn" id="akn"></div><div class="v" id="av">412 ft</div></div>
+  <div class="pad" style="top:590px;right:96px;display:flex;justify-content:space-between;align-items:baseline"><div><div class="lab">Speed</div><div class="num" style="font-size:40px">14<small>mph</small></div></div><div><div class="lab">ETA</div><div class="num" style="font-size:40px">9<small>min</small></div></div></div>
+  <div class="cta" style="bottom:100px"><button class="btn lo">Hold position</button></div>
+  ${tabs('Fly')}`);
+row.appendChild(fly);
+B.dial(fly.querySelector('#dial'),a=>{fly.querySelector('#needle').style.transform=`translate(-50%,-100%) rotate(${a}deg)`;fly.querySelector('#hv').textContent=String(Math.round(a)).padStart(3,'0')+'°';fly.querySelector('#hc').textContent=B.compass(a);});
+B.vslider(fly.querySelector('#alt'),v=>{const ft=Math.round(60+v*1140); fly.querySelector('#afill').style.height=(v*100)+'%'; fly.querySelector('#akn').style.top=((1-v)*100)+'%'; const av=fly.querySelector('#av'); av.style.top=((1-v)*100)+'%'; av.textContent=ft+' ft';},.31);
+/* route */
+const route=ph('04 · Route',`
+  <div class="hd"><span class="lab">Where to</span><span class="lab">From Morningside</span></div>
+  <div class="list" id="list">${[['Central Park','The Great Lawn','4'],['Washington Square','Greenwich Village','11'],['Williamsburg','Galleries, N 6th','19'],['Brooklyn Bridge','South tower','16'],['Pier 17','Seaport','18'],['Rockaway Beach','Queens','38']].map((d,i)=>`<div class="it ${i===2?'on':''}"><i class="dot"></i><div><b>${d[0]}</b><small>${d[1]}</small></div><span class="eta">${d[2]}<small style="color:var(--ink3)"> min</small></span></div>`).join('')}</div>
+  <div class="cta"><button class="btn" id="goto">Fly to Williamsburg</button></div>
+  ${tabs('Route')}`);
+row.appendChild(route);
+route.querySelectorAll('.it').forEach(it=>it.addEventListener('click',()=>{route.querySelectorAll('.it').forEach(x=>x.classList.remove('on'));it.classList.add('on');route.querySelector('#goto').textContent='Fly to '+it.querySelector('b').textContent;}));
+/* land */
+row.appendChild(ph('05 · Land',`
+  <div class="hd"><span class="lab">Descending</span><span class="lab">Williamsburg</span></div>
+  <div class="pad" style="top:300px"><div class="lab">Height above N 6th Street</div><div class="num">138<small>ft</small></div></div>
+  <div class="bar"><i></i></div>
+  <div class="pad" style="top:500px;color:var(--ink2)">Clear below. Touching down in 40 seconds.</div>
+  <div class="cta"><button class="btn">Land</button><button class="btn ghost">Hold at 100 ft</button></div>`,'land'));
+</script>

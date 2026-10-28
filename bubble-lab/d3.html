@@ -1,0 +1,61 @@
+<!doctype html><meta charset="utf-8"><title>bubble · 03 transit</title><link rel="stylesheet" href="bubble.css">
+<style>
+/* 03 TRANSIT. The city's own wayfinding: a bullet for the line, stops on a strip, bold names, one full-width GO.
+   Prussian is the line colour; the strip is drawn in it, the current position is a white dot inside it. */
+.bul{width:44px;height:44px;border-radius:50%;background:var(--prussian);color:#fff;display:grid;place-items:center;font:600 22px var(--ui)}
+.hd{position:absolute;left:28px;right:28px;top:88px;display:flex;align-items:center;gap:14px}
+.hd b{font:600 26px/1.1 var(--ui);letter-spacing:-.02em;display:block}.hd small{font:400 13px var(--ui);color:var(--ink2)}
+.strip{position:absolute;left:28px;right:28px;top:170px}
+.stop{display:grid;grid-template-columns:44px 1fr auto;align-items:center;min-height:72px;position:relative}
+.stop::before{content:"";position:absolute;left:21px;top:0;bottom:0;width:4px;background:var(--prussian)}
+.stop:first-child::before{top:50%}.stop:last-child::before{bottom:50%}
+.stop i{width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px var(--prussian);margin-left:16px;position:relative}
+.stop.here i{width:20px;height:20px;margin-left:13px;background:var(--prussian);box-shadow:0 0 0 3px var(--prussian),inset 0 0 0 4px #fff}
+.stop.past i{background:var(--prussian)}
+.stop b{font:600 18px var(--ui);letter-spacing:-.015em;display:block}.stop small{font:400 12.5px var(--ui);color:var(--ink2)}
+.stop .t{font:500 14px var(--ui);color:var(--ink2)}
+.stop.here .t{color:var(--prussian)}
+.go{position:absolute;left:0;right:0;bottom:0;height:120px;background:var(--prussian);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 28px 20px}
+.go b{font:600 34px var(--ui);letter-spacing:-.02em}.go span{font:400 14px var(--ui);opacity:.75}
+.sign{position:absolute;left:28px;right:28px;top:170px;background:var(--prussian);color:#fff;border-radius:16px;padding:22px 24px}
+.sign .lab{color:rgba(255,255,255,.6)}.sign b{font:600 32px/1.1 var(--ui);letter-spacing:-.02em;display:block;margin:8px 0 4px}.sign span{font:400 14px var(--ui);opacity:.8}
+.ctl{position:absolute;left:28px;right:28px;top:340px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ctl button{height:88px;border-radius:16px;border:0;background:var(--p08);color:var(--prussian);font:600 17px var(--ui);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;padding:16px;gap:4px}
+.ctl button small{font:400 12px var(--ui);color:var(--p70)}
+.ctl button.on{background:var(--prussian);color:#fff}.ctl button.on small{color:rgba(255,255,255,.7)}
+.big{position:absolute;left:28px;right:28px;top:200px}
+.big .lab{color:var(--ink2)}.big b{font:600 54px/1.05 var(--ui);letter-spacing:-.03em;display:block;margin:10px 0}
+.nxt{position:absolute;left:28px;right:28px;top:560px;border-top:1px solid var(--hair);padding-top:14px;display:flex;justify-content:space-between;font:400 14px var(--ui);color:var(--ink2)}
+</style>
+<div class="top"><a href="./">bubble</a><span>/</span><b>03 transit</b></div>
+<div class="brief">tap a stop to make it the destination · the strip is the route, the dot is where the bubble is</div>
+<div class="row" id="row"></div>
+<script src="bubble.js"></script>
+<script>
+const $=h=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild};
+const sb=`<div class="sb"><span>9:41</span><div class="isl"></div><span style="font-weight:500;color:var(--ink3)">●●●</span></div>`, hb=`<div class="hb" style="background:#fff"></div>`, hbk=`<div class="hb"></div>`;
+const ph=(name,inner,dark)=>$(`<div class="ph"><div class="nm">${name}</div><div class="scr">${sb}${inner}${dark?hb:hbk}</div></div>`);
+const row=document.getElementById('row');
+const STOPS=[['Morningside Heights','116 St',0],['Central Park','The Great Lawn',4],['Washington Square','Greenwich Village',11],['Brooklyn Bridge','South tower',16],['Williamsburg','N 6th St',19],['Pier 17','Seaport',18]];
+row.appendChild(ph('01 · Pair',`<div class="hd"><div class="bul">B</div><div><b>Bubble line</b><small>Bubble 7 · arriving at 116 St</small></div></div>
+  <div class="sign"><div class="lab">Next bubble</div><b>2 min</b><span>Amsterdam Av side</span></div>
+  <div class="big" style="top:380px"><div class="lab">Then</div><b style="font-size:28px">Tap connect when it hovers.</b></div>
+  <div class="go"><b>Connect</b><span>Bubble 7</span></div>`,true));
+const home=ph('02 · Home',`<div class="hd"><div class="bul">B</div><div><b>Now over</b><small>Central Park North · 412 ft · shimmer 84%</small></div></div>
+  <div class="strip">${STOPS.slice(0,5).map((s,i)=>`<div class="stop ${i<1?'past':i===1?'here':''}"><i></i><div><b>${s[0]}</b><small>${s[1]}</small></div><span class="t">${i<=1?'':s[2]+' min'}</span></div>`).join('')}</div>
+  <div class="go"><b>Summon</b><span>to 116 St</span></div>`,true);
+row.appendChild(home);
+row.appendChild(ph('03 · Fly',`<div class="hd"><div class="bul">B</div><div><b>Flying</b><small>to Williamsburg · 19 min</small></div></div>
+  <div class="sign"><div class="lab">Next</div><b>Washington Square</b><span>in 7 min · 412 ft · 14 mph</span></div>
+  <div class="ctl"><button class="on">Continue<small>on the line</small></button><button>Hold<small>stay here</small></button><button>Faster<small>18 mph</small></button><button>Higher<small>600 ft</small></button></div>
+  <div class="go"><b>Go</b><span>next stop</span></div>`,true));
+const route=ph('04 · Route',`<div class="hd"><div class="bul">B</div><div><b>Service map</b><small>from Morningside Heights</small></div></div>
+  <div class="strip" id="strip">${STOPS.map((s,i)=>`<div class="stop ${i===0?'here':i===4?'on':''}" data-n="${s[0]}"><i></i><div><b>${s[0]}</b><small>${s[1]}</small></div><span class="t">${i===0?'you':s[2]+' min'}</span></div>`).join('')}</div>
+  <div class="go"><b id="gob">Go</b><span id="gos">to Williamsburg</span></div>`,true);
+row.appendChild(route);
+route.querySelectorAll('.stop:not(.here)').forEach(st=>st.addEventListener('click',()=>{route.querySelector('#gos').textContent='to '+st.dataset.n;}));
+row.appendChild(ph('05 · Land',`<div class="hd"><div class="bul">B</div><div><b>Arriving</b><small>Williamsburg · N 6th St</small></div></div>
+  <div class="big"><div class="lab">Height</div><b>138 ft</b><span style="color:var(--ink2)">Clear below. 40 seconds.</span></div>
+  <div class="nxt"><span>This is the last stop.</span><span>Shimmer 71%</span></div>
+  <div class="go"><b>Land</b><span>doors open on the left</span></div>`,true));
+</script>

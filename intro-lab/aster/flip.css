@@ -1,0 +1,47 @@
+/* ---- the flip phone, from flip-lab: closed until the reader comes near ---- */
+:root{--shell-a:#5a1d2c;--shell-b:#340414;--shell-c:#22030d;--key:#3f0c1b;--lx:50%;--ly:30%;--hx:-1px;--hy:-1px}
+/* ---------- the stage ---------- */
+.ab .flip-stage{aspect-ratio:1/1.18;display:grid;place-items:center;perspective:1500px;perspective-origin:50% 40%;user-select:none;touch-action:none}
+.ab .phone{position:relative;width:236px;height:236px;margin-top:180px;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+/* the shell: matte plastic, lit from the cursor. Four custom properties carry the light. */
+.ab .shell{background:linear-gradient(180deg,var(--shell-a) 0%,var(--shell-b) 40%,var(--shell-c) 100%);border-radius:30px;
+  box-shadow:inset var(--hx) var(--hy) 2px -.5px rgba(255,252,246,.16),inset calc(var(--hx)*-1) calc(var(--hy)*-1) 3px -1px rgba(0,0,0,.6),0 30px 60px -20px rgba(0,0,0,.45)}
+.ab .shell::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(130% 100% at var(--lx) var(--ly),rgba(255,252,246,.09),rgba(255,252,246,.02) 45%,transparent 70%)}
+/* BASE: keypad half. Stands upright; the hinge is its top edge. */
+.ab .base{position:absolute;left:0;top:0;width:236px;height:236px;transform-style:preserve-3d}
+.ab .base .shell{position:absolute;inset:0;border-radius:18px 18px 30px 30px;transform:translateZ(14px)}
+.ab .base .slab{position:absolute;inset:0;border-radius:18px 18px 30px 30px;background:var(--shell-c);transform:translateZ(0)}
+.ab .base .keys,.base .hinge{transform:translateZ(14px)}
+/* phones: above the shell (14px), since at the same depth Safari can paint the shell over the keys; desktop stays at 14px */
+@media(max-width:640px),(hover:none){.ab .base .keys,.base .hinge{transform:translateZ(15.5px)}}
+.ab .keys{position:absolute;left:22px;right:22px;top:26px;bottom:22px;display:grid;grid-template-rows:auto 1fr;gap:12px}
+.ab .nav{display:grid;grid-template-columns:44px 1fr 44px;gap:8px;align-items:center;justify-items:center}
+.ab .nav .ring{width:78px;height:78px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#3b3936,#1b1a19 70%);box-shadow:inset 0 1px 1px rgba(255,255,255,.12),inset 0 -2px 3px rgba(0,0,0,.6),0 2px 3px rgba(0,0,0,.5);display:grid;place-items:center;position:relative}
+.ab .nav .ring i{position:absolute;width:5px;height:5px;border-radius:50%;background:rgba(255,252,246,.28)}
+.ab .nav .ring i:nth-child(1){top:8px}.nav .ring i:nth-child(2){bottom:8px}.nav .ring i:nth-child(3){left:8px}.nav .ring i:nth-child(4){right:8px}
+.ab .nav .ring b{width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#4a4744,#262421);box-shadow:0 1px 2px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.14);cursor:pointer}
+.ab .nav .ring b:active{transform:translateY(1px)}
+.ab .soft{width:44px;height:26px;border-radius:9px;background:var(--key);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 2px 2px rgba(0,0,0,.5);display:grid;place-items:center;color:rgba(255,252,246,.55);cursor:pointer}
+.ab .soft:active{transform:translateY(1px)}
+.ab .soft svg{width:16px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+.ab .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 8px}
+.ab .pad span{height:100%;min-height:22px;border-radius:7px;background:var(--key);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 2px 2px rgba(0,0,0,.5);display:grid;place-items:center;font:500 12px var(--jak);color:rgba(255,252,246,.55)}
+.ab .hinge{position:absolute;left:14px;right:14px;top:-7px;height:14px;border-radius:7px;background:linear-gradient(180deg,#2c2a27,#151413);box-shadow:0 1px 2px rgba(0,0,0,.6)}
+/* LID: screen half. Hangs from the hinge; closed it lies over the base, open it stands above it. */
+.ab .lid{position:absolute;left:0;bottom:236px;width:236px;height:236px;transform-origin:50% 100%;transform-style:preserve-3d;
+  transform:translateZ(14px) rotateX(180deg);will-change:transform}
+.ab .lid .edge{position:absolute;left:14px;right:14px;top:0;height:12px;transform-origin:50% 0;transform:rotateX(-90deg);background:linear-gradient(90deg,var(--shell-c),var(--shell-b) 30%,var(--shell-b) 70%,var(--shell-c));border-radius:0 0 4px 4px}
+.ab .lid .face{position:absolute;inset:0}
+.ab .lid.shut .in{visibility:hidden}
+.ab .lid:not(.shut) .out{visibility:hidden}
+.ab .lid .in.shell{border-radius:30px 30px 18px 18px;transform:translateZ(0)}
+.ab .lid .out.shell{border-radius:18px 18px 30px 30px;transform:rotateX(180deg) translateZ(12px)}
+.ab .screen{position:absolute;left:18px;right:18px;top:18px;bottom:22px;border-radius:16px;overflow:hidden;background:#0d0c0b;box-shadow:0 1px 0 rgba(255,252,246,.06),0 -1px 0 rgba(0,0,0,.5)}
+.ab .screen canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.ab .screen img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.1)}
+.ab .glare{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.1),transparent 38%)}
+.ab .ext{position:absolute;left:50%;top:34px;width:120px;height:44px;transform:translateX(-50%);border-radius:10px;background:#0d0c0b;box-shadow:inset 0 0 0 1px rgba(255,252,246,.06);
+  display:grid;place-items:center;font:600 13px var(--jak);letter-spacing:.06em;color:rgba(200,214,178,.85);text-shadow:0 0 8px rgba(200,214,178,.35)}
+.ab .cam{position:absolute;left:50%;top:104px;width:12px;height:12px;border-radius:50%;transform:translateX(-50%);background:radial-gradient(circle at 40% 35%,#3c4448,#0b0d0e 65%);box-shadow:0 0 0 3px #1b1a19,0 0 0 4px rgba(255,255,255,.06)}
+.ab .brand{position:absolute;left:0;right:0;bottom:24px;text-align:center;font:600 9px var(--jak);letter-spacing:.3em;color:rgba(255,252,246,.28)}

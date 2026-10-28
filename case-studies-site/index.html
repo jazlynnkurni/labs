@@ -21,6 +21,11 @@
 #load .lc:last-child::after{content:"";position:absolute;right:0;top:0;bottom:0;width:1px;background:var(--hair);transform:scaleY(0);transform-origin:top;animation:ld-stem 420ms var(--ease) forwards;animation-delay:calc(var(--d) + 70ms)}
 #load .lc.on{background:var(--flick-b)}#load .lc.on.g{background:var(--flick-a)}
 #load span{font:300 12.5px "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.08em;color:var(--ink3)}
+#load.gone{animation:ld-out .52s ease forwards}@keyframes ld-out{from{opacity:1}to{opacity:0}}
+/* arriving from the sign-in: the covers wait behind the loader, then come up */
+body.arrive .c{opacity:0;transform:translateY(14px)}
+body.arrive.shown .c{opacity:1;transform:none;transition:opacity .6s ease,transform .7s var(--ease)}
+body.arrive.shown .c.b{transition-delay:.08s}
 @keyframes ld-in{to{opacity:1}}@keyframes ld-rule{to{transform:scaleX(1)}}@keyframes ld-stem{to{transform:scaleY(1)}}
 @media(prefers-reduced-motion:reduce){#load,#load .ld i,#load .lc::before,#load .lc:last-child::after{animation:none;transform:none;opacity:1}}
 </style></head><body>
@@ -63,7 +68,11 @@ fine.addEventListener('change',sync); sync();
     Object.assign(clone.style,{left:(innerWidth-W)/2+'px',top:(innerHeight-H)/2+'px',width:W+'px',borderRadius:'0px',boxShadow:'none'}); }));
   setTimeout(()=>loader(href),850);
 }));
-function loader(href){
+/* ARRIVAL. Straight from the sign-in the chooser opens on the jazlynnwashere.com loader, the same rules, stems and inked
+   cells, and only when the bar has swept does it lift to show the two covers. The flag is read once and cleared from the URL. */
+if(location.search==='?in'){ history.replaceState(null,'',location.pathname); document.body.classList.add('arrive');
+  loader(null,()=>{ const host=document.getElementById('load'); host.classList.add('gone'); document.body.classList.add('shown'); setTimeout(()=>host.remove(),600); }); }
+function loader(href,done){
   const host=document.createElement('div'); host.id='load'; host.innerHTML='<div class="ld"><i class="head"></i><i class="foot"></i></div><span>loading</span>'; document.body.appendChild(host);
   const row=host.querySelector('.ld'); const N=7, cells=[];
   for(let i=0;i<N;i++){ const c=document.createElement('span'); c.className='lc'; c.style.setProperty('--d',(120+i*60)+'ms'); row.appendChild(c); cells.push(c); }
@@ -75,7 +84,7 @@ function loader(href){
     for(let i=0;i<N;i++) cells[i].style.width=(ws[i]/sum*W).toFixed(1)+'px';
     const want=Math.min(N-1,Math.floor((t-.45)/.11)); while(inked<want){ inked++; cells[inked].classList.add('on'); }
     if(t<1.6) requestAnimationFrame(frame); })(t0);
-  setTimeout(()=>{ location.href=href; },1250);
+  setTimeout(()=>{ if(done) done(); else location.href=href; },href?1250:1650);
 }
 /* back from a deck: the browser may restore this page mid-click, so put it back as it was */
 addEventListener('pageshow',e=>{ if(!e.persisted) return; document.querySelectorAll('#load,body>.c').forEach(n=>n.remove());

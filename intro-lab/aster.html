@@ -1,0 +1,261 @@
+<!doctype html><meta charset="utf-8"><title>intro · discs</title><link rel="stylesheet" href="common.css"><link rel="stylesheet" href="aster/flip.css">
+<style>
+/* DISCS. The Angelina Wu deck's grammar in jazlynnwashere.com's material. Paper ground, Plus Jakarta Sans
+   headings in sentence case, Helvetica Neue body, the site's small caps labels. Her persistent element is
+   not a field of asterisks but the home page's frosted riso discs, drawn by the site's own shader: they
+   drift to a new arrangement on every slide of the opening act, form a ring on the fourth, and leave
+   upward when the sections start. The cover is the home page's letter wall spelling her name beside the
+   about page's flip phone. Text swaps by a right-to-left wipe, sections push upward with staggered
+   children, the photo slide steps focus, the collage pops in. */
+:root{--row:52px;--ease:cubic-bezier(.45,0,.15,1)}
+#stage{background:var(--paper);color:var(--ink)}
+#discs{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+#deck{position:absolute;inset:0}
+.sl{position:absolute;inset:0;display:none}.sl.on{display:block}
+.sl>*{position:absolute}
+.h{font-family:var(--jak);font-weight:500;letter-spacing:-.015em;color:var(--ink);text-wrap:balance}
+.label{font-family:var(--jak);font-weight:600;font-size:10.5px;line-height:1.5;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+.plain{font:300 17px/1.5 var(--hel);color:var(--ink2)}
+.hl{background:var(--gold);color:var(--paper);padding:0 8px 2px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.plate{background:#EFEDE8;outline:1px solid var(--outline);outline-offset:-1px;border-radius:0;overflow:hidden;display:grid;place-items:center}
+.plate img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0}
+.plate span{font:600 10px var(--jak);letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);position:relative;text-align:center;padding:0 12px}
+/* the letter wall, from the home page */
+.wall{display:flex;flex-direction:column;gap:calc(var(--row) * .2)}
+.line{display:flex;align-items:stretch}
+.cell{flex:0 0 auto;height:var(--row);transition:background 140ms ease;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);border-left:1px solid var(--hair);display:flex;align-items:center;overflow:hidden;will-change:width}
+.cell:last-child{border-right:1px solid var(--hair)}
+.ch{font-family:var(--hel);font-weight:400;font-size:calc(var(--row) * .9);line-height:1;color:var(--ink);position:relative;transition:color 140ms ease;padding-left:1.5px;white-space:pre}
+/* cover */
+.cov .wall{left:0;right:0;top:300px;align-items:center}
+.cov .sub{left:0;right:0;top:262px;text-align:center}
+.ab{left:50%;bottom:-40px;width:320px;height:600px;transform:translate(-50%,760px) scale(1.1);transform-origin:50% 100%;z-index:5}
+.ab .flip-stage{width:320px;height:600px;aspect-ratio:auto}
+/* THE CALL. The slide dims, the phone rattles up from the bottom edge, and on the next advance its screen becomes the next slide. */
+.sl.dim>*:not(.ab){opacity:.3;transition:opacity .5s}
+@keyframes rattle{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(-2px,-1px) rotate(-1.4deg)}50%{transform:translate(1px,1px) rotate(1.1deg)}75%{transform:translate(2px,-1px) rotate(-.9deg)}100%{transform:translate(0,0) rotate(0)}}
+#fstage.ring{animation:rattle .09s linear infinite}
+/* salam: the greeting set like a dictionary entry */
+.salam .dict{left:0;right:0;top:238px;text-align:center}
+.salam .wd{font-family:var(--jak);font-weight:500;font-size:48px;letter-spacing:-.02em;color:var(--ink)}
+.salam .pr{font:300 20px/1.6 var(--hel);color:var(--ink2);margin-top:12px}
+.salam .pr i{font-style:italic;color:var(--ink3);margin-left:16px}
+.salam .df{font:300 26px/1.5 var(--hel);color:var(--ink);margin:26px auto 0;max-width:620px}
+.salam .df b{font-weight:400;color:var(--ink3);margin-right:10px}
+/* hello */
+.hi .say{left:0;right:0;top:306px;text-align:center;font-size:34px;line-height:1.45}
+/* forefront: the headline, then the two marks pop in */
+.fore .t{left:160px;width:960px;top:250px;text-align:center;font-size:30px;line-height:1.4}
+.fore .marks{left:0;right:0;top:400px;display:flex;justify-content:center;gap:18px;opacity:0;transform:translateY(12px);transition:opacity .45s var(--ease),transform .45s var(--ease)}
+.fore.f1 .marks{opacity:1;transform:none}
+.fore .marks .tile{width:56px;height:56px;border-radius:12px;background:#fff;outline:1px solid var(--outline);display:grid;place-items:center;font:600 15px var(--jak);color:var(--ink)}
+.tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tile{position:relative;overflow:hidden}
+/* taste, inside the ring of discs */
+.taste .k{left:300px;width:680px;top:272px;text-align:center;font-size:30px;line-height:1.4}
+/* build */
+.build .t{left:0;right:0;top:60px;text-align:center;font-size:28px;line-height:1.35}
+.build .gh{left:130px;top:178px;width:1020px;height:290px;border-radius:12px}
+.build .stack{left:0;right:0;top:490px;text-align:center}
+.build .tools{left:0;right:0;top:520px;display:flex;justify-content:center;align-items:flex-start;gap:26px}
+.build .tool{display:flex;flex-direction:column;align-items:center;gap:8px;width:96px}
+.build .tool .tile{width:52px;height:52px;border-radius:12px;background:#fff;color:var(--ink);outline:1px solid var(--outline);display:grid;place-items:center;font:600 13px var(--jak)}
+.build .tool .nm{font:400 12.5px/1.3 var(--hel);color:var(--ink2);text-align:center}
+.build .tools .plain{font-size:15px;color:var(--ink);align-self:center;margin-left:6px;line-height:52px}
+/* focus slides: art and communities step through their photo groups */
+.foc .t{left:0;right:0;top:60px;text-align:center;font-size:30px}
+.foc.art .t{top:44px;left:140px;right:140px;font-size:27px;line-height:1.35}
+.foc .plate{transition:filter .5s var(--ease),opacity .5s}
+.foc .cap{opacity:0;transition:opacity .4s}
+.foc.f1 .plate:not(.g1),.foc.f2 .plate:not(.g2),.foc.f3 .plate:not(.g3){filter:blur(9px);opacity:.35}
+.foc.f1 .cap.g1,.foc.f2 .cap.g2,.foc.f3 .cap.g3{opacity:1}
+/* medium */
+.med .k{left:160px;width:960px;top:280px;text-align:center;font-size:32px;line-height:1.4}
+/* projects */
+.proj .t{left:0;right:0;top:336px;text-align:center;font-size:30px;z-index:2;text-shadow:0 0 24px var(--paper),0 0 10px var(--paper)}
+/* adventurer */
+.adv .k{left:0;right:0;top:330px;text-align:center;font-size:34px}
+/* cases */
+.cases .t{left:0;right:0;top:78px;text-align:center;font-size:30px}
+.cases .card{width:560px;height:400px}
+.cases .card .plate{position:absolute;left:0;top:0;width:560px;height:346px;border-radius:12px}
+.cases .card .cap{position:absolute;left:0;right:0;top:362px;display:flex;justify-content:space-between;font:400 13.5px var(--hel);color:var(--ink)}
+.cases .card .cap i{font:300 13px var(--hel);color:var(--ink3);font-style:normal}
+.dots i{background:rgba(20,23,27,.15)}.top,.top a,.top b{color:var(--ink3)}.top b{color:var(--ink)}.hint{color:var(--ink3)}
+</style>
+<body><div id="stage"><canvas id="discs"></canvas><div id="deck"></div></div>
+<div class="top"><a href="./">intro lab</a><span>/</span><b>discs</b></div><div class="dots"></div><div class="hint">click, space or → to advance · ← back</div>
+<script>
+(()=>{
+const $=(h)=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild};
+const stage=document.getElementById('stage'),deck=document.getElementById('deck');
+const fit=()=>stage.style.setProperty('--k',Math.min(innerWidth/1280,innerHeight/720)*0.96);addEventListener('resize',fit);fit();
+const img=(src)=>`<img src="${src}" onerror="this.remove()" alt="">`;
+const plate=(cls,src,label,style)=>`<div class="plate ${cls}" style="${style}">${src?img(src):''}<span>${label}</span></div>`;
+const FLIP=`<div class="flip-stage" id="fstage" aria-label="A flip phone open on six photographs; the keys change the photo."><div class="phone" id="phone">
+            <div class="base">
+              <div class="slab"></div>
+              <div class="shell"></div>
+              <div class="hinge"></div>
+              <div class="keys">
+                <div class="nav">
+                  <div class="soft" id="prev" title="Previous"><svg viewBox="0 0 26 18"><path d="M11.5 2.6 3.4 9l8.1 6.4V2.6ZM22.6 2.6 14.5 9l8.1 6.4V2.6Z"/></svg></div>
+                  <div class="ring"><i></i><i></i><i></i><i></i><b id="play" title="Pause"></b></div>
+                  <div class="soft" id="next" title="Next"><svg viewBox="0 0 26 18"><path d="M3.4 2.6 11.5 9l-8.1 6.4V2.6ZM14.5 2.6 22.6 9l-8.1 6.4V2.6Z"/></svg></div>
+                </div>
+                <div class="pad"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>*</span><span>0</span><span>#</span></div>
+              </div>
+            </div>
+            <div class="lid" id="lid">
+              <div class="face in shell">
+                <div class="screen" id="screen"><img id="fallback" src="aster/about/camera.jpg" alt=""><div class="glare"></div></div>
+                <div class="brand">JAZLYNN</div>
+              </div>
+              <div class="face out shell">
+                <div class="ext" id="ext">--:--</div>
+                <div class="cam"></div>
+              </div>
+            </div>
+          </div>
+    </div>`;
+
+/* ---------- the slides, in her order, with Jaz's facts ---------- */
+const SL=[
+ /* on-screen text is her bold lines from the DoorDashScript doc, nothing more; the rest is spoken */
+ {cls:'cov',disc:'below',html:`<div class="wall" id="wall"></div><div class="sub label">Portfolio presentation</div>`},
+ {cls:'salam',in:'lift',disc:1,html:`<div class="dict k"><div class="wd">Salam kenal</div><div class="pr">/sa·lam kə·nal/<i>interjection · Indonesian</i></div><div class="df"><b>1.</b>Hello!</div></div>`},
+ {cls:'hi',in:'wipe',disc:2,html:`<div class="say h k">I’m Jazlynn, and I make<br><span class="hl">charming designs.</span></div>`},
+ {cls:'fore',in:'lift',steps:1,disc:4,html:`<div class="t h k">I’ve always somehow found myself at the <span class="hl">forefront of innovation</span> right before they become the next big thing.</div>
+   <div class="marks"><div class="tile">${img('aster/marks/manus-mark.svg')}</div><div class="tile">${img('aster/marks/yhacks.png')}Y</div></div>`},
+ {cls:'taste',in:'wipe',disc:3,html:`<div class="k h">I have a knack for recognizing what people might want <span class="hl">before they even realize they need it.</span></div>`},
+ {cls:'build',in:'push',html:`<div class="t h">Design comes to me instinctively,<br>but coding is something I’ve grown to love.</div>
+   <div class="gh plate">${img('aster/pics/github.png')}<span>GitHub contributions, last year · pics/github.png</span></div>
+   <div class="stack label">Here’s my stack</div>
+   <div class="tools" data-from="top">${[['Claude Code','claude','CC'],['Cursor','cursor','Cur'],['Cognition','cognition','Cog'],['Blackbox AI','blackbox','BB']].map(t=>`<div class="tool"><div class="tile">${img('aster/pics/tool-'+t[1]+'.png')}<b>${t[2]}</b></div><div class="nm">${t[0]}</div></div>`).join('')}<div class="plain">+ my own custom AI tools</div></div>`},
+ {cls:'art foc',in:'push',steps:3,html:`<div class="t h">I had my artworks <span class="hl">exhibited, auctioned, and sold</span> when I was 15 years old.</div>
+   ${plate('g1','aster/pics/art1.jpg','artwork · pics/art1.jpg','left:128px;top:148px;width:256px;height:298px')}
+   ${plate('g1','aster/pics/art2.jpg','exhibition · pics/art2.jpg','left:128px;top:462px;width:256px;height:170px')}
+   ${plate('g2','aster/pics/art3.jpg','bali · pics/art3.jpg','left:400px;top:148px;width:368px;height:192px')}
+   ${plate('g2','aster/pics/art4.jpg','beach · pics/art4.jpg','left:400px;top:356px;width:368px;height:276px')}
+   ${plate('g3','aster/pics/art5.jpg','artwork · pics/art5.jpg','left:784px;top:148px;width:368px;height:192px')}
+   ${plate('g3','aster/pics/art6.jpg','artwork · pics/art6.jpg','left:784px;top:356px;width:368px;height:276px')}`},
+ {cls:'med',in:'lift',html:`<div class="k h">Constantly understanding and learning new forms of knowledge with <span class="hl">empathy, care, and intent</span> is a key quality that I carry in my work.</div>`},
+ {cls:'com foc',in:'push',steps:3,html:`<div class="t h">Communities</div>
+   ${plate('g1','aster/pics/c1.jpg','pics/c1.jpg','left:128px;top:128px;width:256px;height:318px')}
+   ${plate('g1','aster/pics/c2.jpg','pics/c2.jpg','left:128px;top:462px;width:256px;height:150px')}
+   ${plate('g2','aster/pics/c3.jpg','pics/c3.jpg','left:400px;top:128px;width:368px;height:212px')}
+   ${plate('g2','aster/pics/c4.jpg','pics/c4.jpg','left:400px;top:356px;width:368px;height:256px')}
+   ${plate('g3','aster/pics/c5.jpg','galleries, jazz, snow · pics/c5.jpg','left:784px;top:128px;width:368px;height:212px')}
+   ${plate('g3','aster/pics/x-post.png','the X post · pics/x-post.png','left:784px;top:356px;width:368px;height:256px')}
+   <div class="cap label g1" style="left:128px;top:626px">Co-President at Design@Columbia</div>
+   <div class="cap label g2" style="left:400px;top:626px;width:368px">CORE PM Lead at Columbia’s best Startup Entrepreneurship Club</div>`},
+ {cls:'proj',in:'popin',html:`<div class="t h">I can’t seem to stop creating.</div>
+   ${plate('','aster/pics/lab-vertico.png','vertico','left:40px;top:50px;width:300px;height:190px')}
+   ${plate('','aster/pics/lab-pear.png','pear','left:400px;top:28px;width:360px;height:220px')}
+   ${plate('','aster/pics/lab-water.png','water','left:800px;top:60px;width:330px;height:200px')}
+   ${plate('','aster/pics/lab-shuffle.png','shuffle','left:60px;top:300px;width:340px;height:210px')}
+   ${plate('','aster/pics/lab-boxing.png','boxing','left:880px;top:300px;width:300px;height:190px')}
+   ${plate('','aster/pics/lab-porcelain.png','porcelain','left:420px;top:470px;width:420px;height:220px')}`},
+ {cls:'adv',in:'push',html:`<div class="k h">I’m an <span class="hl">adventurer at heart.</span></div>`},
+ {cls:'cases',in:'lift',html:`<div class="t h">And that’s why</div>
+   <div class="card" style="left:64px;top:160px">${plate('','aster/pics/case-eden.png','eden','')}<div class="cap"><span>Eden, the glasses that think on your phone</span><i>2026</i></div></div>
+   <div class="card" style="left:656px;top:160px">${plate('','aster/pics/case-manus.png','manus · pics/case-manus.png','')}<div class="cap"><span>Manus community platform</span><i>2026</i></div></div>`},
+];
+const secs=SL.map(s=>{const el=$(`<section class="sl ${s.cls}">${s.html}</section>`);deck.appendChild(el);return el;});
+const phone=document.querySelector('.ab'), fst=document.getElementById('fstage'); let ringing=false, rise=null;
+function setRing(on,sec){ if(on===ringing) return; ringing=on;
+  if(on){ sec.appendChild(phone); sec.classList.add('dim'); fst.classList.add('ring'); rise=phone.animate([{transform:'translate(-50%,760px) scale(1.1)'},{transform:'translate(-50%,0) scale(1.1)'}],{duration:720,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'}); }
+  else { fst.classList.remove('ring'); secs.forEach(e=>e.classList.remove('dim')); anim(phone,[{transform:'translate(-50%,0) scale(1.1)'},{transform:'translate(-50%,760px) scale(1.1)'}],{duration:420}); } }
+if(fst){ fst.addEventListener('click',e=>e.stopPropagation()); fst.addEventListener('pointerdown',e=>e.stopPropagation()); }
+
+/* ---------- the letter wall: the home page's cells, breathing, spelling her name ---------- */
+(function(){
+  const WORDS=['JAZLYNN','KURNIANDRA'], SPEED=.23, DRIFT=.74, ROW=52, FS=ROW*.9, STRETCH=FS*1.0;
+  const gauge=document.createElement('canvas').getContext('2d'); gauge.font=`400 ${FS}px "Helvetica Neue",Helvetica,Arial,sans-serif`;
+  const wall=document.getElementById('wall'); const FLICK=['var(--gold)','var(--oxblood)']; let lit=0, t0=0, calm=0;
+  const lines=WORDS.map((w,li)=>{const el=$('<div class="line"></div>');const cells=[...w].map((ch,ci)=>{const c=$('<span class="cell"></span>'),s=$('<span class="ch"></span>');s.textContent=ch;c.appendChild(s);el.appendChild(c);
+    const m=gauge.measureText(ch),ink=-(m.actualBoundingBoxLeft||0),pad=Math.max(0,FS*.1-ink);s.style.paddingLeft=pad.toFixed(1)+'px';
+    return {cell:c,glyph:s,base:Math.ceil(m.width+pad)+4,ci,next:2+Math.random()*22,until:0,lit:false,col:FLICK[(Math.random()*2)|0]};});wall.appendChild(el);return {cells,seed:li};});
+  const ink=(c,on)=>{if(c.lit===on)return;c.lit=on;c.cell.style.background=on?c.col:'transparent';c.glyph.style.color=on?'var(--paper)':'';};
+  (function tick(now){const t=now/1000; if(!t0)t0=t; const age=t-t0, arriving=age<2.6, front=age*46;
+    /* the home page settles after five seconds; the cover never does, the cells breathe and flicker for as long as the slide is up */
+    for(const L of lines){let x=0;const cy=L.seed*(ROW*1.2)+ROW/2;
+      for(const c of L.cells){const k=.5+.5*Math.sin(t*SPEED*Math.PI*2+L.seed*DRIFT+c.ci*DRIFT*1.7);const w=c.base+(k*k*(1-calm)+.25*calm)*STRETCH;c.cell.style.width=w.toFixed(1)+'px';
+        if(arriving){const d=x+w/2+cy*.6;ink(c,d<front&&d>front-130);x+=w;continue;}
+        if(calm>.6){if(c.lit){ink(c,false);lit--;}}
+        else{ if(c.lit&&t>c.until){ink(c,false);lit--;c.next=t+6+Math.random()*26;} else if(!c.lit&&t>c.next){ if(lit>=3){c.next=t+1+Math.random()*4;} else {ink(c,true);lit++;c.until=t+.25+Math.random()*.9;} } }
+        x+=w;}}
+    requestAnimationFrame(tick);})(performance.now());
+})();
+
+/* ---------- the discs: the home page's frosted riso discs, rearranged per slide ---------- */
+const SWATCH=['#dfddc8','#c7c7c7','#827a85','#9ba69c','#c4c1c8','#dfddc8','#c2beb3','#dfdac8'];
+/* unit coords: x and r as a share of the stage width, y as a share of its height */
+const LAY=[
+ Array.from({length:11},(_,i)=>{const an=-Math.PI/2+i/11*Math.PI*2+.14;return [.5+Math.cos(an)*.37, .5+Math.sin(an)*.46, .078];}), /* the cover: a ring around the centred name */
+ [[.08,.14,.12],[.26,.22,.09],[.04,.56,.11],[.18,.86,.12],[.44,.90,.09],[.52,.06,.10],[.74,.12,.12],[.94,.08,.10],[.98,.42,.12],[.84,.70,.11],[.66,.94,.10]],
+ [[.12,.08,.11],[.04,.36,.12],[.22,.62,.10],[.08,.92,.12],[.38,.10,.09],[.62,.92,.11],[.80,.08,.12],[.98,.26,.11],[.90,.56,.12],[.78,.84,.10],[.46,.84,.08]],
+ null, /* the ring, computed */
+ [[.05,.10,.10],[.03,.50,.09],[.06,.90,.10],[.30,.05,.08],[.50,.03,.07],[.70,.05,.08],[.95,.12,.10],[.97,.50,.09],[.94,.90,.10],[.30,.97,.07],[.70,.97,.07]] /* the edges, around the cards */
+];
+LAY[3]=LAY[0].map((_,i,a)=>{const an=-Math.PI/2+i/a.length*Math.PI*2;return [.5+Math.cos(an)*.35, .52+Math.sin(an)*.42, .065];});
+const FLY=LAY[3].map(p=>[p[0],p[1]-1.3,p[2]]);
+const BELOW=LAY[1].map(p=>[p[0],p[1]+1.4,p[2]]); /* the cover is plain; the discs wait under the stage and rise one by one into the second slide's formation */
+const cv=document.getElementById('discs'); let H=null, cur=BELOW.map(p=>p.slice()), tw=null, last=cur;
+import('./aster/sheets-gl.js').then(m=>{ H=m.mountSheets(cv,LAY[0].map(p=>({x:p[0],y:p[1],r:p[2]})),SWATCH,{paper:'#FAF9F7',ground:'#1C1A17',bleed:0,clear:()=>0}); if(H){ H.discs.forEach(d=>d.moved=true); placeDiscs(last); } });
+const easeIO=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+function placeDiscs(set){ last=set; if(!H) return; const r=cv.getBoundingClientRect(), W=r.width, Hh=r.height, U=650;
+  H.discs.forEach((d,i)=>{const p=set[i]; d.ux=p[0]; d.uy=p[1]; d.ur=p[2]; d.x=d.tx=(p[0]*W-W/2)/U; d.y=d.ty=(Hh/2-p[1]*Hh)/U; d.r=p[2]*W/U; d.vx=d.vy=0; d.alive=(p[1]<-.4||p[1]>1.4)?0:1;}); H.draw(); }
+function moveDiscs(to,dur=650,freeze,stag=0){ const from=cur.map(p=>p.slice()); cur=to.map(p=>p.slice()); if(tw) cancelAnimationFrame(tw); const t0=performance.now(), total=dur+stag*(to.length-1);
+  const at=ms=>placeDiscs(from.map((f,i)=>{const e=easeIO(Math.max(0,Math.min(1,(ms-i*stag)/dur)));return [f[0]+(to[i][0]-f[0])*e,f[1]+(to[i][1]-f[1])*e,f[2]+(to[i][2]-f[2])*e];}));
+  if(freeze!=null){ at(freeze); return; }
+  (function f(now){const ms=now-t0; at(Math.min(total,ms)); if(ms<total) tw=requestAnimationFrame(f);})(t0); }
+const setFor=i=>SL[i].disc==='below'?BELOW:SL[i].disc!=null?LAY[SL[i].disc]:FLY;
+
+/* ---------- transitions ---------- */
+const EASE='cubic-bezier(.45,0,.15,1)';
+const kids=(sec)=>[...sec.children];
+const anim=(el,frames,o)=>el.animate(frames,{fill:'both',easing:EASE,...o}).finished;
+function wipe(a,b){ /* text swaps by one sweep line travelling right to left; the leaving block drifts toward the new one */
+  const ps=[]; const ta=secs[a].querySelector('.k')||secs[a].firstElementChild, tb=secs[b].querySelector('.k')||secs[b].firstElementChild;
+  const ra=ta.getBoundingClientRect(), rb=tb.getBoundingClientRect(), k=parseFloat(getComputedStyle(stage).getPropertyValue('--k'))||1;
+  const dx=(rb.left-ra.left)/k*.35, dy=(rb.top-ra.top)/k*.35;
+  kids(secs[a]).forEach(el=>{ if(el.classList.contains('ab')) ps.push(anim(el,[{opacity:1,transform:'translate(0,0)'},{opacity:0,transform:'translate(60px,0)'}],{duration:320}));
+    else ps.push(anim(el,[{clipPath:'inset(0 0 0 0)',transform:'translate(0,0)'},{clipPath:'inset(0 100% 0 0)',transform:`translate(${dx}px,${dy}px)`}],{duration:380})); });
+  kids(secs[b]).forEach(el=>ps.push(anim(el,[{clipPath:'inset(0 0 0 100%)'},{clipPath:'inset(0 0 0 0)'}],{duration:380,delay:60})));
+  const pop=secs[b].querySelector('.pop'); if(pop) ps.push(anim(pop,[{transform:'scale(0)'},{transform:'scale(1.12)',offset:.7},{transform:'scale(1)'}],{duration:420,delay:380}));
+  return Promise.all(ps);}
+function lift(a,b){const ps=[];kids(secs[a]).forEach(el=>ps.push(anim(el,[{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY(-46px)'}],{duration:480})));
+  kids(secs[b]).forEach(el=>ps.push(anim(el,[{opacity:0,transform:'translateY(46px)'},{opacity:1,transform:'translateY(0)'}],{duration:520,delay:120})));return Promise.all(ps);}
+function push(a,b){const ps=[];kids(secs[a]).forEach((el,i)=>ps.push(anim(el,[{transform:'translateY(0)'},{transform:'translateY(-760px)'}],{duration:620,delay:i*28})));
+  kids(secs[b]).forEach((el,i)=>{const top=el.dataset.from==='top';ps.push(anim(el,[{transform:`translateY(${top?-760:760}px)`},{transform:'translateY(0)'}],{duration:640,delay:80+i*46}));});return Promise.all(ps);}
+function popin(a,b){const ps=[];kids(secs[a]).forEach(el=>ps.push(anim(el,[{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.96)'}],{duration:360})));
+  kids(secs[b]).forEach((el,i)=>ps.push(anim(el,[{opacity:0,transform:'scale(.9)'},{opacity:1,transform:'scale(1)'}],{duration:420,delay:120+i*55})));return Promise.all(ps);}
+function fade(a,b){const ps=[];kids(secs[a]).forEach(el=>ps.push(anim(el,[{opacity:1},{opacity:0}],{duration:300})));kids(secs[b]).forEach(el=>ps.push(anim(el,[{opacity:0},{opacity:1}],{duration:380,delay:120})));return Promise.all(ps);}
+function screen(a,b){ /* the next slide starts as the picture on the phone's screen and grows to fill the stage */
+  if(rise) rise.finish();
+  const sr=document.getElementById('screen').getBoundingClientRect(), st=stage.getBoundingClientRect(), k=parseFloat(getComputedStyle(stage).getPropertyValue('--k'))||1;
+  const sx=(sr.left-st.left)/k, sy=(sr.top-st.top)/k, sw=sr.width/k, sh=sr.height/k, sc=sw/720, vh=sh/sc, cy=(720-vh)/2;
+  const el=secs[b]; el.style.transformOrigin='0 0'; el.style.zIndex=6; if(q.get('dbg')){const pr=phone.getBoundingClientRect();document.title=`screen ${[sx,sy,sw,sh].map(v=>v.toFixed(0)).join(' ')} phone ${[pr.left,pr.top,pr.width,pr.height].map(v=>v.toFixed(0)).join(' ')} parent ${phone.parentElement.className} anims ${document.getAnimations().filter(x=>x.effect.target===phone).map(x=>x.currentTime|0).join(',')} ringing ${ringing}`;}
+  return anim(el,[{transform:`translate(${sx-280*sc}px,${sy-cy*sc}px) scale(${sc})`,clipPath:`inset(${cy}px 280px ${cy}px 280px round ${16/sc}px)`},{transform:'none',clipPath:'inset(0px 0px 0px 0px round 0px)'}],{duration:850,easing:'cubic-bezier(.6,0,.2,1)'}).then(()=>{el.style.zIndex='';}); }
+const FN={screen,wipe,lift,push,popin,fade};
+
+/* ---------- control ---------- */
+let s=0,step=0,busy=false; const dots=document.querySelector('.dots'); SL.forEach(()=>dots.appendChild(document.createElement('i')));
+function paint(){[...dots.children].forEach((d,i)=>d.classList.toggle('on',i===s));
+  secs.forEach((el,i)=>{const f=(i===s&&step&&!(SL[i].call&&step===SL[i].steps))?' f'+step:'';el.className='sl '+SL[i].cls+(el.classList.contains('on')?' on':'')+(el.classList.contains('dim')?' dim':'')+f;});
+  const want=!!SL[s].call&&step===SL[s].steps; if(want) setRing(true,secs[s]); else if(ringing&&!busy) setRing(false); }
+function show(i){secs.forEach((e,k)=>e.classList.toggle('on',k===i));s=i;cur=setFor(i).map(p=>p.slice());placeDiscs(cur);paint();}
+const q=new URLSearchParams(location.search); const FR=q.get('t')?parseFloat(q.get('t')):null;
+async function go(b){ if(busy||b<0||b>=SL.length) return; busy=true; if(q.get('dbg')) document.title='go '+s+'>'+b; try{ const a=s; const fn=b>a?(FN[SL[b].in]||fade):fade;
+  secs[b].classList.add('on'); moveDiscs(setFor(b),SL[a].disc==='below'?720:650,FR,SL[a].disc==='below'||SL[b].disc==='below'?70:0); s=b; step=0; paint(); await fn(a,b); secs[a].classList.remove('on'); if(ringing){ fst.classList.remove('ring'); secs[a].classList.remove('dim'); ringing=false; } }catch(e){ document.title='ERR '+e.message; } busy=false; }
+function next(){ if(SL[s].steps&&step<SL[s].steps){step++;paint();return;} go(s+1); }
+function prev(){ if(step){step--;paint();return;} go(s-1); }
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next();}else if(e.key==='ArrowLeft'){e.preventDefault();prev();}});
+stage.addEventListener('click',e=>{ (e.clientX>innerWidth*.2?next:prev)(); });
+const start=Math.max(0,Math.min(SL.length-1,(parseInt(q.get('s'))||1)-1));
+show(start); if(q.get('step')){step=parseInt(q.get('step'));paint();}
+if(q.get('go')){setTimeout(()=>{go(s+1);setTimeout(()=>{document.getAnimations().forEach(a=>{a.pause();a.currentTime=(phone&&a.effect&&a.effect.target&&phone.contains(a.effect.target))?5000:(FR||200);});},30);},900);}
+})();
+</script>
+</body>

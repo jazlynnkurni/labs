@@ -1,0 +1,64 @@
+<!doctype html><meta charset="utf-8"><title>bubble · 05 map</title><link rel="stylesheet" href="bubble.css">
+<style>
+/* 05 MAP. The map is the screen: a hairline New York in the palest blue, water left white, the bubble a Prussian dot.
+   You draw where it goes with a finger. A bottom sheet carries the numbers and the one action. */
+.map{position:absolute;inset:0}
+.map svg{position:absolute;inset:0;width:100%;height:100%}
+.land{fill:var(--p08);stroke:var(--p15);stroke-width:1}
+.park{fill:var(--p15)}
+.st{stroke:rgba(0,49,83,.1);stroke-width:1;fill:none}
+.bub{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--prussian);transform:translate(-50%,-50%);box-shadow:0 0 0 6px rgba(0,49,83,.12)}
+.bub::after{content:"";position:absolute;inset:-14px;border-radius:50%;box-shadow:0 0 0 1px rgba(0,49,83,.35);animation:ring 2.4s ease-out infinite}
+@keyframes ring{0%{transform:scale(.4);opacity:1}100%{transform:scale(1.4);opacity:0}}
+.pin{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;gap:6px;font:500 12px var(--ui);color:var(--ink);white-space:nowrap}
+.pin i{width:10px;height:10px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px var(--prussian)}
+.pin.on i{background:var(--prussian)}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:28px 28px 0 0;box-shadow:0 -20px 50px -30px rgba(14,27,38,.35),0 0 0 1px var(--hair);padding:14px 28px 42px}
+.sheet::before{content:"";display:block;width:38px;height:4px;border-radius:2px;background:var(--p15);margin:0 auto 18px}
+.kv{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+.kv b{font:500 22px var(--ui);letter-spacing:-.02em}.kv span{font:400 13px var(--ui);color:var(--ink2)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:6px 0 18px}
+.stats div{border-top:1px solid var(--hair);padding-top:10px}.stats .lab{margin-bottom:4px}.stats b{font:400 22px var(--ui);letter-spacing:-.02em}.stats b small{font-size:12px;color:var(--ink3);margin-left:3px}
+.chips{display:flex;gap:8px;margin-bottom:18px}.chips span{padding:8px 14px;border-radius:999px;background:var(--p08);color:var(--prussian);font:500 13px var(--ui)}.chips span.on{background:var(--prussian);color:#fff}
+.srch{position:absolute;left:28px;right:28px;top:68px;height:48px;border-radius:999px;background:#fff;box-shadow:0 0 0 1px var(--hair),0 10px 30px -18px rgba(14,27,38,.4);display:flex;align-items:center;padding:0 18px;font:400 14px var(--ui);color:var(--ink3)}
+.route{fill:none;stroke:var(--prussian);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.route.ghost{stroke-dasharray:4 8;stroke-width:2;opacity:.6}
+</style>
+<div class="top"><a href="./">bubble</a><span>/</span><b>05 map</b></div>
+<div class="brief">on fly, draw a path on the map with your finger · tap a pin on route</div>
+<div class="row" id="row"></div>
+<script src="bubble.js"></script>
+<script>
+const $=h=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild};
+const sb=`<div class="sb"><span>9:41</span><div class="isl"></div><span style="font-weight:500;color:var(--ink3)">●●●</span></div>`, hb=`<div class="hb"></div>`;
+/* a hairline New York, roughly: New Jersey at the left, Manhattan down the middle, Brooklyn and Queens at the right */
+const NYC=(extra='')=>`<svg viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice">
+  <path class="land" d="M-10 -10 H118 L128 150 L122 330 L104 500 L70 640 L30 760 L-10 790 Z"/>
+  <path class="land" d="M196 20 L240 44 L256 150 L250 300 L238 420 L214 520 L186 596 L158 566 L150 430 L164 300 L178 170 L186 80 Z"/>
+  <rect class="park" x="196" y="150" width="30" height="110" rx="3" transform="rotate(-6 211 205)"/>
+  <path class="land" d="M262 330 L400 320 L400 860 L250 860 L206 690 L236 540 L254 430 Z"/>
+  <g class="st">${Array.from({length:14},(_,i)=>`<line x1="${166+i*2}" y1="${90+i*32}" x2="${252-i*1.2}" y2="${80+i*32}"/>`).join('')}${Array.from({length:7},(_,i)=>`<line x1="${270+i*18}" y1="340" x2="${250+i*22}" y2="820"/>`).join('')}</g>
+  ${extra}</svg>`;
+const ph=(name,inner)=>$(`<div class="ph"><div class="nm">${name}</div><div class="scr">${inner}${sb}${hb}</div></div>`);
+const row=document.getElementById('row');
+const PINS=[['Central Park',211,205,4],['Washington Sq',214,372,11],['Williamsburg',312,440,19],['Brooklyn Bridge',236,500,16],['Pier 17',214,520,18],['Rockaway',352,780,38]];
+row.appendChild(ph('01 · Pair',`<div class="map">${NYC()}<div class="bub pulse" style="left:206px;top:120px"></div></div>
+  <div class="sheet"><div class="kv"><b>Bubble 7 is 0.4 mi away</b></div><div class="kv"><span>Over Amsterdam Avenue · 120 ft</span><span>Shimmer 84%</span></div><button class="btn">Connect</button></div>`));
+row.appendChild(ph('02 · Home',`<div class="map">${NYC()}<div class="bub" style="left:206px;top:124px"></div></div><div class="srch">Where to?</div>
+  <div class="sheet"><div class="kv"><b>Over Morningside Heights</b><span>Connected</span></div>
+  <div class="stats"><div><div class="lab">Altitude</div><b>412<small>ft</small></b></div><div><div class="lab">Shimmer</div><b>84<small>%</small></b></div><div><div class="lab">Wind</div><b>6<small>kn</small></b></div></div>
+  <button class="btn">Summon</button></div>`));
+const fly=ph('03 · Fly',`<div class="map" id="m3">${NYC('<path class="route ghost" d="M206 124 L211 205 L214 372 L312 440"/><path class="route" id="drawn" d=""/>')}<div class="bub" style="left:206px;top:124px"></div></div>
+  <div class="sheet"><div class="kv"><b>Draw where to go</b><span id="dl">—</span></div>
+  <div class="chips"><span>Slow</span><span class="on">14 mph</span><span>Fast</span></div>
+  <div class="stats"><div><div class="lab">Altitude</div><b>412<small>ft</small></b></div><div><div class="lab">Heading</div><b id="dh">032<small>NE</small></b></div><div><div class="lab">ETA</div><b id="de">—</b></div></div>
+  <button class="btn">Fly this path</button></div>`);
+row.appendChild(fly);
+B.trail(fly.querySelector('#m3 svg'),fly.querySelector('#drawn'),pts=>{ if(pts.length<2) return; let L=0; for(let i=1;i<pts.length;i++) L+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]); const mi=L/95; fly.querySelector('#dl').textContent=mi.toFixed(1)+' mi'; fly.querySelector('#de').textContent=Math.max(1,Math.round(mi/14*60))+'<small>min</small>'; const a=pts[pts.length-1], b=pts[0]; const h=((Math.atan2(a[0]-b[0],-(a[1]-b[1]))*180/Math.PI)+360)%360; fly.querySelector('#dh').innerHTML=String(Math.round(h)).padStart(3,'0')+'<small>'+B.compass(h)+'</small>'; });
+const route=ph('04 · Route',`<div class="map" id="m4">${NYC()}<div class="bub" style="left:206px;top:124px"></div>${PINS.map((p,i)=>`<div class="pin ${i===2?'on':''}" style="left:${p[1]}px;top:${p[2]}px" data-n="${p[0]}" data-m="${p[3]}"><i></i>${p[0]}</div>`).join('')}</div>
+  <div class="sheet"><div class="kv"><b id="rn">Williamsburg</b><span id="rm">19 min</span></div><div class="kv"><span>Galleries on N 6th, then the waterfront.</span></div><button class="btn">Fly there</button></div>`);
+row.appendChild(route);
+route.querySelectorAll('.pin').forEach(p=>p.addEventListener('click',()=>{route.querySelectorAll('.pin').forEach(x=>x.classList.remove('on'));p.classList.add('on');route.querySelector('#rn').textContent=p.dataset.n;route.querySelector('#rm').textContent=p.dataset.m+' min';}));
+row.appendChild(ph('05 · Land',`<div class="map">${NYC('<circle cx="312" cy="440" r="40" fill="none" stroke="#003153" stroke-opacity=".25"/><circle cx="312" cy="440" r="14" fill="none" stroke="#003153"/>')}<div class="bub" style="left:306px;top:424px"></div></div>
+  <div class="sheet"><div class="kv"><b>Landing at N 6th Street</b><span>138 ft</span></div><div class="kv"><span>Clear below. 40 seconds.</span><span>Shimmer 71%</span></div><button class="btn">Land</button><div style="height:10px"></div><button class="btn ghost">Hold at 100 ft</button></div>`));
+</script>

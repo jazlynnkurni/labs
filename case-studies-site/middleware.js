@@ -67,10 +67,11 @@ export default async function middleware(req) {
   if (url.pathname === '/login' && req.method === 'POST') {
     const form = await req.formData();
     if (await token(String(form.get('pw') || '')) === want) {
-      return new Response(null, { status: 303, headers: { location: '/', 'set-cookie': `cs=${want}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=2592000` } });
+      return new Response(null, { status: 303, headers: { location: '/?in', 'set-cookie': `cs=${want}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=2592000` } });
     }
     return html(page(true), 401);
   }
+  if (url.pathname === '/login') return new Response(null, { status: 303, headers: { location: '/' } });   // /login is only a POST target; reaching it any other way (back button, refresh) goes home
   if (cookieOf(req, 'cs') === want) return;               // signed in: serve the page as normal
   return html(page(false), 401);
 }

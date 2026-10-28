@@ -1,0 +1,30 @@
+<!doctype html><meta charset="utf-8"><title>intro · filmstrip</title><link rel="stylesheet" href="common.css">
+<style>
+/* FILMSTRIP. The five slides are frames on one strip of film. Advancing pulls the strip one frame
+   to the left; the photographs are pinned stamps that travel faster than the frame, so they lead
+   the move and settle after it, and the neighbouring frames peek at the edges. */
+#stage{perspective:1800px}
+#strip{position:absolute;left:0;top:0;height:720px;display:flex;gap:40px;padding:0 0 0 0;transition:transform 1.15s cubic-bezier(.65,0,.2,1);will-change:transform}
+#strip::before,#strip::after{content:"";position:absolute;left:-2000px;right:-2000px;height:26px;background:repeating-linear-gradient(90deg,var(--ink) 0 18px,transparent 18px 44px);opacity:.14}
+#strip::before{top:14px}#strip::after{bottom:14px}
+.s{position:relative;flex:0 0 1280px;height:720px;padding:72px 110px 60px;display:grid;grid-template-columns:600px 1fr;gap:40px;transition:transform 1.15s cubic-bezier(.65,0,.2,1),opacity .9s ease;transform-origin:50% 50%}
+.s .lines{margin-top:16px;display:grid;gap:10px}.s .chips{margin-top:18px}.s .dict{margin-bottom:16px}
+.s .pics{position:relative}
+.s .ph{position:absolute;width:250px;height:176px;box-shadow:0 18px 40px -20px rgba(20,23,27,.45);transition:transform 1.3s cubic-bezier(.6,0,.2,1)}
+.s .p0{left:20px;top:10px;--r:-3deg}.s .p1{left:230px;top:120px;--r:2.5deg;width:230px;height:160px}.s .p2{left:40px;top:270px;--r:1.5deg;width:220px;height:150px}.s .p3{left:260px;top:330px;--r:-2deg;width:200px;height:140px}
+.s .ph{transform:translateX(calc(var(--lead,0) * 1px)) rotate(var(--r))}
+.s.off{opacity:.45}
+</style>
+<body><div id="stage"><div id="strip"></div></div>
+<div class="top"><a href="./">intro lab</a><span>/</span><b>filmstrip</b></div>
+<script src="content.js"></script><script src="engine.js"></script>
+<script>
+(()=>{
+  const strip=document.getElementById('strip'); let els=[];
+  function build(slides,markup){ slides.forEach((s,i)=>{ const el=document.createElement('section'); el.className='s'+(i?' off':''); el.innerHTML=markup(s,i); strip.appendChild(el); els.push(el); }); place(0); }
+  function place(i,dir=0){ strip.style.transform=`translateX(${-i*1320}px)`;
+    els.forEach((e,k)=>{ e.classList.toggle('off',k!==i); e.style.transform=`rotateY(${(k-i)*-7}deg) scale(${k===i?1:.96})`;
+      e.querySelectorAll('.ph').forEach((p,j)=>{ p.style.setProperty('--lead', (k===i? 0 : (k<i? -90-j*30 : 90+j*30))); }); }); }
+  Intro.start({ build, go(a,b,dir){ place(b,dir); return new Promise(r=>setTimeout(r,1150)); }, jump(i){ strip.style.transition='none'; place(i); requestAnimationFrame(()=>strip.style.transition=''); } });
+})();
+</script></body>

@@ -1,0 +1,65 @@
+<!doctype html><meta charset="utf-8"><title>bubble · 04 remote</title><link rel="stylesheet" href="bubble.css">
+<style>
+/* 04 REMOTE. A physical remote drawn in white plastic on an 8-point grid: an e-ink readout strip at the top, a D-pad, a long
+   altitude pill, round keys. Prussian is the pressed state and the readout ink. */
+.eink{position:absolute;left:28px;right:28px;top:88px;height:112px;border-radius:14px;background:var(--p08);padding:16px 18px;font-family:var(--mono);color:var(--prussian);box-shadow:inset 0 0 0 1px var(--p15)}
+.eink .l{display:flex;justify-content:space-between;font-size:12px;letter-spacing:.06em;opacity:.7}
+.eink .b{font-size:30px;font-weight:500;letter-spacing:-.01em;margin-top:10px}
+.eink .b small{font-size:12px;opacity:.6;margin-left:8px;letter-spacing:.06em}
+.dpad{position:absolute;left:50%;top:260px;width:248px;height:248px;transform:translateX(-50%)}
+.dpad button{position:absolute;width:80px;height:80px;border-radius:24px;border:0;background:#fff;box-shadow:0 0 0 1px var(--hair),0 6px 14px -8px rgba(14,27,38,.35);display:grid;place-items:center;color:var(--ink)}
+.dpad button:active,.dpad button.on{background:var(--prussian);color:#fff;box-shadow:none}
+.dpad .u{left:84px;top:0}.dpad .d{left:84px;bottom:0}.dpad .l{left:0;top:84px}.dpad .r{right:0;top:84px}
+.dpad .c{left:84px;top:84px;border-radius:50%;font:500 13px var(--ui);box-shadow:inset 0 0 0 1.5px var(--prussian);color:var(--prussian)}
+.dpad svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pill{position:absolute;left:28px;right:28px;top:548px;height:56px;border-radius:999px;background:var(--p08);box-shadow:inset 0 0 0 1px var(--p15)}
+.pill .fill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:var(--prussian)}
+.pill .kn{position:absolute;top:50%;width:44px;height:44px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px var(--prussian);transform:translate(-50%,-50%)}
+.pill .v{position:absolute;right:20px;top:50%;transform:translateY(-50%);font:500 13px var(--mono);color:var(--prussian)}
+.pill .lab{position:absolute;left:20px;top:50%;transform:translateY(-50%);color:var(--prussian);opacity:.7}
+.keys{position:absolute;left:28px;right:28px;top:632px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.keys button{height:60px;border-radius:16px;border:0;background:#fff;box-shadow:0 0 0 1px var(--hair);font:500 14px var(--ui);color:var(--ink)}
+.keys button.on{background:var(--prussian);color:#fff;box-shadow:none}
+.grid6{position:absolute;left:28px;right:28px;top:232px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid6 button{height:96px;border-radius:18px;border:0;background:#fff;box-shadow:0 0 0 1px var(--hair);font:500 15px var(--ui);color:var(--ink);display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;padding:14px 16px}
+.grid6 button small{font:500 12px var(--mono);color:var(--ink3)}.grid6 button.on{background:var(--prussian);color:#fff;box-shadow:none}.grid6 button.on small{color:rgba(255,255,255,.7)}
+.ring{position:absolute;left:50%;top:300px;width:220px;height:220px;transform:translateX(-50%);border-radius:50%;display:grid;place-items:center;font:500 16px var(--ui);color:var(--prussian);user-select:none;-webkit-user-select:none}
+.ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:3}
+.big{position:absolute;left:28px;right:28px;bottom:120px;display:grid;gap:12px}
+</style>
+<div class="top"><a href="./">bubble</a><span>/</span><b>04 remote</b></div>
+<div class="brief">press the D-pad · drag the altitude pill · press and hold the ring to land</div>
+<div class="row" id="row"></div>
+<script src="bubble.js"></script>
+<script>
+const $=h=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild};
+const sb=`<div class="sb"><span>9:41</span><div class="isl"></div><span style="font-weight:500;color:var(--ink3)">●●●</span></div>`, hb=`<div class="hb"></div>`;
+const ph=(name,inner)=>$(`<div class="ph"><div class="nm">${name}</div><div class="scr">${sb}${inner}${hb}</div></div>`);
+const eink=(l1,l2,big,unit)=>`<div class="eink"><div class="l"><span>${l1}</span><span>${l2}</span></div><div class="b">${big}<small>${unit}</small></div></div>`;
+const arrow=d=>({u:'M10 15V5M5 10l5-5 5 5',d:'M10 5v10M5 10l5 5 5-5',l:'M15 10H5M10 5l-5 5 5 5',r:'M5 10h10M10 5l5 5-5 5'})[d];
+const row=document.getElementById('row');
+row.appendChild(ph('01 · Pair',`${eink('BUBBLE 7','SEARCHING','· · ·','')}
+  <div class="ring" style="top:300px"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" stroke="#D5DFE7"/><circle cx="50" cy="50" r="47" stroke="#003153" stroke-dasharray="60 240" class="pulse"/></svg>Looking</div>
+  <div class="big"><button class="btn">Connect</button></div>`));
+row.appendChild(ph('02 · Home',`${eink('BUBBLE 7','OVER MORNINGSIDE','412','FT  ·  84%')}
+  <div class="grid6" style="top:232px;grid-template-columns:1fr"><button class="on">Summon<small>TO YOU · 2 MIN</small></button><button>Plan a route<small>6 PRESETS</small></button></div>
+  <div class="keys" style="top:470px"><button>Lights</button><button>Shimmer</button><button>Lock</button></div>`));
+const fly=ph('03 · Fly',`${eink('HDG 032 NE','SPD 14 MPH','<span id="ev">412</span>','FT')}
+  <div class="dpad" id="dp">${['u','d','l','r'].map(d=>`<button class="${d}" data-d="${d}"><svg viewBox="0 0 20 20"><path d="${arrow(d)}"/></svg></button>`).join('')}<button class="c">Hold</button></div>
+  <div class="pill" id="pill"><div class="fill" id="pf"></div><span class="lab">Altitude</span><div class="kn" id="pk"></div><span class="v" id="pv">412 FT</span></div>
+  <div class="keys"><button>Slower</button><button class="on">14 mph</button><button>Faster</button></div>`);
+row.appendChild(fly);
+fly.querySelectorAll('.dpad button[data-d]').forEach(b=>{b.addEventListener('pointerdown',()=>b.classList.add('on'));['pointerup','pointerleave','pointercancel'].forEach(k=>b.addEventListener(k,()=>b.classList.remove('on')));});
+B.hslider(fly.querySelector('#pill'),v=>{const ft=Math.round(60+v*1140); fly.querySelector('#pf').style.width=`calc(${(v*100).toFixed(1)}% )`; fly.querySelector('#pk').style.left=`calc(28px + ${(v*100).toFixed(1)}% - ${(v*56).toFixed(1)}px)`; fly.querySelector('#pv').textContent=ft+' FT'; fly.querySelector('#ev').textContent=ft;},.31);
+const route=ph('04 · Route',`${eink('ROUTE','FROM 116 ST','<span id="rv">WILLIAMSBURG</span>','19 MIN')}
+  <div class="grid6" id="g6">${[['Central Park','4 MIN'],['Washington Sq','11 MIN'],['Williamsburg','19 MIN'],['Brooklyn Bridge','16 MIN'],['Pier 17','18 MIN'],['Rockaway','38 MIN']].map((d,i)=>`<button class="${i===2?'on':''}">${d[0]}<small>${d[1]}</small></button>`).join('')}</div>
+  <div class="big"><button class="btn">Go</button></div>`);
+row.appendChild(route);
+route.querySelectorAll('#g6 button').forEach(b=>b.addEventListener('click',()=>{route.querySelectorAll('#g6 button').forEach(x=>x.classList.remove('on'));b.classList.add('on');route.querySelector('#rv').textContent=b.firstChild.textContent.trim().toUpperCase();}));
+const land=ph('05 · Land',`${eink('WILLIAMSBURG','N 6TH ST','138','FT  ·  40 S')}
+  <div class="ring" id="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" stroke="#D5DFE7"/><circle id="arc" cx="50" cy="50" r="47" stroke="#003153" stroke-dasharray="0 300"/></svg><span id="rt">Hold to land</span></div>
+  <div class="big"><button class="btn ghost">Hold at 100 ft</button></div>`);
+row.appendChild(land);
+B.hold(land.querySelector('#ring'),1400,p=>{land.querySelector('#arc').setAttribute('stroke-dasharray',`${(p*295.3).toFixed(1)} 300`); land.querySelector('#rt').textContent=p>0?'Landing…':'Hold to land';},()=>{land.querySelector('#rt').textContent='Landed';});
+</script>

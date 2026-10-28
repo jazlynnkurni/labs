@@ -1,0 +1,49 @@
+<!doctype html><meta charset="utf-8"><title>bubble · 02 glass</title><link rel="stylesheet" href="bubble.css">
+<style>
+/* 02 GLASS. The bubble is the control. One soft sphere on white, lit from the top left, a Prussian rim. You push it from
+   inside to steer; the inner dot is where you are pushing. Words are lowercase and few. Altitude is a thin gauge on the right. */
+.sph{position:absolute;left:50%;top:50%;width:300px;height:300px;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle at 36% 32%,#fff 0,#F4F7FA 28%,#DCE5EC 68%,#C9D6E0 100%);box-shadow:inset 0 0 0 1px rgba(0,49,83,.22),inset -14px -18px 40px rgba(0,49,83,.08),0 30px 60px -40px rgba(0,49,83,.5)}
+.sph::before{content:"";position:absolute;left:18%;top:12%;width:34%;height:22%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,.95),rgba(255,255,255,0) 70%)}
+.sph .in{position:absolute;left:50%;top:50%;width:14px;height:14px;border-radius:50%;background:var(--prussian);transform:translate(-50%,-50%);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.sph .in.live{transition:none}
+.sph .ripple{position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,49,83,.14);animation:rip 2.6s ease-out infinite}
+@keyframes rip{0%{transform:scale(.3);opacity:0}30%{opacity:1}100%{transform:scale(1);opacity:0}}
+.w{position:absolute;left:28px;right:28px;text-align:center;font:400 17px/1.5 var(--ui);color:var(--ink2);letter-spacing:-.005em}
+.w b{font-weight:500;color:var(--ink);display:block;font-size:26px;letter-spacing:-.02em;line-height:1.2}
+.w.sm{font-size:14px;color:var(--ink3)}
+.g{position:absolute;right:30px;top:232px;width:30px;height:380px}
+.g .tr{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--hair);transform:translateX(-50%)}
+.g .fill{position:absolute;left:50%;bottom:0;width:3px;border-radius:2px;background:var(--prussian);transform:translateX(-50%)}
+.g .v{position:absolute;right:38px;font:400 13px var(--ui);color:var(--ink2);white-space:nowrap;transform:translateY(-50%)}
+.act{position:absolute;left:28px;right:28px;bottom:48px;display:grid;gap:10px}
+.pill{display:flex;justify-content:center;align-items:center;height:52px;border-radius:999px;background:var(--p08);color:var(--prussian);font:500 15px var(--ui)}
+.pill.on{background:var(--prussian);color:#fff}
+.dest{position:absolute;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff,#E6ECF1 70%,#D3DDE5);box-shadow:inset 0 0 0 1px rgba(0,49,83,.2);display:grid;place-items:center;text-align:center;font:400 12px/1.25 var(--ui);color:var(--ink);padding:8px;cursor:pointer;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.dest.on{box-shadow:inset 0 0 0 2px var(--prussian)}.dest:hover{transform:scale(1.04)}
+.dest small{display:block;color:var(--ink3);font-size:11px}
+</style>
+<div class="top"><a href="./">bubble</a><span>/</span><b>02 glass</b></div>
+<div class="brief">push the sphere from inside to steer · drag the gauge for altitude · tap a bubble to choose it</div>
+<div class="row" id="row"></div>
+<script src="bubble.js"></script>
+<script>
+const $=h=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild};
+const sb=`<div class="sb"><span>9:41</span><div class="isl"></div><span style="font-weight:500;color:var(--ink3)">●●●</span></div>`, hb=`<div class="hb"></div>`;
+const ph=(name,inner,cls='')=>$(`<div class="ph"><div class="nm">${name}</div><div class="scr ${cls}">${sb}${inner}${hb}</div></div>`);
+const row=document.getElementById('row');
+row.appendChild(ph('01 · Pair',`<div class="w" style="top:120px"><b>hello.</b>bubble seven is close.</div><div class="sph" style="top:46%"><div class="ripple"></div><div class="ripple" style="animation-delay:1.3s"></div></div><div class="w sm" style="top:640px">hold the bubble to wake it</div>`));
+row.appendChild(ph('02 · Home',`<div class="w" style="top:120px"><b>over morningside.</b>412 ft · shimmer 84%</div><div class="sph" style="top:46%"><div class="in"></div></div><div class="act"><div class="pill on">come to me</div><div class="pill">somewhere else</div></div>`));
+const fly=ph('03 · Fly',`<div class="w" style="top:110px"><b id="hd">north-east</b><span id="sp">drifting · 14 mph</span></div><div class="sph" id="sph" style="top:48%;left:44%"><div class="in" id="in"></div></div>
+  <div class="g" id="g"><div class="tr"></div><div class="fill" id="gf"></div><div class="v" id="gv">412 ft</div></div><div class="act"><div class="pill">hold still</div></div>`);
+row.appendChild(fly);
+{ const inn=fly.querySelector('#in'), hd=fly.querySelector('#hd'), sp=fly.querySelector('#sp');
+  B.stick(fly.querySelector('#sph'),(x,y)=>{ inn.classList.toggle('live',!(x===0&&y===0)); inn.style.transform=`translate(calc(-50% + ${x*120}px),calc(-50% + ${y*120}px))`; const m=Math.hypot(x,y); if(m>.05){ const a=((Math.atan2(x,-y)*180/Math.PI)+360)%360; hd.textContent=B.compass(a).toLowerCase().replace('ne','north-east').replace('nw','north-west').replace('se','south-east').replace('sw','south-west').replace(/^n$/,'north').replace(/^s$/,'south').replace(/^e$/,'east').replace(/^w$/,'west'); sp.textContent=`moving · ${Math.round(4+m*26)} mph`; } else sp.textContent='drifting · 14 mph'; });
+  B.vslider(fly.querySelector('#g'),v=>{ fly.querySelector('#gf').style.height=(v*100)+'%'; const gv=fly.querySelector('#gv'); gv.style.top=((1-v)*100)+'%'; gv.textContent=Math.round(60+v*1140)+' ft'; },.31); }
+const route=ph('04 · Route',`<div class="w" style="top:110px"><b>where next.</b>tap a bubble</div>
+  ${[['central park',4,96,70,230],['washington sq',11,78,250,330],['williamsburg',19,116,220,470],['brooklyn bridge',16,86,60,540],['pier 17',18,70,250,610],['rockaway',38,64,110,680]].map((d,i)=>`<div class="dest ${i===2?'on':''}" style="width:${d[2]}px;height:${d[2]}px;left:${d[3]}px;top:${d[4]}px">${d[0]}<small>${d[1]} min</small></div>`).join('')}
+  <div class="act"><div class="pill on" id="go">go to williamsburg</div></div>`);
+row.appendChild(route);
+route.querySelectorAll('.dest').forEach(d=>d.addEventListener('click',()=>{route.querySelectorAll('.dest').forEach(x=>x.classList.remove('on'));d.classList.add('on');route.querySelector('#go').textContent='go to '+d.firstChild.textContent.trim();}));
+row.appendChild(ph('05 · Land',`<div class="w" style="top:110px"><b>touching down.</b>n 6th street, williamsburg</div><div class="sph" style="top:58%;width:220px;height:220px"><div class="in"></div></div><div style="position:absolute;left:28px;right:28px;top:706px;height:1px;background:var(--hair)"></div><div class="w sm" style="top:640px">138 ft · 40 seconds</div><div class="act"><div class="pill on">land</div></div>`));
+</script>
