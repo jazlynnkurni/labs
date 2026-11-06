@@ -18,7 +18,7 @@ function mix(hex, to, k) {
 }
 const CSS = `
 .tile { position: absolute; --b:0; --bv:0; --bb:0; --bp:0; --bc:0; --bk:0; --bx:0; pointer-events: none; }
-.tile svg { display: block; width: 100%; height: 100%; overflow: visible; opacity: var(--bv); filter: blur(calc(8px * (1 - var(--bv)))); will-change: opacity, filter; }
+.tile svg { display: block; width: 100%; height: 100%; overflow: visible; opacity: var(--bv); filter: blur(calc(8px * (1 - var(--bv)))); }
 .tile * { transform-box: view-box; }
 .tile .body { transform-origin: 200px 200px; transform: scale(calc(0.82 + 0.18 * var(--bb))); }
 .tile .petals { transform-origin: 200px 200px; transform: rotate(calc(-12deg * (1 - var(--bp)))); }
