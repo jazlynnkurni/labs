@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tiles-lab · wall</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #171717; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  #sky { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
+  body[data-bg="sky"] #sky { display: block; }
+  #wall { position: absolute; inset: 0; display: grid; }
+  .cell { position: relative; overflow: hidden; contain: layout paint; box-shadow: inset -0.5px -0.5px 0 0 rgba(255, 255, 255, 0.12); }   /* a half-pixel hairline on the right and bottom of each brick */
+  body[data-bg="sky"] .cell { box-shadow: inset -0.5px -0.5px 0 0 rgba(255, 255, 255, 0.7); }
+  .cell .tile { left: 50%; top: 50%; transform: translate(-50%, -50%); }
+  /* the background picker: two circles, bottom left */
+  #pick { position: absolute; left: 16px; bottom: 16px; display: flex; gap: 10px; }
+  #pick button { width: 16px; height: 16px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25); transition: box-shadow 150ms ease-out, transform 150ms ease-out; }
+  #pick button:active { transform: scale(0.96); }
+  #pick button[aria-pressed="true"] { box-shadow: 0 0 0 1px #fff, 0 0 0 3px rgba(255, 255, 255, 0.35); }
+  #pick .charcoal { background: #171717; }
+  #pick .sky { background: linear-gradient(180deg, #1c70cc, #66a8e6); }
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas>
+<div id="wall"></div>
+<div id="pick"><button class="sky" data-bg="sky" aria-label="Sky" aria-pressed="true"></button><button class="charcoal" data-bg="charcoal" aria-label="Charcoal" aria-pressed="false"></button></div>
+<script src="tile.js?v=6"></script>
+<script id="frag" type="x-shader/x-fragment">
+precision highp float;
+uniform vec2 uRes;
+uniform float uT;
+
+float hash(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+float vnoise(vec2 p) {
+  vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  float a = hash(i), b = hash(i + vec2(1.0, 0.0)), c = hash(i + vec2(0.0, 1.0)), d = hash(i + vec2(1.0, 1.0));
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+const mat2 M = mat2(1.6, 1.2, -1.2, 1.6);
+float fbm(vec2 p) { float v = 0.0, a = 0.5; for (int i = 0; i < 6; i++) { v += a * vnoise(p); p = M * p; a *= 0.5; } return v; }
+float fbm4(vec2 p) { float v = 0.0, a = 0.5; for (int i = 0; i < 4; i++) { v += a * vnoise(p); p = M * p; a *= 0.5; } return v; }
+
+/* cloud density: soft fbm masses, gently warped so they drift and bulge,
+   with a little ridged detail that only shows at the edges (the cotton) */
+float dens(vec2 p, float t) {
+  vec2 q = vec2(fbm4(p * 0.45 + vec2(t * 0.03, 0.0)), fbm4(p * 0.45 + vec2(7.1, 2.3) + t * 0.02));
+  vec2 pp = p + 0.4 * q;
+  float base = fbm(pp);
+  vec2 d = pp * 3.5 + t * 0.05; float det = 0.0, a = 0.5;
+  for (int i = 0; i < 3; i++) { det += a * abs(2.0 * vnoise(d) - 1.0); d = M * d; a *= 0.5; }
+  return base + 0.10 * det;
+}
+float shape(float n) { return smoothstep(0.52, 0.66, n); }
+
+/* cirrus: stretched sideways, thin, faint */
+float cirrus(vec2 p, float t) {
+  vec2 s = vec2(p.x * 0.45 + t * 0.012, p.y * 2.6 + 0.3 * sin(p.x * 0.7));
+  float n = fbm4(s + 0.5 * vec2(fbm4(s * 1.3), fbm4(s * 1.3 + 3.1)));
+  return smoothstep(0.52, 0.72, n) * 0.5;
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / uRes;
+  vec2 p = vec2(uv.x * uRes.x / uRes.y, uv.y) * 1.8 + vec2(11.0, 3.0);
+  float t = uT;
+  p.x += t * 0.015;                                /* the whole sky drifts right, slowly */
+
+  /* the sky itself: deep blue up top, paler toward the bottom, a soft glow toward the sun */
+  vec2 sun2 = vec2(-0.6, 0.8);
+  vec3 sky = mix(vec3(0.42, 0.67, 0.90), vec3(0.10, 0.43, 0.80), smoothstep(0.0, 1.0, uv.y));
+  sky += vec3(0.10, 0.09, 0.06) * pow(max(0.0, dot(normalize(vec2(uv.x - 0.5, uv.y - 0.5) * vec2(uRes.x / uRes.y, 1.0)), normalize(sun2))), 3.0) * 0.6;
+  vec3 col = sky;
+
+  /* high thin cirrus */
+  float ci = cirrus(p * 0.8 + vec2(3.0, 1.0), t);
+  col = mix(col, vec3(0.93, 0.96, 1.0), ci);
+
+  /* a far layer: smaller, fainter, bluer */
+  {
+    float nf = dens(p * 2.2 + vec2(40.0, 17.0), t);
+    float df = shape(nf);
+    col = mix(col, mix(vec3(0.88, 0.92, 0.98), vec3(0.74, 0.81, 0.92), smoothstep(0.62, 0.85, nf)), df * 0.5);
+  }
+
+  /* the cumulus, lit: a normal from the density slope, the sun up and to the left */
+  float n = dens(p, t);
+  float d = shape(n);
+  if (d > 0.001) {
+    float e = 0.02;
+    float nx = dens(p + vec2(e, 0.0), t), ny = dens(p + vec2(0.0, e), t);
+    vec3 N = normalize(vec3(-(nx - n) * 14.0, -(ny - n) * 14.0, 1.0));
+    vec3 L = normalize(vec3(-0.45, 0.65, 0.62));
+    float diff = clamp(dot(N, L), 0.0, 1.0);
+    float thick = smoothstep(0.60, 0.86, n);                       /* deep inside the cloud */
+    vec3 shade = vec3(0.58, 0.66, 0.80);                           /* grey-blue underside */
+    vec3 cloud = mix(shade, vec3(1.0), 0.30 + 0.70 * diff);
+    cloud = mix(cloud, cloud * vec3(0.86, 0.89, 0.95), thick * (1.0 - diff) * 0.9);   /* the belly, in its own shadow */
+    cloud += vec3(0.08, 0.07, 0.05) * (1.0 - thick) * diff;        /* thin edges glow */
+    col = mix(col, cloud, d * (0.8 + 0.2 * thick));
+  }
+
+  /* the haze: lower sky a little milkier */
+  col = mix(col, vec3(0.80, 0.88, 0.97), 0.08 * (1.0 - uv.y));
+  gl_FragColor = vec4(col, 1.0);
+}
+</script>
+<script>
+/* a wall of empty square bricks. the square under the cursor fills
+   with a tile and keeps it, pixels first. the c1 colourway. behind
+   it, either charcoal or a shader sky: blue, cotton cumulus that
+   drifts and billows, thin cirrus above. two circles pick which.    */
+(() => {
+document.body.dataset.bg = 'sky';
+for (const b of document.querySelectorAll('#pick button')) b.addEventListener('click', () => {
+  document.body.dataset.bg = b.dataset.bg;
+  for (const o of document.querySelectorAll('#pick button')) o.setAttribute('aria-pressed', o === b ? 'true' : 'false');
+});
+const T = window.Tile, wall = document.getElementById('wall');
+const palette = { body: '#2f9be0', cross: '#e5212b', petals: ['#f4e71f', '#e2208e', '#ffffff', '#ffffff'], core: '#f7f0c2' };
+const CELL = 96;
+const tiles = [];
+let W = 0, H = 0;
+
+/* the sky */
+const canvas = document.getElementById('sky');
+const gl = canvas.getContext('webgl', { antialias: false, alpha: false, premultipliedAlpha: false });
+let prog = null, uRes, uT;
+if (gl) {
+  const vs = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vs, 'attribute vec2 a; void main(){ gl_Position = vec4(a, 0.0, 1.0); }'); gl.compileShader(vs);
+  const fs = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fs, document.getElementById('frag').textContent); gl.compileShader(fs);
+  if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(fs));
+  prog = gl.createProgram(); gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog); gl.useProgram(prog);
+  const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  const a = gl.getAttribLocation(prog, 'a'); gl.enableVertexAttribArray(a); gl.vertexAttribPointer(a, 2, gl.FLOAT, false, 0, 0);
+  uRes = gl.getUniformLocation(prog, 'uRes'); uT = gl.getUniformLocation(prog, 'uT');
+}
+function sizeSky() {
+  const dpr = 1;                                          // soft clouds: 1x is plenty, and the shader samples a lot
+  canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+  if (gl) { gl.viewport(0, 0, canvas.width, canvas.height); gl.uniform2f(uRes, canvas.width, canvas.height); }
+}
+const t0 = performance.now();
+function drawSky(now) {
+  if (!gl || !prog || !canvas.width || document.body.dataset.bg !== 'sky') return;   // the charcoal wall costs nothing
+  gl.uniform1f(uT, (now - t0) / 1000);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+}
+
+/* the wall */
+function build() {
+  if (innerWidth < 2 || innerHeight < 2) return;
+  W = innerWidth; H = innerHeight;
+  sizeSky();
+  wall.innerHTML = ''; tiles.length = 0;
+  const cols = Math.max(1, Math.round(W / CELL)), rows = Math.max(1, Math.round(H / CELL));
+  wall.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  wall.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+  const cw = W / cols, ch = H / rows;
+  const size = Math.round(Math.min(cw, ch) * 1.45);
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    const cell = document.createElement('div'); cell.className = 'cell';
+    const t = T.makeTile({ x: 1e5, y: 1e5, size, palette, scatter: 0.35 });   // parked away from the driver's resting cursor
+    t.el.style.left = t.el.style.top = '50%';
+    cell.appendChild(t.el); wall.appendChild(cell); tiles.push(t);
+    cell.addEventListener('pointerenter', () => { t.pinned = true; });
+    cell.addEventListener('pointerdown', () => { t.pinned = !t.pinned; });
+  }
+}
+T.bloom(tiles, { tau: 240, pixelsFirst: true });
+(function watch(now) { if (innerWidth !== W || innerHeight !== H) build(); drawSky(now); requestAnimationFrame(watch); })(performance.now());
+})();
+</script>
+</body>
+</html>

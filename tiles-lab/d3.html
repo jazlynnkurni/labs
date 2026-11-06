@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>d3 · waterfall</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #171717; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
+<script src="ascii.js"></script>
+<script>
+/* a waterfall. water slides over a lip, falls faster as it drops,
+   and hits a pool: spray pixels jump, mist climbs, rings run outward. */
+(() => {
+const A = window.ASCII, S = A.S;
+let P, mist = [], lipRow = 0, poolRow = 0, x0 = 0, x1 = 0;
+let rings = [];
+A.start({
+  cw: 8, ch: 13,
+  setup() {
+    P = A.particles({ gravity: 0.9 });
+    lipRow = Math.floor(S.ROWS * 0.18); poolRow = Math.floor(S.ROWS * 0.74);
+    x0 = Math.floor(S.COLS * 0.36); x1 = Math.floor(S.COLS * 0.62);
+    mist = []; rings = [];
+  },
+  update(dt, t) {
+    // where the fall lands, the pool throws spray
+    for (let k = 0; k < 3; k++) if (A.rnd() < 0.8) {
+      const i = x0 + A.rnd() * (x1 - x0);
+      P.add(i * S.CW, poolRow * S.CH, (A.rnd() - 0.5) * 5, -(3 + A.rnd() * 6), { life: 0.8 + A.rnd() * 0.8, drag: 0.04 });
+    }
+    if (A.rnd() < 0.5) mist.push({ x: (x0 + A.rnd() * (x1 - x0)) * S.CW, y: poolRow * S.CH - 4, vy: -(14 + A.rnd() * 22), age: 0, life: 2.5 + A.rnd() * 2 });
+    for (const m of mist) { m.age += dt; m.y += m.vy * dt; m.x += (A.vnoise(m.x * 0.01, t * 0.5) - 0.5) * 60 * dt; }
+    for (let i = mist.length - 1; i >= 0; i--) if (mist[i].age > mist[i].life) mist.splice(i, 1);
+    if (A.rnd() < 0.08) rings.push({ x: (x0 + A.rnd() * (x1 - x0)) * S.CW, r: 0, age: 0 });
+    for (const g of rings) { g.age += dt; g.r += 70 * dt; }
+    for (let i = rings.length - 1; i >= 0; i--) if (rings[i].age > 3) rings.splice(i, 1);
+    P.update(dt, b => b.age > 0.3 && b.position.y > poolRow * S.CH + 2);
+  },
+  draw(t) {
+    const { COLS, ROWS, CW, CH } = S;
+    const frame = Math.floor(t * 9);
+    // the cliff: dark mass either side of the fall with a lit edge
+    for (let r = 0; r < poolRow; r++) for (let i = 0; i < COLS; i++) {
+      const inFall = i >= x0 && i < x1 && r >= lipRow;
+      const n = A.hash3(i, r, 4);
+      if (!inFall) {
+        if (r < lipRow) { if (i >= x0 - 1 && i < x1 + 1 && n < 0.6) A.cell(i, r, '-', 0.3); continue; }   // the river above the lip
+        const edge = (i === x0 - 1 || i === x1) ? 1 : 0;
+        if (edge) A.cell(i, r, n < 0.5 ? '#' : '%', 0.35);
+        else if (n < 0.1) A.cell(i, r, n < 0.04 ? ':' : '.', 0.1);
+      } else {
+        // falling water: streaks sliding down faster with depth, brighter where they bunch
+        const d = r - lipRow;
+        const speed = 9 + d * 0.9;
+        const v = A.vnoise(i * 0.7, r * 0.25 - t * speed * 0.35) * 0.6 + A.vnoise(i * 2.1 + 3, r * 0.5 - t * speed * 0.5) * 0.4;
+        const edgeK = Math.min(i - x0, x1 - 1 - i) < 1 ? 0.6 : 1;
+        if (v > 0.42) { const b = (v - 0.42) * 2.2; A.cell(i, r, b > 0.6 ? '|' : (b > 0.3 ? ':' : '.'), (0.3 + 0.7 * Math.min(1, b)) * edgeK); }
+        if (d === 0 && n < 0.8) A.cell(i, r, '~', 0.8);
+      }
+    }
+    // the pool: churned white where the fall lands, rings running out, calm beyond
+    for (let r = poolRow; r < ROWS; r++) for (let i = 0; i < COLS; i++) {
+      const x = i * CW + CW / 2;
+      const n = A.hash3(i, r, frame);
+      const dr = r - poolRow;
+      const inside = i >= x0 - 2 && i < x1 + 2;
+      let ch = ' ', a = 0;
+      if (inside && dr < 4) { const m = A.hash3(i, r, frame + 2); ch = m < 0.4 ? '#' : m < 0.7 ? '%' : '@'; a = 0.9 - dr * 0.15; }
+      else {
+        let h = 0;
+        for (const g of rings) { const dx = Math.abs(x - g.x) - g.r; if (Math.abs(dx) < 10) h += (1 - g.age / 3) * Math.cos(dx * 0.3); }
+        const sw = A.vnoise(i * 0.3 - t * 0.6, r * 0.6) - 0.5;
+        const b = 0.1 + 0.35 * h + 0.2 * sw;
+        if (b > 0.14) { ch = b > 0.4 ? '=' : b > 0.25 ? '-' : (n < 0.5 ? '.' : ','); a = 0.15 + 0.8 * Math.min(1, b); }
+      }
+      if (ch !== ' ') A.cell(i, r, ch, a);
+    }
+    // mist, climbing and thinning
+    for (const m of mist) { const k = 1 - m.age / m.life; A.cell(Math.floor(m.x / CW), Math.floor(m.y / CH), k > 0.5 ? ':' : '.', 0.35 * k); }
+  },
+  overlay() { P.draw(0.3); }
+});
+})();
+</script>
+</body>
+</html>

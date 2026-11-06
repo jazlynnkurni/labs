@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tiles-lab · one tile</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; height: 100%; background: #000; -webkit-font-smoothing: antialiased; }
+  body { display: grid; place-items: center; min-height: 100dvh; overflow: hidden; }
+
+  .tile {
+    width: min(360px, 70vw);
+    aspect-ratio: 1;
+    --b: 0;   /* bloom 0..1 */
+    --bb: 0;  /* body */
+    --bp: 0;  /* petals */
+    --bc: 0;  /* red cross */
+    --bk: 0;  /* cream core */
+    --bv: 0;  /* visibility, leads the rest */
+    --bx: 0;  /* pixels and ascii, last */
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .tile svg {
+    display: block; width: 100%; height: 100%; overflow: visible;
+    /* nothing there until the cursor comes near: the tile surfaces out of the black */
+    opacity: var(--bv);
+    filter: blur(calc(8px * (1 - var(--bv))));
+  }
+
+  .tile * { transform-box: view-box; }
+
+  .body {
+    transform-origin: 200px 200px;
+    transform: scale(calc(0.82 + 0.18 * var(--bb)));
+  }
+
+  .petals {
+    transform-origin: 200px 200px;
+    transform: rotate(calc(-12deg * (1 - var(--bp))));
+  }
+  .arm .reach {
+    transform-origin: 0 0;
+    transform:
+      translateX(calc(-22px * (1 - var(--bp))))
+      scale(calc(0.5 + 0.5 * var(--bp)), calc(0.78 + 0.22 * var(--bp)));
+  }
+  .arm .twin {
+    transform-origin: 0 0;
+    transform: rotate(calc(14deg * var(--bp)));
+  }
+
+  .cross {
+    transform-origin: 200px 200px;
+    transform: scale(calc(0.7 + 0.3 * var(--bc)));
+  }
+  .core {
+    transform-origin: 200px 200px;
+    transform: scale(calc(0.6 + 0.4 * var(--bk)));
+  }
+
+  /* the clash: hard pixels and ascii, gathered in at rest, thrown out on bloom */
+  .scatter {
+    transform-origin: 200px 200px;
+    transform: scale(calc(0.72 + 0.28 * var(--bx)));
+    opacity: var(--bx);
+  }
+  .scatter rect { shape-rendering: crispEdges; }
+
+  /* pixels bleep: hard on and off, each on its own clock */
+  .scatter rect { animation: var(--bleep, none) var(--dur, 1s) steps(1, end) var(--delay, 0s) infinite; }
+  @keyframes bleepShort { 0%, 18% { opacity: 1; } 18.01%, 100% { opacity: 0; } }
+  @keyframes bleepHalf  { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+  @keyframes bleepLong  { 0%, 82% { opacity: 1; } 82.01%, 100% { opacity: 0; } }
+  @keyframes bleepTwice { 0%, 12% { opacity: 1; } 12.01%, 30% { opacity: 0; } 30.01%, 44% { opacity: 1; } 44.01%, 100% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .scatter rect { animation: none; } }
+  .scatter text {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-weight: 500;
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+</style>
+</head>
+<body>
+
+<div class="tile" id="tile" aria-label="One tile">
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <filter id="cut" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <g id="bodyShape">
+      <rect x="95" y="95" width="210" height="210" rx="46"/>
+      <circle cx="118" cy="118" r="40"/>
+      <circle cx="282" cy="118" r="40"/>
+      <circle cx="118" cy="282" r="40"/>
+      <circle cx="282" cy="282" r="40"/>
+    </g>
+    <rect id="pill" x="12" y="-27" width="163" height="54" rx="27"/>
+
+
+    <!-- feathered edges so every layer melts into the next -->
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2.2"/>
+    </filter>
+
+    <!-- halftone screen for the blue body, 45 degrees -->
+    <pattern id="dotsBlue" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="7" height="7" fill="#2f9be0"/>
+      <circle cx="3.5" cy="3.5" r="1.7" fill="#15609f"/>
+    </pattern>
+
+    <!-- halftone screen for the red plus, 45 degrees -->
+    <pattern id="dots" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="7" height="7" fill="#e5212b"/>
+      <circle cx="3.5" cy="3.5" r="1.7" fill="#9c0f1a"/>
+    </pattern>
+  </defs>
+
+  <g class="scatter" id="under"></g>
+
+  <g filter="url(#cut)">
+
+    <!-- blue lobed body, a lighter cut edge underneath -->
+    <g class="body">
+      <g filter="url(#soft)">
+        <use xlink:href="#bodyShape" fill="url(#dotsBlue)"/>
+      </g>
+    </g>
+
+    <!-- four diagonal arms, each a pair of pills that fan apart -->
+    <g class="petals" filter="url(#soft)">
+      <g class="arm" transform="translate(200 200) rotate(-135)">
+        <g class="reach">
+          <g class="twin"><use xlink:href="#pill" fill="#f7ef6a"/></g>
+          <use xlink:href="#pill" fill="#f4e71f"/>
+        </g>
+      </g>
+      <g class="arm" transform="translate(200 200) rotate(-45)">
+        <g class="reach">
+          <g class="twin"><use xlink:href="#pill" fill="#ee6fb6"/></g>
+          <use xlink:href="#pill" fill="#e2208e"/>
+        </g>
+      </g>
+      <g class="arm" transform="translate(200 200) rotate(45)">
+        <g class="reach">
+          <g class="twin"><use xlink:href="#pill" fill="#e6ecf3"/></g>
+          <use xlink:href="#pill" fill="#ffffff"/>
+        </g>
+      </g>
+      <g class="arm" transform="translate(200 200) rotate(135)">
+        <g class="reach">
+          <g class="twin"><use xlink:href="#pill" fill="#e6ecf3"/></g>
+          <use xlink:href="#pill" fill="#ffffff"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- red plus -->
+    <g class="cross" fill="url(#dots)" filter="url(#soft)">
+      <rect x="82" y="183" width="236" height="34" rx="17"/>
+      <rect x="183" y="82" width="34" height="236" rx="17"/>
+    </g>
+
+    <!-- cream core -->
+    <g class="core" fill="#f7f0c2" filter="url(#soft)">
+      <rect x="146" y="191" width="108" height="18" rx="9"/>
+      <rect x="191" y="146" width="18" height="108" rx="9"/>
+    </g>
+
+  </g>
+
+  <g class="scatter" id="over"></g>
+</svg>
+</div>
+
+<script>
+// pixels and ascii scattered around and across the tile, seeded so it is the same every load
+(() => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const under = document.getElementById('under');
+  const over = document.getElementById('over');
+  const pal = ['#f4e71f', '#e2208e', '#ffffff', '#2f9be0', '#e5212b', '#f7f0c2'];
+  const glyphs = '+x.:;=#/\\*^~-|<>[]{}'.split('');
+  let seed = 20261105;
+  const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const pick = a => a[Math.floor(rnd() * a.length)];
+  const G = 10;
+  // positions lean toward the four diagonals, where the petals are
+  const spot = (r0, r1) => {
+    const r = r0 + (r1 - r0) * Math.pow(rnd(), 0.85);
+    let a = rnd() * Math.PI * 2;
+    if (rnd() < 0.6) a = (Math.PI / 4) + Math.floor(rnd() * 4) * (Math.PI / 2) + (rnd() - 0.5) * 0.5;
+    return [200 + r * Math.cos(a), 200 + r * Math.sin(a)];
+  };
+  const px = (g, n, r0, r1, black) => {
+    for (let i = 0; i < n; i++) {
+      const [x, y] = spot(r0, r1);
+      const size = rnd() < 0.22 ? 2 * G : G;
+      const e = document.createElementNS(NS, 'rect');
+      e.setAttribute('x', Math.round(x / G) * G); e.setAttribute('y', Math.round(y / G) * G);
+      e.setAttribute('width', size); e.setAttribute('height', size);
+      e.setAttribute('fill', black && rnd() < black ? '#000' : pick(pal));
+      e.style.setProperty('--bleep', pick(['bleepShort', 'bleepHalf', 'bleepLong', 'bleepTwice', 'bleepHalf']));
+      e.style.setProperty('--dur', (0.5 + rnd() * 3.2).toFixed(2) + 's');
+      e.style.setProperty('--delay', (-rnd() * 4).toFixed(2) + 's');
+      g.appendChild(e);
+    }
+  };
+  const ascii = (g, n, r0, r1) => {
+    for (let i = 0; i < n; i++) {
+      const [x, y] = spot(r0, r1);
+      const e = document.createElementNS(NS, 'text');
+      e.setAttribute('x', Math.round(x / G) * G); e.setAttribute('y', Math.round(y / G) * G);
+      e.setAttribute('font-size', 11 + Math.floor(rnd() * 11));
+      e.setAttribute('fill', pick(pal));
+      const len = rnd() < 0.25 ? 3 : 1;
+      let t = ''; for (let k = 0; k < len; k++) t += pick(glyphs);
+      e.textContent = t;
+      g.appendChild(e);
+    }
+  };
+  px(under, 95, 60, 250);  ascii(under, 42, 80, 260);
+  px(over, 34, 40, 200, 0.35);  ascii(over, 16, 50, 190);
+})();
+
+(() => {
+  const tile = document.getElementById('tile');
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let target = 0, b = 0, pinned = false;
+  const clamp01 = v => Math.max(0, Math.min(1, v));
+  const smooth = v => { v = clamp01(v); return v * v * (3 - 2 * v); };
+  const seg = (v, a, w) => smooth((v - a) / w);
+
+  if (fine) {
+    addEventListener('pointermove', e => {
+      const r = tile.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const d = Math.hypot(e.clientX - cx, e.clientY - cy);
+      const inner = r.width * 0.42;     // fully bloomed once the cursor is on the tile
+      const reach = r.width * 1.1;      // starts waking up this far out
+      target = clamp01(1 - (d - inner) / reach);
+    }, { passive: true });
+    document.addEventListener('pointerleave', () => { target = 0; });
+  } else {
+    tile.addEventListener('pointerdown', () => { pinned = !pinned; target = pinned ? 1 : 0; });
+  }
+
+  // slow: time-based so it settles in about 1.6s whatever the frame rate
+  const tau = reduced ? 0 : 420;  // ms
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(now - last, 100); last = now;
+    const k = tau ? 1 - Math.exp(-dt / tau) : 1;
+    b += (target - b) * k;
+    if (Math.abs(target - b) < 0.0005) b = target;
+    const s = tile.style;
+    s.setProperty('--b', b.toFixed(4));
+    s.setProperty('--bv', smooth(b * 1.6).toFixed(4));
+    s.setProperty('--bb', smooth(b * 1.25).toFixed(4));
+    s.setProperty('--bp', smooth(b).toFixed(4));
+    s.setProperty('--bc', seg(b, 0.25, 0.75).toFixed(4));
+    s.setProperty('--bk', seg(b, 0.45, 0.55).toFixed(4));
+    s.setProperty('--bx', seg(b, 0.35, 0.65).toFixed(4));
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

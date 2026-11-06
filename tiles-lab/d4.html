@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>d4 · mountains in fog</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #171717; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script src="ascii.js"></script>
+<script>
+/* ridges receding into fog. five ridge lines, the far ones faint, the
+   near ones dense. fog drifts through as a slow noise field and eats
+   whatever it covers. a few birds cross. the camera creeps sideways.  */
+(() => {
+const A = window.ASCII, S = A.S;
+const LAYERS = 5;
+let birds = [];
+function ridge(l, x) {
+  // each layer has its own profile; lower layers sit lower on screen
+  const base = 0.42 + l * 0.11;
+  const amp = 0.12 + l * 0.03;
+  const f = 0.0022 - l * 0.0002;
+  return base - amp * (A.fbm(x * f + l * 13.7, l * 5.1) - 0.3) * 2.2 - 0.03 * (A.vnoise(x * f * 7 + l, 9) - 0.5);
+}
+A.start({
+  cw: 8, ch: 13,
+  halo: [0.14, 0.05],
+  setup() { birds = []; for (let k = 0; k < 4; k++) birds.push({ x: A.rnd() * S.W, y: S.H * (0.12 + A.rnd() * 0.25), v: 18 + A.rnd() * 14, ph: A.rnd() * 6 }); },
+  update(dt, t) { for (const b of birds) { b.x += b.v * dt; if (b.x > S.W + 40) { b.x = -40; b.y = S.H * (0.1 + A.rnd() * 0.3); } } },
+  draw(t) {
+    const { COLS, ROWS, CW, CH, W, H } = S;
+    const frame = Math.floor(t * 4);
+    const drift = t * 6;                                     // the slow sideways creep
+    for (let i = 0; i < COLS; i++) {
+      // ridge heights in this column, far to near, with parallax
+      const tops = [];
+      for (let l = 0; l < LAYERS; l++) tops.push(ridge(l, i * CW + drift * (0.3 + l * 0.35)));
+      for (let r = 0; r < ROWS; r++) {
+        const y = (r + 0.5) / ROWS;
+        // which layer owns this cell: the nearest ridge that rises above it
+        let own = -1;
+        for (let l = LAYERS - 1; l >= 0; l--) if (y > tops[l]) { own = l; break; }
+        const n = A.hash3(i, r, frame);
+        const fog = A.fbm(i * 0.03 + t * 0.05, r * 0.045 - t * 0.02) + 0.25 * (1 - y);   // thicker toward the valleys and the sky line
+        let ch = ' ', a = 0;
+        if (own >= 0) {
+          const depth = own / (LAYERS - 1);                  // 0 far, 1 near
+          const edge = y - tops[own] < 1.2 / ROWS;
+          const dens = 0.08 + 0.42 * depth;                  // near ridges are drawn more densely
+          if (edge) { ch = n < 0.5 ? '^' : (n < 0.75 ? '/' : '\\'); a = 0.45 + 0.55 * depth; }
+          else if (n < dens) { const b = depth * (0.5 + 0.5 * A.vnoise(i * 0.2, r * 0.3 + own * 7)); ch = A.ramp(0.1 + 0.45 * b, A.hash3(i, r, 8)); a = 0.08 + 0.4 * b; }
+          // fog eats the far ridges first
+          const eat = A.clamp((fog - 0.45 - 0.3 * depth) * 3, 0, 1);
+          a *= 1 - eat;
+          if (eat > 0.35 && n < eat * 0.5) { ch = n < 0.2 ? ':' : '.'; a = 0.1 + 0.25 * eat; }
+        } else {
+          // the sky: fog banks and a very faint grain
+          const sky = A.clamp((fog - 0.6) * 2.5, 0, 1);
+          if (sky > 0.1 && n < sky * 0.45) { ch = n < 0.15 ? ':' : (n < 0.3 ? ',' : '.'); a = 0.06 + 0.22 * sky; }
+        }
+        if (ch !== ' ') A.cell(i, r, ch, a);
+      }
+    }
+    for (const b of birds) { const i = Math.floor(b.x / CW), r = Math.floor(b.y / CH); A.cell(i, r, Math.sin(t * 7 + b.ph) > 0 ? 'v' : '~', 0.5); }
+  }
+});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tiles-lab · hover</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #171717; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  #field { position: absolute; inset: 0; }
+</style>
+</head>
+<body>
+<div id="field"></div>
+<script src="tile.js"></script>
+<script>
+/* an empty page. wherever the cursor comes to rest a tile surfaces
+   under it and blooms; move on and it sinks back into the charcoal
+   while the next one rises where you are. the c1 colourway.           */
+(() => {
+const T = window.Tile, field = document.getElementById('field');
+const palette = { body: '#2f9be0', cross: '#e5212b', petals: ['#f4e71f', '#e2208e', '#ffffff', '#ffffff'], core: '#f7f0c2' };
+const SIZE = 240;
+const tiles = [];
+const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+function spawn(x, y, pinned) {
+  const t = T.makeTile({ x, y, size: SIZE, palette, scatter: 0.8 });
+  if (pinned) t.pinned = true;
+  field.appendChild(t.el); tiles.push(t);
+  return t;
+}
+// a new tile rises where the cursor is, once it has left the reach of every live one
+let cx = -1e5, cy = -1e5, moving = 0;
+if (fine) {
+  addEventListener('pointermove', e => {
+    cx = e.clientX; cy = e.clientY; moving = performance.now();
+    const near = tiles.some(t => !t.sinking && Math.hypot(cx - t.x, cy - t.y) < t.size * 0.55);
+    if (!near) {
+      for (const t of tiles) t.sinking = true;        // the old ones let go
+      spawn(cx, cy);
+    }
+  }, { passive: true });
+} else {
+  addEventListener('pointerdown', e => { const hit = tiles.find(t => Math.hypot(e.clientX - t.x, e.clientY - t.y) < t.size * 0.6); if (!hit) spawn(e.clientX, e.clientY, true); });
+}
+T.bloom(tiles, { reach: 0.9 });
+// a sinking tile keeps its target at zero even if the cursor wanders back; gone once it is dark
+(function sweep() {
+  for (let i = tiles.length - 1; i >= 0; i--) {
+    const t = tiles[i];
+    if (t.sinking) { t.pinned = false; t.x = -1e5; t.y = -1e5; }   // out of reach, so the driver lets it fall
+    if (t.sinking && t.b < 0.003) { t.el.remove(); tiles.splice(i, 1); }
+  }
+  requestAnimationFrame(sweep);
+})();
+})();
+</script>
+</body>
+</html>

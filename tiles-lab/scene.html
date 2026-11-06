@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tiles-lab · scene</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #171717; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  #field { position: absolute; inset: 0; }
+</style>
+</head>
+<body>
+<div id="field"></div>
+<script src="tile.js"></script>
+<script>
+/* the tile field: tiles scattered over charcoal, each with its own
+   palette, each blooming as the cursor nears.                          */
+(() => {
+const T = window.Tile;
+const field = document.getElementById('field');
+const fract = v => v - Math.floor(v);
+const hash2 = (i, j) => fract(Math.sin(i * 127.1 + j * 311.7) * 43758.5453);
+const tiles = [];
+function place() {
+  field.innerHTML = ''; tiles.length = 0;
+  const W = innerWidth, H = innerHeight;
+  const count = Math.round((W * H) / 60000);
+  const seed = 11;
+  for (let k = 0; k < count; k++) {
+    const u = hash2(k, seed), v = hash2(k, seed + 1);
+    const t = T.makeTile({ x: W * (0.06 + 0.88 * u), y: H * (0.08 + 0.84 * v), size: 84 + Math.round(hash2(k, seed + 2) * 70), scatter: 0.5 });
+    field.appendChild(t.el); tiles.push(t);
+  }
+}
+place();
+T.bloom(tiles, { reach: 1.0 });
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { place(); }, 200); });
+})();
+</script>
+</body>
+</html>

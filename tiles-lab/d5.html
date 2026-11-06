@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>d5 · fire</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #171717; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
+<script src="ascii.js"></script>
+<script>
+/* a fire. heat is fed in at the logs and climbs the grid, cooling and
+   wandering sideways; the glyph ramp is the flame. embers lift off the
+   hottest cells and drift up as pixels. smoke thins above.             */
+(() => {
+const A = window.ASCII, S = A.S;
+let heat, prev, P, cx = 0, logRow = 0, cols = 0, rows = 0, acc = 0;
+const STEP = 1 / 40;                 // the flame climbs one row per step, 40 steps a second
+A.start({
+  cw: 8, ch: 13,
+  halo: [0.22, 0.08],
+  setup() {
+    cols = S.COLS; rows = S.ROWS;
+    heat = new Float32Array(cols * rows); prev = new Float32Array(cols * rows);
+    cx = Math.floor(cols / 2); logRow = Math.floor(rows * 0.8);
+    P = A.particles({ gravity: -0.18 });
+  },
+  update(dt, t) {
+    acc += dt;
+    let steps = 0;
+    while (acc >= STEP && steps < 4) { acc -= STEP; steps++; climb(t); }
+    P.update(dt, null, b => ({ x: 0.000012 * (A.vnoise(b.position.y * 0.02, b.age * 2) - 0.5), y: 0 }));
+  },
+  draw(t) { drawFire(t); },
+  overlay() { P.draw(0.8); }
+});
+function climb(t) {
+  {
+    // feed the base: hottest in the middle, flickering
+    const half = Math.max(6, Math.floor(cols * 0.09));
+    for (let i = 0; i < cols; i++) {
+      const u = (i - cx) / half;
+      const base = Math.max(0, 1 - u * u) * (0.75 + 0.25 * A.vnoise(i * 0.5, t * 9));
+      heat[(logRow - 1) * cols + i] = base * (A.rnd() < 0.85 ? 1 : 0.4);
+    }
+    // climb: each cell takes from the three below, cools, drifts with a slow wind
+    const wind = (A.vnoise(t * 0.4, 3) - 0.5) * 1.4;
+    prev.set(heat);
+    for (let r = logRow - 2; r >= 0; r--) {
+      const h = (logRow - 1 - r) / (logRow - 1);           // 0 at the base, 1 at the top
+      for (let i = 0; i < cols; i++) {
+        const src = i - Math.round(wind + (A.rnd() - 0.5) * 1.6);
+        const j = A.clamp(src, 1, cols - 2);
+        const v = (prev[(r + 1) * cols + j - 1] + prev[(r + 1) * cols + j] * 4 + prev[(r + 1) * cols + j + 1]) / 6;
+        heat[r * cols + i] = Math.max(0, v - (0.012 + 0.07 * h) - A.rnd() * 0.02);
+      }
+    }
+    // embers lift from the hot tips
+    for (let k = 0; k < 2; k++) {
+      const i = cx + Math.round((A.rnd() - 0.5) * half * 2), r = logRow - 4 - Math.floor(A.rnd() * 8);
+      if (i > 0 && i < cols && heat[r * cols + i] > 0.35 && A.rnd() < 0.35) P.add(i * S.CW + S.CW / 2, r * S.CH, (A.rnd() - 0.5) * 1.2 + wind * 0.5, -(0.5 + A.rnd()), { size: A.rnd() < 0.3 ? 4 : 3, life: 1.8 + A.rnd() * 2.2, drag: 0.05 });
+    }
+  }
+}
+function drawFire(t) {
+  {
+    const frame = Math.floor(t * 10);
+    for (let r = 0; r < logRow; r++) for (let i = 0; i < cols; i++) {
+      const v = heat[r * cols + i];
+      if (v < 0.05) continue;
+      const n = A.hash3(i, r, frame);
+      if (v < 0.16) { if (n < 0.35) A.cell(i, r, n < 0.15 ? ':' : '.', 0.12 + v * 0.8); continue; }   // smoke
+      A.cell(i, r, A.ramp(0.15 + v * 0.95, n), 0.25 + 0.75 * Math.min(1, v * 1.3));
+      if (v > 0.8 && n < 0.18) A.cellPx(i, r, 1, 4);
+    }
+    // the logs
+    const half = Math.max(6, Math.floor(cols * 0.09));
+    for (let i = cx - half - 3; i <= cx + half + 3; i++) {
+      const n = A.hash3(i, 1, 2);
+      A.cell(i, logRow, n < 0.6 ? '=' : '#', 0.3);
+      if (A.hash3(i, 2, 2) < 0.5) A.cell(i, logRow + 1, n < 0.5 ? '-' : '=', 0.2);
+    }
+    // the ground under it, lit faintly
+    for (let i = 0; i < cols; i++) { const d = Math.abs(i - cx) / (half * 2.5); if (d < 1 && A.hash3(i, 3, frame >> 2) < 0.5 * (1 - d)) A.cell(i, logRow + 2, '.', 0.1 + 0.12 * (1 - d)); }
+  }
+}
+})();
+</script>
+</body>
+</html>

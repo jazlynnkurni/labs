@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tiles-lab · ocean</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #171717; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
+<script>
+(() => {
+'use strict';
+
+/* ---------- canvas, grid ---------- */
+const BG = '#171717';
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const water = document.createElement('canvas');   // the ascii sea, before the square halo
+const wctx = water.getContext('2d');
+const CW = 8, CH = 13;
+let W = 0, H = 0, DPR = 1, COLS = 0, ROWS = 0, HROW = 0;
+
+/* ---------- glyph atlas ---------- */
+const GLYPHS = " .,:;-=+*#%@~^'\"";
+const RAMP = " .,:;-=+*";
+const FOAM = "#%@*";
+const atlas = document.createElement('canvas');
+const atlasX = {};
+function buildAtlas() {
+  atlas.width = GLYPHS.length * CW * DPR; atlas.height = CH * DPR;
+  const a = atlas.getContext('2d');
+  a.scale(DPR, DPR);
+  a.fillStyle = '#fff';
+  a.font = '500 12px ui-monospace, "SF Mono", Menlo, monospace';
+  a.textBaseline = 'middle'; a.textAlign = 'center';
+  for (let i = 0; i < GLYPHS.length; i++) { atlasX[GLYPHS[i]] = i * CW; a.fillText(GLYPHS[i], i * CW + CW / 2, CH / 2 + 0.5); }
+}
+function glyph(c, ch, x, y, alpha) {
+  if (ch === ' ' || alpha <= 0.02) return;
+  c.globalAlpha = Math.min(1, alpha);
+  c.drawImage(atlas, atlasX[ch] * DPR, 0, CW * DPR, CH * DPR, x, y, CW, CH);
+}
+
+/* ---------- noise ---------- */
+const fract = v => v - Math.floor(v);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const hash2 = (i, j) => fract(Math.sin(i * 127.1 + j * 311.7) * 43758.5453);
+const hash3 = (i, j, k) => fract(Math.sin(i * 12.9898 + j * 78.233 + k * 37.719) * 43758.5453);
+function vnoise(x, y) {
+  const xi = Math.floor(x), yi = Math.floor(y);
+  let fx = x - xi, fy = y - yi;
+  fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy);
+  const a = hash2(xi, yi), b = hash2(xi + 1, yi), c = hash2(xi, yi + 1), d = hash2(xi + 1, yi + 1);
+  return a + (b - a) * fx + (c - a) * fy + (a - b - c + d) * fx * fy;
+}
+const noise1 = (x, s) => vnoise(x, s) - 0.5;        // -0.5..0.5 along one axis
+const rnd = Math.random;
+
+/* ---------- the view ----------
+   a low camera on the beach looking out. the water is a flat plane;
+   a screen row below the horizon sees the plane at distance z = K / dy,
+   true perspective. world x across the plane is sx * z / F.
+   the shoreline is near the camera, the break zone a little beyond.  */
+let K = 1, F = 600;
+const ZN = 2.0;                   // distance at the bottom row
+const Z_SHORE = 2.85;             // where the sand starts
+function rowZ(r) { return K / Math.max(1, (r + 0.5 - HROW) * CH); }
+function zRow(z) { return HROW + (K / z) / CH; }   // fractional row at distance z
+
+/* ---------- breakers ----------
+   each one is a crest line parallel to the beach, rolling in. it has a
+   height above the plane that projects as a face on screen. past its
+   break line the lip turns to foam, peeling unevenly along x, and a
+   whitewater apron spreads in front of it. at the shoreline it becomes
+   swash: a foam sheet with a scalloped edge running up the sand.       */
+const breakers = [], swashes = [];
+let spawnIn = 1.0, seedN = 1;
+function spawnBreaker(z) {
+  const big = rnd() < 0.3;
+  breakers.push({ z, H: (0.55 + rnd() * 0.5) * (big ? 1.4 : 1), seed: seedN++ * 17.3, zb: 6.2 + rnd() * 2.2, age: 0 });
+}
+function speedAt(z) { return 0.9 + 0.22 * z; }
+function updateSea(dt, t) {
+  spawnIn -= dt;
+  if (spawnIn <= 0) { spawnBreaker(15 + rnd() * 3); spawnIn = 5.5 + rnd() * 3.5; }
+  for (const b of breakers) {
+    b.age += dt;
+    b.z -= speedAt(b.z) * dt;
+    if (b.z <= Z_SHORE + 0.15) { swashes.push({ edge: Z_SHORE, v: -0.55 * (0.7 + b.H * 0.5), a: 1, seed: b.seed + 5 }); b.dead = true; }
+  }
+  for (let i = breakers.length - 1; i >= 0; i--) if (breakers[i].dead) breakers.splice(i, 1);
+  for (const s of swashes) {
+    s.v += 0.32 * dt;                // slows running up the sand, then slides back
+    s.edge += s.v * dt;
+    s.a = Math.max(0, s.a - dt * 0.14);
+    if (s.edge > Z_SHORE + 0.35 || s.a <= 0) s.dead = true;
+  }
+  for (let i = swashes.length - 1; i >= 0; i--) if (swashes[i].dead) swashes.splice(i, 1);
+}
+
+/* ---------- Matter.js: the spray ---------- */
+const M = window.Matter;
+let engine, world;
+const spray = [];
+function buildWorld() { engine = M.Engine.create(); world = engine.world; engine.gravity.y = 1; }
+function burst(x, y, n, power, spread) {
+  if (!M) return;
+  for (let i = 0; i < n; i++) {
+    const size = rnd() < 0.3 ? 4 : 3;
+    const b = M.Bodies.rectangle(x + (rnd() - 0.5) * 8, y, size, size, { frictionAir: 0.03, density: 0.0008, collisionFilter: { group: -2 } });
+    M.Body.setVelocity(b, { x: (rnd() - 0.5) * spread, y: -(power * (0.5 + rnd())) });
+    b.size = size; b.age = 0; b.life = 1.2 + rnd() * 1.2; b.sea = y + 26;
+    M.Composite.add(world, b); spray.push(b);
+  }
+}
+function updateSpray(dt) {
+  for (let i = spray.length - 1; i >= 0; i--) {
+    const b = spray[i]; b.age += dt;
+    const p = b.position;
+    if ((b.age > 0.3 && p.y > b.sea) || b.age > b.life || p.x < -40 || p.x > W + 40) { M.Composite.remove(world, b); spray.splice(i, 1); }
+  }
+}
+
+/* ---------- drawing ---------- */
+function drawSea(t) {
+  wctx.clearRect(0, 0, W, H);
+  const frame = Math.floor(t * 8);
+  const N = ROWS - HROW;
+  // the sea plane, column by column
+  for (let i = 0; i < COLS; i++) {
+    const sx = i * CW + CW / 2 - W / 2;
+    // per breaker, where its base and lip sit on screen in this column
+    const faces = [];
+    for (const b of breakers) {
+      const xw = sx * b.z / F;
+      const zc = b.z + 0.7 * noise1(xw * 0.28, b.seed) + 0.15 * noise1(xw * 1.4, b.seed + 3);   // the crest line bends
+      const Hw = b.H * (0.9 + 0.65 * noise1(xw * 0.7, b.seed + 1)) * clamp((14 - zc) / 7, 0.35, 1);   // grows as it shoals, unevenly
+      const zBreak = b.zb + 1.3 * noise1(xw * 0.35, b.seed + 2);          // peels unevenly
+      const prog = clamp((zBreak - zc) / 1.6, 0, 1);                      // 0 unbroken, 1 fully broken
+      const dyBase = K / zc, dyTop = dyBase - F * Hw * (1 - 0.35 * prog) / zc;
+      const lipVar = 0.7 + 0.7 * vnoise(xw * 2.4 + b.seed, t * 0.6);                   // a bumpy foam top
+      faces.push({ b, zc, Hw, prog, dyBase, dyTop, xw, lipVar });
+    }
+    for (let k = 0; k < N; k++) {
+      const r = HROW + k, y = r * CH, dy = (k + 0.5) * CH;
+      const z = K / dy;
+      const near = clamp(1 - (z - ZN) / 12, 0, 1);
+      const fade = 0.28 + 0.72 * clamp(1 - z / 60, 0, 1);
+      const xw = sx * z / F;
+      const n = hash3(i, r, frame);
+      let ch = ' ', a = 0, isFoam = false;
+
+      if (z < Z_SHORE) {
+        // sand: dim, dry, a little grain
+        const g = hash3(i, r, 2);
+        if (g < 0.28) { ch = g < 0.1 ? ',' : '.'; a = 0.1 + g * 0.3; }
+      } else {
+        // open water: fine chop, long low swell lines far out
+        const swell = Math.sin(z * 0.9 - t * 1.1 + noise1(xw * 0.08, 4) * 2) * 0.5 + 0.5;
+        const chop = vnoise(xw * 0.6 + t * 0.4, z * 1.4 - t * 2.2);
+        const b0 = clamp(0.13 + 0.28 * Math.pow(swell, 3) + 0.24 * (chop - 0.5), 0, 1);
+        const idx = Math.floor(b0 * 6 + (n - 0.5) * 1.2);
+        ch = RAMP[Math.max(0, Math.min(5, idx))]; a = 0.12 + 0.8 * b0;
+        if (b0 > 0.3 && n < 0.3) ch = '~';
+      }
+
+      // whitewater aprons on the plane, in front of a broken crest
+      for (const f of faces) {
+        const u = f.zc - z;                                            // how far in front of the crest
+        const apron = (1.2 + 1.8 * f.prog) * (0.65 + 0.7 * vnoise(f.xw * 0.9 + f.b.seed, 2));
+        if (u > 0 && u < apron && f.prog > 0.05) {
+          const d = u / apron;
+          const dens = f.prog * (1 - d) * (0.55 + 0.6 * vnoise(xw * 1.6 + f.b.seed, z * 2.2 - t * 1.5));
+          if (dens > 0.18) { const m = hash3(i, r, frame + 3); ch = dens > 0.55 ? FOAM[Math.floor(m * 4)] : (m < 0.5 ? '+' : '*'); a = 0.4 + 0.6 * dens; isFoam = dens > 0.5; }
+        } else if (u < 0 && u > -0.5) {
+          // the back of the wave: dark
+          if (!isFoam) { ch = n < 0.3 ? '.' : ' '; a = 0.1; }
+        }
+      }
+      // the faces themselves, standing up off the plane. nearest wins
+      for (const f of faces) {
+        if (dy <= f.dyBase && dy >= f.dyTop) {
+          const v = (f.dyBase - dy) / Math.max(1, f.dyBase - f.dyTop);   // 0 at the base, 1 at the lip
+          const lip = (0.25 + 0.5 * f.prog) * f.lipVar;                    // how much of the face is foam
+          const m = hash3(i, r, frame + 7);
+          if (v > 1 - lip && f.prog > 0.02) { ch = FOAM[Math.floor(m * 4)]; a = 0.75 + 0.25 * f.prog; isFoam = true; }
+          else {
+            const b1 = 0.3 + 0.45 * v + (m - 0.5) * 0.15;                  // the lit face, paler toward the lip
+            const idx = Math.floor(b1 * RAMP.length);
+            ch = RAMP[Math.max(1, Math.min(RAMP.length - 1, idx))]; a = 0.12 + 0.5 * b1; isFoam = false;
+          }
+          if (M && v > 0.85 && f.prog > 0.3 && f.prog < 0.95 && rnd() < 0.02 * near + 0.004) burst(i * CW + CW / 2, y, 1 + Math.floor(rnd() * 2), 3 + 4 * near, 2.5);
+        }
+      }
+      // swash: a foam sheet with a scalloped edge over the sand
+      for (const s of swashes) {
+        const edge = s.edge + 0.11 * noise1(xw * 1.7, s.seed) + 0.04 * noise1(xw * 5, s.seed + 1);
+        if (z >= edge && z < Z_SHORE + 0.5) {
+          const back = clamp((z - edge) / (Z_SHORE + 0.5 - edge), 0, 1);
+          const m = hash3(i, r, frame + 9);
+          if (z - edge < 0.035 + 0.025 * near) { ch = m < 0.6 ? '#' : '%'; a = 0.85 * s.a + 0.1; isFoam = true; }
+          else if (m < 0.12 + 0.3 * s.a * (1 - back)) { ch = m < 0.1 ? '+' : (m < 0.25 ? '=' : '-'); a = (0.2 + 0.35 * s.a) * (1 - 0.5 * back); }
+          else if (z < Z_SHORE) { ch = m < 0.5 ? '.' : ' '; a = 0.16; }     // wet sand under it
+        }
+      }
+
+      if (ch !== ' ') glyph(wctx, ch, i * CW, y, a * fade);
+      if (isFoam && n < 0.2 * near) { wctx.globalAlpha = fade; wctx.fillStyle = '#fff'; wctx.fillRect(i * CW + 2, y + 4, 4, 4); }
+    }
+  }
+  // the horizon
+  for (let i = 0; i < COLS; i++) if (hash3(i, 1, frame >> 2) < 0.8) glyph(wctx, '-', i * CW, (HROW - 1) * CH, 0.22);
+}
+function drawSpray() {
+  for (const b of spray) {
+    const p = b.position, s = b.size;
+    const k = b.age > b.life - 0.5 ? (b.life - b.age) / 0.5 : 1;
+    ctx.globalAlpha = 0.25 * k; ctx.fillStyle = '#fff';
+    ctx.fillRect(Math.round(p.x) - s / 2 - 2, Math.round(p.y) - s / 2 - 2, s + 4, s + 4);
+    ctx.globalAlpha = k;
+    ctx.fillRect(Math.round(p.x) - s / 2, Math.round(p.y) - s / 2, s, s);
+  }
+  ctx.globalAlpha = 1;
+}
+function squareHalo() {
+  ctx.globalAlpha = 0.18;
+  for (const [dx, dy] of [[CW, 0], [-CW, 0], [0, CH], [0, -CH], [CW, CH], [-CW, CH], [CW, -CH], [-CW, -CH]]) ctx.drawImage(water, dx, dy, W, H);
+  ctx.globalAlpha = 0.06;
+  for (const [dx, dy] of [[2 * CW, 0], [-2 * CW, 0], [0, 2 * CH], [0, -2 * CH], [2 * CW, CH], [-2 * CW, -CH], [CW, 2 * CH], [-CW, -2 * CH]]) ctx.drawImage(water, dx, dy, W, H);
+  ctx.globalAlpha = 1;
+  ctx.drawImage(water, 0, 0, W, H);
+}
+
+/* ---------- loop ---------- */
+let last = performance.now(), t = 0;
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
+  updateSea(dt, t);
+  ctx.globalAlpha = 1; ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+  drawSea(t);
+  squareHalo();
+  if (M) { M.Engine.update(engine, 1000 / 60); updateSpray(dt); drawSpray(); }
+  requestAnimationFrame(frame);
+}
+function setup() {
+  DPR = Math.min(2, devicePixelRatio || 1);
+  W = innerWidth; H = innerHeight;
+  for (const c of [canvas, water]) { c.width = W * DPR; c.height = H * DPR; }
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0); wctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  COLS = Math.ceil(W / CW); ROWS = Math.ceil(H / CH); HROW = Math.floor(ROWS * 0.4);
+  K = (ROWS - HROW) * CH * ZN;          // the bottom row sees the plane at ZN
+  F = W * 0.6;
+  buildAtlas();
+  breakers.length = 0; swashes.length = 0; spray.length = 0;
+  if (M) buildWorld();
+  spawnBreaker(7.5); spawnBreaker(12.5);
+}
+setup();
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(setup, 200); });
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

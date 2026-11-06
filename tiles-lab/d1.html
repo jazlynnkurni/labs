@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>d1 · rain on a pond</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #171717; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
+<script src="ascii.js"></script>
+<script>
+/* rain on a pond, seen from above. each drop lands, splashes, and
+   sends out a ring that spreads, thins and fades. rings cross and add. */
+(() => {
+const A = window.ASCII, S = A.S;
+const rings = [], drops = [];
+let P, nextDrop = 0;
+const RATE = 9;                        // drops per second
+function drop(x, y) {
+  drops.push({ x, y, age: 0 });
+  rings.push({ x, y, r: 0, v: 55 + A.rnd() * 25, amp: 0.8 + A.rnd() * 0.5, age: 0 });
+  // the splash: a few pixels jump out and fall back
+  P.burst(x, y, 2 + Math.floor(A.rnd() * 4), 2.5, 2.5, { life: 0.5 + A.rnd() * 0.3, drag: 0.06 });
+}
+A.start({
+  cw: 8, ch: 13,
+  setup() { P = A.particles({ gravity: 0.6 }); rings.length = 0; drops.length = 0; },
+  update(dt, t) {
+    nextDrop -= dt;
+    while (nextDrop <= 0) { drop(A.rnd() * S.W, A.rnd() * S.H); nextDrop += (0.6 + A.rnd() * 0.8) / RATE; }
+    for (const g of rings) { g.age += dt; g.r += g.v * dt; g.v *= 1 - 0.25 * dt; }
+    for (let i = rings.length - 1; i >= 0; i--) if (rings[i].r > 420 || rings[i].age > 6) rings.splice(i, 1);
+    for (const d of drops) d.age += dt;
+    for (let i = drops.length - 1; i >= 0; i--) if (drops[i].age > 0.35) drops.splice(i, 1);
+    P.update(dt);
+  },
+  draw(t) {
+    const { COLS, ROWS, CW, CH } = S;
+    const frame = Math.floor(t * 6);
+    for (let r = 0; r < ROWS; r++) for (let i = 0; i < COLS; i++) {
+      const x = i * CW + CW / 2, y = r * CH + CH / 2;
+      // the still water: a faint drifting grain
+      let h = 0, best = 0, bx = 0, by = 0, bd = 0;
+      for (const g of rings) {
+        const dx = x - g.x, dy = y - g.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        const w = 10 + g.r * 0.08;                        // the ring widens as it travels
+        const u = (d - g.r) / w;
+        if (u < -2.5 || u > 1.5) continue;
+        const fall = g.amp / (1 + g.r * 0.012);           // and fades
+        // a crest with a trough behind it
+        const v = fall * (Math.exp(-u * u * 1.6) - 0.45 * Math.exp(-(u + 1.4) * (u + 1.4) * 1.2));
+        h += v;
+        if (Math.abs(v) > best) { best = Math.abs(v); bx = dx; by = dy; bd = d; }
+      }
+      const n = A.hash3(i, r, frame);
+      let ch = ' ', a = 0;
+      if (h > 0.12) {
+        // ring glyphs follow the ring: curved on the sides, flat top and bottom
+        const ang = Math.abs(Math.atan2(by, bx));
+        const side = ang < 0.5 || ang > Math.PI - 0.5;
+        const diag = !side && (ang < 1.1 || ang > Math.PI - 1.1);
+        if (h > 0.6) ch = side ? (bx < 0 ? '(' : ')') : (diag ? ((bx < 0) !== (by < 0) ? '/' : '\\') : '=');
+        else if (h > 0.3) ch = side ? (bx < 0 ? '(' : ')') : (diag ? ((bx < 0) !== (by < 0) ? '/' : '\\') : '-');
+        else ch = n < 0.5 ? '.' : ',';
+        a = 0.25 + 0.75 * Math.min(1, h);
+      } else if (h < -0.08) {
+        ch = ' ';                                           // the trough goes dark
+      } else {
+        const g = A.vnoise(i * 0.35 + t * 0.15, r * 0.35 - t * 0.1);
+        if (g > 0.62 && n < 0.5) { ch = n < 0.25 ? '.' : ','; a = 0.08 + (g - 0.62) * 0.5; }
+      }
+      if (ch !== ' ') A.cell(i, r, ch, a);
+    }
+    // the drop itself: a flash where it lands
+    for (const d of drops) {
+      const i = Math.floor(d.x / CW), r = Math.floor(d.y / CH);
+      const k = 1 - d.age / 0.35;
+      A.cell(i, r, d.age < 0.12 ? '*' : 'o', 0.5 + 0.5 * k);
+      if (d.age < 0.1) A.cellPx(i, r, 1, 5);
+    }
+  },
+  overlay() { P.draw(0.25); }
+});
+})();
+</script>
+</body>
+</html>

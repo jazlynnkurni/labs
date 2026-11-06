@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>c5 · mono red</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #171717; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  #field { position: absolute; inset: 0; }
+</style>
+</head>
+<body>
+<div id="field"></div>
+<script src="tile.js"></script>
+<script>
+/* c5: white body, black plus, grey petals, one red core. one tile, centred, blooming as the cursor nears. */
+(() => {
+const T = window.Tile, field = document.getElementById('field');
+const palette = {"body": "#ffffff", "cross": "#161616", "petals": ["#d8d8d8", "#9a9a9a", "#ffffff", "#5c5c5c"], "core": "#e5212b"};
+const tiles = [];
+function place() {
+  field.innerHTML = ''; tiles.length = 0;
+  const size = Math.min(360, innerWidth * 0.7);
+  const t = T.makeTile({ x: innerWidth / 2, y: innerHeight / 2, size, palette });
+  field.appendChild(t.el); tiles.push(t);
+}
+place();
+T.bloom(tiles);
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(place, 200); });
+})();
+</script>
+</body>
+</html>

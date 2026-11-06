@@ -17,3 +17,4 @@ Personal prototypes, each its own folder, each served on its own port with
 | `menu-lab` | five liquid-glass menus, every motion a spring: bead, pour, orbit, tide, split | 6160 |
 | `search-lab` | a universal search for Dia: one bar over docs, mail, meetings, files and tabs, with a reading of what you might mean | 6170 |
 | `emboss-seal` | SwiftUI port of the embossed paste texture, Metal shader, gravity-lit | Xcode |
+| `tiles-lab` | the cut-sticker tiles from `~/Desktop/tiles.JPG`: one tile that blooms near the cursor, five colourways, a bare tree that comes into leaf as you hover its branches. `python3 serve.py 6450` (no-cache) | 6450 |
