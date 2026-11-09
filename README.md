@@ -18,3 +18,6 @@ Personal prototypes, each its own folder, each served on its own port with
 | `search-lab` | a universal search for Dia: one bar over docs, mail, meetings, files and tabs, with a reading of what you might mean | 6170 |
 | `emboss-seal` | SwiftUI port of the embossed paste texture, Metal shader, gravity-lit | Xcode |
 | `tiles-lab` | the cut-sticker tiles from `~/Desktop/tiles.JPG`: one tile that blooms near the cursor, five colourways, a bare tree that comes into leaf as you hover its branches. `python3 serve.py 6450` (no-cache) | 6450 |
+| `flower-lab` | one pink calla lily from `~/Desktop/IMG_4600.JPG`, close up, a parametric spathe in WebGL2 with waxy shading, light through the petal and veins. `python3 serve.py 6470` | 6470 |
+| `thermal-lab` | a thermal camera from `~/Desktop/thermal.png`: a black page with an unseen figure, hover pours heat in that spreads along the body and shows it through the thermal ramp. `python3 serve.py 6480` | 6480 |
+| `boxing-lab` | the boxing GIF in code: two paper-puppet fighters made of clothes and floating fists, ten render styles behind `?all`; locked to Glass, on white through the Out of Office footer's glass (a purple backing silhouette, bloom, split plates, a floor that reflects). `python3 serve.py 6490` | 6490 |

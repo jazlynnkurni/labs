@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Boxer editor</title>
+<style>
+/* THE SHAPE EDITOR. Both fighters at rest over the GIF, frame by frame, so every piece can be traced. Pick a piece,
+   drag its points; double-click an edge to add one; alt-click a point to take it out; drag inside a piece to move
+   it whole. Every change is saved and the lab redraws with it, live, in its own tab. */
+:root{--ink:#f2f2f2;--mute:rgba(255,255,255,.5);--hair:rgba(255,255,255,.1);--sel:#ffd84d}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0b0b0b;color:var(--ink);font:12px/1.4 -apple-system,"Helvetica Neue",sans-serif;overflow:hidden}
+body{display:grid;grid-template-columns:270px 1fr;height:100vh}
+aside{border-right:1px solid var(--hair);padding:16px 14px;overflow:auto;background:#121212}
+h2{font:600 10.5px -apple-system,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin:18px 0 8px}
+h2:first-child{margin-top:0}
+.parts{display:flex;flex-wrap:wrap;gap:5px}
+.parts button,.btns button{font:500 12px -apple-system,sans-serif;color:var(--ink);background:#1e1e1e;border:1px solid var(--hair);border-radius:8px;padding:6px 9px;cursor:pointer}
+.parts button.on{background:var(--sel);color:#111;border-color:var(--sel)}
+.btns{display:flex;flex-wrap:wrap;gap:6px}
+label.r{display:grid;grid-template-columns:78px 1fr 34px;gap:8px;align-items:center;margin:6px 0;color:var(--mute)}
+label.r output{color:var(--ink);font-variant-numeric:tabular-nums;text-align:right}
+label.c{display:flex;gap:8px;align-items:center;margin:6px 0;color:var(--mute)}
+input[type=range]{width:100%;accent-color:var(--sel)}
+.hint{color:var(--mute);margin-top:14px;line-height:1.55}
+main{position:relative;min-width:0}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(16px);opacity:0;background:#fff;color:#111;padding:8px 13px;border-radius:9px;font-weight:600;transition:.25s;pointer-events:none}
+#toast.on{opacity:1;transform:translateX(-50%)}
+</style></head><body>
+<aside>
+  <h2>Left fighter</h2><div class="parts" id="p0"></div>
+  <h2>Right fighter</h2><div class="parts" id="p1"></div>
+  <h2>Tracing</h2>
+  <label class="c"><input type="checkbox" id="trOn" checked> Show the GIF behind</label>
+  <label class="r">Frame <input type="range" id="trF" min="0" max="201" value="0"><output id="trFo">0</output></label>
+  <label class="c"><input type="checkbox" id="trPlay"> Play the GIF</label>
+  <label class="r">GIF opacity <input type="range" id="trA" min="0" max="1" step=".01" value=".55"><output id="trAo">.55</output></label>
+  <label class="r">Fighters <input type="range" id="fA" min="0" max="1" step=".01" value=".7"><output id="fAo">.7</output></label>
+  <label class="r">GIF x <input type="range" id="trX" min="-200" max="200" value="0"><output id="trXo">0</output></label>
+  <label class="r">GIF y <input type="range" id="trY" min="-150" max="150" value="-22"><output id="trYo">-22</output></label>
+  <label class="r">GIF size <input type="range" id="trS" min="1" max="3" step=".01" value="1.48"><output id="trSo">1.48</output></label>
+  <h2>Pose</h2>
+  <label class="r">Moment <input type="range" id="pT" min="0" max="8" step=".01" value="0"><output id="pTo">0</output></label>
+  <label class="c"><input type="checkbox" id="pPlay"> Let them move</label>
+  <h2>Shapes</h2>
+  <div class="btns"><button id="undo">Undo</button><button id="resetP">Reset piece</button><button id="resetA">Reset all</button><button id="copy">Copy shapes</button></div>
+  <p class="hint">Drag a point to move it. Drag inside the piece to move it whole. Double-click an edge to add a point. Alt-click a point to remove it. ⌘Z undoes. Changes save as you go and show live in the lab.</p>
+</aside>
+<main><canvas id="c"></canvas></main>
+<div id="toast"></div>
+<script src="rig.js"></script>
+<script>
+const cv=document.getElementById('c'), g=cv.getContext('2d'), $=id=>document.getElementById(id);
+const TR=new Image(); TR.src='trace.jpg';
+/* the editable pieces: which fighter, where its points live in SHAPES, which frame places them */
+const PARTS=[
+  [0,'Trouser leg',['leg',0],'leg'],[0,'Shoe',['shoe',0,'body'],'shoe'],[0,'Fist',['fist',0],'fist'],
+  [0,'Knit band',['torso',0,'knit'],'torso.knit'],[0,'Head',['torso',0,'head'],'torso.head'],
+  [1,'Trouser leg',['leg',1],'leg'],[1,'Shoe',['shoe',1,'body'],'shoe'],[1,'Fist',['fist',1],'fist'],
+  [1,'Head',['torso',1,'head'],'torso.head'],[1,'Shirt',['torso',1,'shirt'],'torso.shirt'],[1,'Tie',['torso',1,'tie'],'torso.tie'],
+  [1,'Collar L',['torso',1,'collarL'],'torso.collarL'],[1,'Collar R',['torso',1,'collarR'],'torso.collarR']];
+const BASE=[292,508];
+let SEL=0;
+const ptsOf=i=>{ const [,, path]=PARTS[i]; let o=SHAPES; for(const k of path) o=o[k]; return o; };
+const setPts=(i,v)=>{ const path=PARTS[i][2]; let o=SHAPES; for(let k=0;k<path.length-1;k++) o=o[path[k]]; o[path[path.length-1]]=v; };
+const defOf=i=>{ const path=PARTS[i][2]; let o=DEFAULT_SHAPES; for(const k of path) o=o[k]; return JSON.parse(JSON.stringify(o)); };
+for(const who of [0,1]) $('p'+who).innerHTML=PARTS.map((p,i)=>p[0]===who?`<button data-i="${i}">${p[1]}</button>`:'').join('');
+document.querySelectorAll('.parts button').forEach(b=>b.onclick=()=>{ SEL=+b.dataset.i; mark(); });
+function mark(){ document.querySelectorAll('.parts button').forEach(b=>b.classList.toggle('on',+b.dataset.i===SEL)); }
+mark();
+
+/* the stage: design space fitted into the canvas */
+let W=0,H=0,DPR=1,K=1,OX=0,OY=0;
+function size(){ DPR=Math.min(2,devicePixelRatio||1); const r=cv.getBoundingClientRect(); W=r.width; H=r.height; cv.width=W*DPR; cv.height=H*DPR;
+  K=Math.min(W/DW,H/DH)*.94; OX=(W-DW*K)/2; OY=(H-DH*K)/2; }
+size(); addEventListener('resize',size);
+const toS=([x,y])=>[OX+x*K,OY+y*K], toD=([x,y])=>[(x-OX)/K,(y-OY)/K];
+
+/* the controls */
+const ctl={}; for(const id of ['trF','trA','fA','trX','trY','trS','pT']){ const el=$(id); ctl[id]=+el.value; el.oninput=()=>{ ctl[id]=+el.value; $(id+'o').textContent=el.value; }; }
+try{ const s=JSON.parse(localStorage.getItem('boxing-editor')||'null'); if(s) for(const k in s) if($(k)){ $(k).value=s[k]; ctl[k]=+s[k]; $(k+'o').textContent=s[k]; } }catch(e){}
+setInterval(()=>{ try{ localStorage.setItem('boxing-editor',JSON.stringify(ctl)); }catch(e){} },1000);
+
+let T0=performance.now(), frameF=0;
+function now(){ return $('pPlay').checked?(performance.now()-T0)/1000:ctl.pT; }
+function curFrames(i){ const who=PARTS[i][0]; return frames(who,now(),BASE[who])[PARTS[i][3]]; }
+function screenPts(i){ const F=curFrames(i); return ptsOf(i).map(q=>toS(F.to(q))); }
+
+function draw(){
+  requestAnimationFrame(draw);
+  g.setTransform(DPR,0,0,DPR,0,0); g.fillStyle='#000'; g.fillRect(0,0,W,H);
+  /* the GIF frame underneath */
+  if($('trPlay').checked){ frameF=(frameF+.6)%202; $('trF').value=Math.floor(frameF); $('trFo').textContent=Math.floor(frameF); ctl.trF=Math.floor(frameF); } else frameF=ctl.trF;
+  if($('trOn').checked&&TR.complete&&TR.naturalWidth){ const f=Math.floor(ctl.trF), sx=(f%16)*400, sy=Math.floor(f/16)*217, s=ctl.trS*K;
+    g.save(); g.globalAlpha=ctl.trA; g.drawImage(TR,sx,sy,400,217,OX+ctl.trX*K+(DW*K-400*s)/2,OY+ctl.trY*K+(DH*K-217*s)/2,400*s,217*s); g.restore(); }
+  /* the fighters, still and clean, at rest */
+  BOIL=0; EDGE=4.5; EDGECOL='#f2f2f2'; SHADOWS=false; EV.length=0;
+  const t=now();
+  g.save(); g.globalAlpha=ctl.fA; g.translate(OX,OY); g.scale(K,K); fighter(g,0,t,BASE[0]); fighter(g,1,t,BASE[1]); g.restore();
+  /* every piece's outline faintly, the chosen one bright with its points */
+  for(let i=0;i<PARTS.length;i++){ const P=screenPts(i); g.beginPath(); P.forEach(([x,y],k)=>k?g.lineTo(x,y):g.moveTo(x,y)); g.closePath();
+    g.strokeStyle=i===SEL?'#ffd84d':'rgba(255,216,77,.22)'; g.lineWidth=i===SEL?1.6:1; g.stroke(); }
+  const P=screenPts(SEL);
+  P.forEach(([x,y],k)=>{ g.beginPath(); g.arc(x,y,k===hov?6.5:5,0,7); g.fillStyle=k===drag?.k?'#fff':'#ffd84d'; g.fill(); g.lineWidth=1.5; g.strokeStyle='#111'; g.stroke(); });
+}
+requestAnimationFrame(draw);
+
+/* editing */
+let drag=null, hov=-1, hist=[];
+const snap=()=>{ hist.push(JSON.stringify(SHAPES)); if(hist.length>100) hist.shift(); };
+const save=()=>{ saveShapes(); };
+const pos=e=>{ const r=cv.getBoundingClientRect(); return [e.clientX-r.left,e.clientY-r.top]; };
+function nearest(P,m,r=10){ let b=-1,bd=r; P.forEach(([x,y],k)=>{ const d=Math.hypot(x-m[0],y-m[1]); if(d<bd){ bd=d; b=k; } }); return b; }
+function inside(P,[x,y]){ let c=false; for(let i=0,j=P.length-1;i<P.length;j=i++){ const [xi,yi]=P[i],[xj,yj]=P[j]; if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi) c=!c; } return c; }
+cv.addEventListener('pointerdown',e=>{
+  const m=pos(e), P=screenPts(SEL), k=nearest(P,m);
+  if(k>=0&&e.altKey){ const pts=ptsOf(SEL); if(pts.length>3){ snap(); pts.splice(k,1); save(); } return; }
+  if(k>=0){ snap(); drag={k}; cv.setPointerCapture(e.pointerId); return; }
+  if(inside(P,m)){ snap(); drag={whole:true,last:m}; cv.setPointerCapture(e.pointerId); return; }
+  /* a click on another piece picks it */
+  for(let i=0;i<PARTS.length;i++) if(i!==SEL&&inside(screenPts(i),m)){ SEL=i; mark(); return; }
+});
+cv.addEventListener('pointermove',e=>{
+  const m=pos(e);
+  if(!drag){ hov=nearest(screenPts(SEL),m); cv.style.cursor=hov>=0?'grab':inside(screenPts(SEL),m)?'move':'default'; return; }
+  const F=curFrames(SEL), pts=ptsOf(SEL);
+  if(drag.whole){ const d0=F.from(toD(drag.last)), d1=F.from(toD(m)), dx=d1[0]-d0[0], dy=d1[1]-d0[1];
+    setPts(SEL,pts.map(([a,b])=>[+(a+dx).toFixed(3),+(b+dy).toFixed(3)])); drag.last=m; }
+  else { const q=F.from(toD(m)); pts[drag.k]=[+q[0].toFixed(3),+q[1].toFixed(3)]; }
+  save();
+});
+const end=()=>{ drag=null; }; cv.addEventListener('pointerup',end); cv.addEventListener('pointercancel',end);
+cv.addEventListener('dblclick',e=>{
+  /* add a point on the nearest edge, where you clicked */
+  const m=pos(e), P=screenPts(SEL); let best=-1,bd=14,bt=0;
+  for(let i=0;i<P.length;i++){ const a=P[i],b=P[(i+1)%P.length], ab=[b[0]-a[0],b[1]-a[1]], t=Math.max(0,Math.min(1,((m[0]-a[0])*ab[0]+(m[1]-a[1])*ab[1])/((ab[0]**2+ab[1]**2)||1)));
+    const d=Math.hypot(a[0]+ab[0]*t-m[0],a[1]+ab[1]*t-m[1]); if(d<bd){ bd=d; best=i; bt=t; } }
+  if(best<0) return; snap(); const q=curFrames(SEL).from(toD(m)); ptsOf(SEL).splice(best+1,0,[+q[0].toFixed(3),+q[1].toFixed(3)]); save();
+});
+addEventListener('keydown',e=>{ if((e.metaKey||e.ctrlKey)&&e.key==='z'){ e.preventDefault(); $('undo').click(); } });
+const toast=t=>{ const el=$('toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove('on'),1500); };
+$('undo').onclick=()=>{ if(!hist.length) return; const o=JSON.parse(hist.pop()); for(const k in o) SHAPES[k]=o[k]; save(); };
+$('resetP').onclick=()=>{ snap(); setPts(SEL,defOf(SEL)); save(); toast('Piece reset'); };
+$('resetA').onclick=()=>{ snap(); SHAPES=JSON.parse(JSON.stringify(DEFAULT_SHAPES)); save(); toast('All shapes reset'); };
+$('copy').onclick=async()=>{ const t='BOXER SHAPES\n'+JSON.stringify(SHAPES); try{ await navigator.clipboard.writeText(t); toast('Copied. Paste it to Claude to lock it in.'); }catch(e){ toast('Copy was blocked'); } };
+</script>
+</body></html>
