@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ramp glow">
+<title>Ramp purchase glow</title>
+<style>
+/* Ramp's type, loaded from Ramp's own CDN (open CORS), not copied into the repo. */
+@font-face{font-family:Lausanne;font-weight:350;font-display:swap;src:url(https://assets.ramp.com/fonts/lausanne/lausanne-350/TWKLausanne-350.woff2) format("woff2")}
+@font-face{font-family:Lausanne;font-weight:400;font-display:swap;src:url(https://assets.ramp.com/fonts/lausanne/lausanne-400/TWKLausanne-400.woff2) format("woff2")}
+@font-face{font-family:Lausanne;font-weight:700;font-display:swap;src:url(https://assets.ramp.com/fonts/lausanne/lausanne-700/TWKLausanne-700.woff2) format("woff2")}
+
+:root{
+  /* Ramp, from ramp.com */
+  --solar:#e4f222;--ink:#0c0a08;--hushed:rgba(12,10,8,.6);--black:#1a1919;--wash:#f4f2f0;--line:#d2cecb;--gray:#6e6a68;
+  --ramp:"Lausanne",Arial,sans-serif;
+  /* the system, for everything Apple draws */
+  --sf:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;
+  --sfr:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  /* the lab panel, as in the card lab */
+  --lab:#1e2124;--hair:#2e3236;--dim:#8b9197;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{background:#141618;color:#e8eaec;font-family:var(--sfr);-webkit-font-smoothing:antialiased;
+  display:grid;grid-template-columns:1fr 320px;overscroll-behavior:none}
+
+.stage{display:grid;place-items:center;overflow:hidden;min-height:100dvh;
+  background:radial-gradient(130% 90% at 50% 0%,#23282d,#141618 70%)}
+
+/* ---- THE PHONE, 402 x 874 pt, drawn 1:1 and scaled only to fit ---- */
+.phone{position:relative;width:402px;height:874px;border-radius:55px;background:#fff;overflow:hidden;flex:none;
+  transform-origin:50% 50%;box-shadow:0 0 0 11px #1b1d20,0 0 0 13px #2a2e33,0 40px 90px rgba(0,0,0,.6);isolation:isolate}
+
+/* status bar: the system's, so SF */
+.sb{position:absolute;left:0;right:0;top:0;height:54px;display:flex;align-items:center;justify-content:space-between;
+  padding:4px 34px 0 46px;font:600 17px/1 var(--sf);color:#000;letter-spacing:-.01em;z-index:2;font-variant-numeric:tabular-nums}
+.sb .ic{display:flex;gap:6px;align-items:center}
+.sb svg{display:block;fill:#000}
+
+/* ---- RAMP ---- */
+.app{position:absolute;inset:0;padding:70px 24px 0;font-family:var(--ramp);color:var(--ink)}
+.app h1{margin:0 0 16px;font:400 32px/1.1 var(--ramp);letter-spacing:-.02em;text-wrap:balance}
+.list{position:relative}
+.row{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:start;padding:16px 0;
+  box-shadow:inset 0 -.5px 0 var(--line)}
+.av{width:40px;height:40px;border-radius:10px;background:var(--wash);display:grid;place-items:center;
+  font:700 15px/1 var(--ramp);color:var(--ink)}
+.l b,.r b{display:block;font:400 16px/20px var(--ramp);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.l span,.r span{display:block;font:350 13px/18px var(--ramp);color:var(--hushed);margin-top:2px;white-space:nowrap}
+.l{min-width:0}
+.r{text-align:right}
+.r b{font-variant-numeric:tabular-nums}
+/* the line under the amount: its space is always reserved, so its arrival moves nothing */
+.cov{opacity:0;will-change:opacity,transform,filter}
+.cov em{font-style:normal;color:var(--ink)}
+
+/* ---- THE EDGE GLOW: an SVG over the whole screen ---- */
+#glow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;overflow:visible}
+
+/* ---- THE ISLAND and its bud ---- */
+.isl{position:absolute;left:50%;top:11px;width:125px;height:37px;margin-left:-62.5px;border-radius:18.5px;background:#000;z-index:6}
+.bud{position:absolute;top:11px;width:37px;height:37px;border-radius:50%;background:#000;z-index:5;
+  display:grid;place-items:center;opacity:0}
+.bud svg{display:block;width:20px;height:20px;overflow:visible}
+
+/* ---- APPLE PAY: familiar and quiet ---- */
+.dim{position:absolute;inset:0;background:#000;opacity:0;z-index:4;pointer-events:none}
+.pay{position:absolute;left:8px;right:8px;bottom:8px;height:338px;border-radius:47px;background:#fff;z-index:5;
+  transform:translateY(110%);font-family:var(--sf);color:#000;padding:22px 24px 0;
+  box-shadow:0 0 0 .5px rgba(0,0,0,.06),0 -8px 40px rgba(0,0,0,.12)}
+.pay .hd{display:flex;justify-content:space-between;align-items:center;height:32px}
+.pay .ap{font:600 22px/1 var(--sf);letter-spacing:-.02em}
+.pay .x{width:30px;height:30px;border-radius:50%;background:#eeeef0;display:grid;place-items:center}
+.pay .x svg{width:10px;height:10px;stroke:#8a8a8e;stroke-width:2.2;stroke-linecap:round}
+.pcard{width:184px;height:116px;border-radius:12px;background:var(--black);margin:22px auto 0;position:relative;
+  box-shadow:0 6px 16px rgba(0,0,0,.18),0 0 0 .5px rgba(0,0,0,.2)}
+.pcard .wm{position:absolute;left:14px;top:12px;font:700 19px/1 var(--ramp);color:#fff;letter-spacing:-.03em}
+.pcard .num{position:absolute;right:14px;bottom:12px;font:400 12px/1 var(--ramp);color:rgba(255,255,255,.6);font-variant-numeric:tabular-nums}
+.pst{position:relative;height:90px;margin-top:22px}
+.pst .m{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;gap:10px}
+.pst .m b{font:600 17px/1.2 var(--sf)}
+.pst svg{display:block}
+.pst .done{opacity:0}
+
+/* ---- the lab panel ---- */
+.lab{background:var(--lab);border-left:1px solid var(--hair);padding:24px 16px;overflow-y:auto;display:flex;flex-direction:column;gap:24px;max-height:100dvh}
+.lab h1{font:600 13.5px/1.3 var(--sfr);margin:0}
+.lab h2{font:600 10px/1 var(--sfr);margin:0 0 8px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim)}
+.note{font:500 11px/1.5 var(--sfr);color:var(--dim);margin:0}
+.note b{color:#c8ccd0;font-weight:600}
+.btn{font:600 12.5px/1 var(--sfr);color:var(--ink);background:var(--solar);border:0;border-radius:10px;height:40px;cursor:pointer;width:100%;
+  transition:transform .12s ease-out}
+.btn:active{transform:scale(.96)}
+.seg{display:flex;gap:4px;padding:4px;border-radius:12px;background:#16181a;box-shadow:inset 0 0 0 1px var(--hair)}
+.seg button{flex:1;height:32px;border:0;border-radius:8px;background:none;color:var(--dim);font:600 11px/1 var(--sfr);cursor:pointer;
+  transition:background-color .15s ease,color .15s ease;white-space:nowrap}
+.seg button.on{background:#2c3135;color:#fff}
+.grp > * + *{margin-top:8px}
+.tl{position:relative;background:#16181a;border-radius:10px;box-shadow:inset 0 0 0 1px var(--hair);padding:8px 10px 10px;cursor:ew-resize;touch-action:none;user-select:none}
+.tr{display:grid;grid-template-columns:68px 1fr;align-items:center;height:20px;font:500 10px/1 var(--sfr);color:var(--dim)}
+.tr .bar{position:relative;height:6px}
+.tr .bar i{position:absolute;top:0;bottom:0;border-radius:3px;background:#3a4045}
+.tr.hot .bar i{background:var(--solar)}
+.tr.off{opacity:.35}
+.ph{position:absolute;top:4px;bottom:4px;width:1.5px;background:#fff;border-radius:1px;pointer-events:none}
+.rd{font:600 10.5px/1.6 var(--sfr);color:var(--dim);font-variant-numeric:tabular-nums;margin:0}
+.rd b{color:#e8eaec;font-weight:600}
+code{font:500 10px/1.5 ui-monospace,Menlo,monospace;color:#d9e66a;background:#101214;border:1px solid var(--hair);border-radius:8px;
+  padding:8px;display:block;white-space:pre;overflow-x:auto}
+
+/* ?still: no CSS transitions, so a headless still is the real frame */
+body.still *{transition:none!important}
+
+/* ---- ON AN IPHONE: the screen is the phone. The lab sits below, a scroll away. ---- */
+@media (max-width:760px){
+  body{display:block;background:#fff}
+  .stage{display:block;min-height:0;background:none}
+  .phone{border-radius:0;box-shadow:none}
+  .lab{border-left:0;max-height:none}
+}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="phone" id="phone">
+    <div class="app">
+      <h1>Transactions</h1>
+      <div class="list" id="list">
+        <div class="row" id="new">
+          <div class="av">G</div>
+          <div class="l"><b id="mer"></b><span id="meta"></span></div>
+          <div class="r"><b id="amt"></b><span class="cov" id="cov">Covered by <em id="budget"></em></span></div>
+        </div>
+        <div class="row old"><div class="av">N</div><div class="l"><b>Northside Coffee</b><span>Yesterday · ··4021</span></div><div class="r"><b>$18.40</b><span>Team Meals</span></div></div>
+        <div class="row old"><div class="av">A</div><div class="l"><b>Atlas Office Supply</b><span>Mon · ··4021</span></div><div class="r"><b>$126.35</b><span>Office</span></div></div>
+        <div class="row old"><div class="av">M</div><div class="l"><b>Metro Transit</b><span>Mon · ··4021</span></div><div class="r"><b>$2.90</b><span>Travel</span></div></div>
+      </div>
+    </div>
+
+    <div class="sb" id="sb"><span>9:41</span>
+      <span class="ic">
+        <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 2.6c2.3 0 4.4.9 6 2.4l1.2-1.3A10.3 10.3 0 0 0 8 .8 10.3 10.3 0 0 0 .8 3.7L2 5c1.6-1.5 3.7-2.4 6-2.4zm0 3.6c1.3 0 2.5.5 3.4 1.3l1.2-1.3A6.8 6.8 0 0 0 8 4.4 6.8 6.8 0 0 0 3.4 6.2l1.2 1.3c.9-.8 2.1-1.3 3.4-1.3zM8 9.6 6 11.6l2 0 2 0z"/></svg>
+        <svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="#000" stroke-opacity=".4"/><rect x="2" y="2" width="20" height="9" rx="2.5"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z" fill-opacity=".45"/></svg>
+      </span>
+    </div>
+
+    <svg id="glow" aria-hidden="true">
+      <defs>
+        <filter id="fMid" filterUnits="userSpaceOnUse"><feGaussianBlur id="gMid"/></filter>
+        <filter id="fSoft" filterUnits="userSpaceOnUse"><feGaussianBlur id="gSoft"/></filter>
+        <filter id="fTrail" filterUnits="userSpaceOnUse"><feGaussianBlur id="gTrail"/></filter>
+      </defs>
+      <g id="rim"></g>
+    </svg>
+
+    <div class="dim" id="dim"></div>
+    <div class="pay" id="pay">
+      <div class="hd"><span class="ap">&#63743;&#8202;Pay</span><span class="x"><svg viewBox="0 0 10 10"><path d="M1 1l8 8M9 1 1 9"/></svg></span></div>
+      <div class="pcard"><span class="wm">ramp</span><span class="num" id="pnum"></span></div>
+      <div class="pst">
+        <div class="m hold" id="hold">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="#000" stroke-width="2.4" stroke-linecap="round"><path d="M16 14c3 5 3 11 0 16"/><path d="M22 10c4.5 7 4.5 17 0 24"/><path d="M28 6c6 9 6 23 0 32"/></svg>
+          <b>Hold Near Reader</b>
+        </div>
+        <div class="m done" id="done">
+          <svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="#0a84ff"/><path d="M13 22.5l6 6 12-13" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <b>Done</b>
+        </div>
+      </div>
+    </div>
+
+    <div class="bud" id="bud"><svg viewBox="0 0 20 20" id="glyph"><rect x="1" y="4" width="18" height="12.5" rx="3" fill="#e4f222"/><rect x="1" y="7" width="18" height="2.6" fill="#000"/><rect x="4" y="12" width="5" height="1.8" rx=".9" fill="#000" fill-opacity=".55"/></svg></div>
+    <div class="isl" id="isl"></div>
+  </div>
+</main>
+
+<aside class="lab">
+  <h1>Ramp &middot; purchase lands</h1>
+  <p class="note">Built in the Card Into Island format: the phone at 1:1, every number in <b>spec.js</b>, read by this page and by the SwiftUI printout below. Ramp's lime, ink, grays and Lausanne are read off ramp.com.</p>
+
+  <div class="grp">
+    <h2>Replay</h2>
+    <button class="btn" id="play">Replay</button>
+    <div class="seg" id="speed">
+      <button data-v="1" class="on">1&times;</button><button data-v="0.5">0.5&times;</button><button data-v="0.25">0.25&times;</button><button data-v="0.1">0.1&times;</button>
+    </div>
+    <div class="seg" id="iso">
+      <button data-v="all" class="on">All</button><button data-v="glow">Edge glow</button><button data-v="glyph">Glyph</button><button data-v="reveal">Budget</button>
+    </div>
+    <p class="note">Pick one part to replay it on its own, then slow it down. The others hold still.</p>
+  </div>
+
+  <div class="grp">
+    <h2>Timeline, drag to scrub</h2>
+    <div class="tl" id="tl"><div id="tracks"></div><span class="ph" id="ph"></span></div>
+    <p class="rd" id="rd"></p>
+  </div>
+
+  <div class="grp">
+    <h2>SwiftUI, from these values</h2>
+    <code id="swift"></code>
+    <p class="note">On a real phone the glyph is the Live Activity's <b>minimal</b> view. The system owns that entrance, so the bud timing here is the target to ask for, not a promise.</p>
+  </div>
+</aside>
+
+<script type="module" src="ramp.js"></script>
+</body>
+</html>
