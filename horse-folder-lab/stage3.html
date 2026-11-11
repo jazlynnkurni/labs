@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>horse-folder-lab · one horse</title>
+<link rel="stylesheet" href="review.css">
+<style>
+  .strip { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px; }
+  .cell { aspect-ratio: 230 / 160; border-radius: 12px; overflow: hidden; position: relative; }
+  .checker { background: repeating-conic-gradient(#7d7d7d 0 25%, #8f8f8f 0 50%) 0 0 / 16px 16px; }
+  .cell img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+  .ref { background: url(ref.png) no-repeat; }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Stage 3 · one horse</p>
+  <h1>One horse, at the scale it sits on the folder</h1>
+  <p class="lede">Traced from Muybridge&apos;s Sallie Gardner (1878), the jockey removed, redrawn as chalk: an uneven line that skips, a translucent rubbed body, shading that follows the form, mane and tail in loose strokes. Placed where the reference&apos;s third horse is. Below, the drawing alone on transparency and the reference horse, both enlarged by the same amount.</p>
+  <div class="pair">
+    <figure><div class="frame" id="build"></div><figcaption>Build</figcaption></figure>
+    <figure><div class="frame"><img src="ref.png" alt="The reference"></div><figcaption>Reference</figcaption></figure>
+  </div>
+  <div class="strip">
+    <figure><div class="cell checker"><img src="frames/h06.png" alt="The chalk horse on transparency"></div><figcaption>Drawing alone, transparent</figcaption></figure>
+    <figure><div class="cell" id="refcrop"></div><figcaption>Reference horse, same enlargement</figcaption></figure>
+  </div>
+</main>
+<script type="module">
+  import { mountFolder } from './folder.js';
+  import { loadFrames, overlay, drawHorse } from './horses.js';
+  const el = document.getElementById('build');
+  mountFolder(el);
+  const o = overlay(el), frames = await loadFrames();
+  const draw = () => { o.begin(); drawHorse(o.ctx, frames[5], { x: 350 - 11.3, ground: 396, scale: 1 }); o.end(); };
+  draw(); addEventListener('resize', draw);
+  // the reference horse at the same enlargement as the drawing above it (228 x 145 reference px)
+  const rc = document.getElementById('refcrop'), fit = () => { const s = rc.clientWidth / 228; rc.style.cssText = `background:url(ref.png) no-repeat;background-size:${736 * s}px;background-position:${-340 * s}px ${-252 * s}px`; };
+  fit(); addEventListener('resize', fit);
+</script>
+</body>
+</html>

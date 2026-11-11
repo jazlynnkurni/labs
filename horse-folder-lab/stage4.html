@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>horse-folder-lab · gallop</title>
+<link rel="stylesheet" href="review.css">
+<style>
+  .stage { max-width: 736px; }
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 24px; }
+  .controls label { display: flex; align-items: center; gap: 8px; color: var(--mute); }
+  .readout { font-variant-numeric: tabular-nums; color: var(--mute); min-width: 120px; }
+  .sheet { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 32px; }
+  .sheet button { padding: 0; border-radius: 10px; background: #868684; aspect-ratio: 228 / 145; overflow: hidden; position: relative; min-height: 0; }
+  .sheet button img { width: 100%; height: 100%; display: block; }
+  .sheet button span { position: absolute; left: 8px; top: 6px; font-size: 11px; color: #fff; font-variant-numeric: tabular-nums; }
+  .sheet button[aria-current="true"] { box-shadow: 0 0 0 2px #1a1a1a; }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Stage 4 · frame-by-frame gallop</p>
+  <h1>One horse, one stride, drawn frame by frame</h1>
+  <p class="lede">Muybridge photographed Sallie Gardner&apos;s full stride in 11 frames, so the cycle is those 11 drawings; a twelfth would repeat the first. Discrete frames, no interpolation, no transforms. The torso&apos;s rise and fall is in the drawings themselves.</p>
+  <div class="stage"><div class="frame" id="build"></div></div>
+  <div class="controls">
+    <button id="play" aria-pressed="true">Pause</button>
+    <button id="prev" aria-label="Previous frame">Previous</button>
+    <button id="next" aria-label="Next frame">Next</button>
+    <label>Frames per second <input id="fps" type="range" min="4" max="12" step="1" value="9"> <span id="fpsv" class="readout" style="min-width:24px">9</span></label>
+    <span id="read" class="readout">Frame 1 of 11</span>
+  </div>
+  <div class="sheet" id="sheet"></div>
+</main>
+<script type="module">
+  import { mountFolder } from './folder.js';
+  import { N, loadFrames, overlay, drawHorse } from './horses.js';
+  const el = document.getElementById('build');
+  mountFolder(el);
+  const o = overlay(el), frames = await loadFrames();
+  let i = 0, playing = true, fps = 9, acc = 0, last = performance.now();
+  const sheet = document.getElementById('sheet');
+  frames.forEach((im, k) => { const b = document.createElement('button'); b.innerHTML = `<img src="${im.src}" alt=""><span>${k + 1}</span>`; b.setAttribute('aria-label', `Show frame ${k + 1}`); b.onclick = () => { set(false); i = k; draw(); }; sheet.appendChild(b); });
+  function draw() {
+    o.begin(); drawHorse(o.ctx, frames[i], { x: 360 - 11.3, ground: 396, scale: 1 }); o.end();
+    document.getElementById('read').textContent = `Frame ${i + 1} of ${N}`;
+    [...sheet.children].forEach((b, k) => b.setAttribute('aria-current', k === i));
+  }
+  function set(p) { playing = p; const b = document.getElementById('play'); b.textContent = p ? 'Pause' : 'Play'; b.setAttribute('aria-pressed', p); acc = 0; last = performance.now(); }
+  document.getElementById('play').onclick = () => set(!playing);
+  document.getElementById('prev').onclick = () => { set(false); i = (i - 1 + N) % N; draw(); };
+  document.getElementById('next').onclick = () => { set(false); i = (i + 1) % N; draw(); };
+  document.getElementById('fps').oninput = e => { fps = +e.target.value; document.getElementById('fpsv').textContent = fps; };
+  // discrete frames: the drawing changes only on the beat, never in between
+  (function tick(now) { if (playing) { acc += now - last; const step = 1000 / fps; if (acc >= step) { acc %= step; i = (i + 1) % N; draw(); } } last = now; requestAnimationFrame(tick); })(last);
+  draw(); addEventListener('resize', draw);
+</script>
+</body>
+</html>
