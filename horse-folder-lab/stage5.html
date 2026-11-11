@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>horse-folder-lab · procession</title>
+<link rel="stylesheet" href="review.css">
+</head>
+<body>
+<main>
+  <p class="eyebrow">Stage 5 · four horses</p>
+  <h1>The procession, before the analog finish</h1>
+  <div class="pair">
+    <figure><div class="frame" id="build"></div><figcaption>Build</figcaption></figure>
+    <figure><div class="frame"><img src="ref.png" alt="The reference"></div><figcaption>Reference</figcaption></figure>
+  </div>
+</main>
+<script type="module">
+  import { mountProcession } from './procession.js';
+  mountProcession(document.getElementById('build'), { finish: false });
+</script>
+</body>
+</html>
