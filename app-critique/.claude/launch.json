@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "app-critique",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "6540", "--bind", "127.0.0.1"],
+      "port": 6540
+    }
+  ]
+}

@@ -1,0 +1,215 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>App Critique</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&display=swap">
+<style>
+/* APP CRITIQUE · ClassPass. The intro deck's material: paper slides on a 1280x720 stage that push left and right,
+   Jakarta for heads, Helvetica for body, plum for emphasis, the gold felt tip on one phrase per headline.
+   The grid: eyebrow and headline sit in the band 32-136, content starts on the 168 line (32px under it), centred.
+   Annotations: each finding owns a number. Its region on the screenshot gets a plum hairline outline, its marker sits in
+   the gutter to the left of the screen at the region's top, and its words sit in the column on the right. Every click
+   reveals the next finding in reading order. Sage markers are things that work. */
+:root{--jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --gold:#A99939;--plum:#340414;--sage:#9ba69c;--paper:#FAF9F7;--ink:#14171B;--ink2:rgba(20,23,27,.66);--ink3:rgba(20,23,27,.42);
+  --hair:rgba(20,23,27,.14);--ease:cubic-bezier(.45,0,.15,1);--out:cubic-bezier(.2,.7,.2,1)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden;background:#0E0D0C;color:var(--ink);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform:translate(-50%,-50%) scale(var(--k,1));background:var(--paper);overflow:hidden}
+.sl{position:absolute;inset:0;display:none;background:var(--paper)}.sl.on{display:block}
+.sl>*{position:absolute}
+h1,h2{margin:0;font-family:var(--jak);font-weight:500;letter-spacing:-.015em;text-wrap:balance}
+p{margin:0;text-wrap:pretty}
+.lab{font:600 10.5px/1.5 var(--jak);letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+
+/* the head: eyebrow over headline, bottom-aligned in the band so every slide's content starts on the same line */
+.head{left:0;right:0;top:32px;height:104px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:10px;text-align:center;padding:0 140px}
+.head .lab{color:var(--plum)}
+.head h2{font-size:30px;line-height:1.25;color:var(--ink);max-width:1000px}
+.hl{color:var(--plum);font-weight:600;padding:0 .08em;margin:0 -.08em;box-decoration-break:clone;-webkit-box-decoration-break:clone;mix-blend-mode:multiply;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M6 6 C 60 2, 140 9, 200 5 S 330 3, 394 7 L 397 32 C 340 37, 250 30, 190 35 S 70 38, 4 33 Z' fill='%23A99939' opacity='.42'/><path d='M12 9 C 90 4, 180 12, 260 8 S 360 6, 390 10 L 392 29 C 320 33, 230 27, 150 31 S 60 34, 10 30 Z' fill='%23A99939' opacity='.2'/></svg>") no-repeat 0 55%/0% 1.08em}
+.sl.on .hl{animation:mkdraw .8s cubic-bezier(.3,.7,.2,1) .6s both}
+@keyframes mkdraw{from{background-size:0% 1.08em}to{background-size:100% 1.08em}}
+
+/* enters: ~100ms between chunks, 8px rise, 8px blur, opacity */
+.in{opacity:0}
+.sl.on .in{animation:rise .6s var(--out) both;animation-delay:calc(var(--i,0) * 100ms + 150ms)}
+@keyframes rise{from{opacity:0;transform:translateY(8px);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}
+
+/* ---------- flow slides ---------- */
+.body{left:0;right:0;top:168px;display:flex;justify-content:center;align-items:flex-start;gap:48px}
+.body>*{position:relative}
+.shots{display:flex;gap:32px;align-items:flex-start}
+.fig{display:flex;flex-direction:column;align-items:center;gap:12px}
+.shot{position:relative;height:var(--ph,470px);aspect-ratio:644/1400}
+.shot.wide{height:auto;width:var(--pw,420px);aspect-ratio:1400/997}
+.shot img{display:block;width:100%;height:100%;border-radius:calc(var(--ph,470px) * .068);outline:1px solid rgba(0,0,0,.1);outline-offset:-1px;background:#fff}
+.shot.wide img{border-radius:14px}
+.cap{font:400 11.5px/1.45 var(--hel);color:var(--ink3);text-align:center;max-width:calc(var(--ph,470px) * .46 + 20px)}
+.shot.wide+.cap{max-width:var(--pw,420px)}
+/* a region: plum hairline, hidden until its finding is revealed */
+.rg{position:absolute;border:1.5px solid var(--plum);border-radius:8px;opacity:0;transform:scale(.985);transition:opacity .24s var(--out),transform .24s var(--out);pointer-events:none}
+.rg.ok{border-color:#6f7d70}
+.mk{position:absolute;left:-26px;width:20px;height:20px;margin-top:-1px;border-radius:50%;background:var(--plum);color:#fff;font:600 11px/20px var(--jak);text-align:center;font-variant-numeric:tabular-nums;
+  opacity:0;transform:scale(.5);filter:blur(4px);transition:opacity .24s var(--out),transform .24s var(--out),filter .24s var(--out)}
+.mk.ok,.fn .n.ok{background:var(--sage);color:var(--ink)}
+.shown{opacity:1!important;transform:none!important;filter:blur(0)!important}
+.redact{position:absolute;border-radius:10px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);background:rgba(255,255,255,.25)}
+
+/* the findings column */
+.finds{width:var(--fw,320px);display:flex;flex-direction:column;gap:24px}
+.fn{display:grid;grid-template-columns:20px 1fr;column-gap:12px;row-gap:4px;opacity:0;transform:translateY(8px);filter:blur(8px);transition:opacity .28s var(--out),transform .28s var(--out),filter .28s var(--out)}
+.fn .n{grid-row:span 2;width:20px;height:20px;margin-top:1px;border-radius:50%;background:var(--plum);color:#fff;font:600 11px/20px var(--jak);text-align:center;font-variant-numeric:tabular-nums}
+.fn h3{margin:0;font:600 16px/1.3 var(--jak);color:var(--ink);letter-spacing:-.01em}
+.fn p{font:300 14.5px/1.5 var(--hel);color:var(--ink2)}
+.later{font:italic 300 13px/1.5 var(--hel);color:var(--ink3);padding-top:16px;border-top:1px solid var(--hair);opacity:0;transition:opacity .28s var(--out)}
+.foot{left:0;right:0;top:684px;text-align:center;font:400 12px/1.4 var(--hel);color:var(--ink3)}
+.foot b{font:600 10px var(--jak);letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin-right:8px}
+.foot i{font-style:normal;margin:0 14px;color:var(--hair)}
+
+/* ---------- cover ---------- */
+.cover .mid{left:0;right:0;top:0;height:720px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center}
+.cover h1{font-size:76px;line-height:1;letter-spacing:-.03em}
+.cover .sub{font:300 17px/1.5 var(--hel);color:var(--ink2)}
+
+/* ---------- text slides ---------- */
+.cols{left:0;right:0;top:168px;display:flex;justify-content:center;align-items:center;gap:0}
+/* a text slide as one centred group: head over content, 32px apart, equal space above and below, equal left and right */
+.ctr{left:0;right:0;top:0;height:720px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px}
+.ctr>.head,.ctr>.cols{position:static;height:auto;padding:0}
+.ctr>.cols{gap:64px}
+.col{width:440px;padding:0;display:flex;flex-direction:column;gap:32px}
+.col+.col{border-left:1px solid var(--hair)}
+.col .lab{color:var(--plum)}
+.col p{font:400 17px/1.5 var(--hel);color:var(--ink)}
+.col p.g{color:var(--ink);font-size:15px}
+.big{font:500 44px/1 var(--jak);letter-spacing:-.025em;color:var(--plum);font-variant-numeric:tabular-nums}
+.big small{font:300 15px/1.4 var(--hel);letter-spacing:0;color:var(--ink2);margin-left:10px}
+.blk{display:flex;flex-direction:column;gap:8px}
+.blk h4,.col .ch4{margin:0;font:600 15px/1.35 var(--jak);color:var(--plum);letter-spacing:-.005em}
+.jr{display:flex;flex-direction:column;gap:8px;padding-top:32px;border-top:1px solid var(--hair)}
+.jr .lab{color:var(--plum)}
+.trip{display:flex;align-items:baseline;gap:12px;font:500 20px var(--jak);letter-spacing:-.015em;white-space:nowrap}
+.col .note{font:italic 300 13.5px/1.5 var(--hel);color:var(--ink3);text-align:left}
+.trip span{color:var(--ink3);font:300 17px var(--hel)}
+.trip em{font-style:normal;color:var(--plum)}
+/* ABIGAIL. The Maya card from the Clover deck (slide 41, .mc9), ported as is: one pane of glass running from sage into
+   mauve, the label, her name, her facts as chips, then her situation as dotted rows. The portrait frame shows only when
+   img/abigail.jpg exists; no stand-in picture. */
+:root{--sig-deep:#6F7C70;--sig2:#827a85;--gl-sage:rgba(155,166,156,.62);--gl-sage-lt:rgba(214,222,215,.85);--gl-mauve-lt:rgba(222,216,224,.85)}
+.pcard{position:relative;width:340px;border-radius:24px;padding:18px 18px 12px;
+  background:linear-gradient(160deg,rgba(255,255,255,.98) 0%,var(--gl-sage-lt) 52%,var(--gl-mauve-lt) 100%);
+  box-shadow:inset 2px 2px 2px rgba(255,255,255,.95),inset 0 -22px 36px -26px rgba(130,122,133,.35),0 0 0 1px rgba(20,23,27,.06),0 26px 48px -24px rgba(52,4,20,.32)}
+.pcard .av{display:inline-block;height:126px;border-radius:20px;padding:5px;margin-bottom:10px;background:linear-gradient(145deg,#fff,var(--gl-sage));
+  box-shadow:inset 1.5px 1.5px 1px rgba(255,255,255,.9),0 0 0 1px rgba(255,255,255,.6),0 10px 22px -10px rgba(52,4,20,.4)}
+.pcard .av img{display:block;height:100%;width:auto;border-radius:15px}
+.pcard .who{margin:0;font:600 11.5px/1.4 var(--jak);letter-spacing:.06em;text-transform:uppercase;color:#8a8780}
+.pcard .nm{margin:2px 0 8px;font:500 30px/1.1 var(--jak);letter-spacing:-.02em;color:var(--plum)}
+.pcard .fx{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.pcard .fx span{font:600 11.5px/1 var(--jak);padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.8);color:var(--ink);box-shadow:0 0 0 1px rgba(52,4,20,.14)}
+.pcard .tl{margin:0 0 4px;font:600 11.5px/1.4 var(--jak);letter-spacing:.06em;text-transform:uppercase;color:var(--plum)}
+.pcard .tr{display:flex;align-items:flex-start;gap:10px;margin:0;padding:6px 0;border-top:1px solid rgba(52,4,20,.14);font:400 14.5px/1.4 var(--hel);color:var(--ink)}
+.pcard .tr i{flex:none;width:8px;height:8px;margin-top:6px;border-radius:50%;background:var(--plum)}
+.note{left:0;right:0;text-align:center;font:italic 300 13.5px/1.5 var(--hel);color:var(--ink3)}
+
+/* ---------- opportunities ---------- */
+.ops{left:0;right:0;top:168px;display:flex;justify-content:center}
+.op{width:360px;padding:0 36px;display:flex;flex-direction:column;gap:12px}
+.op+.op{border-left:1px solid var(--hair)}
+.op .p{font:600 12px var(--jak);letter-spacing:.14em;color:var(--plum)}
+.op h3{margin:0;font:500 22px/1.25 var(--jak);letter-spacing:-.015em;color:var(--ink);text-wrap:balance}
+.op p{font:300 15px/1.5 var(--hel);color:var(--ink2)}
+.op .m{margin-top:6px;padding-top:12px;border-top:1px solid var(--hair);font:300 13.5px/1.5 var(--hel);color:var(--ink2)}
+.op .m b{display:block;font:600 10px/1.6 var(--jak);letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
+.keep{left:0;right:0;top:520px;display:flex;justify-content:center}
+.keep>div{width:1080px;padding-top:20px;border-top:1px solid var(--hair);display:flex;gap:16px;align-items:baseline;justify-content:center}
+.keep p{font:300 15px/1.5 var(--hel);color:var(--ink)}
+
+/* chrome */
+#bar{position:fixed;left:0;right:0;bottom:0;height:2px;background:rgba(255,255,255,.08);z-index:9}#bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .3s var(--out)}
+.hint{position:fixed;right:18px;bottom:12px;font:400 12px var(--hel);color:rgba(255,255,255,.3);z-index:9}
+@media (prefers-reduced-motion:reduce){.sl.on .in,.sl.on .hl{animation-duration:1ms;animation-delay:0ms}.rg,.mk,.fn,.later{transition:none}}
+</style>
+<body><div id="stage"><div id="deck"></div></div><div id="bar"><i></i></div><div class="hint">click, space or → · ← back</div>
+<script>
+(()=>{
+const stage=document.getElementById('stage'),deck=document.getElementById('deck');
+const fit=()=>stage.style.setProperty('--k',Math.min(innerWidth/1280,innerHeight/720));addEventListener('resize',fit);fit();
+
+/* A screen: src, caption, regions [n,x,y,w,h] in % of the screenshot, redactions [x,y,w,h]. ok marks a finding that works. */
+const SH=(id,cap,rg=[],opt={})=>({id,cap,rg,...opt});
+/* ---------- the deck ---------- */
+const S=[
+ {type:'cover'},
+ {type:'context'},
+];
+
+/* ---------- builders ---------- */
+const esc=s=>s;
+function flow(d){
+  const fig=sh=>{
+    const seen=new Set();
+    const regs=sh.rg.map(([n,x,y,w,h,ok])=>`<div class="rg ${ok?'ok':''}" data-n="${n}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%"></div>`).join('');
+    const mks=sh.rg.filter(r=>!seen.has(r[0])&&seen.add(r[0])).map(([n,x,y,w,h,ok])=>`<div class="mk ${ok?'ok':''}" data-n="${n}" style="top:${y}%">${n}</div>`).join('');
+    const red=(sh.redact||[]).map(([x,y,w,h])=>`<div class="redact" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%"></div>`).join('');
+    return `<div class="fig in" style="--i:${0}"><div class="shot ${sh.wide?'wide':''}" style="${sh.pw?`--pw:${sh.pw}px`:''}"><img src="img/IMG_${sh.id}.jpg" alt="${sh.cap}">${red}${regs}${mks}</div><div class="cap">${sh.cap}</div></div>`;
+  };
+  const finds=d.finds.map((f,i)=>`<div class="fn" data-n="${i+1}"><span class="n ${f.ok?'ok':''}">${i+1}</span><h3>${f.t}</h3><p>${f.b}</p></div>`).join('');
+  const foot=d.foot.map(([k,v])=>`<b>${k}</b>${v}`).join('<i>/</i>');
+  return {steps:d.finds.length+(d.later?1:0),html:`
+   <div class="head"><div class="lab in" style="--i:0">${d.eb}</div><h2 class="in" style="--i:1">${d.h}</h2></div>
+   <div class="body" style="--ph:${d.ph}px;--fw:${d.fw}px"><div class="shots">${d.shots.map(fig).join('')}</div>
+     <div class="finds">${finds}${d.later?`<p class="later">${d.later}</p>`:''}</div></div>
+   <div class="foot in" style="--i:4">${foot}</div>`};
+}
+const BUILD={
+ cover:()=>({steps:0,html:`<div class="mid"><div class="lab in" style="--i:0">App critique</div><h1 class="in" style="--i:1">ClassPass</h1>
+   <p class="sub in" style="--i:2">Booking a class, from Home to Profile.</p></div>`}),
+ context:()=>({steps:0,html:`
+   <div class="ctr"><div class="head"><div class="lab in" style="--i:0">01 · Context</div><h2 class="in" style="--i:1">Business Context, Problem Space, &amp; Use Case</h2></div>
+   <div class="cols">
+    <div class="col in" style="--i:2;align-self:center"><div class="blk"><h4 class="ch4">ClassPass</h4>
+      <p class="g">A credit-based fitness marketplace connecting members with studios looking to fill unused capacity.</p></div>
+      <div class="blk"><h4>The business model</h4><p class="g">ClassPass earns subscription revenue while paying studios per booking, using dynamic pricing to balance demand and availability.</p></div>
+      <div class="blk"><h4>The business challenge</h4><p class="g">Historically, ClassPass’s unlimited plans made frequent users expensive to serve, prompting its shift toward credits. Today, it must retain variety-seeking members while competing with studios’ direct memberships and discounts.</p></div>
+      <div class="jr"><h4 class="ch4">User Journey</h4><div class="trip"><em>Discover</em><span>→</span><em>Book</em><span>→</span><em>Attend or cancel</em></div></div></div>
+    <div class="pcard in" style="--i:3"><span class="av"><img src="img/abigail.jpg" alt="Abigail" onerror="this.parentElement.remove()"></span>
+      <p class="who">Our user</p><p class="nm">Abigail</p>
+      <div class="fx"><span>Early 20s</span><span>Product marketer</span><span>New York</span></div>
+      <p class="tl">Her Saturday</p>
+      <p class="tr"><i></i>Wants to be fit and social</p>
+      <p class="tr"><i></i>New to ClassPass, on a friend’s recommendation</p>
+      <p class="tr"><i></i>Books a class for Saturday</p>
+      <p class="tr"><i></i>Then finds it clashes with a restaurant reservation, and needs to cancel</p></div>
+   </div></div>`}),
+ flow
+};
+
+const built=S.map(d=>BUILD[d.type](d));
+const secs=built.map(b=>{const el=document.createElement('section');el.className='sl';el.innerHTML=b.html;deck.appendChild(el);return el});
+let s=0,step=0,busy=false;
+const all=new URLSearchParams(location.search).has('all');
+function paintSteps(){
+  const el=secs[s];
+  el.querySelectorAll('.rg,.mk,.fn').forEach(x=>x.classList.toggle('shown',+x.dataset.n<=step));
+  const later=el.querySelector('.later'); if(later) later.classList.toggle('shown',step>built[s].steps-1&&step>=built[s].steps);
+  const total=built.reduce((a,b)=>a+b.steps+1,0);let done=0;for(let i=0;i<s;i++)done+=built[i].steps+1;done+=step+1;
+  document.querySelector('#bar i').style.width=(100*done/total)+'%';
+  history.replaceState(null,'','#'+(s+1)+(location.search?'':''));
+}
+const anim=(el,kf,o)=>el.animate(kf,{easing:'cubic-bezier(.45,0,.15,1)',fill:'none',...o}).finished;
+async function go(b,toStep=0){
+  if(busy||b<0||b>=S.length) return;
+  if(b===s){step=toStep;paintSteps();return;}
+  busy=true;const a=s,dir=b>a?1:-1;secs[b].classList.add('on');s=b;step=toStep;paintSteps();
+  await Promise.all([anim(secs[a],[{transform:'translateX(0)'},{transform:`translateX(${-1280*dir}px)`}],{duration:700}),
+                     anim(secs[b],[{transform:`translateX(${1280*dir}px)`},{transform:'translateX(0)'}],{duration:700})]);
+  secs[a].classList.remove('on');busy=false;
+}
+function next(){ if(busy) return; if(step<built[s].steps){step++;paintSteps();} else go(s+1); }
+function prev(){ if(busy) return; if(step>0){step--;paintSteps();} else go(s-1,built[s-1]?built[s-1].steps:0); }
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();next();}else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev();}});
+addEventListener('click',next);
+const start=Math.max(0,Math.min(S.length-1,(parseInt(location.hash.slice(1))||1)-1));
+s=start;secs[s].classList.add('on');step=all?built[s].steps:0;paintSteps();
+})();
+</script>
+</body></html>
