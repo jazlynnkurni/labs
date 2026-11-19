@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5 Liquid</title><link rel="stylesheet" href="common.css"></head>
+<body>
+<canvas id="c" aria-label="The hero circles; they can be moved"></canvas>
+<div class="mark">jazlynn</div>
+<div class="stack" id="stack"></div>
+<p class="tag"><b>5 · Liquid.</b> The circles are drops: close ones run together, the edges tremble. Pull one and it stretches out of the others before it lets go.</p>
+<script type="module">
+import { stage, discs, homeOf, sheet, wall, hit, pointer, reduced, SW, grain } from './common.js';
+wall(document.getElementById('stack'));
+const cv = document.getElementById('c'), s = stage(cv), ds = discs(s), p = pointer(cv);
+
+/* drops on a sheet: a field, not outlines. Close circles merge into one wet shape, the colour blended
+   by how near each is; a dragged one trails a slower drop of itself, so it stretches and necks. */
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+for (const d of ds) { d.rgb = hex(d.col); d.tx = d.x; d.ty = d.y; d.tvx = 0; d.tvy = 0; }
+let drag = null, off = [0, 0]; const t0 = performance.now();
+const low = document.createElement('canvas'), lx = low.getContext('2d'); let img;
+cv.addEventListener('pointerdown', () => { const d = hit(ds, p.x, p.y); if (!d) return; drag = d; off = [d.x - p.x, d.y - p.y]; });
+addEventListener('pointerup', () => { drag = null; });
+(function frame(now) {
+  const t = (now - t0) / 1000, ctx = s.ctx, Q = 3, w = Math.ceil(s.W / Q), h = Math.ceil(s.H / Q);
+  if (low.width !== w || low.height !== h) { low.width = w; low.height = h; img = lx.createImageData(w, h); }
+  cv.style.cursor = drag ? 'grabbing' : hit(ds, p.x, p.y) ? 'grab' : 'default';
+  const src = [];
+  for (const d of ds) { const [hx, hy] = homeOf(d, s); d.r = d.h.r * s.W * (reduced ? 1 : 1 + .02 * Math.sin(t * 1.3 + d.i * 2.1));
+    const tx = d === drag ? p.x + off[0] : hx, ty = d === drag ? p.y + off[1] : hy;
+    d.vx = (d.vx + (tx - d.x) * (d === drag ? .3 : .07)) * .8; d.vy = (d.vy + (ty - d.y) * (d === drag ? .3 : .07)) * .8; d.x += d.vx; d.y += d.vy;
+    d.tvx = (d.tvx + (d.x - d.tx) * .035) * .86; d.tvy = (d.tvy + (d.y - d.ty) * .035) * .86; d.tx += d.tvx; d.ty += d.tvy;    // the slower drop behind it
+    src.push([d.x / Q, d.y / Q, (d.r * 1.4 / Q) ** 2, d.rgb], [d.tx / Q, d.ty / Q, (d.r * .62 * 1.4 / Q) ** 2, d.rgb]); }
+  /* a short-range kernel (1 - d²/R²)³ that ends at 1.4 r, thresholded where a lone drop's edge is exactly r,
+     so drops only run together when they are close, never into one pool */
+  const T = (1 - 1 / 1.96) ** 3;
+  const D = img.data;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    let f = 0, r = 0, g = 0, b = 0;
+    for (const [sx, sy, RR, c] of src) { const u = 1 - ((x - sx) ** 2 + (y - sy) ** 2) / RR; if (u <= 0) continue; const q = u * u * u; f += q; r += c[0] * q; g += c[1] * q; b += c[2] * q; }
+    const i = (y * w + x) * 4; if (f <= 0) { D[i + 3] = 0; continue; }
+    const a = Math.min(1, Math.max(0, (f - T * .96) / (T * .08)));   // a crisp, wet edge
+    D[i] = r / f; D[i + 1] = g / f; D[i + 2] = b / f; D[i + 3] = a * 225;
+  }
+  lx.putImageData(img, 0, 0);
+  ctx.clearRect(0, 0, s.W, s.H); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high'; ctx.drawImage(low, 0, 0, s.W, s.H);
+  ctx.save(); ctx.globalCompositeOperation = 'source-atop'; ctx.fillStyle = grain(ctx); ctx.fillRect(0, 0, s.W, s.H); ctx.restore();
+  requestAnimationFrame(frame);
+})(performance.now());
+</script>
+</body></html>

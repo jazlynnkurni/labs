@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2 Kandinsky</title><link rel="stylesheet" href="common.css"></head>
+<body>
+<canvas id="c" aria-label="The hero circles; they can be moved"></canvas>
+<div class="mark">jazlynn</div>
+<div class="stack" id="stack"></div>
+<p class="tag"><b>2 · Kandinsky, several circles.</b> On a dark ground they breathe and glow. Throw one: it glides, knocks the others, and they all drift home.</p>
+<script type="module">
+import { stage, discs, homeOf, sheet, wall, hit, pointer, reduced, SW, grain } from './common.js';
+wall(document.getElementById('stack'));
+const cv = document.getElementById('c'), s = stage(cv), ds = discs(s), p = pointer(cv);
+
+/* Kandinsky's Several Circles (1926): weightless discs that glow where they cross, on night. A slow
+   breath says they are alive; a turning ring under the hand says this one can be thrown. */
+let drag = null, off = [0, 0]; const t0 = performance.now();
+cv.addEventListener('pointerdown', () => { const d = hit(ds, p.x, p.y); if (!d) return; drag = d; off = [d.x - p.x, d.y - p.y]; ds.push(ds.splice(ds.indexOf(d), 1)[0]); });
+addEventListener('pointerup', () => { if (drag) { drag.vx = p.vx * 1.4; drag.vy = p.vy * 1.4; } drag = null; });
+(function frame(now) {
+  const ctx = s.ctx, t = (now - t0) / 1000; ctx.clearRect(0, 0, s.W, s.H);
+  const over = drag || hit(ds, p.x, p.y); cv.style.cursor = drag ? 'grabbing' : over ? 'grab' : 'default';
+  for (const d of ds) {
+    const [hx, hy] = homeOf(d, s); d.r0 = d.h.r * s.W; d.r = d.r0 * (reduced ? 1 : 1 + .018 * Math.sin(t * .6 + d.i * 1.3));
+    if (d === drag) { const tx = p.x + off[0], ty = p.y + off[1]; d.vx = (tx - d.x) * .5; d.vy = (ty - d.y) * .5; }
+    else { d.vx = (d.vx + (hx - d.x) * .0025) * .986; d.vy = (d.vy + (hy - d.y) * .0025) * .986; }
+    d.x += d.vx; d.y += d.vy;
+    if (d.x < d.r * .5) { d.x = d.r * .5; d.vx *= -.6; } if (d.x > s.W + d.r * .4) { d.x = s.W + d.r * .4; d.vx *= -.6; }
+    if (d.y < -d.r * .3) { d.y = -d.r * .3; d.vy *= -.6; } if (d.y > s.H + d.r * .3) { d.y = s.H + d.r * .3; d.vy *= -.6; }
+    d.hover += ((d === over ? 1 : 0) - d.hover) * .15;
+  }
+  // a moving circle hands its push on: anything it runs into is knocked along the line between them
+  for (const a of ds) { const sp = Math.hypot(a.vx, a.vy); if (sp < 2) continue;
+    for (const b of ds) { if (a === b || b === drag) continue; const dx = b.x - a.x, dy = b.y - a.y, dist = Math.hypot(dx, dy) || 1, near = (a.r + b.r) * .62;
+      if (dist < near) { const n = (near - dist) / near; b.vx += dx / dist * sp * .22 * n; b.vy += dy / dist * sp * .22 * n; } } }
+  for (const d of ds) {
+    ctx.save(); ctx.globalCompositeOperation = 'lighter'; const g = ctx.createRadialGradient(d.x, d.y, d.r * .55, d.x, d.y, d.r * 1.35);
+    g.addColorStop(0, d.col + '22'); g.addColorStop(1, d.col + '00'); ctx.fillStyle = g; ctx.fillRect(d.x - d.r * 1.4, d.y - d.r * 1.4, d.r * 2.8, d.r * 2.8); ctx.restore();
+    sheet(ctx, d.x, d.y, d.r, d.col, { blend: 'screen', alpha: .5 });
+  }
+  if (over) { ctx.save(); ctx.globalAlpha = .55 * over.hover; ctx.strokeStyle = '#FAF9F7'; ctx.setLineDash([2, 7]); ctx.lineDashOffset = -t * 18;
+    ctx.beginPath(); ctx.arc(over.x, over.y, over.r + 9, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
+  requestAnimationFrame(frame);
+})(performance.now());
+</script>
+</body></html>

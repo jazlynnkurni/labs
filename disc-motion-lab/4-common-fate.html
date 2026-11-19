@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4 Common fate</title><link rel="stylesheet" href="common.css"></head>
+<body>
+<canvas id="c" aria-label="The hero circles; they can be moved"></canvas>
+<div class="mark">jazlynn</div>
+<div class="stack" id="stack"></div>
+<p class="tag"><b>4 · Common fate.</b> Nothing to click: move across them and they part around your hand, each nudging its neighbours, then ease back into place.</p>
+<script type="module">
+import { stage, discs, homeOf, sheet, wall, hit, pointer, reduced, SW, grain } from './common.js';
+wall(document.getElementById('stack'));
+const cv = document.getElementById('c'), s = stage(cv), ds = discs(s), p = pointer(cv);
+
+/* Gestalt's common fate: things that move together read as one living thing. The circles answer the
+   mere passing of the hand, so a visitor learns they move before they think to try. */
+const t0 = performance.now();
+(function frame(now) {
+  const ctx = s.ctx; ctx.clearRect(0, 0, s.W, s.H); cv.style.cursor = 'default';
+  const R = Math.min(s.W, s.H) * .32, off = ds.map(() => [0, 0]);
+  ds.forEach((d, i) => { const [hx, hy] = homeOf(d, s); d.r = d.h.r * s.W;
+    if (!p.in) return; const dx = hx - p.x, dy = hy - p.y, dist = Math.hypot(dx, dy) || 1;
+    if (dist < R) { const f = (1 - dist / R) ** 2; off[i][0] += dx / dist * f * 110 + p.vx * f * 9; off[i][1] += dy / dist * f * 110 + p.vy * f * 9; } });
+  // each takes a share of its neighbours' movement: the parting ripples outward
+  const share = off.map((o, i) => { let sx = 0, sy = 0; ds.forEach((e, j) => { if (i === j) return; const [ax, ay] = homeOf(ds[i], s), [bx, by] = homeOf(e, s), w = Math.max(0, 1 - Math.hypot(ax - bx, ay - by) / (s.W * .3)); sx += off[j][0] * w * .35; sy += off[j][1] * w * .35; }); return [sx, sy]; });
+  ds.forEach((d, i) => { const [hx, hy] = homeOf(d, s), tx = hx + off[i][0] + share[i][0], ty = hy + off[i][1] + share[i][1];
+    d.vx = (d.vx + (tx - d.x) * .06) * .84; d.vy = (d.vy + (ty - d.y) * .06) * .84; d.x += d.vx; d.y += d.vy; if (reduced) { d.x = hx; d.y = hy; }
+    sheet(ctx, d.x, d.y, d.r, d.col); });
+  requestAnimationFrame(frame);
+})(performance.now());
+</script>
+</body></html>

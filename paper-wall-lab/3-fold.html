@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>3 Fold</title>
+<link rel="stylesheet" href="lab.css"><style>.row { perspective: 900px; }
+.panel { position: relative; width: 50px; height: 58px; display: grid; place-items: center; font: 400 44px/1 "Helvetica Neue", Helvetica, sans-serif; color: #14171B;
+  background: var(--paper); transform-style: preserve-3d; backface-visibility: hidden; }
+.panel::after { content: ""; position: absolute; inset: 0; pointer-events: none; }</style></head>
+<body><div class="mark">jazlynn</div><div class="wall" id="wall"></div><p class="tag"><b>3 · Accordion fold.</b> The words are printed on the white page itself, folded along every cell seam: only light and shade show the paper. The folds breathe; hover a row and it flattens to read.</p>
+<script type="module">
+import { WORDS, PAPER, rng, newsprint, torn, reduced } from './paper.js';
+const wall = document.getElementById('wall');
+/* the page folded like a map: panels alternate mountain and valley, each lit by which way it faces, so
+   the sheet keeps the page's own colour and the fold is all shading. The angle breathes, like her rows. */
+const rows = WORDS.map((w, i) => { const row = document.createElement('div'); row.className = 'row';
+  const panels = [...w].map((ch, k) => { const p = document.createElement('div'); p.className = 'panel'; p.textContent = ch; row.appendChild(p); return p; });
+  wall.appendChild(row); row.addEventListener('pointerenter', () => row.flat = 1); row.addEventListener('pointerleave', () => row.flat = 0); row.flat = 0; row.f = 0; return { row, panels, i }; });
+const t0 = performance.now();
+(function frame(now) { const t = (now - t0) / 1000;
+  for (const R of rows) { R.row.f += ((R.row.flat ? 1 : 0) - R.row.f) * .12;
+    const a = (reduced ? 26 : 22 + 10 * Math.sin(t * .7 + R.i * .6)) * (1 - R.row.f);
+    R.panels.forEach((p, k) => { const s = k % 2 ? -1 : 1, ang = a * s, c = Math.cos(ang * Math.PI / 180);
+      p.style.transform = `rotateY(${ang}deg)`; p.style.marginLeft = k ? `${-50 * (1 - c)}px` : '0';
+      const k2 = Math.sin(Math.abs(ang) * Math.PI / 180);   // how far this facet is turned
+      p.style.backgroundImage = s > 0 ? `linear-gradient(90deg, rgba(255,255,255,${(.5 * k2).toFixed(3)}), rgba(20,18,16,${(.06 * k2).toFixed(3)}))`
+                                      : `linear-gradient(90deg, rgba(20,18,16,${(.05 * k2).toFixed(3)}), rgba(20,18,16,${(.26 * k2).toFixed(3)}))`; }); }
+  requestAnimationFrame(frame); })(performance.now());
+</script></body></html>

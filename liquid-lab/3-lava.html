@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>3 Lava lamp</title><link rel="stylesheet" href="lab.css"></head>
+<body>
+<canvas id="c" aria-label="Liquid drops; drag one"></canvas>
+<p class="tag"><b>3 · Lava lamp.</b> On their own the drops rise, sink, meet and part, slowly, all the time. Bring your hand close and they lift away from it; take one and carry it.</p>
+<script type="module">
+import { mount, T, smooth, present, grain } from './liquid.js';
+const cv = document.getElementById('c');
+
+/* nothing waits for the hand: each drop drifts on its own slow rise and fall, so they keep meeting and
+   parting. The hand is heat: drops near it are pushed upward. */
+mount(cv, {
+  update(d, tx, ty, S) { if (d === S.dragging()) return [tx, ty]; const m = Math.min(S.W, S.H) * .82, t = S.t;
+    let x = d.hx + Math.sin(t * .21 + d.i * 2.3) * m * .08, y = d.hy + Math.sin(t * .33 + d.i * 1.7) * m * .2;
+    if (S.P.in) { const dd = Math.hypot(S.P.x - d.x, S.P.y - d.y); if (dd < m * .35) { const k = (1 - dd / (m * .35)); y -= k * m * .22; x += (d.x - S.P.x) * k * .3; } }
+    return [x, y]; },
+  render(S) { const { F, R, G, B, img } = S, D = img.data;
+    for (let i = 0; i < F.length; i++) { const f = F[i], o = i * 4; if (f <= T * .9) { D[o + 3] = 0; continue; }
+      const glow = Math.min(1, (f / T - 1) * .5), lift = 1 + .28 * glow;
+      D[o] = Math.min(255, R[i] / f * lift); D[o + 1] = Math.min(255, G[i] / f * lift); D[o + 2] = Math.min(255, B[i] / f * lift); D[o + 3] = smooth(T * .95, T * 1.05, f) * 245; }
+    present(S); } });
+</script>
+</body></html>

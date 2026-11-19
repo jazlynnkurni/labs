@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>1 Mercury</title><link rel="stylesheet" href="lab.css"></head>
+<body>
+<canvas id="c" aria-label="Liquid drops; drag one"></canvas>
+<p class="tag"><b>1 · Mercury.</b> The drops as liquid metal on night: lit from their own surface, a hard highlight, a bright rim. Your colours only tint the chrome.</p>
+<script type="module">
+import { mount, T, smooth, present, grain } from './liquid.js';
+const cv = document.getElementById('c');
+
+/* the field is treated as a height: its slope is the surface normal, so the light finds the curve of each
+   drop and of every neck between two. Chrome is mostly the world it reflects, so the swatch is a tint. */
+const L = [-.42, -.62, .66], Hn = (() => { const h = [L[0], L[1], L[2] + 1], n = Math.hypot(...h); return h.map(v => v / n); })();
+mount(cv, { render(S) { const { F, R, G, B, img, w } = S, D = img.data, K = 2.2 / T;
+  for (let i = 0; i < F.length; i++) { const f = F[i], o = i * 4; if (f <= T * .9) { D[o + 3] = 0; continue; }
+    const gx = (F[i + 1] || 0) - (F[i - 1] || 0), gy = (F[i + w] || 0) - (F[i - w] || 0);
+    let nx = -gx * K, ny = -gy * K, nz = 1; const nl = Math.hypot(nx, ny, nz); nx /= nl; ny /= nl; nz /= nl;
+    const diff = Math.max(0, nx * L[0] + ny * L[1] + nz * L[2]), spec = Math.pow(Math.max(0, nx * Hn[0] + ny * Hn[1] + nz * Hn[2]), 60), rim = Math.pow(1 - nz, 2.2);
+    const tr = R[i] / f, tg = G[i] / f, tb = B[i] / f, base = 150 + 70 * diff;
+    D[o] = base * .72 + tr * .28 * diff + spec * 255 + rim * 70; D[o + 1] = base * .72 + tg * .28 * diff + spec * 255 + rim * 70; D[o + 2] = base * .74 + tb * .28 * diff + spec * 255 + rim * 80;
+    D[o + 3] = smooth(T * .96, T * 1.04, f) * 255; }
+  present(S, { grainOn: false }); } });
+</script>
+</body></html>

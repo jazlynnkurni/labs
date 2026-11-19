@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>0 Liquid</title><link rel="stylesheet" href="lab.css"></head>
+<body>
+<canvas id="c" aria-label="Liquid drops; drag one"></canvas>
+<p class="tag"><b>0 · The component.</b> Seven drops in your swatches. Close ones run together, the edges tremble. Pull one and it stretches out of the others.</p>
+<script type="module">
+import { mount, T, smooth, present, grain } from './liquid.js';
+const cv = document.getElementById('c');
+
+/* the base: each pixel takes the colour of the drops weighted by how near each is; the surface is sharp */
+mount(cv, { render(S) { const { F, R, G, B, img } = S, D = img.data;
+  for (let i = 0; i < F.length; i++) { const f = F[i], o = i * 4; if (f <= 0) { D[o + 3] = 0; continue; }
+    D[o] = R[i] / f; D[o + 1] = G[i] / f; D[o + 2] = B[i] / f; D[o + 3] = smooth(T * .96, T * 1.04, f) * 235; }
+  present(S); } });
+</script>
+</body></html>

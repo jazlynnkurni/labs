@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>2 Ink</title><link rel="stylesheet" href="lab.css"></head>
+<body>
+<canvas id="c" aria-label="Liquid drops; drag one"></canvas>
+<p class="tag"><b>2 · Ink in water.</b> Watercolour drops: soft bleeding edges, the pigment pooling dark at the rim, the paper grain showing through. Drag one and it smears.</p>
+<script type="module">
+import { mount, T, smooth, present, grain } from './liquid.js';
+const cv = document.getElementById('c');
+
+/* wet-on-wet: the edge is soft and wide, and pigment collects where the water stops, so the rim is darker
+   than the middle (the coffee-ring edge). The paper's grain sits on top, heavier than on the other pages. */
+mount(cv, { render(S) { const { F, R, G, B, img } = S, D = img.data;
+  for (let i = 0; i < F.length; i++) { const f = F[i], o = i * 4; if (f <= T * .4) { D[o + 3] = 0; continue; }
+    const rim = Math.exp(-(((f - T) / (T * .3)) ** 2)), k = 1 - .32 * rim;
+    D[o] = R[i] / f * k; D[o + 1] = G[i] / f * k; D[o + 2] = B[i] / f * k; D[o + 3] = smooth(T * .45, T * 1.35, f) * 200 + rim * 40; }
+  present(S); const { ctx, W, H } = S; ctx.save(); ctx.globalCompositeOperation = 'source-atop'; ctx.globalAlpha = .7; ctx.fillStyle = grain(ctx); ctx.fillRect(0, 0, W, H); ctx.restore(); } });
+</script>
+</body></html>

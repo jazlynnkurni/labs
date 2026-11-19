@@ -1,0 +1,8 @@
+:root { --paper: #FAF9F7; --ink: #14171B; --hair: rgba(20,23,27,.12); }
+html, body { margin: 0; min-height: 100%; background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; }
+body { display: grid; align-items: center; min-height: 100vh; }
+.wall { margin-left: clamp(24px, 9vw, 160px); display: flex; flex-direction: column; gap: 10px; padding: 64px 0; }
+.row { display: flex; align-items: stretch; }
+.tag { position: fixed; left: clamp(24px, 9vw, 160px); bottom: 24px; max-width: 52ch; font: 400 13px/1.5 -apple-system, "SF Pro Text", system-ui, sans-serif; color: rgba(20,23,27,.5); }
+.tag b { font-weight: 500; color: var(--ink); }
+.mark { position: fixed; left: clamp(24px, 9vw, 160px); top: 28px; font: italic 600 22px Georgia, serif; }

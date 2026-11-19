@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>4 Torn through</title>
+<link rel="stylesheet" href="lab.css"><style>.cell { position: relative; width: 52px; height: 60px; margin-right: 4px; }
+.cell .under { position: absolute; inset: 0; display: grid; place-items: center; font: 700 44px/1 Didot, "Bodoni 72", Georgia, serif; color: #14171B; transition: clip-path 260ms cubic-bezier(.22,1,.36,1); }
+.cell .lip { position: absolute; inset: 0; background: #fff; transition: clip-path 260ms cubic-bezier(.22,1,.36,1); filter: drop-shadow(0 1px 1px rgba(0,0,0,.18)); }</style></head>
+<body><div class="mark">jazlynn</div><div class="wall" id="wall"></div><p class="tag"><b>4 · Torn through the page.</b> The page is the paper; each letter is a hole torn in it, a newspaper underneath. Hover a word and it tears a little wider.</p>
+<script type="module">
+import { WORDS, PAPER, rng, newsprint, torn, reduced } from './paper.js';
+const wall = document.getElementById('wall');
+/* the hole has two edges: the newspaper shows inside the tear, and around it the page's own torn lip, a
+   pale ragged rim with a hairline shadow where the sheet lifts off what is under it */
+let n = 0;
+for (const w of WORDS) { const row = document.createElement('div'); row.className = 'row';
+  const cells = [...w].map(ch => { const c = document.createElement('div'); c.className = 'cell'; const k = ++n;
+    c.innerHTML = `<div class="lip"></div><div class="under">${ch}</div>`; row.appendChild(c);
+    const np = newsprint(52, 60, k * 5, { ink: 'rgba(30,28,24,.32)' }), under = c.querySelector('.under'), lip = c.querySelector('.lip');
+    under.style.background = `url(${np.toDataURL()}) 0 0/100% 100%`;
+    const set = wide => { const pad = wide ? 0 : 4; const inset = (amp, sd) => { const p = torn(52 - pad * 2, 60 - pad * 2, sd, { amp, step: 3 }); return p.replace(/(-?[\d.]+)px (-?[\d.]+)px/g, (m, a, b) => `${(+a + pad).toFixed(1)}px ${(+b + pad).toFixed(1)}px`); };
+      under.style.clipPath = inset(4.5, k * 11); lip.style.clipPath = inset(2.5, k * 11 + 1); };
+    set(false); c.set = set; return c; });
+  row.addEventListener('pointerenter', () => cells.forEach(c => c.set(true))); row.addEventListener('pointerleave', () => cells.forEach(c => c.set(false)));
+  wall.appendChild(row); }
+</script></body></html>

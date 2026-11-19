@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>1 Ransom</title>
+<link rel="stylesheet" href="lab.css"><style>.scrap { position: relative; margin: 0 2px; transition: transform 200ms cubic-bezier(.22,1,.36,1), filter 200ms ease-out; filter: drop-shadow(0 1px 1px rgba(0,0,0,.12)); }
+.scrap .bg { position: absolute; inset: 0; } .scrap span { position: relative; display: block; line-height: 1; padding: 6px 10px 4px; }
+@media (hover: hover) { .scrap:hover { transform: translateY(-3px) rotate(var(--r)) scale(1.06) !important; filter: drop-shadow(0 6px 8px rgba(0,0,0,.18)); } }</style></head>
+<body><div class="mark">jazlynn</div><div class="wall" id="wall"></div><p class="tag"><b>1 · Ransom cut-outs.</b> Every letter is its own scrap torn from a different page: mixed papers and typefaces, tilted, pinned to the white sheet. Hover one and it lifts.</p>
+<script type="module">
+import { WORDS, PAPER, rng, newsprint, torn, reduced } from './paper.js';
+const wall = document.getElementById('wall');
+/* Dada's ransom note: each letter cut from its own paper, so the word is a collage of sources */
+const FACES = ["Georgia,serif","'Helvetica Neue',Helvetica,sans-serif","Didot,'Bodoni 72',serif","'Courier New',monospace","Futura,'Avenir Next',sans-serif","Baskerville,'Times New Roman',serif"];
+const PAPERS = [['#ebe7dd','#14171B'],['#f2ede0','#14171B'],['#1c1a17','#FAF9F7'],['#e8e2d6','#5a1f1f'],['#f4f1ea','#14171B'],['#dcd6c8','#14171B']];
+let n = 0;
+for (const w of WORDS) { const row = document.createElement('div'); row.className = 'row';
+  for (const ch of w) { const R = rng(++n * 97), s = document.createElement('div'); s.className = 'scrap';
+    const [bg, fg] = PAPERS[(R() * PAPERS.length) | 0], face = FACES[(R() * FACES.length) | 0], size = 40 + R() * 14, rot = (R() - .5) * 7;
+    s.style.cssText = `--r:${rot}deg;transform:rotate(${rot}deg) translateY(${(R() - .5) * 6}px)`;
+    s.innerHTML = `<div class="bg"></div><span style="font:${R() < .4 ? 700 : 400} ${size}px/1 ${face};color:${fg}">${ch}</span>`; row.appendChild(s);
+    requestAnimationFrame(() => { const b = s.getBoundingClientRect(), bgEl = s.firstChild, np = newsprint(b.width, b.height, n * 3 + 1, { tone: bg, ink: fg === '#FAF9F7' ? 'rgba(250,249,247,.25)' : 'rgba(30,28,24,.3)', photo: false });
+      bgEl.style.cssText = `background:url(${np.toDataURL()}) 0 0/100% 100%;clip-path:${torn(b.width, b.height, n * 7 + 3, { amp: 3.5 })}`; s.querySelector('span').style.clipPath = torn(b.width, b.height, n * 7 + 3, { amp: 3.5 }); }); }
+  wall.appendChild(row); }
+</script></body></html>

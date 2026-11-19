@@ -1,0 +1,5 @@
+html, body { margin: 0; height: 100%; background: #FAF9F7; color: #14171B; overflow: hidden; -webkit-font-smoothing: antialiased; }
+canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; touch-action: none; }
+.tag { position: fixed; left: 32px; bottom: 26px; max-width: 46ch; z-index: 2; font: 400 13px/1.5 -apple-system, "SF Pro Text", system-ui, sans-serif; color: rgba(20,23,27,.5); pointer-events: none; }
+.tag b { font-weight: 500; color: #14171B; }
+.dark, .dark body { background: #1C1A17; } .dark .tag { color: rgba(250,249,247,.5); } .dark .tag b { color: #FAF9F7; }

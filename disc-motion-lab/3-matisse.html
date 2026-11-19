@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3 Matisse</title><link rel="stylesheet" href="common.css"></head>
+<body>
+<canvas id="c" aria-label="The hero circles; they can be moved"></canvas>
+<div class="mark">jazlynn</div>
+<div class="stack" id="stack"></div>
+<p class="tag"><b>3 · Matisse, paper cut-outs.</b> Under your hand a circle lifts off the wall on its shadow. Carry it anywhere; it flexes with your speed and settles where you drop it. Double-click to put them all back.</p>
+<script type="module">
+import { stage, discs, homeOf, sheet, wall, hit, pointer, reduced, SW, grain } from './common.js';
+wall(document.getElementById('stack'));
+const cv = document.getElementById('c'), s = stage(cv), ds = discs(s), p = pointer(cv);
+
+/* Matisse cutting colour from paper: the circles are sheets pinned to the wall. Things that lift can
+   be picked up, so the lift on hover is the whole affordance. They stay where you put them. */
+let drag = null, off = [0, 0];
+const pos = new Map(ds.map(d => [d, null]));            // where she has placed each one, in fractions of the screen
+cv.addEventListener('pointerdown', () => { const d = hit(ds, p.x, p.y); if (!d) return; drag = d; off = [d.x - p.x, d.y - p.y]; ds.push(ds.splice(ds.indexOf(d), 1)[0]); });
+addEventListener('pointerup', () => { if (drag) { pos.set(drag, [drag.x / s.W, drag.y / s.H]); drag.lv = -.12; } drag = null; });
+cv.addEventListener('dblclick', () => { for (const d of ds) pos.set(d, null); });
+(function frame() {
+  const ctx = s.ctx; ctx.clearRect(0, 0, s.W, s.H);
+  const over = drag || hit(ds, p.x, p.y); cv.style.cursor = drag ? 'grabbing' : over ? 'grab' : 'default';
+  for (const d of ds) {
+    d.r = d.h.r * s.W; const placed = pos.get(d), [hx, hy] = placed ? [placed[0] * s.W, placed[1] * s.H] : homeOf(d, s);
+    const tx = d === drag ? p.x + off[0] : hx, ty = d === drag ? p.y + off[1] : hy, k = d === drag ? .3 : .1, damp = d === drag ? .62 : .78;
+    d.vx = (d.vx + (tx - d.x) * k) * damp; d.vy = (d.vy + (ty - d.y) * k) * damp; d.x += d.vx; d.y += d.vy;
+    const want = d === drag ? 1 : d === over ? .55 : 0;
+    d.lv = (d.lv + (want - d.lift) * .16) * .72; d.lift += d.lv; if (reduced) d.lift = want;
+  }
+  for (const d of ds) {
+    const sp = Math.hypot(d.vx, d.vy), stretch = Math.min(.1, sp * .006), a = Math.atan2(d.vy, d.vx), L = Math.max(0, d.lift);
+    ctx.save(); ctx.shadowColor = 'rgba(40,32,24,.22)'; ctx.shadowBlur = 4 + 26 * L; ctx.shadowOffsetY = 2 + 12 * L;
+    ctx.translate(d.x, d.y - 4 * L); ctx.rotate(a); ctx.scale((1 + .03 * L) * (1 + stretch), (1 + .03 * L) * (1 - stretch * .6));
+    ctx.beginPath(); ctx.arc(0, 0, d.r, 0, Math.PI * 2); ctx.fillStyle = d.col; ctx.fill(); ctx.restore();
+    sheet(ctx, d.x, d.y - 4 * L, d.r, d.col, { alpha: 0, rot: a, sx: (1 + .03 * L) * (1 + stretch), sy: (1 + .03 * L) * (1 - stretch * .6) });
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body></html>

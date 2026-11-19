@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>5 Peel</title>
+<link rel="stylesheet" href="lab.css"><style>.cell { position: relative; width: 50px; height: 58px; perspective: 500px; }
+.cell .under { position: absolute; inset: 0; } .cell .flap { position: absolute; inset: 0; display: grid; place-items: center; background: var(--paper);
+  font: 400 44px/1 "Helvetica Neue", Helvetica, sans-serif; color: #14171B; transform-origin: 0 0; transition: transform 420ms cubic-bezier(.22,1,.36,1), box-shadow 420ms ease-out;
+  box-shadow: inset 0 0 0 .5px rgba(20,23,27,.10); backface-visibility: visible; }
+@media (hover: hover) { .cell:hover .flap { transform: rotate3d(1,-1,0,58deg); box-shadow: inset 0 0 0 .5px rgba(20,23,27,.1), 6px 8px 14px -6px rgba(0,0,0,.25); } }</style></head>
+<body><div class="mark">jazlynn</div><div class="wall" id="wall"></div><p class="tag"><b>5 · Peeling flaps.</b> Every letter is a flap of the white page, lying flat. Hover one and it peels back from its corner, newsprint underneath.</p>
+<script type="module">
+import { WORDS, PAPER, rng, newsprint, torn, reduced } from './paper.js';
+const wall = document.getElementById('wall');
+/* flat, the flaps are the page: only the faintest hairline seam. A hover lifts one from its top-left
+   corner on a diagonal, the way a sticker is peeled, and the newsprint it was cut from shows under it */
+let n = 0;
+for (const w of WORDS) { const row = document.createElement('div'); row.className = 'row';
+  for (const ch of w) { const c = document.createElement('div'); c.className = 'cell'; const np = newsprint(50, 58, ++n * 9, { ink: 'rgba(30,28,24,.36)' });
+    c.innerHTML = `<div class="under" style="background:url(${np.toDataURL()}) 0 0/100% 100%"></div><div class="flap">${ch}</div>`; row.appendChild(c); }
+  wall.appendChild(row); }
+</script></body></html>

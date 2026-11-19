@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>2 Strips</title>
+<link rel="stylesheet" href="lab.css"><style>.strip { position: relative; display: inline-flex; align-self: flex-start; transition: transform 240ms cubic-bezier(.22,1,.36,1); }
+.strip .fib, .strip .np { position: absolute; inset: 0; } .strip .fib { background: #fff; }
+.strip span { position: relative; font: 400 46px/1 "Helvetica Neue", Helvetica, sans-serif; letter-spacing: .32em; padding: 10px 14px 8px 18px; color: #14171B; }
+@media (hover: hover) { .strip:hover { transform: translateX(10px) rotate(var(--r)) !important; } }</style></head>
+<body><div class="mark">jazlynn</div><div class="wall" id="wall"></div><p class="tag"><b>2 · Torn strips.</b> Each word is one strip ripped from a newspaper, the article faint behind the letters, white fibres where it tore. Hover a strip and it slides out.</p>
+<script type="module">
+import { WORDS, PAPER, rng, newsprint, torn, reduced } from './paper.js';
+const wall = document.getElementById('wall');
+/* one strip per word: torn along all four sides from a printed page; a slightly larger white layer under it
+   is the paper's fibre showing where it ripped, the way torn newsprint has a pale ragged lip */
+WORDS.forEach((w, i) => { const R = rng(i * 31 + 5), s = document.createElement('div'); s.className = 'strip'; const rot = (R() - .5) * 1.4;
+  s.style.cssText = `--r:${rot}deg;transform:rotate(${rot}deg) translateX(${R() * 14}px);filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.12))`;
+  s.innerHTML = `<div class="fib"></div><div class="np"></div><span>${w}</span>`; wall.appendChild(s);
+  requestAnimationFrame(() => { const b = s.getBoundingClientRect(), np = newsprint(b.width, b.height, i + 11, { ink: 'rgba(30,28,24,.16)', heads: false, photo: false });
+    s.querySelector('.fib').style.clipPath = torn(b.width, b.height, i * 13 + 2, { amp: 4.5, step: 3 });
+    const np2 = s.querySelector('.np'); np2.style.cssText = `background:url(${np.toDataURL()}) 0 0/100% 100%;clip-path:${torn(b.width, b.height, i * 13 + 9, { amp: 6, step: 3 })}`; }); });
+</script></body></html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>6 Peel, signature</title>
+<link rel="stylesheet" href="lab.css"><style>
+.cell { position: relative; width: 50px; height: 58px; perspective: 500px; }
+.cell .under { position: absolute; inset: 0; display: grid; place-items: center; color: #FAF9F7; font: 500 34px/1 "Helvetica Neue", Helvetica, sans-serif; text-decoration: none; }
+.cell .under svg { width: 26px; height: 26px; fill: #FAF9F7; }
+.cell .flap { position: absolute; inset: 0; display: grid; place-items: center; background: var(--paper); cursor: pointer;
+  font: 400 44px/1 "Helvetica Neue", Helvetica, sans-serif; color: #14171B; transform-origin: 0 0;
+  transition: transform 480ms cubic-bezier(.22,1,.36,1), box-shadow 480ms ease-out; box-shadow: inset 0 0 0 .5px rgba(20,23,27,.10); }
+.cell.peeled .flap { transform: rotate3d(1,-.22,0,-80deg); box-shadow: inset 0 0 0 .5px rgba(20,23,27,.1), 0 -6px 12px -4px rgba(0,0,0,.25); }   /* lifted off its top edge, a little askew: what was under it shows whole */
+.cell.peeled .flap { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .cell .flap { transition: none; } }
+</style></head>
+<body><div class="mark">jazlynn</div><div class="wall" id="wall"></div>
+<p class="tag"><b>6 · Peel, signature.</b> Under each flap, your purple and green. Sweep across JAZLYNN and it says something. Every other word hides one small thing, and one flap a visit is gold.</p>
+<script type="module">
+import { WORDS, rng } from './paper.js';
+/* her signature, under the page: the mauve and the sage from her discs, alternating, with the paper's
+   grain on them; gold (her flicker colour) for the one lucky flap */
+const MAUVE = '#827a85', SAGE = '#9ba69c', GOLD = '#A99939';
+const grainURL = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'), im = g.createImageData(128, 128);
+  for (let i = 0; i < im.data.length; i += 4) { const v = Math.random() < .5 ? 0 : 255; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = Math.random() * 40; }
+  g.putImageData(im, 0, 0); return c.toDataURL(); })();
+/* the small things hidden under the page, drawn in paper on the colour */
+const SYM = {
+  disc:   '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>',
+  star:   '<svg viewBox="0 0 24 24"><path d="M12 2c.6 5.4 4.6 9.4 10 10-5.4.6-9.4 4.6-10 10-.6-5.4-4.6-9.4-10-10 5.4-.6 9.4-4.6 10-10z"/></svg>',
+  heart:  '<svg viewBox="0 0 24 24"><path d="M12 21s-8-5.1-8-11a4.6 4.6 0 0 1 8-3 4.6 4.6 0 0 1 8 3c0 5.9-8 11-8 11z"/></svg>',
+  flower: '<svg viewBox="0 0 24 24"><g><circle cx="12" cy="6" r="4"/><circle cx="17.7" cy="10.1" r="4"/><circle cx="15.5" cy="16.9" r="4"/><circle cx="8.5" cy="16.9" r="4"/><circle cx="6.3" cy="10.1" r="4"/></g><circle cx="12" cy="12" r="2.6" fill="currentColor" style="color:#827a85"/></svg>',
+  moon:   '<svg viewBox="0 0 24 24"><path d="M15 3a9 9 0 1 0 6 15A8 8 0 0 1 15 3z"/></svg>',
+  spiral: '<svg viewBox="0 0 24 24"><path d="M12 12m0 0a1.5 1.5 0 0 1 3 0a3 3 0 0 1-6 0a4.5 4.5 0 0 1 9 0a6 6 0 0 1-12 0a7.5 7.5 0 0 1 15 0" fill="none" stroke="#FAF9F7" stroke-width="2" stroke-linecap="round"/></svg>',
+  smile:  '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#FAF9F7" stroke-width="2"/><circle cx="8.6" cy="10" r="1.4"/><circle cx="15.4" cy="10" r="1.4"/><path d="M7.8 14.2c1 2 2.4 3 4.2 3s3.2-1 4.2-3" fill="none" stroke="#FAF9F7" stroke-width="2" stroke-linecap="round"/></svg>',
+};
+const MESSAGE = ['S', 'A', 'Y', '', 'H', 'I', 'smile'];        // under J A Z L Y N N
+const EGGS = ['disc', 'star', 'heart', 'flower', 'moon', 'spiral', 'star'];
+const R = rng(2026), total = WORDS.reduce((a, w) => a + w.length, 0), lucky = (Math.random() * (total - 7) + 7) | 0;
+const wall = document.getElementById('wall'); let n = 0;
+WORDS.forEach((w, wi) => { const row = document.createElement('div'); row.className = 'row';
+  const egg = wi ? (R() * w.length) | 0 : -1;
+  [...w].forEach((ch, ci) => { const k = n++, c = document.createElement('div'); c.className = 'cell';
+    const gold = k === lucky, bg = gold ? GOLD : (k % 2 ? SAGE : MAUVE);
+    let inside = '';
+    if (wi === 0) { const m = MESSAGE[ci]; inside = m === 'smile' ? SYM.smile : m; }
+    else if (gold) inside = SYM.star; else if (ci === egg) inside = SYM[EGGS[wi - 1]];
+    const tagName = wi === 0 && MESSAGE[ci] === 'smile' ? 'a' : 'div';
+    c.innerHTML = `<${tagName} class="under" ${tagName === 'a' ? 'href="mailto:jazkurnz06@gmail.com" aria-label="Say hi to Jazlynn"' : 'aria-hidden="true"'} style="background:url(${grainURL}),${bg}">${inside}</${tagName}><div class="flap">${ch}</div>`;
+    /* a peeled flap stays up a few seconds, so a sweep across JAZLYNN reads as one line */
+    let t = 0; const peel = () => { c.classList.add('peeled'); clearTimeout(t); t = setTimeout(() => c.classList.remove('peeled'), 6000); };
+    c.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') peel(); });
+    c.querySelector('.flap').addEventListener('click', peel);
+    row.appendChild(c); });
+  wall.appendChild(row); });
+</script></body></html>

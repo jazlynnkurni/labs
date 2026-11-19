@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1 Albers</title><link rel="stylesheet" href="common.css"></head>
+<body>
+<canvas id="c" aria-label="The hero circles; they can be moved"></canvas>
+<div class="mark">jazlynn</div>
+<div class="stack" id="stack"></div>
+<p class="tag"><b>1 · Albers, colour answers.</b> A circle leans toward your hand; take it and the overlaps recolour as it passes over the others. Let go and it springs home.</p>
+<script type="module">
+import { stage, discs, homeOf, sheet, wall, hit, pointer, reduced, SW, grain } from './common.js';
+wall(document.getElementById('stack'));
+const cv = document.getElementById('c'), s = stage(cv), ds = discs(s), p = pointer(cv);
+
+/* Albers: a colour is never seen as it is. The overlaps ARE the feedback: drag one sheet across
+   the others and every overlap it touches deepens and shifts. The lean says "this one can be taken". */
+let drag = null, off = [0, 0];
+cv.addEventListener('pointerdown', () => { const d = hit(ds, p.x, p.y); if (!d) return; drag = d; off = [d.x - p.x, d.y - p.y]; ds.push(ds.splice(ds.indexOf(d), 1)[0]); });
+addEventListener('pointerup', () => { drag = null; });
+(function frame() {
+  const ctx = s.ctx; ctx.clearRect(0, 0, s.W, s.H);
+  const over = drag || hit(ds, p.x, p.y); cv.style.cursor = drag ? 'grabbing' : over ? 'grab' : 'default';
+  for (const d of ds) {
+    const [hx, hy] = homeOf(d, s); d.r = d.h.r * s.W; let tx = hx, ty = hy;
+    if (d === drag) { tx = p.x + off[0]; ty = p.y + off[1]; }
+    else if (p.in) { const dx = p.x - hx, dy = p.y - hy, dist = Math.hypot(dx, dy), R = d.r * 1.7; if (dist < R) { const k = (1 - dist / R) * .1; tx += dx * k; ty += dy * k; } }
+    const k = d === drag ? .35 : .09, damp = d === drag ? .6 : .8;
+    d.vx = (d.vx + (tx - d.x) * k) * damp; d.vy = (d.vy + (ty - d.y) * k) * damp; d.x += d.vx; d.y += d.vy;
+    if (reduced && d !== drag) { d.x = tx; d.y = ty; }
+    d.hover += ((d === over ? 1 : 0) - d.hover) * .2;
+  }
+  for (const d of ds) sheet(ctx, d.x, d.y, d.r * (1 + .015 * d.hover), d.col);
+  if (over) { ctx.save(); ctx.globalAlpha = .35 * over.hover; ctx.strokeStyle = '#14171B'; ctx.beginPath(); ctx.arc(over.x, over.y, over.r * (1 + .015 * over.hover) + 5, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body></html>
