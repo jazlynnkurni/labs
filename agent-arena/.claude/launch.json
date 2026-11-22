@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "agent-arena",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["run", "dev:fixtures"],
+      "port": 6700
+    }
+  ]
+}
