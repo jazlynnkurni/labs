@@ -1,0 +1,52 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3 · Annotated screens</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;600;700&display=swap">
+<link rel="stylesheet" href="../shared.css">
+<style>
+/* each goal as one thread: its dot, down past the real ClassPass screen where the goal shows up (circled, as in the
+   critique slides), to the flow and the report's evidence, ending on the same dot */
+.top{left:0;right:0;top:64px;display:flex;justify-content:center}
+.top .head{max-width:1000px}
+.goal{top:186px}
+.shot{top:228px;--w:220;width:220px;height:296px}
+.note{top:556px;width:300px;display:flex;flex-direction:column;gap:8px}
+.note h3{font-size:20px;line-height:25px;color:var(--ink)}
+.note .body{font-size:15px;line-height:1.45}
+.dot{top:562px;width:12px;height:12px;border-radius:50%;background:var(--dot)}
+.thread{left:0;top:0;width:1280px;height:720px;pointer-events:none}
+.thread .w{fill:none;stroke:rgba(52,4,20,.4);stroke-width:1}
+.thread .ring{fill:none;stroke:var(--plum);stroke-width:1.5}
+.thread .pin{fill:var(--plum)}
+/* columns 400 wide from x 40; the thread runs on x + 46, the screen sits at x + 80 */
+.k1 .goal,.k1 .dot{left:80px}.k2 .goal,.k2 .dot{left:480px}.k3 .goal,.k3 .dot{left:880px}
+.k1 .shot,.k1 .note{left:120px}.k2 .shot,.k2 .note{left:520px}.k3 .shot,.k3 .note{left:920px}
+.k1,.k2,.k3{display:contents}.k1>*,.k2>*,.k3>*{position:absolute;margin:0}
+</style></head>
+<body><div id="stage">
+<div class="top"><h2 class="head" data-b="0">According to <span class="hl">ClassPass&rsquo;s 2026 Industry Impact Report</span>, these are the company&rsquo;s <span class="hl">business goals</span>:</h2></div>
+
+<div class="k1"><p class="lab g1 goal" data-b="1">Wellness beyond fitness</p>
+  <div class="shot" style="--top:400" data-b="2"><img src="../img/IMG_5005.jpg" alt="ClassPass Home with the Save on spa and salon row"></div>
+  <span class="dot g1" data-b="4"></span>
+  <div class="note" data-b="4"><h3>Finding a class</h3><p class="body">Wellness bookings grew 37% in 2025, as fast as fitness</p></div></div>
+<div class="k2"><p class="lab g2 goal" data-b="5">AI integration</p>
+  <div class="shot" style="--top:160" data-b="6"><img src="../img/IMG_5016.jpg" alt="ClassPass Support chat opening with its AI notice"></div>
+  <span class="dot g2" data-b="8"></span>
+  <div class="note" data-b="8"><h3>Support chat</h3><p class="body">AI already sets class spots and credit prices, and now answers members</p></div></div>
+<div class="k3"><p class="lab g3 goal" data-b="9">Retention</p>
+  <div class="shot" style="--top:100" data-b="10"><img src="../img/IMG_5009.jpg" alt="Rate your experience at SLT"></div>
+  <span class="dot g3" data-b="12"></span>
+  <div class="note" data-b="12"><h3>Rating a class</h3><p class="body">80% of members who join after a trial go back to a studio they tried</p></div></div>
+
+<svg class="thread" viewBox="0 0 1280 720" aria-hidden="true">
+  <path class="w" data-b="3" d="M86 204V556"/><path class="w" data-b="3" d="M86 397H124"/>
+  <rect class="ring" data-b="3" x="124" y="378" width="163" height="38" rx="8"/><circle class="pin" cx="86" cy="397" r="3"/>
+  <path class="w" data-b="7" d="M486 204V556"/><path class="w" data-b="7" d="M486 365H528"/>
+  <rect class="ring" data-b="7" x="528" y="302" width="192" height="126" rx="10"/><circle class="pin" cx="486" cy="365" r="3"/>
+  <path class="w" data-b="11" d="M886 204V556"/><path class="w" data-b="11" d="M886 342H928"/>
+  <rect class="ring" data-b="11" x="928" y="322" width="160" height="40" rx="8"/><circle class="pin" cx="886" cy="342" r="3"/>
+</svg>
+</div>
+<p class="tag">3 · Annotated screens · click to play the build · <a href="../">all five</a></p>
+<script src="../shared.js"></script>
+</body></html>

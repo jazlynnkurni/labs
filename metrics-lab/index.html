@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Metrics lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Five ways to set slide 2's three numbers (52, 8, 30%) in the Eden deck's type and olive, each on a strip the
+   width of the slide's content (1136px) under the same three-column grid as its cards. */
+:root{--ink:#14171B;--moss:#3E4F1A;--olive:#6B7A3A;--sage:#C4D4A4;--paper:#F3F1ED;--hair:rgba(20,23,27,.16);--jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#EDEBE6;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1240px;margin:0 auto;padding:40px 32px 80px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:#6f6b64;margin:0 0 28px}
+.opt{background:#fff;border-radius:18px;padding:30px 52px 34px;margin-bottom:22px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--moss);margin:0 0 4px}
+.lab small{display:block;font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:#6f6b64;margin-top:3px}
+/* a ghost of the three cards above, so each strip is judged in place */
+.ghost{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin:18px 0 0}
+.ghost i{display:block;height:46px;border:2px solid var(--moss);border-top:0;border-radius:0 0 20px 20px;opacity:.35}
+.row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+
+/* 01 Hairline index: small numerals over a fine rule, the label beside, quiet like a caption */
+.d1 .row{margin-top:22px;padding-top:18px;border-top:1px solid var(--ink)}
+.d1 .st{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:baseline}
+.d1 .n{font:500 30px/1 var(--jak);letter-spacing:-.02em;color:var(--moss);font-variant-numeric:tabular-nums}
+.d1 b{display:block;font:600 15px/1.3 var(--jak)}
+.d1 p{margin:2px 0 0;font-size:13.5px;color:#4a4740}
+
+/* 02 Editorial: a big light numeral, the label set under it in small caps */
+.d2 .row{margin-top:26px}
+.d2 .n{font:300 64px/.9 var(--jak);letter-spacing:-.045em;color:var(--moss)}
+.d2 .n sup{font-size:.38em;letter-spacing:0;vertical-align:.95em;margin-left:2px}
+.d2 b{display:block;margin-top:12px;font:600 11.5px var(--jak);letter-spacing:.1em;text-transform:uppercase}
+.d2 p{margin:4px 0 0;font-size:14px;color:#4a4740;max-width:30ch}
+
+/* 03 Tinted tiles: each number on a soft sage card under its column */
+.d3 .row{margin-top:18px}
+.d3 .st{background:#EEF2E3;border-radius:18px;padding:18px 22px 18px;display:flex;align-items:center;gap:18px}
+.d3 .n{font:600 40px/1 var(--jak);letter-spacing:-.03em;color:var(--moss)}
+.d3 b{display:block;font:600 15px/1.3 var(--jak)}
+.d3 p{margin:2px 0 0;font-size:13.5px;color:#4a4740}
+
+/* 04 Ledger: label left, number right, dotted leader between; reads like a report */
+.d4 .row{margin-top:22px}
+.d4 .st{border-top:2px solid var(--moss);padding-top:12px}
+.d4 .ln{display:flex;align-items:baseline;gap:8px}
+.d4 b{font:600 15px/1.3 var(--jak);white-space:nowrap}
+.d4 .ld{flex:1;border-bottom:1.5px dotted rgba(20,23,27,.35);transform:translateY(-4px)}
+.d4 .n{font:600 26px/1 var(--jak);color:var(--moss);letter-spacing:-.02em}
+.d4 p{margin:6px 0 0;font-size:13.5px;color:#4a4740}
+
+/* 05 Highlighter: the number marked with the deck's own sage highlight, the line beside it in body type */
+.d5 .row{margin-top:24px;padding-top:16px;border-top:1px solid var(--hair)}
+.d5 .st{display:flex;align-items:center;gap:16px}
+.d5 .n{position:relative;font:600 40px/1 var(--jak);letter-spacing:-.03em;color:var(--moss);padding:0 4px}
+.d5 .n::before{content:"";position:absolute;left:-4px;right:-4px;bottom:3px;height:42%;background:var(--sage);opacity:.55;border-radius:3px;z-index:-1;transform:rotate(-1deg)}
+.d5 .n{isolation:isolate;z-index:0}
+.d5 b{display:block;font:600 15px/1.3 var(--jak)}
+.d5 p{margin:2px 0 0;font-size:13.5px;color:#4a4740}
+</style></head><body>
+<div class="wrap">
+<h1>Metrics lab</h1>
+<p class="lede">Five directions for slide 2's numbers, each under a ghost of the three cards so you can judge it in place. Tell me the number you want.</p>
+<div id="opts"></div>
+</div>
+<script>
+const M=[['52','internal testers','Smart glasses distributed for internal evaluation.'],['8','usability sessions','Technical and non-technical participants.'],['30%','fewer unnecessary HUD interactions','From internal prototype testing.']];
+const D=[['01','Hairline index','Small numerals over one fine rule, quiet like a caption.'],['02','Editorial','A large light numeral with a small-caps label beneath.'],['03','Tinted tiles','Each number on a soft sage card under its column.'],['04','Ledger','Label, dotted leader, number: reads like a report.'],['05','Highlighter','The number marked with the deck’s own sage highlight.']];
+const fmt=(n,i)=>i===1&&n.endsWith('%')?n.replace('%','<sup>%</sup>'):n;
+document.getElementById('opts').innerHTML=D.map(([k,t,d],i)=>{
+  const c='d'+(i+1);
+  const cells=M.map(([n,b,p])=>{
+    if(i===3) return `<div class="st"><div class="ln"><b>${b.length>22?b.split(' ').slice(0,2).join(' '):b}</b><span class="ld"></span><span class="n">${n}</span></div><p>${b.length>22?b.split(' ').slice(2).join(' ')+'. ':''}${p}</p></div>`;
+    if(i===1) return `<div class="st"><div class="n">${fmt(n,1)}</div><b>${b}</b><p>${p}</p></div>`;
+    return `<div class="st"><div class="n">${n}</div><div><b>${b}</b><p>${p}</p></div></div>`;
+  }).join('');
+  return `<section class="opt ${c}"><p class="lab">${k} ${t}<small>${d}</small></p><div class="ghost"><i></i><i></i><i></i></div><div class="row">${cells}</div></section>`;
+}).join('');
+</script>
+</body></html>

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Levels lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap">
+<style>
+/* Five directions for slide 24, the three failure levels. Deck rules: content on the line 32px under the title, open layouts
+   (no bento), sage/mauve glass, plum text and beads, gold for friction, the green line, grey italic footnote, media whole. */
+:root{--ink:#14171B;--plum:#340414;--gold:#A99939;--hair:rgba(20,23,27,.12);--mute:#6f6b64;--green:#6F7C70;
+  --sage:#9ba69c;--mauve:#827a85;--jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1240px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:var(--mute);margin:0 0 30px;max-width:95ch}
+.opt{margin-bottom:54px}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0 0 12px}
+.lab small{font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:var(--mute);margin-left:8px}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 14px 30px -20px rgba(0,0,0,.3);overflow:hidden;position:relative}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:52px 72px 0;position:absolute;left:0;top:0}
+.hd{font:500 40px/1.12 var(--jak);letter-spacing:-.02em;margin:0;max-width:30ch;display:flex;gap:16px;align-items:flex-start}
+.hd em{font-style:normal;color:var(--plum)}
+.body{position:absolute;left:72px;right:72px;top:176px;height:446px}
+.fn{position:absolute;left:72px;bottom:86px;margin:0;font:italic 300 13px var(--hel);color:#8a8780}
+.ft{position:absolute;left:72px;right:72px;bottom:40px;border-top:1px solid var(--hair);padding-top:12px;display:flex;justify-content:space-between;font:400 13px var(--hel)}
+.ft span:first-child{color:var(--plum)}
+.bead{display:inline-grid;place-items:center;flex:none;width:44px;height:44px;border-radius:50%;color:#fff;font:600 19px var(--jak);
+  background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.6),rgba(255,255,255,0) 70%),radial-gradient(circle at 50% 65%,#6a2a3f,#340414 70%);box-shadow:0 6px 12px -5px rgba(52,4,20,.55)}
+/* the deck's rail, kept so each direction is judged in place */
+.rail{position:absolute;left:14px;top:176px;height:400px;width:30px;display:flex;flex-direction:column;align-items:center;justify-content:space-between}
+.rail::before{content:"";position:absolute;left:14px;top:10px;bottom:10px;width:1.5px;background:rgba(20,23,27,.14)}
+.rail i{position:relative;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px rgba(52,4,20,.22);font:600 10px/20px var(--jak);font-style:normal;text-align:center;color:#8a8780}
+.rail i.on{width:30px;height:30px;line-height:30px;font-size:13px;color:#fff;background:radial-gradient(circle at 50% 65%,#6a2a3f,#340414 70%)}
+.tag{font:600 12px/1.4 var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0}
+.sub{font:300 16px/1.45 var(--hel);margin:0}
+.h{font:600 18px/1.3 var(--jak);margin:0}
+.mk{background:linear-gradient(transparent 58%,rgba(169,153,57,.32) 58%);padding:0 2px}
+/* the HUD utterance: dark glass, white, the follow-up in olive */
+.hud{background:linear-gradient(180deg,#1a1c1e,#0b0c0d);color:#fff;border-radius:16px;padding:16px 18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 18px 30px -18px rgba(20,23,27,.6);font:500 15px/1.45 var(--jak)}
+.hud .a{color:#cbbf6a}
+.hud .ch{display:flex;gap:8px;margin-top:8px}.hud .ch span{font:500 12px/1 var(--jak);padding:6px 10px;border-radius:999px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.hud .st{display:flex;align-items:center;gap:9px;margin:0;font:500 13.5px/1.9 var(--jak)}
+.hud .st::before{content:"";width:9px;height:9px;border-radius:50%;background:#9fd3a6}
+.hud .st.w::before{background:#e5a54a}.hud .st.p::before{background:none;box-shadow:inset 0 0 0 1.5px #fff}
+/* liquid glass orbs: sage, mauve, and the two mixed */
+.orb{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font:600 17px var(--jak);color:var(--plum);
+  box-shadow:inset 2px 2px 2px rgba(255,255,255,.95),inset 0 -14px 22px -14px rgba(52,4,20,.22),0 0 0 1px rgba(20,23,27,.06),0 14px 26px -16px rgba(52,4,20,.4)}
+.o1{background:radial-gradient(circle at 30% 22%,#fff,rgba(214,222,215,.95) 55%,rgba(155,166,156,.75))}
+.o2{background:radial-gradient(circle at 30% 22%,#fff,rgba(222,216,224,.95) 55%,rgba(130,122,133,.7))}
+.o3{background:radial-gradient(circle at 30% 22%,#fff,rgba(220,220,218,.9) 50%,transparent 80%),linear-gradient(135deg,rgba(155,166,156,.85),rgba(130,122,133,.85))}
+.qs{display:flex;gap:10px;align-items:center}
+.q{font:600 14px/1 var(--jak);padding:10px 14px;border-radius:999px;color:var(--plum);background:radial-gradient(circle at 30% 0,#fff,rgba(214,222,215,.7));box-shadow:inset 1px 1px 1px #fff,0 0 0 1px rgba(52,4,20,.12)}
+
+/* 01 escalation: three steps rising on the green line */
+.d1 .stairs{position:absolute;inset:0}
+.d1 .line{position:absolute;left:0;right:0;bottom:70px;height:2px;background:rgba(111,124,112,.35)}
+.d1 .lv{position:absolute;width:340px;display:flex;flex-direction:column;gap:12px}
+.d1 .lv .top{display:flex;gap:12px;align-items:center}
+.d1 .lv::after{content:"";position:absolute;left:22px;width:2px;background:var(--green);opacity:.5;top:52px}
+/* 02 one HUD, three moments */
+.d2 .g{display:grid;grid-template-columns:430px 1fr;gap:56px;height:100%;align-items:center}
+.d2 .lens{position:relative;height:410px;border-radius:40px;background:radial-gradient(120% 90% at 30% 10%,#3b3f3c,#0c0d0e 70%);box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 26px 44px -26px rgba(20,23,27,.7);padding:28px;display:flex;flex-direction:column;justify-content:center;gap:16px}
+.d2 .lens .hud{background:rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.14);backdrop-filter:blur(4px)}
+.d2 .lens .n{position:absolute;left:-14px;width:28px;height:28px;font-size:12px}
+.d2 .rows{display:flex;flex-direction:column}
+.d2 .r{display:grid;grid-template-columns:1fr;gap:4px;padding:16px 0;border-top:1px solid var(--hair)}
+.d2 .r:first-child{border-top:0}
+/* 03 what broke, what the HUD said: a three-row ledger of pairs, hairlines only */
+.d3 .t{display:grid;grid-template-columns:200px 1fr 1fr;column-gap:40px}
+.d3 .t>*{padding:18px 0;border-top:1px solid var(--hair);display:flex;flex-direction:column;justify-content:center;gap:6px}
+.d3 .t .hh{border-top:0;padding:0 0 10px}
+/* 04 the artefact: the levels table whole, points centred on it */
+.d4 .g{display:grid;grid-template-columns:auto 1fr;gap:56px;align-items:center;height:100%}
+.d4 .img{height:410px;aspect-ratio:1728/986;border-radius:14px;overflow:hidden;box-shadow:0 18px 34px -22px rgba(20,23,27,.5);background:#fff}
+.d4 .img img{display:block;width:100%;height:100%}
+.d4 ul{list-style:none;margin:0;padding:0}
+.d4 li{display:flex;gap:12px;padding:14px 0;border-top:1px solid var(--hair);font:500 18px/1.35 var(--jak)}
+.d4 li:first-child{border-top:0}
+.d4 li::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--plum);margin-top:9px}
+/* 05 where it broke: one request through hear, understand, do */
+.d5 .pipe{position:relative;display:grid;grid-template-columns:repeat(3,1fr);column-gap:40px}
+.d5 .pipe::before{content:"";position:absolute;left:23px;right:23px;top:22px;height:2px;background:var(--green);opacity:.55;z-index:0}.d5 .st5 .top{position:relative}
+.d5 .st5{position:relative;display:flex;flex-direction:column;gap:12px}
+.d5 .st5 .top{display:flex;align-items:center;gap:10px}.d5 .st5 .top>*{z-index:1}.d5 .st5 .top .tag{background:#fff;padding:0 6px}
+.d5 .cut{position:relative;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px var(--gold);display:grid;place-items:center;font:700 12px var(--jak);color:var(--gold)}
+.d5 .ask{font:italic 300 16px var(--hel);color:var(--mute);margin:0 0 22px}
+</style></head><body>
+<div class="wrap">
+<h1>Levels lab, slide 24</h1>
+<p class="lede">Five directions for slide 24, the three failure levels. Each sits on the content line under the title, uses open layouts (no boxes), the sage and mauve glass, plum, gold for what broke, and the green line. The deck's numbered rail is kept on the left so you see it in place. Tell me the number.</p>
+<div id="opts"></div>
+</div>
+<script>
+const rail=`<div class="rail">${[1,2,3,4,5].map(x=>`<i class="${x===1?'on':''}">${x}</i>`).join('')}</div>`;
+const head=`<p class="hd"><span class="bead">1</span><span>If a step failed, I made the HUD say <em>what Clover understood and what it finished.</em></span></p>`;
+const fn=`<p class="fn">I adapted Microsoft&rsquo;s Guidelines for Human-AI Interaction into these three questions.</p>`;
+const qs=`<div class="qs"><span class="q">What did you understand?</span><span class="q">What did you complete?</span><span class="q">What still needs my attention?</span></div>`;
+const H1=`<div class="hud">&ldquo;I missed the time.&rdquo;<br><span class="a">&ldquo;Was that 3 PM or 5 PM?&rdquo;</span></div>`;
+const H2=`<div class="hud">&ldquo;Which Rita did you mean?&rdquo;<div class="ch"><span>Rita Chen</span><span>Rita Williams</span></div></div>`;
+const H3=`<div class="hud"><p class="st">To-do created</p><p class="st w">Calendar couldn&rsquo;t sync</p><p class="st p">Message awaiting approval</p></div>`;
+const L=[
+ {o:'o1',t:'Level 1 &middot; Input',w:'Clover could not hear her',r:'Ask only for the missing detail.',h:H1},
+ {o:'o2',t:'Level 2 &middot; Intent',w:'Clover heard her, but not which Rita',r:'Offer two clear options.',h:H2},
+ {o:'o3',t:'Level 3 &middot; Execution',w:'The calendar sync failed',r:'Keep what worked, retry what failed.',h:H3}];
+const D=[
+ ['01','Escalation steps','The three levels climb left to right, each a glass orb (sage, mauve, then both) with the HUD line it shows. Severity reads at a glance.',
+  `<div class="d1"><div class="stairs">${L.map((l,i)=>`<div class="lv" style="left:${i*380}px;top:${140-i*70}px"><div class="top"><span class="orb ${l.o}">${i+1}</span><p class="tag">${l.t}</p></div><p class="sub"><span class="mk">${l.w}</span>.</p>${l.h}<p class="h">${l.r}</p></div>`).join('')}</div></div>`],
+ ['02','One HUD, three moments','A single glasses lens on the left shows all three lines the HUD can say. Each row on the right names what broke (gold) and the rule I set.',
+  `<div class="d2"><div class="g"><div class="lens">${L.map((l,i)=>l.h.replace('class="hud"',`class="hud" style="position:relative"`)).join('')}</div><div class="rows">${L.map((l,i)=>`<div class="r"><div style="display:flex;gap:12px;align-items:center"><span class="orb ${l.o}" style="width:34px;height:34px;font-size:14px">${i+1}</span><p class="tag">${l.t}</p></div><p class="sub" style="padding-left:46px"><span class="mk">${l.w}</span>.</p><p class="h" style="padding-left:46px">${l.r}</p></div>`).join('')}<div class="r" style="padding-top:20px">${qs}</div></div></div></div>`],
+ ['03','Broke, said, rule','Three rows read across: the level, what broke (gold), what the HUD said, and my rule beneath it. Hairlines only, no cards.',
+  `<div class="d3"><div class="t"><p class="tag hh" style="color:#8a8780">Level</p><p class="tag hh" style="color:#8a8780">What broke</p><p class="tag hh" style="color:#8a8780">What the HUD said</p>${L.map((l,i)=>`<div style="flex-direction:row;align-items:center;justify-content:flex-start;gap:12px"><span class="orb ${l.o}">${i+1}</span><p class="tag">${l.t.split(' &middot; ')[1]}</p></div><div><p class="sub" style="font-size:18px"><span class="mk">${l.w}</span>.</p><p class="h" style="font-size:16px;color:var(--green)">${l.r}</p></div><div>${l.h}</div>`).join('')}</div></div>`],
+ ['04','The table itself','The original levels table from the Drive, whole and large, with the three rules as plum points centred on it. Least redesign, most evidence.',
+  `<div class="d4"><div class="g"><div class="img"><img src="media/levels-white.png" alt=""></div><ul>${L.map(l=>`<li>${l.r}</li>`).join('')}</ul></div></div>`],
+ ['05','Where it broke','One request travels hear, understand, do along the green line. A gold mark shows where each level breaks, and the HUD line drops beneath it.',
+  `<div class="d5"><p class="ask">&ldquo;Clover, book Rita for 3 and tell her I&rsquo;m on my way.&rdquo;</p><div class="pipe">${[['Hear',0],['Understand',1],['Do',2]].map(([n,i])=>`<div class="st5"><div class="top"><span class="orb ${L[i].o}">${i+1}</span><p class="tag">${n}</p><span class="cut">!</span></div><p class="sub"><span class="mk">${L[i].w}</span>.</p>${L[i].h}<p class="h">${L[i].r}</p></div>`).join('')}</div></div>`]];
+document.getElementById('opts').innerHTML=D.map(([n,t,d,b])=>`<div class="opt"><p class="lab">${n} &nbsp;${t}<small>${d}</small></p><div class="frame"><div class="sl">${rail}${head}<div class="body">${b}</div>${fn}<div class="ft"><span>24 &nbsp; Designs</span><span>Eden Case Study</span></div></div></div></div>`).join('');
+const fit=()=>document.querySelectorAll('.frame').forEach(f=>f.querySelector('.sl').style.transform=`scale(${f.clientWidth/1280})`);
+addEventListener('resize',fit);fit();
+</script>
+</body></html>

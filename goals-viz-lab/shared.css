@@ -1,0 +1,26 @@
+/* Tokens, stage and the gold felt tip, copied from app-critique (DoorDashAppCritiqueR2) so every option reads as the deck */
+:root{--jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --gold:#A99939;--plum:#340414;--paper:#FAF9F7;--ink:#14171B;--ink2:rgba(20,23,27,.66);--ink3:rgba(20,23,27,.42);
+  --hair:rgba(20,23,27,.14);--out:cubic-bezier(.2,.7,.2,1);
+  --sage:#9ba69c;--mauve:#827a85;
+  --depth:0 0 0 1px rgba(0,0,0,.06),0 1px 2px -1px rgba(0,0,0,.06),0 2px 4px 0 rgba(0,0,0,.04)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden;background:#0E0D0C;color:var(--ink);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform:translate(-50%,-50%) scale(var(--k,1));background:var(--paper);overflow:hidden}
+#stage>*{position:absolute}
+h1,h2,h3{margin:0;font-family:var(--jak);font-weight:500;letter-spacing:-.015em;text-wrap:balance}
+p{margin:0;text-wrap:pretty}
+.lab{font:600 10.5px/1.5 var(--jak);letter-spacing:.15em;text-transform:uppercase;color:var(--plum);white-space:nowrap;display:flex;align-items:center;gap:12px}
+.lab::before{content:"";flex:none;width:12px;height:12px;border-radius:50%;background:var(--dot)}
+.g1{--dot:var(--sage)}.g2{--dot:var(--mauve)}.g3{--dot:var(--gold)}
+.head{font-size:30px;line-height:1.25;color:var(--ink);text-align:center}
+.hl{color:var(--plum);font-weight:600;padding:0 .08em;margin:0 -.08em;box-decoration-break:clone;-webkit-box-decoration-break:clone;mix-blend-mode:multiply;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M6 6 C 60 2, 140 9, 200 5 S 330 3, 394 7 L 397 32 C 340 37, 250 30, 190 35 S 70 38, 4 33 Z' fill='%23A99939' opacity='.42'/><path d='M12 9 C 90 4, 180 12, 260 8 S 360 6, 390 10 L 392 29 C 320 33, 230 27, 150 31 S 60 34, 10 30 Z' fill='%23A99939' opacity='.2'/></svg>") no-repeat 0 55%/100% 1.08em}
+.body{font:400 17px/1.5 var(--hel);color:var(--ink)}
+.tnum{font-variant-numeric:tabular-nums}
+/* a cropped ClassPass screen: native 644 wide, shown at --w, starting at native row --top */
+.shot{overflow:hidden;border-radius:16px;box-shadow:var(--depth),0 12px 32px -12px rgba(20,23,27,.18);background:#fff;position:relative}
+.shot img{position:absolute;left:0;width:100%;top:calc(var(--top) * -1px * var(--w) / 644)}
+.shot::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1);pointer-events:none}
+.tag{position:fixed;left:16px;bottom:12px;font:500 12px/1 var(--jak);color:rgba(255,255,255,.4);letter-spacing:0}
+.tag a{color:inherit}

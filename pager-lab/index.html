@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Caption pager lab</title>
+<style>
+  :root { --bg:#fff; --ink:#0f0f0f; --muted:#6b6b6b; --line:#e7e5e4; --primary:#e6b800; --card:#fff; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif; font-weight:500; letter-spacing:-0.01em; }
+  header { padding:28px 32px 8px; }
+  header h1 { font-size:22px; margin:0 0 6px; font-weight:600; }
+  header p { margin:0; color:var(--muted); font-size:14px; max-width:720px; line-height:1.45; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(360px,1fr)); gap:28px; padding:24px 32px 64px; }
+  section { border:1px solid var(--line); border-radius:20px; padding:20px; box-shadow:0 1px 2px rgba(0,0,0,.05), 0 24px 48px -28px rgba(0,0,0,.25); outline:2px solid transparent; transition:outline-color .2s; }
+  section.focus { outline-color:var(--primary); }
+  section h2 { font-size:15px; margin:0; font-weight:600; display:flex; gap:8px; align-items:baseline; }
+  section h2 small { color:var(--muted); font-weight:500; font-size:12px; }
+  section .why { color:var(--muted); font-size:13px; line-height:1.45; margin:6px 0 14px; }
+  .photo { position:relative; width:100%; max-width:320px; margin:0 auto; border-radius:20px; overflow:hidden; box-shadow:0 2px 4px rgba(0,0,0,.12), 0 30px 60px -20px rgba(0,0,0,.5); }
+  .photo img { display:block; width:100%; height:auto; }
+  .photo .shade { position:absolute; inset:auto 0 0; height:40%; background:linear-gradient(to top, rgba(0,0,0,.35), transparent); }
+  .glass { position:absolute; left:14px; right:14px; bottom:14px; padding:12px 16px; border-radius:16px; color:#fff; font-size:15px; line-height:1.35;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.10)); backdrop-filter:blur(22px) saturate(160%); -webkit-backdrop-filter:blur(22px) saturate(160%);
+    border:1px solid rgba(255,255,255,.28); box-shadow:inset 0 1px 0 rgba(255,255,255,.45), 0 10px 30px -12px rgba(0,0,0,.45); text-shadow:0 1px 1px rgba(0,0,0,.25); }
+  .pager { margin:14px auto 0; max-width:320px; }
+  .hint { text-align:center; color:var(--muted); font-size:12px; margin-top:10px; }
+  button { font:inherit; color:inherit; background:none; border:0; padding:0; cursor:pointer; }
+
+  /* 1 filmstrip */
+  .strip { display:flex; gap:8px; overflow-x:auto; padding:6px 2px; scrollbar-width:none; }
+  .strip::-webkit-scrollbar { display:none; }
+  .strip button { flex:0 0 56px; height:56px; border-radius:12px; overflow:hidden; position:relative; opacity:.55; transform:scale(.92); transition:all .25s cubic-bezier(.2,.7,.2,1); }
+  .strip button img { width:100%; height:100%; object-fit:cover; display:block; }
+  .strip button.on { opacity:1; transform:scale(1.08); box-shadow:0 0 0 2px #fff, 0 0 0 4px var(--primary); }
+  .strip button span { position:absolute; left:4px; right:4px; bottom:4px; font-size:8px; line-height:1.15; color:#fff; background:rgba(0,0,0,.35); border-radius:5px; padding:2px 4px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; backdrop-filter:blur(6px); }
+
+  /* 2 length segments */
+  .seg { display:flex; gap:4px; height:10px; align-items:stretch; }
+  .seg button { border-radius:999px; background:#e7e5e4; transition:background .25s, transform .25s; position:relative; }
+  .seg button:hover { background:#d6d3d1; }
+  .seg button.on { background:var(--primary); transform:scaleY(1.35); }
+  .seg button.seen { background:#c9c5c0; }
+  .segmeta { display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-top:8px; }
+
+  /* 3 deck */
+  .deck { position:relative; height:46px; }
+  .deck .card { position:absolute; left:50%; top:0; width:220px; height:34px; border-radius:10px; background:var(--card); border:1px solid var(--line); box-shadow:0 6px 16px -10px rgba(0,0,0,.4); transform:translateX(-50%); transition:all .35s cubic-bezier(.2,.7,.2,1); display:block; line-height:32px; text-align:left; font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 12px; }
+  .deck .count { position:absolute; right:0; top:8px; font-size:12px; color:var(--muted); }
+  .deck .count b { color:var(--ink); font-weight:600; }
+
+  /* 4 word chips */
+  .chips { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
+  .chips button { border-radius:999px; border:1px solid var(--line); padding:6px 10px; font-size:12px; color:var(--muted); max-width:100%; display:flex; gap:6px; align-items:center; transition:all .25s cubic-bezier(.2,.7,.2,1); }
+  .chips button i { font-style:normal; font-size:10px; width:16px; height:16px; border-radius:50%; background:#f1efed; display:grid; place-items:center; color:var(--ink); }
+  .chips button span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:84px; }
+  .chips button.on { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .chips button.on i { background:var(--primary); color:#000; }
+  .chips button.on span { max-width:180px; }
+
+  /* 5 heat strip */
+  .heat { display:flex; gap:4px; height:28px; align-items:flex-end; }
+  .heat button { flex:1; border-radius:6px 6px 3px 3px; background:#e7e5e4; position:relative; transition:all .25s; min-height:6px; }
+  .heat button.on { outline:2px solid var(--ink); outline-offset:2px; }
+  .heat button b { position:absolute; left:50%; bottom:calc(100% + 4px); transform:translateX(-50%); font-size:10px; color:var(--muted); font-weight:500; opacity:0; transition:opacity .2s; }
+  .heat button.on b, .heat button:hover b { opacity:1; }
+  .heatmeta { display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-top:8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Caption pager: five directions</h1>
+  <p>The old dashes only said "you are at position 7 of 7". A good indicator should also help you remember, compare, and go back. Click any section to focus it, then use ← → or tap. Same photo and six captions in all five.</p>
+</header>
+<div class="grid" id="grid"></div>
+
+<script>
+const IMG = 'demo.jpg';
+const CAPS = [
+  { t:'When the group chat finally agrees on a restaurant.', likes:14 },
+  { t:'Sweater weather, but make it a personality.', likes:31 },
+  { t:'Me hiding my smile after reading my own text back.', likes:9 },
+  { t:'POV: you said "one more episode" and meant it.', likes:22 },
+  { t:'Knitwear so soft it should come with a warning.', likes:5 },
+  { t:'Caught being happy in public. No comment.', likes:18 },
+];
+const DIRS = [
+  { id:'strip', name:'Filmstrip', tag:'recognition', why:'The pager is the content: each stop is the photo with that caption on it. You find the one you liked by sight, the way you scrub a camera roll. The current one is lifted and ringed.' },
+  { id:'seg', name:'Length segments', tag:'progress + preview', why:'A progress bar where each segment is as wide as its caption is long. You get position and a feel for the set at once: short zingers versus long ones, and which you have already passed (darker).' },
+  { id:'deck', name:'Card deck', tag:'how many left', why:'Captions as a stack behind the current one. Depth shows what remains, the top card peels away as you advance, and the next caption peeks through so there is no blank step.' },
+  { id:'chips', name:'First-words chips', tag:'recall by words', why:'A numbered chip per caption carrying its first words. Recognition beats recall: you jump back to "Sweater weather…" rather than to "number 2". The current chip expands to the full line.' },
+  { id:'heat', name:'Reaction strip', tag:'information scent', why:'Each bar is one caption and its height is how many people liked it (the data the app already stores). The pager doubles as a quality map, so you can go straight to the crowd favourite instead of paging in order.' },
+];
+const grid = document.getElementById('grid');
+const state = {};
+let focusId = 'strip';
+
+function photo(id) {
+  return `<div class="photo"><img src="${IMG}" alt=""><div class="shade"></div><div class="glass" data-cap="${id}">${CAPS[0].t}</div></div>`;
+}
+for (const d of DIRS) {
+  state[d.id] = 0;
+  const s = document.createElement('section'); s.id = 'sec-' + d.id;
+  s.innerHTML = `<h2>${DIRS.indexOf(d)+1}. ${d.name} <small>${d.tag}</small></h2><p class="why">${d.why}</p>${photo(d.id)}<div class="pager" data-pager="${d.id}"></div><p class="hint">${d.id==='deck' ? 'tap the deck or use ← →' : 'tap a stop or use ← →'}</p>`;
+  s.addEventListener('pointerdown', () => setFocus(d.id));
+  grid.appendChild(s);
+  render(d.id);
+}
+function setFocus(id) { focusId = id; document.querySelectorAll('section').forEach(x => x.classList.toggle('focus', x.id === 'sec-' + id)); }
+setFocus('strip');
+function go(id, i) { state[id] = Math.max(0, Math.min(CAPS.length - 1, i)); render(id); }
+addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(focusId, state[focusId] + 1); if (e.key === 'ArrowLeft') go(focusId, state[focusId] - 1); });
+
+function render(id) {
+  const i = state[id]; const n = CAPS.length;
+  const g = document.querySelector(`.glass[data-cap="${id}"]`); if (g.textContent !== CAPS[i].t) { g.style.opacity = 0; setTimeout(() => { g.textContent = CAPS[i].t; g.style.transition = 'opacity .25s'; g.style.opacity = 1; }, 120); }
+  const p = document.querySelector(`[data-pager="${id}"]`);
+  if (id === 'strip') {
+    p.innerHTML = `<div class="strip">${CAPS.map((c,k) => `<button class="${k===i?'on':''}" data-k="${k}" aria-label="Caption ${k+1}"><img src="${IMG}" alt=""><span>${c.t}</span></button>`).join('')}</div>`;
+    const on = p.querySelector('.on'); on && on.scrollIntoView({ inline:'center', block:'nearest', behavior:'smooth' });
+  }
+  if (id === 'seg') {
+    const total = CAPS.reduce((s,c) => s + c.t.length, 0);
+    p.innerHTML = `<div class="seg">${CAPS.map((c,k) => `<button style="flex:${c.t.length/total}" class="${k===i?'on':k<i?'seen':''}" data-k="${k}" aria-label="Caption ${k+1}, ${c.t.split(' ').length} words" title="${c.t}"></button>`).join('')}</div><div class="segmeta"><span>${i+1} of ${n}</span><span>${CAPS[i].t.split(' ').length} words</span></div>`;
+  }
+  if (id === 'deck') {
+    const left = n - 1 - i;
+    p.innerHTML = `<div class="deck">${CAPS.slice(i+1, i+4).map((c,k) => `<div class="card" style="top:${k*5}px;transform:translateX(-50%) scale(${1-k*.05});z-index:${10-k};opacity:${1-k*.25}">${k===0?c.t:''}</div>`).join('')}<div class="count"><b>${i+1}</b> of ${n}${left?` · ${left} more`:' · last one'}</div></div>`;
+    p.querySelector('.deck').onclick = () => go(id, i + 1);
+  }
+  if (id === 'chips') {
+    p.innerHTML = `<div class="chips">${CAPS.map((c,k) => `<button class="${k===i?'on':''}" data-k="${k}"><i>${k+1}</i><span>${k===i ? c.t : c.t.split(' ').slice(0,2).join(' ') + '…'}</span></button>`).join('')}</div>`;
+  }
+  if (id === 'heat') {
+    const max = Math.max(...CAPS.map(c => c.likes));
+    p.innerHTML = `<div class="heat">${CAPS.map((c,k) => `<button class="${k===i?'on':''}" data-k="${k}" style="height:${Math.max(22, c.likes/max*100)}%;background:hsl(49 100% ${88 - (c.likes/max)*50}%)" aria-label="Caption ${k+1}, ${c.likes} likes"><b>${c.likes}</b></button>`).join('')}</div><div class="heatmeta"><span>${i+1} of ${n}</span><span>${CAPS[i].likes} people liked this one</span></div>`;
+  }
+  p.querySelectorAll('button[data-k]').forEach(b => b.onclick = () => go(id, +b.dataset.k));
+}
+</script>
+</body>
+</html>

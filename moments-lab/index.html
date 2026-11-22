@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moments lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap">
+<style>
+/* Five directions for slide 28, the same moments on the glasses and in the Island. Visual first: the HUD and Island
+   frames large and whole, a few words each, no connector lines, no boxes. White and sage/mauve glass, plum accents. */
+:root{--ink:#14171B;--plum:#340414;--gold:#A99939;--hair:rgba(20,23,27,.12);--mute:#6f6b64;--green:#6F7C70;
+  --jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1240px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:var(--mute);margin:0 0 30px;max-width:95ch}
+.opt{margin-bottom:54px}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0 0 12px}
+.lab small{font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:var(--mute);margin-left:8px}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 14px 30px -20px rgba(0,0,0,.3);overflow:hidden;position:relative}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:52px 72px 0;position:absolute;left:0;top:0}
+.hd{font:500 40px/1.12 var(--jak);letter-spacing:-.02em;margin:0;max-width:30ch;display:flex;gap:16px;align-items:flex-start}
+.hd em{font-style:normal;color:var(--plum)}
+.body{position:absolute;left:72px;right:72px;top:176px;height:430px}
+.fn{position:absolute;left:72px;bottom:86px;margin:0;font:italic 300 13px var(--hel);color:#8a8780}
+.ft{position:absolute;left:72px;right:72px;bottom:40px;border-top:1px solid var(--hair);padding-top:12px;display:flex;justify-content:space-between;font:400 13px var(--hel)}
+.ft span:first-child{color:var(--plum)}
+.bead{display:inline-grid;place-items:center;flex:none;width:44px;height:44px;border-radius:50%;color:#fff;font:600 19px var(--jak);
+  background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.6),rgba(255,255,255,0) 70%),radial-gradient(circle at 50% 65%,#6a2a3f,#340414 70%);box-shadow:0 6px 12px -5px rgba(52,4,20,.55)}
+.tag{font:600 12px/1.4 var(--jak);letter-spacing:.08em;text-transform:uppercase;color:#8a8780;margin:0}
+/* media cards: whole images, rounded, with the deck's layered depth; the card colour matches each image's own ground */
+.card{border-radius:22px;overflow:hidden;flex:none;box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 0 0 .5px rgba(20,23,27,.1),0 3px 6px rgba(20,23,27,.1),0 22px 40px -14px rgba(52,4,20,.3)}
+.card img{display:block;width:100%;height:100%}
+.hud{background:#000;aspect-ratio:442/294}
+.isl{background:#101214;padding:10px}
+.isl img{height:auto}
+.isl.d img{aspect-ratio:420/106}.isl.r img{aspect-ratio:420/118}
+/* white glass capsule and glass orbs */
+.cps{display:inline-flex;align-items:center;gap:10px;white-space:nowrap;font:600 15px/1 var(--jak);padding:11px 16px;border-radius:999px;color:var(--plum);
+  background:radial-gradient(circle at 30% 0,#fff,rgba(214,222,215,.7));box-shadow:inset 1px 1px 1px #fff,0 0 0 1px rgba(52,4,20,.12),0 10px 18px -12px rgba(52,4,20,.35)}
+.cps.m{background:radial-gradient(circle at 30% 0,#fff,rgba(222,216,224,.75))}
+.orb{flex:none;width:30px;height:30px;border-radius:50%;
+  box-shadow:inset 2px 2px 2px rgba(255,255,255,.95),inset 0 -10px 16px -10px rgba(52,4,20,.22),0 0 0 1px rgba(20,23,27,.06),0 10px 18px -12px rgba(52,4,20,.4)}
+.og{background:radial-gradient(circle at 30% 22%,#fff,rgba(214,222,215,.95) 55%,rgba(155,166,156,.75))}
+.om{background:radial-gradient(circle at 30% 22%,#fff,rgba(222,216,224,.95) 55%,rgba(130,122,133,.7))}
+.lb{font:600 20px/1.25 var(--jak);margin:0;color:var(--ink)}
+/* the phone, in the slide-26 silhouette; its screen is the Island's own dark ground, the Island frame at the top */
+.ip{position:relative;display:inline-block;flex:none;padding:8px;border-radius:44px;background:#0b0c0d;
+  box-shadow:inset 0 0 0 1.5px #2a2c2e,inset 0 0 0 3px #0b0c0d,0 30px 50px -26px rgba(20,23,27,.6),0 8px 16px -10px rgba(20,23,27,.35)}
+.ip .scr{position:relative;height:100%;aspect-ratio:362/792;border-radius:36px;overflow:hidden;background:#101214}
+.ip .scr img{position:absolute;left:6px;right:6px;top:10px;width:calc(100% - 12px)}
+.ip i{position:absolute;width:3px;border-radius:2px;background:linear-gradient(90deg,#2a2b2e,#4a4c50)}
+.ip i.a1{left:-3px;top:19%;height:5%}.ip i.a2{left:-3px;top:28%;height:10%}.ip i.a3{left:-3px;top:40%;height:10%}
+.ip i.pw{right:-3px;top:31%;height:15%;background:linear-gradient(270deg,#2a2b2e,#4a4c50)}
+/* the two moments trade places every four seconds (03 and 05) */
+.sw{position:relative}.sw>*{transition:none}
+.sw .p2{position:absolute;inset:0;animation:sw2 8s infinite}
+.sw .p1{animation:sw1 8s infinite}
+@keyframes sw1{0%,42%{opacity:1}50%,92%{opacity:0}100%{opacity:1}}
+@keyframes sw2{0%,42%{opacity:0}50%,92%{opacity:1}100%{opacity:0}}
+
+/* 01 matched pairs: each moment is a row, the HUD on the left, its Island twin on the right, the moment named between */
+.d1{display:grid;grid-template-columns:auto 1fr auto;align-items:center;column-gap:36px;row-gap:22px;height:100%;align-content:center}
+.d1 .hud{height:168px}
+.d1 .isl{width:440px}
+.d1 .mid{justify-self:center}
+.d1 .tag.r{justify-self:start}
+/* 02 two moments as columns: the moment above, the glasses frame, then its Island twin beneath */
+.d2{display:flex;justify-content:center;align-items:center;gap:96px;height:100%}
+.d2 .col{display:flex;flex-direction:column;align-items:center;gap:14px;width:340px}
+.d2 .hud{width:340px}
+.d2 .isl{width:340px}
+/* 03 phone hero, the sequence: the glasses frame and the Island swap together; the orb list marks which moment */
+.d3{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;column-gap:56px;height:100%}
+.d3 .hudw{justify-self:end;width:390px}
+.d3 .hudw .hud{width:390px}
+.d3 .ip{height:400px}
+.d3 .ls{display:flex;flex-direction:column;gap:22px}
+.d3 .ls>div{display:flex;gap:14px;align-items:center}
+.d3 .ls .k1{animation:sw1 8s infinite}.d3 .ls .k2{animation:sw2b 8s infinite}
+@keyframes sw2b{0%,42%{opacity:.3}50%,92%{opacity:1}100%{opacity:.3}}
+.d3 .ls .k1{animation-name:sw1b}
+@keyframes sw1b{0%,42%{opacity:1}50%,92%{opacity:.3}100%{opacity:1}}
+/* 04 the Island leads: each Island frame large, the glasses frame small beside it, the moment as a glass orb */
+.d4{display:flex;flex-direction:column;justify-content:center;gap:34px;height:100%}
+.d4 .row{display:grid;grid-template-columns:270px 610px 1fr;align-items:center;column-gap:36px}
+.d4 .nm{display:flex;gap:14px;align-items:center}
+.d4 .isl{width:610px;padding:14px}
+.d4 .lb{white-space:nowrap}
+.d4 .hud{width:170px;justify-self:end}
+/* 05 the lens: the glasses frame, the phone, and the Island magnified in a round glass lens, all swapping together */
+.d5{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;column-gap:52px;height:100%}
+.d5 .hudw{justify-self:end;width:330px}.d5 .hudw .hud{width:330px}
+.d5 .ip{height:400px}
+.d5 .lensw{display:flex;flex-direction:column;align-items:center;gap:20px;justify-self:start}
+.lens{position:relative;width:280px;height:280px;border-radius:50%;overflow:hidden;background:#101214;
+  box-shadow:inset 2px 2px 3px rgba(255,255,255,.35),0 0 0 6px rgba(255,255,255,.85),0 0 0 7px rgba(20,23,27,.08),0 24px 44px -22px rgba(52,4,20,.45)}
+.lens .sw{position:absolute;left:18px;right:18px;top:50%;transform:translateY(-50%)}
+.lens img{display:block;width:100%}
+.lens::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(70% 45% at 40% 12%,rgba(255,255,255,.22),transparent 70%);pointer-events:none}
+.d5 .capw{position:relative;height:40px;width:260px}
+.d5 .capw .cps{position:absolute;inset:auto;top:0;left:50%;transform:translateX(-50%)}
+</style></head><body>
+<div class="wrap">
+<h1>Moments lab, slide 28</h1>
+<p class="lede">Five directions for slide 28, visual first: the glasses frames and their Island twins large and whole, a few words each, no connector lines and no boxes. Facts kept: show progress and confirm before sending, on the glasses and in the Island, and the footnote on true point size. Tell me the number.</p>
+<div id="opts"></div>
+</div>
+<script>
+const head=`<p class="hd"><span class="bead">4</span><span>So I showed the same moments in the Island <em>that the HUD showed on the glasses.</em></span></p>`;
+const fn=`<p class="fn">I drew every Island format at true point size, against the 62 points each side allows.</p>`;
+const H2=(st='')=>`<div class="card hud" style="${st}"><img src="media/if-disp2.png" alt="Show progress on the HUD"></div>`;
+const H3=(st='')=>`<div class="card hud" style="${st}"><img src="media/if-disp3.png" alt="Confirm before sending on the HUD"></div>`;
+const ID=(st='')=>`<div class="card isl d" style="${st}"><img src="media/isl-doing.png" alt="Drafting a reply, with the time left"></div>`;
+const IR=(st='')=>`<div class="card isl r" style="${st}"><img src="media/isl-ready.png" alt="Send it or Not now"></div>`;
+const phone=`<div class="ip"><i class="a1"></i><i class="a2"></i><i class="a3"></i><i class="pw"></i><div class="scr"><div class="sw" style="position:absolute;left:6px;right:6px;top:10px"><img class="p1" src="media/isl-doing.png" alt="" style="display:block;width:100%"><img class="p2" src="media/isl-ready.png" alt="" style="display:block;width:100%"></div></div></div>`;
+const D=[
+ ['01','Matched pairs','Each moment is a row: the glasses frame on the left, its Island twin on the right, the moment named in a glass capsule between.',
+  `<div class="d1"><p class="tag">On the glasses</p><span></span><p class="tag r">In the Island</p>
+   ${H2()}<span class="cps mid">Show progress</span>${ID()}
+   ${H3()}<span class="cps m mid">Confirm before sending</span>${IR()}</div>`],
+ ['02','Two moments, two columns','Each moment is a column: its name, the glasses frame, then the Island twin beneath at the same width.',
+  `<div class="d2"><div class="col"><span class="cps">Show progress</span>${H2()}${ID()}</div><div class="col"><span class="cps m">Confirm before sending</span>${H3()}${IR()}</div></div>`],
+ ['03','The phone, in sequence','The phone is the hero. The glasses frame and the Island swap together between the two moments; the orbs mark which one is showing.',
+  `<div class="d3"><div class="hudw sw"><div class="p1">${H2()}</div><div class="p2">${H3()}</div></div>${phone}<div class="ls"><div class="k1"><span class="orb og"></span><p class="lb">Show progress</p></div><div class="k2"><span class="orb om"></span><p class="lb">Confirm before sending</p></div></div></div>`],
+ ['04','The Island leads','Each Island frame large, the moment as a glass orb beside it, and the glasses frame it mirrors small on the right.',
+  `<div class="d4"><div class="row"><div class="nm"><span class="orb og"></span><p class="lb">Show progress</p></div>${ID()}${H2()}</div><div class="row"><div class="nm"><span class="orb om"></span><p class="lb">Confirm before sending</p></div>${IR()}${H3()}</div></div>`],
+ ['05','The lens','The glasses frame, the phone, and its Island magnified in a round glass lens. All three swap together between the two moments, named in the capsule under the lens.',
+  `<div class="d5"><div class="hudw sw"><div class="p1">${H2()}</div><div class="p2">${H3()}</div></div>${phone}<div class="lensw"><div class="lens"><div class="sw"><img class="p1" src="media/isl-doing.png" alt=""><img class="p2" src="media/isl-ready.png" alt=""></div></div><div class="capw sw"><span class="cps p1">Show progress</span><span class="cps m p2">Confirm before sending</span></div></div></div>`]];
+document.getElementById('opts').innerHTML=D.map(([n,t,d,b])=>`<div class="opt"><p class="lab">${n} &nbsp;${t}<small>${d}</small></p><div class="frame"><div class="sl">${head}<div class="body">${b}</div>${fn}<div class="ft"><span>28 &nbsp; Designs</span><span>Eden Case Study</span></div></div></div></div>`).join('');
+const fit=()=>document.querySelectorAll('.frame').forEach(f=>f.querySelector('.sl').style.transform=`scale(${f.clientWidth/1280})`);
+addEventListener('resize',fit);fit();
+</script>
+</body></html>

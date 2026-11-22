@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Real vinyl</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#FAF9F7;--ink:#14171B;--ink2:rgba(20,23,27,.66);--ink3:rgba(20,23,27,.42);--hair:rgba(20,23,27,.16);--jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+html[data-theme="dark"]{--paper:#1C1A17;--ink:#FAF9F7;--ink2:rgba(250,249,247,.66);--ink3:rgba(250,249,247,.42);--hair:rgba(250,249,247,.16)}
+html,body{margin:0;background:var(--paper);color:var(--ink);font:300 15.5px/1.62 var(--hel);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:56px 30px 96px}
+.label{font:600 10.5px/1.5 var(--jak);letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+h1{font:500 clamp(28px,4vw,44px)/1.12 var(--jak);letter-spacing:-.012em;margin:12px 0 0;max-width:22ch}
+p.lede{font-size:17px;line-height:1.62;color:var(--ink2);margin:16px 0 0;max-width:60ch}
+.row{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;margin-top:48px}
+.one{display:grid;gap:14px}
+.one .plate{position:relative;aspect-ratio:1;cursor:pointer}
+.one canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.one h3{font:500 14px var(--jak);margin:0}.one p{margin:0;font-size:13px;line-height:1.55;color:var(--ink2)}
+.tools{display:flex;gap:16px;align-items:center;margin-top:48px;flex-wrap:wrap}
+label.chk{display:flex;gap:10px;align-items:center;font:500 12.5px var(--jak)}
+.big{margin-top:64px;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.big .plate{position:relative;aspect-ratio:1;max-width:520px;cursor:pointer}
+.big canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.seg{display:flex;gap:6px;flex-wrap:wrap}.seg button{font:500 12px var(--jak);color:var(--ink);background:transparent;border:1px solid var(--hair);border-radius:999px;padding:6px 11px;cursor:pointer}.seg button[aria-pressed=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+</style></head><body>
+<div class="wrap">
+  <div class="label">Real vinyl · five renderings</div>
+  <h1>A record that reads as a record.</h1>
+  <p class="lede">What a pressed record actually looks like: almost black, a satin sheen rather than gloss, the grooves invisible except as two soft fans of light opposite each other that stay fixed while the disc turns, a dead-wax ring, a paper label with a bright embossed rim, a tiny spindle hole. Five takes on that below, all drawn in canvas from a height field or a shading model, no images. Hover to spin. The big one at the bottom is whichever you pick, at size.</p>
+  <div class="row" id="row"></div>
+  <div class="label" style="margin-top:72px">Pressed · three lights, and three coloured pressings</div><div class="row" id="row2" style="margin-top:24px;grid-template-columns:repeat(6,1fr);gap:20px"></div>
+  <div class="tools"><label class="chk"><input id="spin" type="checkbox"> keep spinning</label><label class="chk"><input id="dark" type="checkbox"> dark mode</label></div>
+  <div class="big"><div class="plate" id="bigplate"><canvas></canvas></div><div><div class="label">At size</div><div class="seg" id="pick"></div><p id="bigwhy" style="margin-top:16px;color:var(--ink2);max-width:40ch"></p></div></div>
+</div>
+<script>
+const TAU=Math.PI*2, LAB='#9ba69c', TITLE='FOSTR', NUM='01';
+const hash=(x,y,s)=>{const n=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return n-Math.floor(n);};
+/* ---- shared pieces ---- */
+function label(c,R,opts={}){ const r=R*.355; c.save(); c.rotate(opts.ang||0); c.translate(R*.004,R*.003);   /* labels are never dead centre: the wobble you see on a turntable */
+  c.fillStyle=opts.col||LAB; c.beginPath(); c.arc(0,0,r,0,TAU); c.fill();
+  /* paper label: a faint tooth and a bright pressed rim where the vinyl meets it */
+  c.save(); c.beginPath(); c.arc(0,0,r,0,TAU); c.clip(); c.globalAlpha=.12; for(let i=0;i<400;i++){ c.fillStyle=hash(i,1,5)>.5?'#fff':'#000'; c.fillRect((hash(i,2,5)-.5)*2*r,(hash(i,3,5)-.5)*2*r,1,1); } c.restore();
+  c.lineWidth=R*.012; c.strokeStyle='rgba(255,255,255,.55)'; c.beginPath(); c.arc(0,0,r-R*.006,0,TAU); c.stroke();
+  c.lineWidth=R*.006; c.strokeStyle='rgba(0,0,0,.35)'; c.beginPath(); c.arc(0,0,r+R*.004,0,TAU); c.stroke();
+  c.fillStyle='rgba(250,249,247,.95)'; c.textAlign='center'; c.textBaseline='middle';
+  c.font=`600 ${Math.round(R*.055)}px "Plus Jakarta Sans"`; c.fillText(TITLE,0,-r*.40);
+  c.font=`500 ${Math.round(R*.040)}px "Plus Jakarta Sans"`; c.fillStyle='rgba(250,249,247,.75)'; c.fillText('SIDE A',0,r*.36); c.fillText(NUM+' · 33⅓',0,r*.56);
+  c.restore();
+  /* the spindle hole is the true centre; it does not move */
+  c.fillStyle='rgba(20,18,22,1)'; c.beginPath(); c.arc(0,0,R*.026,0,TAU); c.fill();
+  c.lineWidth=1; c.strokeStyle='rgba(255,255,255,.5)'; c.beginPath(); c.arc(0,R*.003,R*.026,0.2,Math.PI-.2); c.stroke();
+}
+function edge(c,R){ c.lineWidth=R*.012; c.strokeStyle='rgba(0,0,0,.55)'; c.beginPath(); c.arc(0,0,R-R*.004,0,TAU); c.stroke(); c.lineWidth=1; c.strokeStyle='rgba(255,255,255,.22)'; c.beginPath(); c.arc(0,0,R-R*.013,0,TAU); c.stroke(); }
+function shadow(c,R,dpr,dark){ c.shadowColor=dark?'rgba(0,0,0,.7)':'rgba(20,23,27,.42)'; c.shadowBlur=22*dpr; c.shadowOffsetY=10*dpr; c.fillStyle='#111'; c.beginPath(); c.arc(0,0,R,0,TAU); c.fill(); c.shadowColor='transparent'; }
+/* two light fans opposite each other, the way grooves catch a lamp; they stay fixed to the lamp while the disc turns */
+function fans(c,R,strength,width,lampA){
+  for(const [a,w] of [[lampA,1],[lampA+Math.PI,.72]]){ const g=c.createConicGradient(a-width/2,0,0); const s=strength*w;
+    g.addColorStop(0,'rgba(255,255,255,0)'); g.addColorStop(width/TAU*.35,`rgba(255,255,255,${s*.45})`); g.addColorStop(width/TAU*.5,`rgba(255,255,255,${s})`); g.addColorStop(width/TAU*.65,`rgba(255,255,255,${s*.45})`); g.addColorStop(width/TAU,'rgba(255,255,255,0)'); g.addColorStop(1,'rgba(255,255,255,0)');
+    c.fillStyle=g; c.fillRect(-R,-R,2*R,2*R); }
+}
+function grooveMask(c,R,inner,outer,gaps){
+  /* restricts to the grooved area, with the dead-wax and the gaps left alone */
+  c.beginPath(); c.arc(0,0,outer,0,TAU); c.arc(0,0,inner,0,TAU,true); c.clip('evenodd');
+}
+/* the things on a real disc that are not symmetric, so the turn can be seen: the lead-in and run-out
+   spirals, a few faint radial pressing streaks, a scatter of dust; drawn in the disc's own frame */
+function marks(c,R,ang,light){
+  c.save(); c.rotate(ang);
+  c.strokeStyle=light?'rgba(0,0,0,.22)':'rgba(255,255,255,.16)'; c.lineWidth=.9;
+  c.beginPath(); for(let t=0;t<TAU*2.5;t+=.04){ const r=R*.965-t/(TAU*2.5)*R*.02; c.lineTo(Math.cos(t)*r,Math.sin(t)*r); } c.stroke();            /* lead-in */
+  c.beginPath(); for(let t=0;t<TAU*3;t+=.04){ const r=R*.42-t/(TAU*3)*R*.025; c.lineTo(Math.cos(t)*r,Math.sin(t)*r); } c.stroke();                 /* run-out */
+  c.strokeStyle=light?'rgba(0,0,0,.05)':'rgba(255,255,255,.03)'; c.lineWidth=R*.02;
+  for(const a of [.4,1.9,3.3,4.6,5.7]){ c.beginPath(); c.moveTo(Math.cos(a)*R*.42,Math.sin(a)*R*.42); c.lineTo(Math.cos(a+.05)*R*.95,Math.sin(a+.05)*R*.95); c.stroke(); }   /* pressing streaks */
+  c.fillStyle=light?'rgba(0,0,0,.35)':'rgba(255,255,255,.4)'; for(let i=0;i<34;i++){ const a=hash(i,1,9)*TAU, r=R*(.43+hash(i,2,9)*.5); c.fillRect(Math.cos(a)*r,Math.sin(a)*r,1,1); }
+  c.restore();
+}
+/* ---- a general pressed disc: every groove a V in a height field, shaded by one lamp. opts: body, lab, lamp
+   (angle), pitch (px), spec, trans (0 opaque vinyl .. 1 translucent coloured), streak */
+function pressedDraw(opts){
+  const cache=new Map();
+  return function(c,R,ang,dark){
+    const W=Math.round(R*2);
+    if(!cache.has(W)){ const b=document.createElement('canvas'); b.width=b.height=W; const d=b.getContext('2d').createImageData(W,W), px=d.data;
+      const la=opts.lamp??-2.2, LX=Math.cos(la)*.9, LY=Math.sin(la)*.9, LZ=opts.lz??.36, m=Math.hypot(LX,LY,LZ), lx=LX/m,ly=LY/m,lz=LZ/m;
+      const pitch=opts.pitch??1.25, body=opts.body, lab=opts.lab, trans=opts.trans??0, spec=opts.spec??.9;
+      for(let y=0;y<W;y++) for(let x=0;x<W;x++){ const dx=x-W/2+.5, dy=y-W/2+.5, r=Math.hypot(dx,dy), o=(y*W+x)*4; if(r>R){ px[o+3]=0; continue; }
+        const u=r/R; let dh=0;
+        if(u>.395&&u<.965){ const p=r/pitch; const f=p-Math.floor(p); dh=(f<.5?-1:1)*(opts.depth??1.6); }
+        if(u<=.355&&u>.345) dh=-6; if(u>.965) dh=(u-.965)*-40;
+        const nx=dx/r*dh, ny=dy/r*dh, nl=Math.hypot(nx,ny,1), nnx=-nx/nl, nny=-ny/nl, nnz=1/nl;
+        const diff=Math.max(0,nnx*lx+nny*ly+nnz*lz); const hx=lx,hy=ly,hz=lz+1,hm=Math.hypot(hx,hy,hz); const sp=Math.pow(Math.max(0,nnx*hx/hm+nny*hy/hm+nnz*hz/hm),28);
+        let col=u<=.355?lab:body; let k=.55+.45*diff;
+        if(trans>0&&u>.355){ /* translucent: thinner toward the rim reads lighter, the grooves scatter the light so the fans are softer */ const th=1-(u-.355)/.61; k=.62+.38*diff; col=[col[0]+(255-col[0])*(1-th)*trans*.35,col[1]+(255-col[1])*(1-th)*trans*.35,col[2]+(255-col[2])*(1-th)*trans*.35]; }
+        const s=sp*(u<=.355?.25:spec*(1-trans*.55))*255;
+        px[o]=Math.min(255,col[0]*k+s); px[o+1]=Math.min(255,col[1]*k+s); px[o+2]=Math.min(255,col[2]*k+s); px[o+3]=255; }
+      b.getContext('2d').putImageData(d,0,0); cache.set(W,b); }
+    c.save(); c.rotate(ang); c.drawImage(cache.get(W),-R,-R,2*R,2*R); c.restore();
+    marks(c,R,ang,!!opts.light);
+    c.save(); c.rotate(ang); c.translate(R*.004,R*.003); c.fillStyle=opts.text||'rgba(250,249,247,.95)'; c.textAlign='center'; c.textBaseline='middle'; const r=R*.355; c.font=`600 ${Math.round(R*.055)}px "Plus Jakarta Sans"`; c.fillText(TITLE,0,-r*.40); c.font=`500 ${Math.round(R*.040)}px "Plus Jakarta Sans"`; c.globalAlpha=.75; c.fillText('SIDE A',0,r*.36); c.fillText(NUM+' · 33⅓',0,r*.56); c.globalAlpha=1;
+    c.lineWidth=R*.012; c.strokeStyle='rgba(255,255,255,.5)'; c.beginPath(); c.arc(0,0,r-R*.006,0,TAU); c.stroke(); c.restore();
+    c.fillStyle='#141216'; c.beginPath(); c.arc(0,0,R*.026,0,TAU); c.fill(); edge(c,R);
+  };
+}
+const V2=[
+  { id:'p-key', name:'P1 · Pressed, key light', why:'The height field under a single hard key from the upper left: tight bright fans, deep shadow fan opposite, the label rim catching a crisp line.', draw:pressedDraw({body:[16,15,18],lab:[155,166,156],lamp:-2.2,lz:.3,spec:1.1,depth:1.8}) },
+  { id:'p-soft', name:'P2 · Pressed, sage label', why:'Black vinyl under a big soft light overhead: the fans spread wide and low, no hard specular. The label in the signature sage.', draw:pressedDraw({body:[22,21,25],lab:[155,166,156],lamp:-1.57,lz:.9,spec:.35,depth:1.2}) },
+  { id:'p-wide', name:'P3 · Pressed, mauve label', why:'Black vinyl at a coarser pitch, lit from the side: the grooves show as fine rings and the fans break into bands. The label in the signature mauve.', draw:pressedDraw({body:[14,13,16],lab:[130,122,133],lamp:-2.6,lz:.28,spec:.9,pitch:2.2,depth:2.2}) },
+  { id:'c-sage', name:'C1 · Sage pressing', why:'Translucent sage vinyl with a deeper sage label. The thin outer edge reads lighter, the fans go soft because the material scatters.', draw:pressedDraw({body:[120,136,122],lab:[63,74,64],lamp:-2.2,lz:.4,spec:.7,trans:.8,light:true,text:'rgba(250,249,247,.95)'}) },
+  { id:'c-mauve', name:'C2 · Mauve pressing', why:'The signature mauve, slightly smoky so it stays dark enough to read as a record, with a paper-cream label.', draw:pressedDraw({body:[96,88,100],lab:[223,221,200],lamp:-2.2,lz:.4,spec:.75,trans:.6,light:true,text:'rgba(20,23,27,.85)'}) },
+  { id:'c-gold', name:'C3 · Gold pressing', why:'Amber gold vinyl, the special edition, with an oxblood label. The warmest of the set and the one that sits best against the paper.', draw:pressedDraw({body:[150,132,60],lab:[52,4,20],lamp:-2.2,lz:.4,spec:.8,trans:.7,light:true}) },
+];
+/* ---- the five ---- */
+const V=[
+  { id:'satin', name:'01 · Satin', why:'The straight answer. A near-black body with a satin sheen, two broad light fans fixed to the lamp, a soft dead-wax band, and the grooves drawn only as a faint micro-ring texture you feel more than see.',
+    draw(c,R,ang,dark){ const g=c.createRadialGradient(0,0,R*.35,0,0,R); g.addColorStop(0,'#1a181c'); g.addColorStop(1,'#0e0d10'); c.fillStyle=g; c.beginPath(); c.arc(0,0,R,0,TAU); c.fill();
+      c.save(); c.rotate(ang); c.globalAlpha=.5; c.lineWidth=.5; c.strokeStyle='rgba(255,255,255,.07)'; for(let r=R*.40;r<R*.96;r+=1.1) { c.beginPath(); c.arc(0,0,r,0,TAU); c.stroke(); } c.restore();
+      c.save(); grooveMask(c,R,R*.39,R*.965); fans(c,R,.22,1.3,-Math.PI*.72); c.restore();
+      /* dead wax: slightly glossier ring between grooves and label */
+      const dw=c.createRadialGradient(0,0,R*.36,0,0,R*.40); dw.addColorStop(0,'rgba(255,255,255,.06)'); dw.addColorStop(1,'rgba(255,255,255,0)'); c.fillStyle=dw; c.beginPath(); c.arc(0,0,R*.41,0,TAU); c.fill();
+      marks(c,R,ang,false); label(c,R,{ang}); edge(c,R); } },
+  { id:'lit', name:'02 · Studio light', why:'Same record under a harder key light: the fans are narrower and brighter, with a thin specular line across the top where the lamp hits the surface direct, and the rim catches a bright crescent.',
+    draw(c,R,ang,dark){ c.fillStyle='#121114'; c.beginPath(); c.arc(0,0,R,0,TAU); c.fill();
+      c.save(); c.rotate(ang); c.lineWidth=.6; c.strokeStyle='rgba(255,255,255,.05)'; for(let r=R*.40;r<R*.96;r+=1.2) { c.beginPath(); c.arc(0,0,r,0,TAU); c.stroke(); } c.restore();
+      c.save(); grooveMask(c,R,R*.39,R*.965); fans(c,R,.42,.7,-Math.PI*.7); fans(c,R,.10,2.2,-Math.PI*.7); c.restore();
+      /* a specular streak straight across, as a window reflects */
+      c.save(); c.beginPath(); c.arc(0,0,R*.965,0,TAU); c.clip(); c.rotate(-.55); const sg=c.createLinearGradient(0,-R*.05,0,R*.05); sg.addColorStop(0,'rgba(255,255,255,0)'); sg.addColorStop(.5,'rgba(255,255,255,.18)'); sg.addColorStop(1,'rgba(255,255,255,0)'); c.fillStyle=sg; c.fillRect(-R,-R*.05,2*R,R*.1); c.restore();
+      /* rim crescent */
+      c.lineWidth=R*.01; c.strokeStyle='rgba(255,255,255,.55)'; c.beginPath(); c.arc(0,0,R-R*.008,-Math.PI*.95,-Math.PI*.45); c.stroke();
+      marks(c,R,ang,false); label(c,R,{ang}); edge(c,R); } },
+  { id:'height', name:'03 · Pressed', why:'A true height field: every groove is a V cut into the surface and the whole disc is shaded from that, so the fans, the dead wax step and the label rim all come from one lamp. The most physically honest and the heaviest to draw.',
+    cache:null,
+    draw(c,R,ang,dark){ const W=Math.round(R*2); this.cache=this.cache||new Map(); if(!this.cache.has(W)){ const b=document.createElement('canvas'); b.width=b.height=W; const d=b.getContext('2d').createImageData(W,W), px=d.data;
+        const LX=-.62,LY=-.70,LZ=.36, m=Math.hypot(LX,LY,LZ), lx=LX/m,ly=LY/m,lz=LZ/m;
+        for(let y=0;y<W;y++) for(let x=0;x<W;x++){ const dx=x-W/2+.5, dy=y-W/2+.5, r=Math.hypot(dx,dy), o=(y*W+x)*4; if(r>R){ px[o+3]=0; continue; }
+          const u=r/R; let h=0, dh=0;
+          if(u>.395&&u<.965){ const p=r/1.25; const f=p-Math.floor(p); h=Math.abs(f-.5)*2; dh=(f<.5?-1:1)*1.6; }           /* V grooves, pitch 1.25px */
+          if(u>.355&&u<=.395){ h=.3; dh=0; }                                                                                /* dead wax, flat */
+          if(u<=.355){ h=.9; dh=(u>.345?-6:0); }                                                                             /* label, raised, with a pressed rim */
+          if(u>.965){ h=.2; dh=(u-.965)*-40; }
+          const nx=dx/r*dh, ny=dy/r*dh; const nl=Math.hypot(nx,ny,1); const nnx=-nx/nl, nny=-ny/nl, nnz=1/nl;
+          const diff=Math.max(0,nnx*lx+nny*ly+nnz*lz); const hx=lx, hy=ly, hz=lz+1, hm=Math.hypot(hx,hy,hz); const spec=Math.pow(Math.max(0,nnx*hx/hm+nny*hy/hm+nnz*hz/hm),28);
+          const base=u<=.355?0:1; const col=u<=.355?[155,166,156]:[16,15,18]; const k=.55+.45*diff; const s=spec*(u<=.355?.25:.9)*255;
+          px[o]=Math.min(255,col[0]*k+s); px[o+1]=Math.min(255,col[1]*k+s); px[o+2]=Math.min(255,col[2]*k+s); px[o+3]=255; }
+        b.getContext('2d').putImageData(d,0,0); this.cache.set(W,b); }
+      c.save(); c.rotate(ang); c.drawImage(this.cache.get(W),-R,-R,2*R,2*R); c.restore();
+      /* the label text does not turn with the shading cache, so it is drawn on top, turning */
+      marks(c,R,ang,false);
+      c.save(); c.rotate(ang); c.translate(R*.004,R*.003); c.fillStyle='rgba(250,249,247,.95)'; c.textAlign='center'; c.textBaseline='middle'; const r=R*.355; c.font=`600 ${Math.round(R*.055)}px "Plus Jakarta Sans"`; c.fillText(TITLE,0,-r*.40); c.font=`500 ${Math.round(R*.040)}px "Plus Jakarta Sans"`; c.fillStyle='rgba(250,249,247,.75)'; c.fillText('SIDE A',0,r*.36); c.fillText(NUM+' · 33⅓',0,r*.56); c.restore();
+      c.fillStyle='#141216'; c.beginPath(); c.arc(0,0,R*.026,0,TAU); c.fill(); edge(c,R); } },
+  { id:'photo', name:'04 · Photographic', why:'Built like a product photo: a soft top light so the body reads as deep charcoal rather than black, wide low-contrast fans, a gentle vignette toward the rim, fine dust and a hairline scratch or two. Warm, worn, real.',
+    draw(c,R,ang,dark){ const g=c.createRadialGradient(-R*.25,-R*.35,R*.1,0,0,R); g.addColorStop(0,'#2a282c'); g.addColorStop(.6,'#1a191c'); g.addColorStop(1,'#0c0b0e'); c.fillStyle=g; c.beginPath(); c.arc(0,0,R,0,TAU); c.fill();
+      c.save(); c.rotate(ang); c.lineWidth=.6; c.strokeStyle='rgba(255,255,255,.06)'; for(let r=R*.40;r<R*.96;r+=1.3) { c.beginPath(); c.arc(0,0,r,0,TAU); c.stroke(); }
+      /* a couple of hairline scratches and dust, turning with the disc */
+      c.strokeStyle='rgba(255,255,255,.18)'; c.lineWidth=.7; c.beginPath(); c.moveTo(-R*.5,-R*.6); c.lineTo(R*.1,R*.3); c.stroke(); c.beginPath(); c.moveTo(R*.6,-R*.2); c.lineTo(R*.7,R*.1); c.stroke();
+      c.fillStyle='rgba(255,255,255,.35)'; for(let i=0;i<40;i++){ const a=hash(i,1,9)*TAU, r=R*(.42+hash(i,2,9)*.52); c.fillRect(Math.cos(a)*r,Math.sin(a)*r,1,1); } c.restore();
+      c.save(); grooveMask(c,R,R*.39,R*.965); fans(c,R,.16,1.9,-Math.PI*.74); c.restore();
+      marks(c,R,ang,false); label(c,R,{ang}); edge(c,R); } },
+  { id:'colour', name:'05 · Coloured pressing', why:'The same satin body in the label colour, as a translucent coloured pressing: lighter at the thin edge, deeper toward the centre, the fans softer because the material scatters. One per project in its label colour would read as a set.',
+    draw(c,R,ang,dark){ const g=c.createRadialGradient(0,0,R*.3,0,0,R); g.addColorStop(0,'#5c6b5d'); g.addColorStop(.8,'#7f8c80'); g.addColorStop(1,'#98a69a'); c.fillStyle=g; c.beginPath(); c.arc(0,0,R,0,TAU); c.fill();
+      c.save(); c.rotate(ang); c.lineWidth=.6; c.strokeStyle='rgba(0,0,0,.10)'; for(let r=R*.40;r<R*.96;r+=1.2) { c.beginPath(); c.arc(0,0,r,0,TAU); c.stroke(); } c.restore();
+      c.save(); grooveMask(c,R,R*.39,R*.965); fans(c,R,.26,1.8,-Math.PI*.72); c.restore();
+      marks(c,R,ang,true); label(c,R,{col:'#3f4a40',ang}); c.lineWidth=R*.012; c.strokeStyle='rgba(0,0,0,.35)'; c.beginPath(); c.arc(0,0,R-R*.004,0,TAU); c.stroke(); c.lineWidth=1; c.strokeStyle='rgba(255,255,255,.5)'; c.beginPath(); c.arc(0,0,R-R*.012,0,TAU); c.stroke(); } },
+];
+const plates=[];
+function mount(plate,v){ const cv=plate.querySelector('canvas'), c=cv.getContext('2d'); const S={cv,c,v,ang:0,vel:0,raf:0,hot:false};
+  plate.addEventListener('pointerenter',()=>{ S.hot=true; wake(S); }); plate.addEventListener('pointerleave',()=>{ S.hot=false; wake(S); }); plates.push(S); wake(S); return S; }
+function wake(S){ if(!S.raf) S.raf=requestAnimationFrame(()=>frame(S)); }
+function frame(S){ S.raf=0; const dpr=Math.min(2,devicePixelRatio||1), r=S.cv.getBoundingClientRect(), W=Math.round(r.width*dpr); if(!W) return; if(S.cv.width!==W){ S.cv.width=S.cv.height=W; }
+  const dark=document.documentElement.getAttribute('data-theme')==='dark', spin=S.hot||document.getElementById('spin').checked;
+  S.vel+=((spin?.06:0)-S.vel)*.05; S.ang+=S.vel;
+  const c=S.c, R=W/2*.92; c.setTransform(1,0,0,1,0,0); c.clearRect(0,0,W,W); c.save(); c.translate(W/2,W/2); shadow(c,R,dpr,dark); S.v.draw(c,R,S.ang,dark); c.restore();
+  if(Math.abs(S.vel)>.0004||spin) S.raf=requestAnimationFrame(()=>frame(S)); }
+const row=document.getElementById('row');
+V.forEach(v=>{ const one=document.createElement('div'); one.className='one'; one.innerHTML=`<div class="plate"><canvas></canvas></div><h3>${v.name}</h3><p>${v.why}</p>`; row.appendChild(one); mount(one.querySelector('.plate'),v); });
+const row2=document.getElementById('row2');
+V2.forEach(v=>{ const one=document.createElement('div'); one.className='one'; one.innerHTML=`<div class="plate"><canvas></canvas></div><h3>${v.name}</h3><p>${v.why}</p>`; row2.appendChild(one); mount(one.querySelector('.plate'),v); });
+const ALL=V.concat(V2);
+const pick=document.getElementById('pick'); let big=null;
+ALL.forEach((v,i)=>{ const b=document.createElement('button'); b.textContent=v.name; b.addEventListener('click',()=>setBig(i)); pick.appendChild(b); });
+function setBig(i){ pick.querySelectorAll('button').forEach((b,k)=>b.setAttribute('aria-pressed',k===i)); document.getElementById('bigwhy').textContent=ALL[i].why; if(big){ big.v=ALL[i]; wake(big); } else big=mount(document.getElementById('bigplate'),ALL[i]); }
+setBig(0);
+document.getElementById('spin').addEventListener('change',()=>plates.forEach(wake));
+document.getElementById('dark').addEventListener('change',e=>{ document.documentElement.setAttribute('data-theme',e.target.checked?'dark':'light'); plates.forEach(wake); });
+new ResizeObserver(()=>plates.forEach(wake)).observe(row); new ResizeObserver(()=>plates.forEach(wake)).observe(row2);
+</script>
+</body></html>

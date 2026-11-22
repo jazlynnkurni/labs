@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My CPT at Eden</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;800&display=swap">
+<style>
+:root{--ink:#050505;--paper:#fff;--grey:#8a8a8a;--hair:#d9d9d9;--w:1920px;--h:1080px}
+*{box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased}
+body{margin:0;background:#111;color:var(--ink);font:28px/1.4 -apple-system,"SF Pro Text","SF Pro Display",system-ui,sans-serif;letter-spacing:-.005em;overflow:hidden}
+#deck{position:fixed;inset:0;display:grid;place-items:center}
+.slide{position:absolute;width:var(--w);height:var(--h);background:var(--paper);padding:96px 120px;display:none;transform-origin:center;overflow:hidden}
+.slide.on{display:block}
+h1,h2{margin:0;font-family:Montserrat,sans-serif;font-weight:100;letter-spacing:-.02em;text-wrap:balance}
+h1{font-size:112px;line-height:1.02}
+h2{font-size:64px;line-height:1.08}
+b{font-weight:800;font-family:Montserrat,sans-serif;letter-spacing:-.01em}
+p{margin:0;text-wrap:pretty}
+.eyebrow{font-size:22px;letter-spacing:.08em;text-transform:uppercase;color:var(--grey);margin-bottom:24px}
+.hair{height:1px;background:var(--hair);margin:32px 0 40px}
+/* content starts on one fixed line under the title */
+.body{position:absolute;left:120px;right:120px;top:340px;bottom:96px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:64px;height:100%;align-items:start}
+.cols.media{grid-template-columns:1.05fr 1fr}
+ul{margin:0;padding:0;list-style:none;display:grid;gap:20px;font-size:34px;line-height:1.35}
+ul li{padding-left:44px;position:relative}
+ul li::before{content:"·";position:absolute;left:0;top:-2px;font-family:Montserrat,sans-serif;font-weight:800;font-size:40px;line-height:1}
+ul li small{display:block;font-size:24px;color:var(--grey);margin-top:4px}
+.pic{width:100%;height:100%;object-fit:cover;display:block;outline:1px solid rgba(0,0,0,.1);outline-offset:-1px}
+.frame{height:100%;overflow:hidden}
+.frame.contain .pic{object-fit:contain;outline:none}
+.stat{display:grid;gap:8px}
+.stat .n{font-family:Montserrat,sans-serif;font-weight:100;font-size:150px;line-height:.95;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.stat .l{font-size:26px;color:var(--grey)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:48px;align-content:start}
+.quote{font-family:Montserrat,sans-serif;font-weight:100;font-size:52px;line-height:1.2;letter-spacing:-.015em}
+.quote+.who{margin-top:24px;color:var(--grey);font-size:24px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:0;height:100%}
+.two>div{padding:0 56px 0 0}
+.two>div+div{padding:0 0 0 56px;border-left:1px solid var(--hair)}
+.two h3{margin:0 0 20px;font:800 22px/1.2 Montserrat,sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.two .src{font-size:22px;color:var(--grey);margin-top:28px;line-height:1.4}
+.foot{position:absolute;left:120px;right:120px;bottom:48px;display:flex;justify-content:space-between;font-size:20px;color:var(--grey)}
+.foot .num{font-variant-numeric:tabular-nums}
+.title .body{top:auto;bottom:120px}
+.title h1{font-size:140px}
+.title .meta{margin-top:40px;font-size:28px;color:var(--grey);line-height:1.5}
+.title .meta b{color:var(--ink);font-family:inherit;font-weight:600}
+.bleed{position:absolute;inset:0}
+.bleed .pic{outline:none}
+.scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(255,255,255,.96) 0%,rgba(255,255,255,.9) 38%,rgba(255,255,255,0) 72%)}
+.end .body{display:grid;place-items:center;text-align:center}
+.end h2{font-size:96px}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  body{background:#fff;overflow:visible}
+  #deck{position:static;display:block}
+  .slide{display:block;position:relative;transform:none!important;page-break-after:always;break-after:page}
+  .help{display:none}
+}
+.help{position:fixed;left:16px;bottom:12px;color:#666;font-size:12px;font-family:-apple-system,system-ui,sans-serif}
+</style>
+</head>
+<body>
+<div id="deck">
+
+<!-- 1 -->
+<section class="slide title">
+  <div class="bleed"><img class="pic" src="img/hudwindow.jpg" alt=""><div class="scrim"></div></div>
+  <div class="body">
+    <p class="eyebrow">CPT report</p>
+    <h1>My time at <b>Eden</b></h1>
+    <p class="meta"><b>Jazlynn Kurniandra</b> · Founding Design Engineer<br>June to October 2026 · San Francisco and New York</p>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <p class="eyebrow">What Eden is</p>
+  <h2>Smart glasses with a tiny screen in the lens, and an assistant called <b>Clover</b>.</h2>
+  <div class="body"><div class="cols media">
+    <div class="frame"><img class="pic" src="img/discovered-0069.jpg" alt=""></div>
+    <ul>
+      <li>No camera. A small green display floats in front of one eye.</li>
+      <li>You speak to it. It answers in one short line you can read at a glance.</li>
+      <li>Clover is the assistant. It lives in the glasses and in an iPhone app.</li>
+      <li>The idea: help arrives before you ask for it.</li>
+    </ul>
+  </div></div>
+  <div class="foot"><span>Eden · Clover</span><span class="num">2</span></div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <p class="eyebrow">What I was hired to do</p>
+  <h2>Nothing existed yet. I built the brand, the app and the display rules <b>from 0 to 1</b>.</h2>
+  <div class="body"><div class="cols">
+    <ul>
+      <li>Decide how the display behaves <small>when it speaks, what it shows, when it stays quiet</small></li>
+      <li>Design the iPhone app that goes with the glasses</li>
+      <li>Create the Eden and Clover identity <small>36 logo explorations, one chosen</small></li>
+      <li>Build prototypes the engineers and the manufacturer could use</li>
+    </ul>
+    <div class="frame"><img class="pic" src="img/sketch-whiteboard.jpg" alt=""></div>
+  </div></div>
+  <div class="foot"><span>Eden · Clover</span><span class="num">3</span></div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <p class="eyebrow">What the work looked like</p>
+  <h2>Seven stages from June to October, with <b>two pivots</b>, both from testing.</h2>
+  <div class="body"><div class="cols media">
+    <div class="frame"><img class="pic" src="img/answered-1740.jpg" alt=""></div>
+    <ul>
+      <li>Studied the other smart glasses on the market <small>Rokid, RayNeo, Even Realities, Google Glass, Meta Ray-Ban</small></li>
+      <li>Ran 8 usability sessions with technical and non-technical people</li>
+      <li>Put the glasses on 52 internal testers and watched what they did</li>
+      <li>Sketched, prototyped, tested, changed course, repeated</li>
+      <li>Synced weekly with industrial design, engineering, the AI researcher and both founders</li>
+    </ul>
+  </div></div>
+  <div class="foot"><span>Eden · Clover</span><span class="num">4</span></div>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <p class="eyebrow">What I found out</p>
+  <h2>People wanted help <b>without being interrupted</b>.</h2>
+  <div class="body"><div class="cols">
+    <div>
+      <p class="quote">“I avoid anything that labels me a technologist. I want hardware that is analog, quiet, and does not ask for my attention.”</p>
+      <p class="who">Data scientist, technical tester, usability session</p>
+    </div>
+    <ul>
+      <li>Testers gave quick moments to the glasses <small>the next meeting, a fast answer</small></li>
+      <li>And everything deliberate to the phone <small>calendar, settings, music, messages</small></li>
+      <li>My rule: proactive on the glasses, intentional in the app</li>
+      <li>Stay quiet until it is worth their attention</li>
+    </ul>
+  </div></div>
+  <div class="foot"><span>Eden · Clover</span><span class="num">5</span></div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <p class="eyebrow">The big change</p>
+  <h2>We shipped a menu of apps. People <b>just talked</b>. So I rebuilt it around what they meant.</h2>
+  <div class="body"><div class="cols media">
+    <div class="frame contain"><img class="pic" src="img/if-p08-1.jpg" alt=""></div>
+    <ul>
+      <li>Version one: open an app, then ask inside it <small>what my founder asked for first</small></li>
+      <li>87% of the 52 testers spoke naturally from the start, not in app commands</li>
+      <li>Version two: say what you need, Clover works out which tool to use</li>
+      <li>“What do I have today?” went from 6 interactions to 2</li>
+      <li>The system grew from 30 use cases to 69</li>
+    </ul>
+  </div></div>
+  <div class="foot"><span>Eden · Clover</span><span class="num">6</span></div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <p class="eyebrow">What shipped</p>
+  <h2>Every result was <b>confirmed by a metric</b>.</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat"><div class="n">52</div><div class="l">internal testers wearing the glasses</div></div>
+      <div class="stat"><div class="n">6 → 2</div><div class="l">interactions per request, from app menu to intent</div></div>
+      <div class="stat"><div class="n">−67%</div><div class="l">unnecessary display interactions, now on the HUD with our manufacturer</div></div>
+    </div>
+    <div class="hair"></div>
+    <ul style="grid-template-columns:1fr 1fr 1fr;font-size:28px">
+      <li>The display system, 69 use cases, failure states included</li>
+      <li>The iPhone app and the Dynamic Island hand-off</li>
+      <li>The Eden and Clover brand</li>
+    </ul>
+  </div>
+  <div class="foot"><span>Eden · Clover</span><span class="num">7</span></div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <p class="eyebrow">The two texts</p>
+  <h2>One measures the <b>cost</b> of interruption. The other builds machines that <b>interrupt on purpose</b>.</h2>
+  <div class="body"><div class="two">
+    <div>
+      <h3>Mark, Gonzalez and Harris, 2005</h3>
+      <ul>
+        <li>Watched 24 office workers in detail</li>
+        <li>57% of their working spheres were interrupted</li>
+        <li>Most interrupted work was picked up again the same day, but only after more than two other activities</li>
+        <li>Attention was already fragmented before any software joined in</li>
+      </ul>
+      <p class="src">No Task Left Behind? Examining the Nature of Fragmented Work. CHI 2005.</p>
+    </div>
+    <div>
+      <h3>Lu and colleagues, 2024</h3>
+      <ul>
+        <li>Train AI agents to offer help before anyone asks</li>
+        <li>A reward model that scores whether an offer would be accepted</li>
+        <li>A benchmark of 6,790 events to practise on</li>
+        <li>Unprompted help is treated as a capability to maximise</li>
+      </ul>
+      <p class="src">Proactive Agent: Shifting LLM Agents from Reactive Responses to Active Assistance. arXiv 2410.12361.</p>
+    </div>
+  </div></div>
+  <div class="foot"><span>Eden · Clover</span><span class="num">8</span></div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <p class="eyebrow">How my work sits between them</p>
+  <h2>Clover is the agent the 2024 paper wants. My testers were the workers the 2005 paper describes.</h2>
+  <div class="body"><div class="two">
+    <div>
+      <h3>From the 2005 paper</h3>
+      <ul>
+        <li>My testers already lived in that fragmented day. Every unprompted line on the display lands in it.</li>
+        <li>So the first design rule was about silence: stay quiet until it is worth their attention.</li>
+        <li>Quick moments on the glasses, deliberate work on the phone, decided by the wearer.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>From the 2024 paper</h3>
+      <ul>
+        <li>Clover anticipates the task from what you say, which is the same move the paper trains for.</li>
+        <li>But my success metric ran the other way: fewer display interactions, not more offers of help.</li>
+        <li>The question I had to answer was not whether Clover could interrupt usefully. It was how often it should.</li>
+      </ul>
+    </div>
+  </div></div>
+  <div class="foot"><span>Eden · Clover</span><span class="num">9</span></div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <p class="eyebrow">What I learned</p>
+  <h2>Quiet is a <b>feature</b>.</h2>
+  <div class="body"><div class="cols media">
+    <ul>
+      <li>Pick one north-star metric. Testing is noisy, one number keeps the design honest.</li>
+      <li>Pivots are the best part. Each one tests a hypothesis for real.</li>
+      <li>The best idea is rarely the first one.</li>
+      <li>Sync early and often. Design, engineering, research and founders all moved faster when they could see the same thing.</li>
+      <li>Measure the cost of attention, not just task success <small>time looking at the display, clarifying questions nobody needed, phone pickups</small></li>
+    </ul>
+    <div class="frame"><img class="pic" src="img/answered-1744.jpg" alt=""></div>
+  </div></div>
+  <div class="foot"><span>Eden · Clover</span><span class="num">10</span></div>
+</section>
+
+<!-- 11 -->
+<section class="slide end">
+  <div class="bleed"><img class="pic" src="img/team-polaroids-3x2.jpg" alt="" style="object-position:center 40%"><div class="scrim" style="background:linear-gradient(to top,rgba(255,255,255,.94) 0%,rgba(255,255,255,.7) 30%,rgba(255,255,255,0) 60%)"></div></div>
+  <div class="body" style="top:auto;bottom:120px;display:block;text-align:left">
+    <h2>Thank you.</h2>
+    <p class="meta" style="margin-top:24px;color:var(--grey)">Jazlynn Kurniandra · jazlynnwashere.com</p>
+  </div>
+</section>
+
+</div>
+<div class="help">← → to move · P to print to PDF</div>
+<script>
+const slides=[...document.querySelectorAll('.slide')];let i=Math.max(0,Math.min(slides.length-1,(+location.hash.slice(1)||1)-1));
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);slides.forEach(el=>el.style.transform=`scale(${s})`)}
+function show(n){i=(n+slides.length)%slides.length;slides.forEach((el,k)=>el.classList.toggle('on',k===i));history.replaceState(null,'','#'+(i+1))}
+addEventListener('resize',fit);fit();show(i);
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown')show(i+1);else if(e.key==='ArrowLeft'||e.key==='PageUp')show(i-1);else if(e.key==='Home')show(0);else if(e.key==='End')show(slides.length-1);else if(e.key==='p'||e.key==='P')print()});
+addEventListener('click',e=>{if(e.clientX>innerWidth/2)show(i+1);else show(i-1)});
+</script>
+</body>
+</html>

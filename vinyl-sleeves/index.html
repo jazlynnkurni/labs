@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sleeve systems</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#FAF9F7;--ink:#14171B;--ink2:rgba(20,23,27,.66);--ink3:rgba(20,23,27,.42);--hair:rgba(20,23,27,.16);--plate:#FAF9F7;--gold:#A99939;--ox:#340414;--char:#1C1A17;--sage:#9ba69c;--mauve:#827a85;--jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+html[data-theme="dark"]{--paper:#1C1A17;--ink:#FAF9F7;--ink2:rgba(250,249,247,.66);--ink3:rgba(250,249,247,.42);--hair:rgba(250,249,247,.16);--plate:#262320}
+html,body{margin:0;background:var(--paper);color:var(--ink);font:300 15.5px/1.62 var(--hel);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:56px 30px 96px}
+.label{font:600 10.5px/1.5 var(--jak);letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+h1{font:500 clamp(28px,4vw,44px)/1.12 var(--jak);letter-spacing:-.012em;margin:12px 0 0;max-width:24ch}
+p.lede{font-size:17px;line-height:1.62;color:var(--ink2);margin:16px 0 0;max-width:62ch}
+section{padding-top:80px}
+section .head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+section h2{font:500 clamp(22px,2.6vw,30px)/1.2 var(--jak);letter-spacing:-.012em;margin:12px 0 0;max-width:26ch}
+section .why{margin:0;max-width:50ch;color:var(--ink2);font-size:15px}
+.row{display:grid;grid-template-columns:repeat(7,1fr);gap:16px;margin-top:32px}
+.rec{position:relative;aspect-ratio:1}
+.rec .disc{position:absolute;top:3%;left:10%;width:94%;height:94%;border-radius:50%;background:radial-gradient(circle at 50% 50%,var(--lab) 0 22%,#15131a 22.5% 23.5%,#2a2730 24% 25%,#15131a 25.5%),repeating-radial-gradient(circle at 50% 50%,#1a181e 0 1.5px,#242128 1.5px 3px);box-shadow:0 2px 4px rgba(0,0,0,.2),0 14px 30px -14px rgba(0,0,0,.5);transition:transform .5s cubic-bezier(.22,1,.36,1)}
+.rec .disc::after{content:"";position:absolute;left:50%;top:50%;width:3.4%;height:3.4%;border-radius:50%;background:var(--paper);transform:translate(-50%,-50%)}
+.rec:hover .disc{transform:translateX(26%) rotate(30deg)}
+.sl{position:absolute;inset:0;border-radius:4px;overflow:hidden;background:#fff;box-shadow:0 0 0 .5px rgba(20,23,27,.10),0 1px 2px rgba(20,23,27,.06),0 10px 24px -8px rgba(20,23,27,.18),0 26px 50px -20px rgba(20,23,27,.26);color:#14171B;transition:transform .45s cubic-bezier(.22,1,.36,1)}
+.rec:hover .sl{transform:translateY(-4px)}
+/* paper grain over every sleeve, the site's wash */
+.sl::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");mix-blend-mode:multiply;opacity:.55}
+.sl .cap{position:absolute;left:0;right:0;bottom:0;padding:0 9% 7%;font:500 9px var(--jak);letter-spacing:.02em;display:flex;justify-content:space-between;align-items:baseline}
+.sl .cap small{font:500 7.5px var(--jak);letter-spacing:.12em;color:rgba(20,23,27,.42)}
+/* the logo, always the same way: one ink, fixed box, never the whole cover */
+.mark{position:absolute;display:grid;place-items:center;overflow:hidden}
+.mark img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.mono img{filter:grayscale(1) contrast(1.15);mix-blend-mode:multiply}
+/* 01 label series */
+.v1 .sl{background:#FAF9F7}
+.v1 .num{position:absolute;left:8%;top:6%;font:300 46% var(--hel);letter-spacing:-.03em;line-height:1;color:#14171B}
+.v1 .num{font-size:calc(var(--s) * .34)}
+.v1 .meta{position:absolute;left:8%;top:45%;font:500 8.5px/1.45 var(--jak);color:rgba(20,23,27,.66);max-width:70%}
+.v1 .meta b{display:block;font-weight:500;color:#14171B;font-size:10px}
+.v1 .mark{right:8%;bottom:8%;width:26%;height:16%}
+/* 02 riso two-ink */
+.v2 .sl{background:#F6F3EC}
+.v2 .mark{left:16%;right:16%;top:16%;bottom:30%;overflow:visible}
+.v2 .mark .k{position:absolute;inset:0;mix-blend-mode:multiply;-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat}
+.v2 .mark .k1{background:var(--sage)}.v2 .mark .k2{background:var(--mauve);transform:translate(1.8px,-1.4px);opacity:.55}
+.v2 .cap{font-size:8.5px}
+/* 03 obi */
+.v3 .sl{background:#FAF9F7}
+.v3 .discs{position:absolute;inset:0}
+.v3 .discs i{position:absolute;border-radius:50%;opacity:.9;mix-blend-mode:multiply}
+.v3 .obi{position:absolute;left:0;top:0;bottom:0;width:26%;background:#FAF9F7;border-right:1px solid rgba(20,23,27,.16);display:flex;flex-direction:column;justify-content:space-between;padding:7% 0;box-sizing:border-box;align-items:center}
+.v3 .obi b{writing-mode:vertical-rl;transform:rotate(180deg);font:500 9px var(--jak);letter-spacing:.06em;color:#14171B;white-space:nowrap}
+.v3 .obi small{writing-mode:vertical-rl;transform:rotate(180deg);font:500 7.5px var(--jak);letter-spacing:.12em;color:rgba(20,23,27,.42)}
+.v3 .mark{right:7%;bottom:7%;width:22%;height:12%}
+/* 04 cells */
+.v4 .sl{background:#FAF9F7}
+.v4 .grid{position:absolute;inset:7%;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);padding:1px 0 0 1px}
+.v4 .grid i{border:1px solid rgba(20,23,27,.16);margin:-1px 0 0 -1px;display:block;font:500 6.5px/1.3 var(--jak);letter-spacing:.08em;text-transform:uppercase;color:rgba(20,23,27,.42);padding:5px 6px;box-sizing:border-box;font-style:normal;overflow:hidden}
+.v4 .grid i.big{grid-column:2/4;grid-row:2/4;padding:12%}
+.v4 .grid i.w2{grid-column:span 2;white-space:nowrap;text-overflow:ellipsis}
+.v4 .grid i.big .mark{position:static;width:100%;height:100%}
+.v4 .grid i b{display:block;font:500 9px var(--jak);color:#14171B;letter-spacing:0;text-transform:none;margin-top:2px}
+.v4 .grid i.fill{background:var(--lab);border-color:var(--lab)}
+/* 05 vellum window */
+.v5 .sl{background:#FAF9F7}
+.v5 .win{position:absolute;left:20%;top:50%;width:60%;aspect-ratio:1;transform:translateY(-50%);border-radius:50%;overflow:hidden;background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 1px rgba(20,23,27,.10),inset 14px 4px 26px -8px rgba(20,23,27,.22),inset -6px -8px 18px -10px rgba(255,255,255,.9),inset 0 10px 30px rgba(255,255,255,.5)}
+.v5 .win .mark{inset:18%}
+.v5 .win .mark img{filter:blur(2.2px) saturate(.7) contrast(.9);opacity:.75;transition:filter .5s ease,opacity .5s ease}
+.v5 .win{transition:background .45s ease}.v5 .tint{transition:opacity .45s ease}
+.v5 .rec:hover .win .mark img,.v5 .sl:hover .win .mark img{filter:none;opacity:1}
+.v5 .rec:hover .win{background:#fff}
+.v5 .rec:hover .tint{opacity:0}
+.v5 .win::after{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");mix-blend-mode:screen;opacity:.9;pointer-events:none;transition:opacity .5s ease}
+.v5 .rec:hover .win::after{opacity:0}
+.v5 .tint{position:absolute;left:20%;top:50%;width:60%;aspect-ratio:1;transform:translateY(-50%);border-radius:50%;background:var(--lab);opacity:.18;mix-blend-mode:multiply;z-index:1;pointer-events:none}
+.tools{display:flex;gap:12px;align-items:center;margin-top:64px}
+label.chk{display:flex;gap:10px;align-items:center;font:500 12.5px var(--jak)}
+</style></head><body>
+<div class="wrap">
+  <div class="label">Sleeve systems · the house decides, the logo visits</div>
+  <h1>Five sleeves that make seven logos one series.</h1>
+  <p class="lede">Seven logos in seven voices will never sit together on their own. A record label solves this with a house sleeve: the type, the paper and the layout are the brand, and whatever the artist brings is held in a fixed place at a fixed size, usually in one ink. Each row below is one house, in the site's own materials: paper, grain, Jakarta labels, Helvetica numbers, hair rules, the eight riso tints, sage and mauve. Hover any sleeve.</p>
+  <div id="rows"></div>
+  <div class="tools"><label class="chk"><input id="dark" type="checkbox"> dark mode</label></div>
+</div>
+<script>
+const P=[
+  {n:'01',t:'Fostr',img:'marks/fostr.png',role:'Founding design engineer',y:'2026',lab:'#9ba69c',tag:'0 → 1 · Web'},
+  {n:'02',t:'Halodoc',img:'marks/halodoc-mark.png',role:'Product designer',y:'2026',lab:'#A99939',tag:'AI · Mobile'},
+  {n:'03',t:'Conduit Commerce',img:'marks/conduit-mark.png',role:'Product design lead',y:'2026',lab:'#340414',tag:'AI · Web'},
+  {n:'04',t:'Second Self',img:'marks/second-self.svg',role:'Design engineer',y:'2026',lab:'#827a85',tag:'Personal · AI'},
+  {n:'05',t:'Manus AI',img:'marks/manus-mark.svg',role:'Product designer',y:'2025',lab:'#1C1A17',tag:'AI · Web'},
+  {n:'06',t:'Olive',img:'marks/olive.png',role:'Product designer',y:'2025',lab:'#9ba69c',tag:'Personal · Mobile'},
+  {n:'07',t:'SomiaCX',img:'marks/somiacx-mark.png',role:'Product designer',y:'2024',lab:'#A99939',tag:'0 → 1 · Mobile'},
+];
+const SW=['#dfddc8','#c7c7c7','#827a85','#9ba69c','#c4c1c8','#dfddc8','#c2beb3','#dfdac8'];
+const V=[
+  { id:'v1', name:'01 · Label series', head:'The number is the cover', why:'Like a catalogue series: a big Helvetica number, the title and role in Jakarta, and the logo as a small one-ink mark in a fixed box at the foot. The eye reads the number first, the name second, the logo last. Seven sleeves, one voice.',
+    sleeve:p=>`<div class="num">${p.n}</div><div class="meta"><b>${p.t}</b>${p.role}<br>${p.y}</div><div class="mark mono"><img src="${p.img}" alt=""></div>` },
+  { id:'v2', name:'02 · Riso print', head:'Two inks, slightly off', why:'Every logo printed as a riso in the signature pair: sage under, mauve over, misregistered by a hair the way a real riso pass is. Colour and texture are the house; the logo keeps its shape and loses its own palette. The site\'s discs are printed the same way.',
+    sleeve:p=>`<div class="mark" style="--m:url('${p.img}')"><div class="k k1"></div><div class="k k2"></div></div><div class="cap"><span>${p.t}</span><small>${p.n}</small></div>` },
+  { id:'v3', name:'03 · Obi', head:'The discs are the cover, the strip is the name', why:'The hero\'s riso discs, a different scatter per project in the eight tints, fill the sleeve; an obi strip down the left carries the title and number vertically, the way Japanese pressings do. The logo is tiny in the corner, one ink. The sleeve is unmistakably the site.',
+    sleeve:(p,i)=>{ const seed=i*7+3; const d=[]; for(let k=0;k<6;k++){ const r=18+((seed*31+k*17)%22), x=20+((seed*13+k*41)%70), y=10+((seed*29+k*23)%75); d.push(`<i style="width:${r}%;height:${r}%;left:${x}%;top:${y}%;background:${SW[(i+k)%SW.length]}"></i>`); }
+      return `<div class="discs">${d.join('')}</div><div class="obi"><b>${p.t}</b><small>${p.n}</small></div><div class="mark mono"><img src="${p.img}" alt=""></div>`; } },
+  { id:'v4', name:'04 · Cells', head:'A spec sheet in closed cells', why:'The site\'s closed-cell grid, four by four. The logo sits in the centre four cells in one ink; the number, year, role and tags fill the others as small caps; one cell takes the project\'s label colour. Reads like a data sheet and keeps every logo the same size.',
+    sleeve:p=>{ const c=[`<i>No<b>${p.n}</b></i>`,`<i>Year<b>${p.y}</b></i>`,`<i class="fill"></i>`,`<i></i>`,`<i></i>`,`<i class="big"><div class="mark mono"><img src="${p.img}" alt=""></div></i>`,`<i></i>`,`<i></i>`,`<i></i>`,`<i class="w2">Role<b>${p.role}</b></i>`,`<i class="w2">Title<b>${p.t}</b></i>`]; return `<div class="grid">${c.join('')}</div>`; } },
+  { id:'v5', name:'05 · Vellum window', head:'Seen through the frost', why:'A round window of frosted vellum, tinted with the project\'s label colour, and the logo behind it, softened and muted so all seven arrive at the same temperature. Hover clears the frost and the true logo comes through. The sleeve stays paper and type.',
+    sleeve:p=>`<div class="tint"></div><div class="win"><div class="mark"><img src="${p.img}" alt=""></div></div><div class="cap"><span>${p.t}</span><small>${p.n}</small></div>` },
+];
+const rows=document.getElementById('rows');
+for(const v of V){
+  const sec=document.createElement('section'); sec.className=v.id;
+  sec.innerHTML=`<div class="head"><div><div class="label">${v.name}</div><h2>${v.head}</h2></div><p class="why">${v.why}</p></div><div class="row"></div>`;
+  const row=sec.querySelector('.row');
+  P.forEach((p,i)=>{ const r=document.createElement('div'); r.className='rec'; r.style.setProperty('--lab',p.lab); r.style.setProperty('--s','150px'); r.innerHTML=`<div class="disc"></div><div class="sl">${v.sleeve(p,i)}</div>`; row.appendChild(r); });
+  rows.appendChild(sec);
+}
+document.getElementById('dark').addEventListener('change',e=>document.documentElement.setAttribute('data-theme',e.target.checked?'dark':'light'));
+</script>
+</body></html>

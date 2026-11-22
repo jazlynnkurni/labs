@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Slide 10 to 11</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600&display=swap">
+<style>
+/* Four ways from slide 10 to slide 11, each the real Manus deck in its own frame */
+*{box-sizing:border-box}html,body{margin:0;background:#0F0E0C;color:#fff;font:13px "Plus Jakarta Sans",sans-serif}
+.top{display:flex;align-items:center;gap:12px;padding:12px 16px}
+.top h1{font:600 16px "Plus Jakarta Sans",sans-serif;margin:0;flex:1}
+button{font:600 13px "Plus Jakarta Sans",sans-serif;padding:8px 14px;border-radius:999px;border:0;background:#fff;color:#340414;cursor:pointer}
+button.p{background:#340414;color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.25)}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 10px 10px}
+.t{position:relative}
+.cap{display:flex;align-items:center;gap:10px;margin:0 0 6px}
+.cap b{font-weight:600}.cap span{color:#b9b4ad;flex:1}
+.box{position:relative;width:100%;aspect-ratio:16/10;overflow:hidden;border-radius:8px;background:#000}
+.box iframe{position:absolute;left:0;top:0;width:1440px;height:900px;border:0;transform-origin:0 0}
+</style></head><body>
+<div class="top"><h1>Slide 10 &rarr; 11, four transitions</h1><button class="p" id="all">Play all</button></div>
+<div class="g">
+<div class="t"><div class="cap"><b>1 &nbsp;Bars become cards</b><span>The bars shrink into the three cards, the gap box grows into the page</span><button data-k="0">Play</button></div><div class="box"><iframe src="variant1.html"></iframe></div></div>
+<div class="t"><div class="cap"><b>2 &nbsp;Bars collapse to lines</b><span>The bars thin into the three lines that point at the page</span><button data-k="1">Play</button></div><div class="box"><iframe src="variant2.html"></iframe></div></div>
+<div class="t"><div class="cap"><b>3 &nbsp;Gap zoom</b><span>The camera pushes into the gap box, which becomes the page</span><button data-k="2">Play</button></div><div class="box"><iframe src="variant3.html"></iframe></div></div>
+<div class="t"><div class="cap"><b>4 &nbsp;Staged slide-up</b><span>Slide 10 leaves row by row, slide 11 arrives row by row</span><button data-k="3">Play</button></div><div class="box"><iframe src="variant4.html"></iframe></div></div>
+</div>
+<script>
+const F=[...document.querySelectorAll('.box iframe')];
+const fit=()=>F.forEach(f=>f.style.transform=`scale(${f.parentNode.clientWidth/1440})`); addEventListener('resize',fit); fit();
+function play(f){ try{ const w=f.contentWindow; w.go(9); setTimeout(()=>w.advance(),1200); }catch(e){} }
+document.querySelectorAll('button[data-k]').forEach(b=>b.onclick=()=>play(F[+b.dataset.k]));
+document.getElementById('all').onclick=()=>F.forEach(play);
+F.forEach(f=>f.addEventListener('load',()=>setTimeout(()=>{ try{ f.contentWindow.go(9); }catch(e){} },1800)));
+</script></body></html>

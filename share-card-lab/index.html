@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Share card</title>
+<style>
+  :root{color-scheme:light;--ink:#111;--mute:#6b6b6b;--line:rgba(0,0,0,.1)}
+  *{box-sizing:border-box}
+  html{-webkit-font-smoothing:antialiased}
+  body{margin:0;background:#f2f2f2;color:var(--ink);font:15px/1.4 -apple-system,"SF Pro Text",system-ui,sans-serif;padding:64px 24px 96px}
+  h1{font-weight:500;font-size:20px;margin:0 0 8px;text-wrap:balance}
+  .lede{color:var(--mute);margin:0 0 48px}
+  .wrap{max-width:1280px;margin:0 auto}
+  .grid{display:grid;gap:48px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));align-items:start}
+  .cap{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.04em;margin:0 0 16px}
+  .card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.06),0 1px 2px -1px rgba(0,0,0,.06),0 2px 4px 0 rgba(0,0,0,.04)}
+  .card img{display:block;width:100%;aspect-ratio:1200/630;object-fit:cover;outline:1px solid rgba(0,0,0,.1);outline-offset:-1px}
+  .meta{padding:12px 16px 14px}
+  .t{font-weight:600;font-size:15px}
+  .d{color:var(--mute);font-size:13px;margin-top:2px}
+  /* iMessage: card inside a grey bubble, right aligned */
+  .imsg{background:#fff;border-radius:24px;padding:24px 16px 24px 80px;min-height:360px;display:flex;align-items:flex-end;justify-content:flex-end}
+  .imsg .card{width:100%;max-width:300px;border-radius:18px}
+  .imsg .meta{background:#e9e9eb}
+  /* X: rounded card with domain pill over the image */
+  .x .card{border-radius:16px;position:relative}
+  .x .pill{position:absolute;left:12px;bottom:12px;background:rgba(0,0,0,.72);color:#fff;font-size:13px;padding:2px 8px;border-radius:4px}
+  .x .imgwrap{position:relative}
+  .x .dom{color:var(--mute);font-size:13px;padding:8px 0 0}
+  /* Slack / LinkedIn: left rule, text above image */
+  .slack .card{border-radius:8px;box-shadow:none;border-left:4px solid #ddd;padding:8px 12px 12px;background:transparent}
+  .slack .meta{padding:0 0 8px}
+  .slack .card img{border-radius:8px;max-width:360px}
+  /* browser tab */
+  .tab{background:#fff;border-radius:12px;padding:16px;display:flex;gap:12px;align-items:center}
+  .tab .pane{background:#e9e9eb;border-radius:8px;padding:8px 12px;display:flex;gap:8px;align-items:center;font-size:13px;min-width:0}
+  .tab .pane.on{background:#fff;box-shadow:0 0 0 1px var(--line)}
+  .tab img{width:16px;height:16px}
+  .tab .home{width:60px;height:60px;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+  .tab .home img{width:60px;height:60px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>How the link lands</h1>
+  <p class="lede">Everything is pulled live from localhost:3001, so what you see here is what the site serves. Refresh after a change.</p>
+  <div class="grid">
+    <section>
+      <p class="cap">iMessage</p>
+      <div class="imsg">
+        <div class="card">
+          <img src="http://localhost:3001/og.png" alt="">
+          <div class="meta"><div class="t">Jazlynn Kurniandra</div><div class="d">jazlynnwashere.com</div></div>
+        </div>
+      </div>
+    </section>
+    <section class="x">
+      <p class="cap">X</p>
+      <div class="card">
+        <div class="imgwrap"><img src="http://localhost:3001/og.png" alt=""><span class="pill">Jazlynn Kurniandra</span></div>
+      </div>
+      <div class="dom">From jazlynnwashere.com</div>
+    </section>
+    <section class="slack">
+      <p class="cap">Slack, LinkedIn, Notion</p>
+      <div class="card">
+        <div class="meta"><div class="t">Jazlynn Kurniandra</div><div class="d">jazlynnwashere.com</div></div>
+        <img src="http://localhost:3001/og.png" alt="">
+      </div>
+    </section>
+    <section>
+      <p class="cap">Browser tab and home screen</p>
+      <div class="tab">
+        <div class="pane on"><img src="http://localhost:3001/favicon.png" alt="">Jazlynn Kurniandra</div>
+        <div class="pane"><span style="width:16px;height:16px;border-radius:4px;background:#ccc;display:inline-block"></span>New Tab</div>
+        <div style="flex:1"></div>
+        <div class="home"><img src="http://localhost:3001/apple-touch-icon.png" alt=""></div>
+      </div>
+    </section>
+  </div>
+</div>
+</body>
+</html>

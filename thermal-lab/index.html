@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>thermal-lab · hover</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+/* thermal-lab: a black page with a person standing in it that you cannot
+   see. rest the cursor somewhere on them and heat seeps in, slowly, and
+   spreads along the body: the figure surfaces through the thermal ramp
+   (black, blue, magenta, orange, yellow) and cools back to black when
+   you leave. the heat is a diffusion on a coarse grid, masked to the
+   figure so it conducts along the body and barely spills off it.       */
+(() => {
+const canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
+const CELL = 5;                       // one sim cell is about this many css px: a thermal camera is low-res anyway
+let W = 0, H = 0, cols = 0, rows = 0, DPR = 1;
+let heat, next, mask, img, small, sctx;
+
+/* the figure: the runner lifted from Poster.jpeg (the sprayed-ink silhouette, running left),
+   drawn into a small canvas at sim resolution and read back as a soft mask              */
+const runner = new Image(); runner.src = 'runner.png';
+runner.onload = () => { if (cols) buildMask(); };
+function buildMask() {
+  mask = new Float32Array(cols * rows);
+  if (!runner.complete || !runner.naturalWidth) return;             // not here yet: onload builds it
+  const m = document.createElement('canvas'); m.width = cols; m.height = rows;
+  const c = m.getContext('2d');
+  const F = rows * 0.80, top = rows * 0.10;                           // figure height and placement
+  const w = F * runner.naturalWidth / runner.naturalHeight;
+  c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
+  c.drawImage(runner, (cols - w) / 2, top, w, F);
+  const d = c.getImageData(0, 0, cols, rows).data;
+  for (let i = 0; i < mask.length; i++) { const v = (d[i * 4] / 255 - 0.28) / 0.32; mask[i] = v <= 0 ? 0 : v >= 1 ? 1 : v * v * (3 - 2 * v); }   // the ink's lighter patches are still body: solid inside, soft only at the edge
+}
+
+/* the thermal ramps: cold to hot as colour stops, each built into a 256-entry table. they are not picked, they merge */
+const RAMPS = [
+  { name: 'Ironbow', stops: [[0, 0, 0, 0], [0.14, 16, 4, 92], [0.30, 92, 10, 170], [0.46, 196, 18, 150], [0.60, 255, 46, 130], [0.74, 255, 120, 50], [0.88, 255, 214, 60], [1, 255, 250, 200]] },
+  { name: 'Rainbow', stops: [[0, 0, 0, 0], [0.12, 10, 10, 120], [0.28, 0, 70, 230], [0.42, 0, 190, 220], [0.56, 40, 210, 60], [0.70, 240, 230, 30], [0.84, 250, 110, 20], [0.94, 230, 20, 20], [1, 255, 235, 235]] },
+  { name: 'Lava', stops: [[0, 0, 0, 0], [0.20, 60, 0, 0], [0.42, 170, 10, 0], [0.62, 255, 70, 0], [0.80, 255, 170, 20], [0.92, 255, 235, 110], [1, 255, 255, 240]] },
+  { name: 'Arctic', stops: [[0, 0, 0, 0], [0.18, 6, 20, 60], [0.40, 10, 70, 170], [0.62, 30, 160, 235], [0.80, 120, 220, 250], [1, 245, 252, 255]] },
+  { name: 'Night', stops: [[0, 0, 0, 0], [0.22, 0, 40, 10], [0.48, 10, 120, 30], [0.70, 60, 210, 70], [0.86, 190, 245, 120], [1, 250, 255, 230]] },
+  { name: 'White hot', stops: [[0, 0, 0, 0], [0.35, 70, 70, 74], [0.70, 170, 170, 176], [1, 255, 255, 255]] },
+];
+function buildLUT(stops) {
+  const L = new Uint8ClampedArray(256 * 3);
+  for (let i = 0; i < 256; i++) {
+    const t = i / 255; let k = 0; while (k < stops.length - 2 && t > stops[k + 1][0]) k++;
+    const a = stops[k], b = stops[k + 1], u = (t - a[0]) / (b[0] - a[0]);
+    L[i * 3] = a[1] + (b[1] - a[1]) * u; L[i * 3 + 1] = a[2] + (b[2] - a[2]) * u; L[i * 3 + 2] = a[3] + (b[3] - a[3]) * u;
+  }
+  return L;
+}
+for (const r of RAMPS) r.lut = buildLUT(r.stops);
+const MERGE = RAMPS.slice(0, 5);                       // the colour ones merge; white hot would read as a grey patch
+/* the hue field: where on the ring of ramps each cell sits, from soft noise, so the
+   colours merge into one another across the body and drift slowly with time       */
+let hue;
+const hash2 = (i, j) => { const v = Math.sin(i * 127.1 + j * 311.7) * 43758.5453; return v - Math.floor(v); };
+function vnoise(x, y) {
+  const xi = Math.floor(x), yi = Math.floor(y); let fx = x - xi, fy = y - yi;
+  fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy);
+  const a = hash2(xi, yi), b = hash2(xi + 1, yi), c = hash2(xi, yi + 1), d = hash2(xi + 1, yi + 1);
+  return a + (b - a) * fx + (c - a) * fy + (a - b - c + d) * fx * fy;
+}
+function buildHue() {
+  hue = new Float32Array(cols * rows);
+  for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++)
+    hue[y * cols + x] = 0.65 * vnoise(x / 28 + 3.1, y / 28 + 7.7) + 0.35 * vnoise(x / 11 + 9.2, y / 11 + 1.4);
+}
+
+function setup() {
+  if (innerWidth < 2 || innerHeight < 2) return;
+  W = innerWidth; H = innerHeight; DPR = Math.min(2, devicePixelRatio || 1);
+  canvas.width = W * DPR; canvas.height = H * DPR;
+  cols = Math.ceil(W / CELL); rows = Math.ceil(H / CELL);
+  heat = new Float32Array(cols * rows); next = new Float32Array(cols * rows);
+  small = document.createElement('canvas'); small.width = cols; small.height = rows; sctx = small.getContext('2d');
+  img = sctx.createImageData(cols, rows);
+  buildMask(); buildHue();
+}
+
+/* the cursor: where it is, and how long it has rested there */
+let cx = -1, cy = -1, hold = 0, inside = false;
+const park = (new URLSearchParams(location.search).get('hover') || '').split(',').map(Number);   // ?hover=0.5,0.35 rests the cursor there, for checks
+if (park.length === 2 && !isNaN(park[0])) { addEventListener('resize', () => { cx = park[0] * innerWidth; cy = park[1] * innerHeight; }); cx = park[0] * innerWidth; cy = park[1] * innerHeight; inside = true; }
+const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+addEventListener(fine ? 'pointermove' : 'pointerdown', e => { cx = e.clientX; cy = e.clientY; inside = true; }, { passive: true });
+document.addEventListener('pointerleave', () => { inside = false; });
+
+let last = performance.now();
+function frame(now) {
+  if (innerWidth !== W || innerHeight !== H) setup();
+  if (!cols) { requestAnimationFrame(frame); return; }
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  sim(dt); draw();
+  requestAnimationFrame(frame);
+}
+window.thermal = { advance(sec) { if (!cols) setup(); for (let t = 0; t < sec; t += 1 / 60) sim(1 / 60); draw(); }, stats() { let ms = 0, hs = 0, hm = 0; for (let i = 0; i < mask.length; i++) { ms += mask[i]; hs += heat[i]; if (heat[i] > hm) hm = heat[i]; } return { cols, rows, maskSum: ms, heatSum: hs, heatMax: hm, cx, cy, hold, inside }; } };   // for checks: step the heat forward without waiting
+function sim(dt) {
+
+  /* pour heat in under the cursor. it builds up slowly the longer you rest there,
+     lands on the body (and only faintly beside it), in a soft round patch         */
+  hold = inside ? Math.min(1, hold + dt / 1.6) : 0;
+  if (inside) {
+    const gx = cx / CELL, gy = cy / CELL, R = 7;
+    const amount = 14 * dt * hold * hold;                       // generous: the body conducts it away fast
+    for (let y = Math.max(0, Math.floor(gy - R)); y <= Math.min(rows - 1, Math.ceil(gy + R)); y++)
+      for (let x = Math.max(0, Math.floor(gx - R)); x <= Math.min(cols - 1, Math.ceil(gx + R)); x++) {
+        const d2 = ((x - gx) ** 2 + (y - gy) ** 2) / (R * R); if (d2 > 1) continue;
+        const i = y * cols + x, g = Math.exp(-d2 * 3.0);
+        heat[i] = Math.min(1, heat[i] + amount * g * (0.04 + 0.96 * mask[i]));
+      }
+  }
+  /* conduct: heat spreads along the body, and leaks away everywhere, faster off the body */
+  for (let pass = 0; pass < 14; pass++) {
+    for (let y = 1; y < rows - 1; y++) for (let x = 1; x < cols - 1; x++) {
+      const i = y * cols + x, m = mask[i];
+      const n = heat[i - 1] + heat[i + 1] + heat[i - cols] + heat[i + cols];
+      const k = 0.05 + 0.45 * m;                                   // conducts fast through the body, barely through air
+      let v = heat[i] + k * (n * 0.25 - heat[i]);
+      v *= 0.9997 - 0.04 * (1 - m);                                 // holds its heat on the body, loses it quickly beside it
+      next[i] = v;
+    }
+    [heat, next] = [next, heat];
+  }
+}
+function draw() {
+  /* the ramp, with the faint shimmer of a live camera */
+  const d = img.data;
+  const N = MERGE.length, drift = performance.now() * 0.000012;
+  for (let i = 0; i < heat.length; i++) {
+    const v = Math.min(255, Math.max(0, Math.pow(heat[i] + (Math.random() - 0.5) * 0.02 * heat[i], 0.62) * 255)) | 0;   // lifted: faint warmth already reads as blue and purple
+    if (!v) { d[i * 4] = d[i * 4 + 1] = d[i * 4 + 2] = 0; d[i * 4 + 3] = 255; continue; }
+    const p = ((hue[i] + drift) % 1) * N, ai = Math.floor(p) % N, bi = (ai + 1) % N, f = p - Math.floor(p);
+    const A = MERGE[ai].lut, B = MERGE[bi].lut, k = v * 3;
+    d[i * 4] = A[k] + (B[k] - A[k]) * f; d[i * 4 + 1] = A[k + 1] + (B[k + 1] - A[k + 1]) * f; d[i * 4 + 2] = A[k + 2] + (B[k + 2] - A[k + 2]) * f; d[i * 4 + 3] = 255;
+  }
+  sctx.putImageData(img, 0, 0);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';   // the diffusion is already soft; bilinear upscaling is all it needs
+  ctx.drawImage(small, 0, 0, cols * CELL, rows * CELL);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

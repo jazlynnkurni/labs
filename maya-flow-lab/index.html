@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maya flow lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Slide 20 split in two. 20: Maya asks "What do I have today?" under navigation-first and under the fused, intent-first
+   HUD (6 interactions down to 2). 21: the intent system itself. One visual system across both, and the transition. */
+:root{--ink:#14171B;--plum:#340414;--gold:#A99939;--hair:rgba(20,23,27,.12);--mute:#6f6b64;--green:#6F7C70;
+  --sage:#9ba69c;--mauve:#827a85;--sage-lt:rgba(214,222,215,.9);--mauve-lt:rgba(222,216,224,.9);
+  --jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1340px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+h2{font:600 18px var(--jak);margin:34px 0 6px}
+.lede{color:#6f6b64;margin:0 0 22px;max-width:96ch}
+.sys{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:30px}
+.sys div{background:#fff;border-radius:12px;padding:12px;font:500 12.5px/1.4 var(--jak)}
+.sys div b{display:block;font:600 11px var(--jak);letter-spacing:.06em;text-transform:uppercase;color:var(--plum);margin-bottom:8px}
+.opt{margin-bottom:40px}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0 0 10px}
+.lab small{font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:#6f6b64;margin-left:8px}
+.lab button{margin-left:10px;font:600 11.5px var(--jak);padding:6px 11px;border-radius:999px;border:1.5px solid var(--plum);background:#fff;color:var(--plum);cursor:pointer;text-transform:none;letter-spacing:0}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 18px 40px -24px rgba(0,0,0,.3);overflow:hidden;position:relative}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:52px 72px 0;position:absolute;left:0;top:0;background:#fff}
+.hd{font:500 42px/1.12 var(--jak);letter-spacing:-.02em;margin:0;max-width:30ch;height:96px}
+.hd em{font-style:normal;color:var(--plum)}
+.body{position:absolute;left:72px;right:72px;top:180px;height:440px}
+.ft{position:absolute;left:72px;right:72px;bottom:40px;border-top:1px solid var(--hair);padding-top:12px;display:flex;justify-content:space-between;font:400 13px var(--hel)}
+.ft span:first-child{color:var(--plum)}
+.tag{font:600 13px/1.4 var(--jak);letter-spacing:.06em;text-transform:uppercase;color:#8a8780}.tag.p{color:var(--plum)}
+.num{font:500 56px/1 var(--jak);letter-spacing:-.03em;color:var(--plum)}
+
+/* THE VISUAL SYSTEM for this pair of slides */
+/* Maya, as on her card: the portrait in a sage glass ring */
+.maya{display:flex;align-items:center;gap:12px}
+.maya .pic{height:64px;border-radius:14px;padding:3px;background:linear-gradient(145deg,#fff,rgba(155,166,156,.62));box-shadow:0 8px 18px -8px rgba(52,4,20,.35)}
+.maya .pic img{display:block;height:100%;aspect-ratio:345/538;object-fit:contain;border-radius:11px;background:#fff}
+.maya b{display:block;font:500 22px/1.1 var(--jak);color:var(--plum)}
+.ask{display:inline-block;position:relative;font:500 16px/1.3 var(--jak);padding:10px 14px;border-radius:16px 16px 16px 4px;
+  background:linear-gradient(160deg,#fff,var(--sage-lt));box-shadow:inset 1px 1px 1px #fff,0 0 0 1px rgba(20,23,27,.06),0 10px 20px -12px rgba(52,4,20,.35)}
+/* a HUD frame: what she sees in the lens, dark glass */
+.hud{position:relative;width:118px;height:78px;border-radius:12px;background:#0E1013;box-shadow:0 0 0 1px rgba(255,255,255,.06) inset,0 10px 20px -12px rgba(0,0,0,.6);overflow:hidden;flex:none}
+.hud *{position:absolute}
+.hud .g{left:10px;top:10px;right:10px;bottom:10px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.hud .g i{position:static;border-radius:5px;background:rgba(232,240,220,.16)}
+.hud .g i.on{background:rgba(157,176,122,.9)}
+.hud .l{left:10px;right:10px;height:6px;border-radius:3px;background:rgba(232,240,220,.22)}
+.hud .l.on{background:rgba(157,176,122,.9)}
+.hud .t{left:10px;top:9px;font:600 8.5px var(--jak);color:#E8F0DC;letter-spacing:.02em}
+.hud .card{left:10px;right:10px;top:16px;bottom:16px;border-radius:8px;border:1px solid rgba(157,176,122,.7);padding:6px 8px}
+.hud .card span{position:static;display:block;font:600 8.5px/1.45 var(--jak);color:#E8F0DC}
+.hud .card span.d{opacity:.6;font-weight:500}
+.hud .sc{right:5px;top:18px;width:3px;height:30px;border-radius:2px;background:rgba(232,240,220,.35)}
+/* a step: HUD frame, its plum count bead, and the action in a few words */
+.st{display:flex;flex-direction:column;align-items:center;gap:7px;width:118px}
+.st .k{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;font:600 11px var(--jak);color:#fff;
+  background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.6),rgba(255,255,255,0) 70%),radial-gradient(circle at 50% 65%,#6a2a3f,#340414 70%);box-shadow:0 3px 6px -2px rgba(52,4,20,.5)}
+.st .k.g{background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.6),rgba(255,255,255,0) 70%),radial-gradient(circle at 50% 65%,#c9a33a,#A99939 75%)}
+.st p{margin:0;font:500 12px/1.3 var(--jak);text-align:center;color:var(--ink)}
+.row{position:relative;display:flex;align-items:flex-start;gap:14px}
+.row .ln{position:absolute;left:59px;right:59px;top:39px;height:2px;background:var(--green);z-index:0}
+.row .ln.gd{background:repeating-linear-gradient(90deg,var(--gold) 0 5px,transparent 5px 10px)}
+.row .st{position:relative;z-index:1}
+.lbl{font:600 13px/1.4 var(--jak);letter-spacing:.06em;text-transform:uppercase;color:#8a8780}
+.cnt{display:flex;align-items:baseline;gap:8px}
+.cnt b{font:500 44px/1 var(--jak);color:var(--plum);letter-spacing:-.03em}.cnt span{font:500 13px var(--jak);color:var(--mute)}
+.v{position:relative;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 14px 28px -18px rgba(20,23,27,.5)}
+.v video{display:block;width:100%;height:100%;object-fit:contain}.v.b{aspect-ratio:1440/860}.v.a{aspect-ratio:1372/750}
+
+@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.play .an{animation:up .5s ease both}.play .pp{animation:pop .5s cubic-bezier(.33,1.18,.37,1) both}.play .gr{transform-origin:left;animation:grow .9s cubic-bezier(.3,.7,.2,1) both}
+
+/* 20-A: two rows, before and after */
+.a20{display:grid;grid-template-columns:200px 1fr 130px;gap:22px;height:100%}
+.a20 .who{display:flex;flex-direction:column;gap:14px}
+.a20 .rows{display:flex;flex-direction:column;gap:26px}
+.a20 .side{display:flex;flex-direction:column;justify-content:space-around;align-items:flex-end}
+/* 20-B: two columns, the before column visibly taller */
+.b20{display:grid;grid-template-columns:240px 1fr 1fr;gap:34px;height:100%}
+.b20 .col{position:relative;display:flex;flex-direction:column;gap:10px}
+.b20 .col .st{flex-direction:row;width:auto;align-items:center;gap:10px}
+.b20 .col .st p{text-align:left}
+.b20 .col .hud{width:84px;height:54px}
+.b20 .col .vl{position:absolute;left:41px;top:58px;bottom:30px;width:2px;background:var(--gold)}
+.b20 .col.af .vl{background:var(--green);bottom:auto;height:60px}
+/* 20-C: one line, both journeys race along it */
+.c20{display:flex;flex-direction:column;gap:20px;height:100%}
+.c20 .top{display:flex;align-items:center;gap:22px}
+</style></head><body>
+<div class="wrap">
+<h1>Maya flow lab</h1>
+<p class="lede">Slide 20 split in two. Slide 20 puts Maya through one moment twice: "What do I have today?" under navigation-first (6 interactions) and under the fused, intent-first HUD (2), which is where your &minus;67% comes from. Slide 21 is then only about the intent system. Below: the visual system they share, three options for slide 20, slide 21, and the transition between them (Play the last frame).</p>
+
+<div class="sys">
+<div><b>Maya</b>Portrait in the sage ring from her card, with her question in a sage glass bubble.</div>
+<div><b>HUD frame</b>Dark glass tile showing what she sees in the lens; sage green for what is lit.</div>
+<div><b>Step bead</b>Plum numbered bead per interaction; a gold bead where it breaks.</div>
+<div><b>Line</b>Green where the flow works; dashed gold where it struggles.</div>
+<div><b>Count</b>Plum number for interactions: 6, then 2, matching the &minus;67% slide.</div>
+<div><b>Glass</b>Sage for the glasses, mauve for the phone, mixed for the system.</div>
+</div>
+<div id="opts"></div>
+</div>
+<script>
+const H={
+ dash:'<div class="hud"><div class="g"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>',
+ pick:'<div class="hud"><div class="g"><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>',
+ cal:'<div class="hud"><span class="t">Calendar</span><i class="l" style="top:24px"></i><i class="l" style="top:36px"></i><i class="l" style="top:48px"></i><i class="sc"></i></div>',
+ day:'<div class="hud"><span class="t">Today</span><i class="l on" style="top:24px"></i><i class="l" style="top:36px"></i><i class="l" style="top:48px"></i><i class="sc" style="top:26px"></i></div>',
+ scroll:'<div class="hud"><span class="t">Today</span><i class="l" style="top:20px"></i><i class="l on" style="top:32px"></i><i class="l" style="top:44px"></i><i class="l" style="top:56px"></i><i class="sc" style="top:36px"></i></div>',
+ back:'<div class="hud"><div class="g"><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i></div></div>',
+ ask:'<div class="hud"><span class="t" style="color:#9DB07A">Listening</span><i class="l on" style="top:30px;right:40px"></i><i class="l" style="top:42px;right:60px"></i></div>',
+ glance:'<div class="hud"><div class="card"><span>9:00 Studio crit</span><span class="d">11:15 Kim, follow&#8209;up</span><span class="d">12:00 Classes</span></div></div>'};
+const BEFORE=[['dash','Wakes the dashboard'],['pick','Scrolls to Calendar'],['cal','Opens Calendar'],['day','Switches to today'],['scroll','Scrolls the list'],['back','Backs out for the next app']];
+const AFTER=[['ask','Asks Clover'],['glance','Glances at her day']];
+const maya='<div class="maya"><span class="pic"><img src="media/maya.jpg" alt=""></span><div><span class="tag">Maya, 8:30</span><b>Leaving home</b></div></div>';
+const ask='<span class="ask">&ldquo;What do I have today?&rdquo;</span>';
+const step=([h,t],n,g)=>`<div class="st pp" data-d="${(.5+n*.18).toFixed(2)}">${H[h]}<span class="k ${g?'g':''}">${n+1}</span><p>${t}</p></div>`;
+const head20='<p class="hd">For Maya, the same question <em>went from six interactions to two.</em></p>';
+const frame=(h,b,n)=>`<div class="frame"><div class="sl">${h}<div class="body">${b}</div><div class="ft"><span>${n} &nbsp; Testing</span><span>Eden Case Study</span></div></div></div>`;
+const O=[
+ ['20 &middot; A','Two rows','Maya and her question on the left; the six navigation-first steps on a dashed gold line, the two intent-first steps on a green one; the counts on the right.',frame(head20,
+  `<div class="a20"><div class="who an" data-d=".2">${maya}${ask}</div>
+   <div class="rows"><div><span class="lbl">Navigation&#8209;first</span><div class="row" style="margin-top:10px"><i class="ln gd gr" data-d=".4"></i>${BEFORE.map((s,n)=>step(s,n,n>=3)).join('')}</div></div>
+   <div><span class="lbl" style="color:#340414">Fused, intent&#8209;first</span><div class="row" style="margin-top:10px"><i class="ln gr" data-d="1.7" style="right:auto;width:132px"></i>${AFTER.map((s,n)=>`<div class="st pp" data-d="${(1.8+n*.2).toFixed(2)}">${H[s[0]]}<span class="k">${n+1}</span><p>${s[1]}</p></div>`).join('')}</div></div></div>
+   <div class="side"><div class="cnt an" data-d="1.5"><b>6</b><span>interactions</span></div><div class="cnt an" data-d="2.3"><b>2</b><span>interactions</span></div></div></div>`,20)],
+ ['20 &middot; B','Tall and short','The two journeys as columns: the navigation-first column runs long, the intent-first one stops after two. The height is the argument.',frame(head20,
+  `<div class="b20"><div class="an" data-d=".2" style="display:flex;flex-direction:column;gap:14px">${maya}${ask}<div class="cnt" style="margin-top:20px"><b>&minus;67%</b></div><span class="tag">interactions per request</span></div>
+   <div class="col"><span class="lbl">Navigation&#8209;first &middot; 6</span><i class="vl"></i>${BEFORE.map((s,n)=>step(s,n,n>=3)).join('')}</div>
+   <div class="col af"><span class="lbl" style="color:#340414">Intent&#8209;first &middot; 2</span><i class="vl"></i>${AFTER.map((s,n)=>`<div class="st pp" data-d="${(1.6+n*.2).toFixed(2)}">${H[s[0]]}<span class="k">${n+1}</span><p>${s[1]}</p></div>`).join('')}</div></div>`,20)],
+ ['20 &middot; C','The race','Maya asks once; both journeys start together on their lines; intent-first arrives after two steps and lights up while navigation-first is still going.',frame(head20,
+  `<div class="c20"><div class="top an" data-d=".2">${maya}${ask}</div>
+   <div><span class="lbl" style="color:#340414">Fused, intent&#8209;first</span><div class="row" style="margin-top:10px"><i class="ln gr" data-d=".6" style="right:auto;width:132px"></i>${AFTER.map((s,n)=>`<div class="st pp" data-d="${(.7+n*.35).toFixed(2)}">${H[s[0]]}<span class="k">${n+1}</span><p>${s[1]}</p></div>`).join('')}<div class="cnt pp" data-d="1.5" style="margin:22px 0 0 18px"><b>2</b><span>done</span></div></div></div>
+   <div><span class="lbl">Navigation&#8209;first</span><div class="row" style="margin-top:10px"><i class="ln gd gr" data-d=".6"></i>${BEFORE.map((s,n)=>`<div class="st pp" data-d="${(.7+n*.35).toFixed(2)}">${H[s[0]]}<span class="k ${n>=3?'g':''}">${n+1}</span><p>${s[1]}</p></div>`).join('')}</div></div></div>`,20)],
+ ['21','The intent system','The other slide, only about what you built: the fused HUD system, 30 use cases growing to 69, and 95% coming from small components.',frame('<p class="hd">That ran on one HUD system <em>built from small, minimal components.</em></p>',
+  `<div style="display:grid;grid-template-columns:520px 1fr;gap:40px;height:100%">
+   <div class="sys21 an" data-d=".2"><div class="v b"><video src="media/hudsystem.mp4" poster="media/hudsystem.jpg" muted loop autoplay playsinline></video></div></div>
+   <div style="display:flex;flex-direction:column;gap:22px">
+    <div class="an" data-d=".5"><span class="lbl">Use cases covered</span><div style="display:flex;align-items:baseline;gap:12px;margin-top:6px"><span class="num" style="font-size:40px;color:#8a8780">30</span><span style="color:#6F7C70;font:600 20px var(--jak)">&rarr;</span><span class="num">69</span></div>
+     <div style="height:12px;border-radius:999px;background:rgba(20,23,27,.06);margin-top:10px;overflow:hidden;position:relative"><i class="gr" data-d=".9" style="position:absolute;left:0;top:0;bottom:0;width:100%;border-radius:999px;background:linear-gradient(90deg,#9ba69c,#827a85)"></i><i style="position:absolute;left:43.5%;top:-3px;bottom:-3px;width:2px;background:#fff"></i></div>
+     <div style="display:flex;justify-content:space-between;font:500 12px var(--jak);color:#6f6b64;margin-top:6px"><span>Navigation&#8209;first: 30</span><span>Fused: 69</span></div></div>
+    <div class="an" data-d="1.2"><span class="lbl">From small components</span><div style="display:grid;grid-template-columns:repeat(20,1fr);gap:4px;margin-top:10px">${Array.from({length:100},(_,k)=>`<i class="pp" data-d="${(1.3+k*.01).toFixed(2)}" style="aspect-ratio:1;border-radius:5px;${k<95?'background:linear-gradient(160deg,#fff,rgba(214,222,215,.9) 55%,rgba(222,216,224,.9));box-shadow:inset 1px 1px 1px #fff,0 0 0 1px rgba(20,23,27,.06)':'box-shadow:inset 0 0 0 1.5px rgba(20,23,27,.12)'}"></i>`).join('')}</div>
+     <div style="display:flex;align-items:baseline;gap:10px;margin-top:10px"><span class="num" style="font-size:36px">95%</span><span class="tag p">of use cases</span></div></div>
+   </div></div>`,21)],
+ ['20 &rarr; 21','The transition','Press Play: slide 20 (option A) plays, everything but Maya’s final glanceable card fades, the card grows and flies into the HUD system video on 21, and 21 builds around it.',
+  `<div class="frame" id="tr"><div class="sl" id="trA"></div><div class="sl" id="trB" style="opacity:0"></div></div>`]];
+document.getElementById('opts').innerHTML=O.map(([n,t,ds,h],k)=>`<section class="opt" id="o${k}"><p class="lab">${n} ${t}<small>${ds}</small><button data-k="${k}">Play</button></p>${h}</section>`).join('');
+/* the transition demo: copies of 20-A and 21 */
+const A=document.querySelector('#o0 .sl').innerHTML, B=document.querySelector('#o3 .sl').innerHTML;
+const trA=document.getElementById('trA'), trB=document.getElementById('trB'); trA.innerHTML=A; trB.innerHTML=B;
+const fit=()=>document.querySelectorAll('.frame').forEach(f=>[...f.querySelectorAll(':scope>.sl')].forEach(s=>s.style.transform=`scale(${f.clientWidth/1280})`));
+addEventListener('resize',fit);fit();
+const delays=()=>document.querySelectorAll('[data-d]').forEach(e=>e.style.animationDelay=e.dataset.d+'s'); delays();
+const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2, cl=t=>Math.max(0,Math.min(1,t));
+function playTr(){ const sec=document.getElementById('o4'); trA.style.opacity='1'; trB.style.opacity='0'; [trA,trB].forEach(s=>{s.classList.remove('play');void s.offsetWidth;});
+  sec.classList.remove('play'); trA.classList.add('play');
+  [...trA.querySelectorAll('*')].forEach(e=>{e.style.opacity='';e.style.transform='';});
+  const card=trA.querySelectorAll('.a20 .rows .row')[1].querySelectorAll('.hud')[1], vid=trB.querySelector('.v.b');
+  setTimeout(()=>{ const k=document.querySelector('#tr').clientWidth/1280, fr=document.querySelector('#tr').getBoundingClientRect();
+    const r=e=>{const b=e.getBoundingClientRect();return {x:(b.left-fr.left)/k,y:(b.top-fr.top)/k,w:b.width/k,h:b.height/k}};
+    const c0=r(card), v1=(()=>{trB.style.visibility='hidden';trB.style.opacity='1';const v=r(vid);trB.style.opacity='0';trB.style.visibility='';return v})();
+    const others=[...trA.querySelector('.sl > .body, .body').querySelectorAll('.who, .rows > div:first-child, .side, .lbl, .st p, .st .k, .ln')].concat([trA.querySelector('.hd')]);
+    const keep=card.closest('.st'); trA.querySelectorAll('*').forEach(e=>e.style.animation='none');   /* entrance animations would hold opacity at 1 */ const T0=performance.now();
+    function f(now){ const t=now-T0;
+      others.forEach(e=>e.style.opacity=String(1-cl(t/400)));
+      trA.querySelectorAll('.st').forEach(s=>{ if(s!==keep) s.style.opacity=String(1-cl(t/400)); });
+      const m=ease(cl((t-350)/900)), sx=v1.w/c0.w, sy=v1.h/c0.h;
+      card.style.transformOrigin='0 0'; card.style.transform=`translate(${(v1.x-c0.x)*m}px,${(v1.y-c0.y)*m}px) scale(${1+(sx-1)*m},${1+(sy-1)*m})`;
+      if(t>1150){ trB.style.opacity=String(cl((t-1150)/350)); if(!trB.classList.contains('play')){ trB.classList.add('play'); } }
+      card.style.opacity=String(1-cl((t-1300)/250));
+      if(t<1700) requestAnimationFrame(f); }
+    requestAnimationFrame(f); },3200); }
+document.querySelectorAll('.lab button').forEach(b=>b.onclick=()=>{ if(b.dataset.k==='4') return playTr(); const s=document.getElementById('o'+b.dataset.k);s.classList.remove('play');void s.offsetWidth;s.classList.add('play');});
+document.querySelectorAll('.opt').forEach((s,k)=>{ if(k<4) s.classList.add('play'); });
+</script>
+</body></html>

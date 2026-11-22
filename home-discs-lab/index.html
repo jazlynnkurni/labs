@@ -1,0 +1,9 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Disc layouts</title>
+<style>body{margin:0;background:#e8e8e8;font:14px -apple-system,system-ui;padding:24px;color:#111}h1{font-size:16px;font-weight:500;margin:0 0 16px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:24px}.cell p{margin:0 0 8px;color:#666}.cell a{color:#111}
+.frame{width:100%;aspect-ratio:1320/860;overflow:hidden;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.08)}
+iframe{width:1320px;height:860px;border:0;transform-origin:0 0;transform:scale(var(--s))}</style></head>
+<body><h1>Five formations of the same twelve discs. Open one at full size to drag it; the simulator is at <a href="sim.html">sim.html</a>.</h1>
+<div class="row"><div class="cell"><p>1 · <a href="1.html" target="_blank">Column</a></p><div class="frame"><iframe src="1.html"></iframe></div></div><div class="cell"><p>2 · <a href="2.html" target="_blank">Crescent</a></p><div class="frame"><iframe src="2.html"></iframe></div></div><div class="cell"><p>3 · <a href="3.html" target="_blank">Pile</a></p><div class="frame"><iframe src="3.html"></iframe></div></div><div class="cell"><p>4 · <a href="4.html" target="_blank">Diagonal</a></p><div class="frame"><iframe src="4.html"></iframe></div></div><div class="cell"><p>5 · <a href="5.html" target="_blank">Ring</a></p><div class="frame"><iframe src="5.html"></iframe></div></div></div>
+<script>const fit=()=>{const w=document.querySelector('.frame').clientWidth;document.documentElement.style.setProperty('--s',w/1320)};addEventListener('resize',fit);fit();</script>
+</body></html>

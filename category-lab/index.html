@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Category lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Five ways to condense Clover slide 10 (the category versus Clover, across who, hardware, navigation and look),
+   built from the way Jaz has been editing the deck: few words, visuals carrying the comparison, liquid-glass icons,
+   things that arrive in order, the Manus colourway, and content on the 180 line under the title. */
+:root{--ink:#14171B;--plum:#340414;--gold:#A99939;--green:#6F7C70;--cream:#F5F1E1;--hair:rgba(20,23,27,.12);--mute:#6f6b64;
+  --jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1340px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:#6f6b64;margin:0 0 8px;max-width:90ch}
+.lede.s{font-size:13.5px;margin-bottom:26px}
+.opt{margin-bottom:40px}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0 0 10px}
+.lab small{font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:#6f6b64;margin-left:8px}
+.lab button{margin-left:10px;font:600 11.5px var(--jak);padding:6px 11px;border-radius:999px;border:1.5px solid var(--plum);background:#fff;color:var(--plum);cursor:pointer;text-transform:none;letter-spacing:0}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 18px 40px -24px rgba(0,0,0,.3);overflow:hidden;position:relative}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:52px 72px 0;position:absolute;left:0;top:0}
+.hd{font:500 42px/1.12 var(--jak);letter-spacing:-.02em;margin:0;max-width:30ch;height:96px}
+.hd em{font-style:normal;color:var(--plum)}
+.body{position:absolute;left:72px;right:72px;top:180px}
+.ft{position:absolute;left:72px;right:72px;bottom:40px;border-top:1px solid var(--hair);padding-top:12px;display:flex;justify-content:space-between;font:400 13px var(--hel)}
+.ft span:first-child{color:var(--plum)}
+.tag{font:600 13px/1.4 var(--jak);letter-spacing:.06em;text-transform:uppercase;color:var(--plum)}
+.tag.g{color:#8a8780}
+.h19{font:600 19px/1.3 var(--jak);margin:0}
+.sub{font:300 17px/1.45 var(--hel);margin:0;color:var(--ink)}
+.small{font:400 13px/1.4 var(--hel);color:var(--mute);margin:0}
+/* the liquid-glass icon from the metrics slide */
+.gl{position:relative;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;isolation:isolate;color:var(--plum);flex:none;
+  background:rgba(255,255,255,.2);backdrop-filter:blur(3px) saturate(180%);
+  box-shadow:inset 1.5px 1.5px 1px rgba(255,255,255,.85),inset -1px -1px 1px rgba(255,255,255,.3),0 0 0 1px rgba(255,255,255,.5),0 12px 26px -12px rgba(52,4,20,.35)}
+.gl::before{content:"";position:absolute;inset:-8px;border-radius:50%;z-index:-1;background:radial-gradient(circle,#E2D8AE 0,rgba(169,153,57,.45) 48%,rgba(169,153,57,0) 71%)}
+.gl.r::before{background:radial-gradient(circle,#E8D3DA 0,rgba(52,4,20,.22) 48%,rgba(52,4,20,0) 71%)}
+.gl.s::before{background:radial-gradient(circle,#DCE3DC 0,rgba(111,124,112,.45) 48%,rgba(111,124,112,0) 71%)}
+.gl.x::before{background:radial-gradient(circle,#e4e4e2 0,rgba(20,23,27,.12) 48%,rgba(20,23,27,0) 71%)}
+.gl.x{color:#8a8780}
+.gl::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;background:radial-gradient(55% 40% at 50% 14%,rgba(255,255,255,.75),rgba(255,255,255,0) 72%)}
+.gl svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;position:relative;z-index:1}
+.gl.lg{width:92px;height:92px}.gl.lg svg{width:42px;height:42px}
+.chip{display:inline-flex;align-items:center;font:600 14px/1 var(--jak);padding:9px 14px;border-radius:999px;border:1.5px solid var(--plum);color:var(--plum);background:#fff;white-space:nowrap}
+.chip.f{background:var(--plum);color:#fff}
+.chip.x{border-color:rgba(20,23,27,.18);color:#8a8780;text-decoration:line-through;text-decoration-color:rgba(52,4,20,.55)}
+/* entrance */
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+.play .an{animation:up .55s ease both}
+.play .pp{animation:pop .6s cubic-bezier(.33,1.18,.37,1) both}
+
+/* 01 Versus rows */
+.o1 .r{display:grid;grid-template-columns:72px 170px 1fr 40px 1fr;align-items:center;gap:0 18px;padding:14px 0;border-top:1px solid var(--hair)}
+.o1 .r:first-child{border-top:0;padding-top:0}
+.o1 .ar{height:2px;background:var(--green);position:relative}.o1 .ar::after{content:"";position:absolute;right:0;top:-4px;width:8px;height:8px;border-top:2px solid var(--green);border-right:2px solid var(--green);transform:rotate(45deg)}
+.o1 .cv{justify-self:start}
+
+/* 02 Two cards of tags */
+.o2 .two{display:grid;grid-template-columns:1fr 64px 1fr;align-items:stretch}
+.o2 .cd{border-radius:22px;padding:26px 28px;display:flex;flex-direction:column;gap:18px}
+.o2 .cd.a{border:1.5px solid var(--hair)}
+.o2 .cd.b{background:linear-gradient(180deg,#fff,#F5F1E1 60%,#EDE5C6);box-shadow:inset 0 1px 0 #fff,0 0 0 1px rgba(169,153,57,.35),0 22px 44px -22px rgba(52,4,20,.3)}
+.o2 .top{display:flex;align-items:center;gap:14px}
+.o2 .li{display:grid;grid-template-columns:42px 1fr;gap:14px;align-items:center}
+.o2 .li .gl{width:42px;height:42px}.o2 .li .gl svg{width:20px;height:20px}
+.o2 .mid{display:grid;place-items:center}.o2 .mid i{display:block;width:30px;height:30px;border-top:2px solid var(--green);border-right:2px solid var(--green);transform:rotate(45deg);margin-left:-10px}
+.o2 .w{font:600 19px/1.3 var(--jak)}.o2 .cd.a .w{color:#6f6b64;font-weight:500}
+
+/* 03 Four spectra */
+.o3 .sp{display:grid;grid-template-columns:150px 1fr;align-items:center;gap:24px;padding:18px 0;border-top:1px solid var(--hair)}
+.o3 .sp:first-child{border-top:0;padding-top:4px}
+.o3 .track{position:relative;height:56px}
+.o3 .track::before{content:"";position:absolute;left:0;right:0;top:27px;height:2px;background:linear-gradient(90deg,rgba(20,23,27,.25),var(--green))}
+.o3 .end{position:absolute;top:40px;font:400 13px var(--hel);color:var(--mute)}.o3 .end.l{left:0}.o3 .end.r{right:0;text-align:right;color:var(--plum);font-weight:600;font-family:var(--jak)}
+.o3 .bead{position:absolute;top:16px;width:24px;height:24px;border-radius:50%;margin-left:-12px}
+.o3 .bead.c{background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.85),rgba(255,255,255,0) 70%),radial-gradient(circle at 50% 65%,#3a3d42,#0E1013 70%);box-shadow:0 5px 10px -4px rgba(0,0,0,.5)}
+.o3 .bead.k{width:34px;height:34px;top:11px;margin-left:-17px;background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.9),rgba(255,255,255,0) 70%),radial-gradient(circle at 50% 65%,#6a2a3f,#340414 70%);box-shadow:0 8px 16px -6px rgba(52,4,20,.6)}
+.o3 .lbl{position:absolute;top:-8px;font:600 12px var(--jak);letter-spacing:.06em;text-transform:uppercase;transform:translateX(-50%);white-space:nowrap}
+.o3 .key{display:flex;gap:22px;margin-top:10px;font:400 13px var(--hel);color:var(--mute);align-items:center}
+.o3 .key span{display:inline-flex;align-items:center;gap:8px}
+@keyframes slideK{from{left:8%}to{left:var(--to)}}
+.play .o3 .bead.k{animation:slideK 1.1s cubic-bezier(.3,.7,.2,1) both}
+
+/* 04 Two slides */
+.o4 .big{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.o4 .t{border-radius:22px;padding:22px;min-height:300px;display:flex;flex-direction:column;gap:14px}
+.o4 .a .t{border:1.5px solid var(--hair)}
+.o4 .b .t{background:linear-gradient(180deg,#fff,#F5F1E1 60%,#EDE5C6);box-shadow:inset 0 1px 0 #fff,0 0 0 1px rgba(169,153,57,.35),0 22px 40px -22px rgba(52,4,20,.3)}
+.o4 .t .h19{font-size:22px}.o4 .a .t .h19{color:#6f6b64;font-weight:500}
+.o4 .gline{position:absolute;left:0;right:0;top:560px;height:3px;background:var(--green)}
+
+/* 05 Flip tiles */
+.o5 .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;perspective:1400px}
+.o5 .tile{position:relative;height:340px;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.3,.7,.2,1)}
+.o5 .tile:nth-child(2){transition-delay:.12s}.o5 .tile:nth-child(3){transition-delay:.24s}.o5 .tile:nth-child(4){transition-delay:.36s}
+.o5.flip .tile{transform:rotateY(180deg)}
+.o5 .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.o5 .face.a{border:1.5px solid var(--hair);background:#fff}
+.o5 .face.b{transform:rotateY(180deg);background:linear-gradient(180deg,#fff,#F5F1E1 60%,#EDE5C6);box-shadow:inset 0 1px 0 #fff,0 0 0 1px rgba(169,153,57,.35),0 22px 40px -22px rgba(52,4,20,.3)}
+.o5 .face .h19{font-size:22px}.o5 .face.a .h19{color:#6f6b64;font-weight:500}
+.o5 .face .foot5{margin-top:auto}
+.o5 .hint{position:absolute;left:72px;top:540px;font:italic 400 13px var(--hel);color:rgba(20,23,27,.42)}
+</style></head><body>
+<div class="wrap">
+<h1>Category lab</h1>
+<p class="lede">Five ways to condense slide 10, "So I wanted Clover to feel sophisticated without asking anyone to be a tech enthusiast", from the way you've been editing: words cut to tags, the comparison carried by visuals, liquid-glass icons, things arriving in order, the green line, and content on the line under the title.</p>
+<p class="lede s">Press Play on any option to see it arrive. Option 04 is two slides joined by the green line. Option 05 flips on a click. Tell me the number.</p>
+<div id="opts"></div>
+</div>
+<script>
+const I={
+ who:'<svg viewBox="0 0 48 48"><circle cx="24" cy="16" r="7"/><path d="M10 40c1-8 7-13 14-13s13 5 14 13"/></svg>',
+ cam:'<svg viewBox="0 0 48 48"><rect x="6" y="14" width="36" height="24" rx="6"/><circle cx="24" cy="26" r="6"/><path d="M17 14l3-5h8l3 5"/></svg>',
+ nocam:'<svg viewBox="0 0 48 48"><rect x="6" y="14" width="36" height="24" rx="6"/><circle cx="24" cy="26" r="6"/><path d="M8 8l32 34"/></svg>',
+ nav:'<svg viewBox="0 0 48 48"><rect x="7" y="7" width="14" height="14" rx="4"/><rect x="27" y="7" width="14" height="14" rx="4"/><rect x="7" y="27" width="14" height="14" rx="4"/><rect x="27" y="27" width="14" height="14" rx="4"/></svg>',
+ intent:'<svg viewBox="0 0 48 48"><path d="M8 24h18M20 17l7 7-7 7"/><circle cx="35" cy="24" r="7"/><path d="M32 24l2 2 4-4"/></svg>',
+ look:'<svg viewBox="0 0 48 48"><path d="M24 40c-9-5-14-12-14-20a14 14 0 0 1 28 0c0 8-5 15-14 20z"/><path d="M24 40V18"/><path d="M24 26l-6-5M24 22l6-5"/></svg>',
+ tech:'<svg viewBox="0 0 48 48"><rect x="8" y="10" width="32" height="22" rx="3"/><path d="M4 38h40M18 21l-4 3 4 3M30 21l4 3-4 3"/></svg>',
+ ring:'<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="12"/><circle cx="24" cy="24" r="6"/><path d="M24 4v5M24 39v5"/></svg>',
+ clover:'<svg viewBox="0 0 48 48"><circle cx="18" cy="18" r="8"/><circle cx="30" cy="18" r="8"/><circle cx="18" cy="30" r="8"/><circle cx="30" cy="30" r="8"/><path d="M24 24l6 16"/></svg>',
+ glasses:'<svg viewBox="0 0 48 48"><rect x="4" y="17" width="17" height="13" rx="5.5"/><rect x="27" y="17" width="17" height="13" rx="5.5"/><path d="M21 22q3-3 6 0M4 21 1 19M44 21l3-2"/></svg>'};
+const gl=(k,c='',x='')=>`<span class="gl ${c} ${x}">${I[k]}</span>`;
+const D=[ /* the slide's four comparisons, cut to the words that carry them */
+ {k:'Who it is for', ic:['who','who'], a:'Technical buyers', b:'Everyone else', al:'Founders far enough in to want a secretary', bl:'People who don’t think of themselves as tech buyers'},
+ {k:'The hardware', ic:['cam','nocam'], a:'Camera first', b:'No camera', al:'A camera on every frame', bl:'So no privacy objection'},
+ {k:'Navigation', ic:['nav','intent'], a:'Scroll apps with a ring', b:'Screen only when it helps', al:'Navigation-first, as on Rokid', bl:'No fixed scheme'},
+ {k:'The look', ic:['tech','look'], a:'Technical', b:'Nature-inspired', al:'Restrained and functional', bl:'Built for care and trust'}];
+const head='<p class="hd">So I wanted Clover to feel sophisticated <em>without asking anyone to be a tech enthusiast.</em></p>';
+const foot=(n='10')=>`<div class="ft"><span>${n} &nbsp; Discovery</span><span>Eden Case Study</span></div>`;
+const d=(n,base=.2,step=.14)=>`style="animation-delay:${(base+n*step).toFixed(2)}s"`;
+const frame=(body,n='10',h=head)=>`<div class="frame"><div class="sl">${h}<div class="body">${body}</div>${foot(n)}</div></div>`;
+const O=[
+ ['01','Versus rows','Four rows: a glass icon, the topic, the category struck through, the green arrow, Clover in plum. Read in one sweep.',frame(
+  `<div class="o1">${D.map((r,n)=>`<div class="r an" ${d(n)}>${gl(r.ic[1],['','r','s',''][n])}<span class="tag">${r.k}</span><span class="chip x">${r.a}</span><i class="ar"></i><span class="chip f cv">${r.b}</span></div>`).join('')}</div>`)],
+ ['02','Two cards of tags','The category on the left, Clover on a cream glass card on the right; each line is an icon and a few words.',frame(
+  `<div class="o2"><div class="two">
+   <div class="cd a an" ${d(0)}><div class="top">${gl('glasses','','x')}<span class="tag g">The category</span></div>${D.map(r=>`<div class="li">${gl(r.ic[0],'','x')}<span class="w">${r.a}</span></div>`).join('')}</div>
+   <div class="mid an" ${d(2)}><i></i></div>
+   <div class="cd b an" ${d(3)}><div class="top">${gl('clover')}<span class="tag">Clover</span></div>${D.map((r,n)=>`<div class="li">${gl(r.ic[1],['','r','s',''][n])}<span class="w">${r.b}</span></div>`).join('')}</div>
+  </div></div>`)],
+ ['03','Four spectra','Each topic is a line from the category to Clover; the grey bead is where the category sits, the plum bead slides across to Clover.',frame(
+  `<div class="o3">${D.map((r,n)=>`<div class="sp an" ${d(n)}><span class="tag">${r.k}</span><div class="track"><span class="bead c" style="left:8%"></span><span class="bead k" style="left:92%;--to:92%;animation-delay:${(.5+n*.18).toFixed(2)}s"></span><span class="end l">${r.a}</span><span class="end r">${r.b}</span></div></div>`).join('')}
+   <div class="key an" ${d(5)}><span><i class="bead c" style="position:static;display:inline-block;width:14px;height:14px;margin:0;border-radius:50%;background:#1a1c1f"></i>The category</span><span><i style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#340414"></i>Clover</span></div></div>`)],
+ ['04','Two slides','"The category" on one slide in plain outline; the green line pans right to "Clover" on cream glass. Same four tiles, so the eye compares by position.',`<div class="row2">
+  ${frame(`<div class="o4"><div class="big a">${D.map((r,n)=>`<div class="t an" ${d(n)}>${gl(r.ic[0],'','x')}<span class="tag g">${r.k}</span><p class="h19">${r.a}</p><p class="small">${r.al}</p></div>`).join('')}</div></div><i class="gline" style="position:absolute;left:0;right:-72px;top:380px;height:3px;background:#6F7C70"></i>`,'10','<p class="hd">The category was built <em>for tech enthusiasts.</em></p>')}
+  ${frame(`<div class="o4"><div class="big b">${D.map((r,n)=>`<div class="t an" ${d(n,.3)}>${gl(r.ic[1],['','r','s',''][n])}<span class="tag">${r.k}</span><p class="h19">${r.b}</p><p class="small">${r.bl}</p></div>`).join('')}</div></div><i style="position:absolute;left:-72px;width:72px;top:380px;height:3px;background:#6F7C70"></i>`,'11','<p class="hd">So I built Clover <em>for everyone else.</em></p>')}</div>`],
+ ['05','Flip tiles','Four tiles show the category; a click flips them one after another to Clover. One slide, two beats.',frame(
+  `<div class="o5"><div class="tiles">${D.map((r,n)=>`<div class="tile"><div class="face a">${gl(r.ic[0],'','x')}<span class="tag g">${r.k}</span><p class="h19">${r.a}</p><p class="small foot5">The category</p></div><div class="face b">${gl(r.ic[1],['','r','s',''][n])}<span class="tag">${r.k}</span><p class="h19">${r.b}</p><p class="small foot5" style="color:#340414">Clover</p></div></div>`).join('')}</div><p class="hint">click the slide to flip</p></div>`)]];
+document.getElementById('opts').innerHTML=O.map(([n,t,dsc,h],k)=>`<section class="opt" id="o${k}"><p class="lab">${n} ${t}<small>${dsc}</small><button data-k="${k}">Play</button></p>${h}</section>`).join('');
+const fit=()=>document.querySelectorAll('.frame').forEach(f=>{f.firstElementChild.style.transform=`scale(${f.clientWidth/1280})`});
+addEventListener('resize',fit);fit();
+document.querySelectorAll('.lab button').forEach(b=>b.onclick=()=>{const s=document.getElementById('o'+b.dataset.k);s.classList.remove('play');void s.offsetWidth;s.classList.add('play');s.querySelector('.o5')?.classList.remove('flip');});
+document.querySelector('#o4 .frame').addEventListener('click',e=>e.currentTarget.querySelector('.o5').classList.toggle('flip'));
+document.querySelectorAll('.opt').forEach(s=>s.classList.add('play'));
+</script>
+</body></html>

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IA lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Five ways to show Clover slide 19 (navigation-first versus the intent-led IA) with a shorter title, in the deck's
+   language: sage/mauve glass, plum beads and pills, the green line, straight trees, images shown whole. */
+:root{--ink:#14171B;--plum:#340414;--gold:#A99939;--hair:rgba(20,23,27,.12);--mute:#6f6b64;--green:#6F7C70;
+  --sage-lt:rgba(214,222,215,.9);--mauve-lt:rgba(222,216,224,.9);
+  --jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1340px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:#6f6b64;margin:0 0 26px;max-width:92ch}
+.opt{margin-bottom:40px}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0 0 10px}
+.lab small{font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:#6f6b64;margin-left:8px}
+.lab button{margin-left:10px;font:600 11.5px var(--jak);padding:6px 11px;border-radius:999px;border:1.5px solid var(--plum);background:#fff;color:var(--plum);cursor:pointer;text-transform:none;letter-spacing:0}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 18px 40px -24px rgba(0,0,0,.3);overflow:hidden;position:relative}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:52px 72px 0;position:absolute;left:0;top:0}
+.hd{font:500 42px/1.12 var(--jak);letter-spacing:-.02em;margin:0;max-width:30ch;height:96px}
+.hd em{font-style:normal;color:var(--plum)}
+.body{position:absolute;left:72px;right:72px;top:180px;height:440px}
+.ft{position:absolute;left:72px;right:72px;bottom:40px;border-top:1px solid var(--hair);padding-top:12px;display:flex;justify-content:space-between;font:400 13px var(--hel)}
+.ft span:first-child{color:var(--plum)}
+.tag{font:600 13px/1.4 var(--jak);letter-spacing:.06em;text-transform:uppercase;color:#8a8780}.tag.p{color:var(--plum)}
+.h{font:600 19px/1.3 var(--jak);margin:0}
+.glass{box-shadow:inset 2px 2px 2px rgba(255,255,255,.95),inset 0 -20px 34px -24px rgba(52,4,20,.2),0 0 0 1px rgba(20,23,27,.06),0 22px 40px -24px rgba(52,4,20,.32)}
+.gw{background:linear-gradient(180deg,#fff,#fafafc 60%,#f2f2f6)}
+.gs{background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.98),var(--sage-lt) 60%,rgba(155,166,156,.55))}
+.gx{background:linear-gradient(160deg,rgba(255,255,255,.98),var(--sage-lt) 52%,var(--mauve-lt))}
+.img{border-radius:14px;overflow:hidden;background:#000;box-shadow:0 14px 28px -18px rgba(20,23,27,.5)}
+.img img{display:block;width:100%;height:100%;object-fit:contain}
+.cal{aspect-ratio:450/350}.arch{aspect-ratio:1431/832}
+ul.pc{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+ul.pc li{display:flex;gap:10px;align-items:flex-start;font:500 14.5px/1.35 var(--jak)}
+ul.pc li::before{flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:700 11px/20px var(--jak);text-align:center;margin-top:-1px}
+ul.pc li.y::before{content:"\2713";background:var(--plum);color:#fff}
+ul.pc li.n::before{content:"\2715";background:#fff;color:var(--gold);box-shadow:0 0 0 1.5px var(--gold)}
+.pill{display:inline-flex;font:600 13px/1 var(--jak);padding:9px 12px;border-radius:999px;background:rgba(255,255,255,.88);box-shadow:0 0 0 1px rgba(52,4,20,.14);white-space:nowrap}
+.pill.f{background:var(--plum);color:#fff;box-shadow:none}.pill.x{box-shadow:0 0 0 2px var(--gold);color:#6f6b64}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes inL{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:none}}
+@keyframes inR{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes drop{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.play .an{animation:up .55s ease both}.play .aL{animation:inL .7s cubic-bezier(.3,.7,.2,1) both}.play .aR{animation:inR .7s cubic-bezier(.3,.7,.2,1) both}
+.play .gr{transform-origin:left;animation:grow .7s cubic-bezier(.3,.7,.2,1) both}.play .dr{transform-origin:top;animation:drop .5s cubic-bezier(.3,.7,.2,1) both}
+
+/* 01 before / after */
+.o1{display:grid;grid-template-columns:1fr 80px 1.25fr;align-items:start;height:100%}
+.o1 .pn{border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.o1 .pn .img{height:200px;margin:0 auto}
+.o1 .mid{height:236px;display:flex;align-items:center;padding:0 12px}.o1 .mid i{display:block;width:100%;height:2px;background:var(--green);position:relative}
+.o1 .mid i::after{content:"";position:absolute;right:0;top:-5px;width:10px;height:10px;border-top:2px solid var(--green);border-right:2px solid var(--green);transform:rotate(45deg)}
+
+/* 02 two trees */
+.o2{display:grid;grid-template-columns:1fr 1fr;gap:28px;height:100%}
+.o2 .t{border-radius:22px;padding:18px 20px;display:flex;flex-direction:column;align-items:center;gap:0}
+.o2 .t .tag{align-self:flex-start;margin-bottom:12px}
+.o2 .node{display:inline-flex;align-items:center;gap:8px;font:600 14px/1 var(--jak);padding:10px 14px;border-radius:14px;background:#fff;box-shadow:0 0 0 1px rgba(52,4,20,.14),0 8px 16px -10px rgba(52,4,20,.3)}
+.o2 .node.root{background:var(--plum);color:#fff;box-shadow:none}
+.o2 .v{width:2px;height:20px;background:var(--green)}
+.o2 .bar{position:relative;width:76%;height:20px}.o2 .bar::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--green)}
+.o2 .bar i{position:absolute;top:0;width:2px;height:20px;background:var(--green)}
+.o2 .kids{display:flex;justify-content:space-between;width:90%}
+.o2 .dead{margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.o2 .q{font:500 15px/1.3 var(--jak);color:var(--plum)}
+
+/* 03 one question, two routes */
+.o3{display:flex;flex-direction:column;gap:14px;height:100%}
+.o3 .q{align-self:center;font:500 22px/1.2 var(--jak);color:var(--plum);padding:12px 22px;border-radius:999px}
+.o3 .rt{border-radius:20px;padding:14px 18px;display:grid;grid-template-columns:170px 1fr 200px;gap:18px;align-items:center}
+.o3 .flow{display:flex;align-items:center;gap:8px}
+.o3 .flow i{width:22px;height:2px;background:var(--green);flex:none}.o3 .flow i.br{background:repeating-linear-gradient(90deg,var(--gold) 0 4px,transparent 4px 8px)}
+.o3 .img{height:110px}
+
+/* 04 big images */
+.o4{display:grid;grid-template-columns:1fr 1.25fr;gap:26px;height:100%}
+.o4 .c{display:flex;flex-direction:column;gap:14px}
+.o4 .c .img{height:230px}
+.o4 .vd{display:flex;flex-wrap:wrap;gap:6px}
+
+/* 05 the intent stack */
+.o5{display:grid;grid-template-columns:260px 1fr;gap:28px;height:100%}
+.o5 .old{border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;opacity:.9}
+.o5 .old .img{height:150px;filter:grayscale(.6)}
+.o5 .stk{display:flex;flex-direction:column;gap:8px}
+.o5 .ly{border-radius:18px;padding:13px 18px;display:grid;grid-template-columns:42px 1fr auto;gap:14px;align-items:center}
+.o5 .ly .n{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font:600 14px var(--jak);color:#fff;background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.6),rgba(255,255,255,0) 70%),radial-gradient(circle at 50% 65%,#6a2a3f,#340414 70%)}
+.o5 .ly b{font:600 17px/1.2 var(--jak)}.o5 .ly p{margin:2px 0 0;font:400 13px/1.35 var(--hel);color:var(--mute)}
+.o5 .cn{display:flex;justify-content:center}.o5 .cn i{width:2px;height:10px;background:var(--green)}
+
+/* open layouts: no panels; structure comes from lines, trees and the media themselves */
+.o1{grid-template-columns:1fr 90px 1.25fr}
+.o1 .pn{padding:0}
+.o1 .pn .img{margin:0}
+.o1 .pn .tag{padding-top:6px;border-top:2px solid var(--green)}
+.o2{position:relative}.o2::after{content:"";position:absolute;left:50%;top:10px;bottom:10px;width:1px;background:var(--hair)}
+.o2 .t{padding:0 10px}
+.o3 .rt{padding:12px 0;border-top:1px solid var(--hair)}
+.o3 .rt:first-of-type{border-top:0}
+.o5 .old{padding:0;opacity:.75}
+.o5 .stk{position:relative;padding-left:18px;gap:22px;justify-content:flex-start;padding-top:24px}
+.o5 .stk::before{content:"";position:absolute;left:35px;top:42px;height:150px;width:2px;background:var(--green)}
+.o5 .ly{padding:0;grid-template-columns:36px 1fr auto;background:none!important;box-shadow:none!important}
+.o5 .ly .n{position:relative;z-index:1}
+</style></head><body>
+<div class="wrap">
+<h1>IA lab</h1>
+<p class="lede">Slide 19 with a shorter title, "So I restructured the IA around intent, not apps", and five ways to show the change, in the deck's current language. The calendar and the architecture are shown whole. Press Play to see each arrive. Tell me the number.</p>
+<div id="opts"></div>
+</div>
+<script>
+const head='<p class="hd">So I restructured the IA <em>around intent, not apps.</em></p>';
+const frame=b=>`<div class="frame"><div class="sl">${head}<div class="body">${b}</div><div class="ft"><span>19 &nbsp; Testing</span><span>Eden Case Study</span></div></div></div>`;
+const cal='<div class="img cal"><img src="media/flow-cal.png" alt=""></div>', arch='<div class="img arch"><img src="media/if-p08-1.png" alt=""></div>';
+const NAV='<ul class="pc"><li class="y">Predictable and easy to explain</li><li class="n">&ldquo;What do I have today?&rdquo; names no app</li><li class="n">She has to arrive knowing what she wants</li></ul>';
+const INT='<ul class="pc"><li class="y">Calendar, Maps and Notes become services the agent calls</li><li class="y">A controller decides what deserves the display</li><li class="n">Clover&rsquo;s abilities become harder to discover</li></ul>';
+const d=s=>`data-d="${s}"`;
+const O=[
+ ['01','Before and after','Navigation-first in white glass, the green arrow, intent-led in the mixed glass; ticks and crosses beneath each.',
+  `<div class="o1"><div class="pn aL" ${d(.2)}>${cal.replace('class="img cal"','class="img cal" style="height:200px"')}<span class="tag">Navigation&#8209;first: open an app, then ask</span>${NAV}</div>
+   <div class="mid"><i class="gr" ${d(.7)}></i></div>
+   <div class="pn aR" ${d(.9)}>${arch.replace('class="img arch"','class="img arch" style="height:200px"')}<span class="tag p">Intent&#8209;led: say what you need</span>${INT}</div></div>`],
+ ['02','Two trees','The IA itself, drawn: navigation-first branches into apps and dead-ends on a question with no app; intent-led routes every request through the agent.',
+  `<div class="o2"><div class="t aL" ${d(.2)}><span class="tag">Navigation&#8209;first</span><span class="node root">Home</span><i class="v dr" ${d(.5)}></i><div class="bar"><i style="left:0"></i><i style="left:50%"></i><i style="right:0"></i></div>
+     <div class="kids"><span class="node">Calendar</span><span class="node">Maps</span><span class="node">Notes</span></div>
+     <div class="dead an" ${d(.9)}><span class="q">&ldquo;What do I have today?&rdquo;</span><span class="pill x">Names no app</span></div></div>
+   <div class="t aR" ${d(.5)}><span class="tag p">Intent&#8209;led</span><span class="node root">&ldquo;What do I have today?&rdquo;</span><i class="v dr" ${d(.8)}></i><span class="node">Conversational intent</span><i class="v dr" ${d(.95)}></i><span class="node">Task orchestrator &middot; calls Calendar, Maps, Notes</span><i class="v dr" ${d(1.1)}></i><span class="node">Presentation controller</span><i class="v dr" ${d(1.25)}></i>
+     <div class="kids" style="width:80%;justify-content:center;gap:8px"><span class="pill">Ambient</span><span class="pill f">Glanceable</span><span class="pill">Extended</span></div></div></div>`],
+ ['03','One question, two routes','The same request sent through both models: it breaks under navigation-first and arrives as a glanceable card under intent-led.',
+  `<div class="o3"><span class="q gx glass an" ${d(.2)}>&ldquo;What do I have today?&rdquo;</span>
+   <div class="rt aL" ${d(.5)}><span class="tag">Navigation&#8209;first</span><div class="flow"><span class="pill">Which app?</span><i class="br"></i><span class="pill x">Names no app</span><i class="br"></i><span class="pill x" style="opacity:.5">&hellip;</span></div>${cal}</div>
+   <div class="rt aL" ${d(.8)}><span class="tag p">Intent&#8209;led</span><div class="flow"><span class="pill">Agent hears the intent</span><i></i><span class="pill">Calls Calendar</span><i></i><span class="pill f">Glanceable card</span></div>${arch}</div>
+   <div class="an" ${d(1.1)} style="display:flex;gap:10px;justify-content:center"><span class="pill x">Abilities harder to discover</span><span class="pill">so I made them visible in the app</span></div></div>`],
+ ['04','Big images','The two screens large and whole, each with its verdict as tick and cross pills beneath.',
+  `<div class="o4"><div class="c aL" ${d(.2)}>${cal.replace('class="img cal"','class="img cal" style="height:230px;width:296px"')}<span class="tag">Navigation&#8209;first</span><div class="vd"><span class="pill">&#10003; Predictable</span><span class="pill x">&#10005; Names no app</span><span class="pill x">&#10005; Needs a task first</span></div></div>
+   <div class="c aR" ${d(.4)}>${arch.replace('class="img arch"','class="img arch" style="height:230px"')}<span class="tag p">Intent&#8209;led</span><div class="vd"><span class="pill f">&#10003; Apps become services</span><span class="pill f">&#10003; A controller picks the display</span><span class="pill x">&#10005; Harder to discover</span></div></div></div>`],
+ ['05','The intent stack','The new IA rebuilt as three glass layers that drop in one by one; navigation-first sits beside it, greyed, as what it replaced.',
+  `<div class="o5"><div class="old aL" ${d(.2)}><span class="tag">What it replaced</span>${cal.replace('class="img cal"','class="img cal" style="height:150px"')}<span class="tag">Navigation&#8209;first</span><ul class="pc"><li class="n">Names no app</li><li class="n">Needs a task first</li></ul></div>
+   <div class="stk">${[['1','Conversational intent','What does the user want?','gs'],['2','Task orchestrator','Calls Calendar, Maps and Notes as services','gx'],['3','Presentation controller','What deserves attention right now?','gx']].map(([n,b,p,c],k)=>`<div class="ly an" ${d(.4+k*.3)}><span class="n">${n}</span><div><b>${b}</b><p>${p}</p></div>${k==2?'<div style="display:flex;gap:5px"><span class="pill">Ambient</span><span class="pill f">Glanceable</span><span class="pill">Extended</span></div>':''}</div>`).join('')}
+   <div class="an" ${d(1.4)} style="margin-top:6px"><ul class="pc"><li class="n">Clover&rsquo;s abilities become harder to discover</li></ul></div></div></div>`]];
+document.getElementById('opts').innerHTML=O.map(([n,t,ds,h],k)=>`<section class="opt" id="o${k}"><p class="lab">${n} ${t}<small>${ds}</small><button data-k="${k}">Play</button></p>${frame(h)}</section>`).join('');
+const fit=()=>document.querySelectorAll('.frame').forEach(f=>{f.firstElementChild.style.transform=`scale(${f.clientWidth/1280})`});
+addEventListener('resize',fit);fit();
+document.querySelectorAll('[data-d]').forEach(e=>e.style.animationDelay=e.dataset.d+'s');
+document.querySelectorAll('.lab button').forEach(b=>b.onclick=()=>{const s=document.getElementById('o'+b.dataset.k);s.classList.remove('play');void s.offsetWidth;s.classList.add('play');});
+document.querySelectorAll('.opt').forEach(s=>s.classList.add('play'));
+</script>
+</body></html>

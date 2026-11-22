@@ -1,0 +1,60 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Slide formats lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;600;700&display=swap">
+<style>
+:root{--ink:#14171B;--ink2:rgba(20,23,27,.66);--hair:rgba(20,23,27,.14);--paper:#FAF9F7;--plum:#340414}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 15px/1.5 "Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:1280px;margin:0 auto;padding:64px 64px 96px}
+h1{font:500 30px/1.25 "Plus Jakarta Sans",sans-serif;letter-spacing:-.015em;margin:0 0 8px;text-wrap:balance}
+.lede{color:var(--ink2);margin:0 0 48px;max-width:720px;text-wrap:pretty}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:48px 32px}
+a.card{display:block;color:inherit;text-decoration:none}
+.frame{width:480px;height:270px;overflow:hidden;border-radius:12px;box-shadow:0 0 0 1px rgba(0,0,0,.06),0 1px 2px -1px rgba(0,0,0,.06),0 2px 4px 0 rgba(0,0,0,.04);position:relative;background:#0E0D0C}
+.frame iframe{width:1280px;height:720px;border:0;transform:scale(.375);transform-origin:0 0;pointer-events:none}
+h2{font:600 17px/1.3 "Plus Jakarta Sans",sans-serif;margin:16px 0 4px;color:var(--plum)}
+.card p{margin:0;max-width:480px;text-wrap:pretty}
+.ref{margin-top:8px;color:var(--ink2);font-size:13px}
+.ref a{color:inherit}
+@media (hover:hover){a.card .frame{transition:box-shadow .2s ease-out}a.card:hover .frame{box-shadow:0 0 0 1px rgba(0,0,0,.12),0 8px 24px -8px rgba(0,0,0,.2)}}
+</style></head>
+<body><main>
+<h1>Slide 5, ClassPass business goals</h1>
+<p class="lede">Same content, same deck type and colours, 1280x720. Each slide rests fully built like the deck; click it or press Space to play its build in reading order.</p>
+<div class="grid">
+  <div><a class="card" href="1-big-numbers/"><div class="frame"><iframe src="1-big-numbers/" loading="lazy" tabindex="-1" title="1"></iframe></div>
+    <h2>1 · Big numbers</h2><p>The live table kept, with each column&rsquo;s evidence promoted to a hero figure in the empty space. AI has no figure, so its hero lists what AI does, the new job in plum.</p></a>
+    <p class="ref">After Duarte&rsquo;s rule that a data slide shows what a number means, and Apple&rsquo;s one-stat keynote moments. <a href="https://duarte.com/books/slideology/">slide:ology</a></p></div>
+  <div><a class="card" href="2-strategy-tree/"><div class="frame"><iframe src="2-strategy-tree/" loading="lazy" tabindex="-1" title="2"></iframe></div>
+    <h2>2 · Strategy tree</h2><p>ClassPass at the root, goals as branches, the flow as a node, the evidence as the leaf. The build draws it top down, cause to proof.</p></a>
+    <p class="ref">After Teresa Torres&rsquo;s opportunity solution tree and Amplitude&rsquo;s North Star tree. <a href="https://www.producttalk.org/opportunity-solution-trees/">Product Talk</a> · <a href="https://amplitude.com/books/north-star/about-north-star-framework">Amplitude</a></p></div>
+  <div><a class="card" href="3-annotated-screens/"><div class="frame"><iframe src="3-annotated-screens/" loading="lazy" tabindex="-1" title="3"></iframe></div>
+    <h2>3 · Annotated screens</h2><p>Each goal is one thread from its dot, past the real ClassPass screen with the spot circled, to the flow and its evidence. Ties this slide to the critique slides that follow.</p></a>
+    <p class="ref">After Built for Mars&rsquo;s annotated UX teardowns, and her own circled markers with wires. <a href="https://builtformars.com/archive">Built for Mars</a></p></div>
+  <div><a class="card" href="4-ledger/"><div class="frame"><iframe src="4-ledger/" loading="lazy" tabindex="-1" title="4"></iframe></div>
+    <h2>4 · Ledger</h2><p>The table on its side: one ruled row per goal, read goal, flow, evidence on a visible grid. The key fact in each line is the only plum.</p></a>
+    <p class="ref">After Pentagram&rsquo;s Deloitte Insights charts, bold type on a visible grid drawn from tax ledgers. <a href="https://www.pentagram.com/work/deloitte-insights">Pentagram</a></p></div>
+  <div><a class="card" href="5-bento/"><div class="frame"><iframe src="5-bento/" loading="lazy" tabindex="-1" title="5"></iframe></div>
+    <h2>5 · Bento</h2><p>A keynote recap: each goal is a pair of tiles, the evidence and the flow&rsquo;s real screen, with the middle pair flipped so the grid reads as one object.</p></a>
+    <p class="ref">After Apple&rsquo;s bento recap slides, as collected by MacStories. <a href="https://www.macstories.net/news/wwdc-2025-all-the-small-things-bento-box-version/">MacStories</a></p></div>
+</div>
+<h1 style="margin-top:96px">Slide 8, Depop&rsquo;s two processes</h1>
+<p class="lede">Same deck type and colours. Discovery, then Deal, joined by making an offer.</p>
+<div class="grid">
+  <div><a class="card" href="depop/1-venn/"><div class="frame"><iframe src="depop/1-venn/" loading="lazy" tabindex="-1" title="1"></iframe></div>
+    <h2>1 · Venn</h2><p>Discovery and Deal as two overlapping sets. Making an offer is the overlap, the one moment that belongs to both.</p></a>
+    <p class="ref">After Drew Conway&rsquo;s data science Venn diagram, where the overlap carries the point. <a href="https://www.kdnuggets.com/2016/10/battle-data-science-venn-diagrams.html">KDnuggets</a></p></div>
+  <div><a class="card" href="depop/2-bowtie/"><div class="frame"><iframe src="depop/2-bowtie/" loading="lazy" tabindex="-1" title="2"></iframe></div>
+    <h2>2 · Bowtie</h2><p>Discovery narrows down to one piece, the offer is the knot where the buyer commits, and Deal opens out into price, payment and shipping.</p></a>
+    <p class="ref">After Winning by Design&rsquo;s bowtie, with the commit point as the knot. <a href="https://winningbydesign.com/bowtie">Winning by Design</a></p></div>
+  <div><a class="card" href="depop/3-journey/"><div class="frame"><iframe src="depop/3-journey/" loading="lazy" tabindex="-1" title="3"></iframe></div>
+    <h2>3 · Journey</h2><p>Five real Depop screens in order, with Discovery and Deal bracketed above and each point captioned under its screen. The offer screen is the hinge, ringed in plum.</p></a>
+    <p class="ref">After NN/g&rsquo;s journey map: phases over actions. <a href="https://www.nngroup.com/articles/journey-mapping-101/">NN/g</a></p></div>
+  <div><a class="card" href="depop/4-metro/"><div class="frame"><iframe src="depop/4-metro/" loading="lazy" tabindex="-1" title="4"></iframe></div>
+    <h2>4 · Metro</h2><p>Two lines with the points as stations, and making an offer as the interchange where you change from Discovery to Deal.</p></a>
+    <p class="ref">After Harry Beck&rsquo;s 1933 Tube diagram. <a href="https://tfl.gov.uk/corporate/about-tfl/culture-and-heritage/art-and-design/harry-becks-tube-map">TfL</a></p></div>
+  <div><a class="card" href="depop/5-value-chain/"><div class="frame"><iframe src="depop/5-value-chain/" loading="lazy" tabindex="-1" title="5"></iframe></div>
+    <h2>5 · Value chain</h2><p>Each process is a chevron in a chain, and the offer is the link between them, drawn as the deck&rsquo;s own dark block arrow.</p></a>
+    <p class="ref">After Michael Porter&rsquo;s value chain. <a href="https://www.isc.hbs.edu/about-michael-porter/">HBS ISC</a></p></div>
+</div>
+</main></body></html>

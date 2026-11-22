@@ -1,0 +1,44 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>5 · Bento</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;600;700&display=swap">
+<link rel="stylesheet" href="../shared.css">
+<style>
+/* a keynote-style recap: each goal is a pair of tiles, the evidence and the real screen of the flow that carries it.
+   The middle pair flips so the grid reads as one object, not three columns */
+.top{left:0;right:0;top:56px;display:flex;justify-content:center}
+.top .head{max-width:1000px}
+.grid{left:96px;top:184px;width:1088px;height:488px;display:grid;grid-template-columns:repeat(3,352px);gap:16px}
+.col{display:flex;flex-direction:column;gap:16px}
+.col.flip{flex-direction:column-reverse}
+.tile{background:#fff;border-radius:24px;box-shadow:var(--depth)}
+.stat{height:192px;padding:24px;display:flex;flex-direction:column}
+.stat .big{margin-top:auto;font:300 64px/56px var(--jak);letter-spacing:-.04em;color:var(--ink)}
+.stat .big small{font-size:.55em;letter-spacing:-.02em;margin-left:1px;vertical-align:.6em}
+.stat .body{margin-top:12px;font-size:15px;line-height:1.45}
+.stat .say{margin-top:auto;font:500 22px/1.3 var(--jak);letter-spacing:-.015em;color:var(--ink);text-wrap:pretty}
+.stat .say b{font-weight:600;color:var(--plum)}
+/* media tile: the same 12px inset on all four sides of the screen, concentric corners (24 = 12 + 12) */
+.media{height:280px;padding:12px;display:flex;flex-direction:column;gap:12px}
+.media .shot{flex:1;--w:328;border-radius:12px;box-shadow:none}
+.media h3{font-size:18px;line-height:24px;color:var(--ink);padding:0 12px 0}
+</style></head>
+<body><div id="stage">
+<div class="top"><h2 class="head" data-b="0">According to <span class="hl">ClassPass&rsquo;s 2026 Industry Impact Report</span>, these are the company&rsquo;s <span class="hl">business goals</span>:</h2></div>
+<div class="grid">
+  <div class="col">
+    <div class="tile stat" data-b="2"><p class="lab g1">Wellness beyond fitness</p><p class="big tnum">37<small>%</small></p><p class="body">Wellness bookings grew 37% in 2025, as fast as fitness</p></div>
+    <div class="tile media" data-b="3"><div class="shot" style="--top:830"><img src="../img/IMG_5005.jpg" alt="Save on spa and salon row on ClassPass Home"></div><h3>Finding a class</h3></div>
+  </div>
+  <div class="col flip">
+    <div class="tile stat" data-b="5"><p class="lab g2">AI integration</p><p class="say">AI already sets class spots and credit prices, and <b>now answers members</b></p></div>
+    <div class="tile media" data-b="4"><div class="shot" style="--top:300"><img src="../img/IMG_5016.jpg" alt="ClassPass Support chat and its AI notice"></div><h3>Support chat</h3></div>
+  </div>
+  <div class="col">
+    <div class="tile stat" data-b="6"><p class="lab g3">Retention</p><p class="big tnum">80<small>%</small></p><p class="body">80% of members who join after a trial go back to a studio they tried</p></div>
+    <div class="tile media" data-b="7"><div class="shot" style="--top:176"><img src="../img/IMG_5009.jpg" alt="Rate your experience at SLT"></div><h3>Rating a class</h3></div>
+  </div>
+</div>
+</div>
+<p class="tag">5 · Bento · click to play the build · <a href="../">all five</a></p>
+<script src="../shared.js"></script>
+</body></html>

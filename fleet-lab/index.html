@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fleet lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Five ways to show Clover slide 18 (the navigation-first test: hypothesis, what was tested, what testers showed) in
+   the deck's language now: sage glass for the glasses, mauve for the phone, plum beads and pills, the green line,
+   media shown whole, few words, content on the 180 line. */
+:root{--ink:#14171B;--plum:#340414;--gold:#A99939;--hair:rgba(20,23,27,.12);--mute:#6f6b64;--green:#6F7C70;
+  --sage-lt:rgba(214,222,215,.9);--mauve-lt:rgba(222,216,224,.9);
+  --jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1340px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:#6f6b64;margin:0 0 26px;max-width:90ch}
+.opt{margin-bottom:40px}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0 0 10px}
+.lab small{font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:#6f6b64;margin-left:8px}
+.lab button{margin-left:10px;font:600 11.5px var(--jak);padding:6px 11px;border-radius:999px;border:1.5px solid var(--plum);background:#fff;color:var(--plum);cursor:pointer;text-transform:none;letter-spacing:0}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 18px 40px -24px rgba(0,0,0,.3);overflow:hidden;position:relative}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:52px 72px 0;position:absolute;left:0;top:0}
+.hd{font:500 42px/1.12 var(--jak);letter-spacing:-.02em;margin:0;max-width:30ch;height:96px}
+.hd em{font-style:normal;color:var(--plum)}
+.body{position:absolute;left:72px;right:72px;top:180px;height:440px}
+.ft{position:absolute;left:72px;right:72px;bottom:40px;border-top:1px solid var(--hair);padding-top:12px;display:flex;justify-content:space-between;font:400 13px var(--hel)}
+.ft span:first-child{color:var(--plum)}
+.tag{font:600 13px/1.4 var(--jak);letter-spacing:.06em;text-transform:uppercase;color:#8a8780}.tag.p{color:var(--plum)}
+.h{font:600 19px/1.3 var(--jak);margin:0;color:var(--ink)}
+.sub{font:300 15px/1.45 var(--hel);margin:0;color:var(--mute)}
+.num{font:500 56px/1 var(--jak);letter-spacing:-.03em;color:var(--plum)}
+.glass{box-shadow:inset 2px 2px 2px rgba(255,255,255,.95),inset 0 -20px 34px -24px rgba(52,4,20,.2),0 0 0 1px rgba(20,23,27,.06),0 22px 40px -24px rgba(52,4,20,.32)}
+.gw{background:linear-gradient(180deg,#fff,#fafafc 60%,#f2f2f6)}
+.gs{background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.98),var(--sage-lt) 60%,rgba(155,166,156,.55))}
+.gm{background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.98),var(--mauve-lt) 60%,rgba(130,122,133,.45))}
+.gx{background:linear-gradient(160deg,rgba(255,255,255,.98),var(--sage-lt) 52%,var(--mauve-lt))}
+.k{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;font:600 13px var(--jak);color:#fff;flex:none;
+  background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.6),rgba(255,255,255,0) 70%),radial-gradient(circle at 50% 65%,#6a2a3f,#340414 70%);box-shadow:0 4px 8px -3px rgba(52,4,20,.5)}
+.vid{position:relative;max-height:190px;max-width:100%;width:auto;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:1440/786}
+.vid video{display:block;width:100%;height:100%;object-fit:contain}
+.vid .cnt{position:absolute;left:10px;top:10px;font:600 12px/1 var(--jak);padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.92);color:var(--plum)}
+.steps{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.steps span{font:600 12.5px/1 var(--jak);padding:8px 11px;border-radius:999px;background:rgba(255,255,255,.85);box-shadow:0 0 0 1px rgba(52,4,20,.14)}
+.steps i{font-style:normal;color:var(--green);font-weight:700}
+.chk{list-style:none;margin:0;padding:0;display:grid;gap:7px}.chk li{display:flex;gap:9px;align-items:flex-start;font:500 14px/1.35 var(--jak)}
+.chk li::before{content:"";flex:none;width:9px;height:9px;margin-top:5px;border-radius:50%;background:var(--plum)}
+.qt{font:500 20px/1.3 var(--jak);color:var(--ink);margin:0}
+.qt b{color:var(--plum)}
+.x{font:400 13px/1.4 var(--hel);color:var(--mute);margin:0}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.play .an{animation:up .55s ease both}.play .pp{animation:pop .6s cubic-bezier(.33,1.18,.37,1) both}.play .gr{transform-origin:left;animation:grow .9s cubic-bezier(.3,.7,.2,1) both}
+
+/* 01 Three glass panes on the green line */
+.o1{position:relative;height:100%}
+.o1 .ln{position:absolute;left:0;right:0;top:14px;height:2px;background:var(--green)}
+.o1 .row{position:relative;display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:20px;padding-top:0}
+.o1 .p{border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:10px;min-height:0;height:420px}
+.o1 .p .k{position:relative;margin-top:-2px}
+
+/* 02 The verdict: the hypothesis crossed out on the left, the evidence on the right */
+.o2{display:grid;grid-template-columns:1fr 1fr;gap:28px;height:100%}
+.o2 .l{display:flex;flex-direction:column;gap:14px}
+.o2 .hy{border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:10px;position:relative}
+.o2 .hy .qt{text-decoration:line-through;text-decoration-color:rgba(52,4,20,.5);text-decoration-thickness:2px;color:#6f6b64}
+.o2 .stamp{position:absolute;right:18px;top:16px;font:600 12px/1 var(--jak);letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--plum);padding:7px 11px;border-radius:999px;transform:rotate(4deg)}
+.o2 .r{border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:16px}
+.o2 .big{display:flex;align-items:baseline;gap:14px}
+
+/* 03 One big number: 87% as the hero, the quote and the method beneath */
+.o3{display:grid;grid-template-columns:420px 1fr;gap:34px;height:100%;align-items:start}
+.o3 .hero{border-radius:26px;padding:28px;display:flex;flex-direction:column;gap:10px;height:400px;justify-content:center}
+.o3 .hero .num{font-size:120px;line-height:.9}
+.o3 .side{display:flex;flex-direction:column;gap:14px}
+.o3 .card{border-radius:20px;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+
+/* 04 A test timeline: the three stages as beads on the green line, each with its card beneath */
+.o4{position:relative;height:100%}
+.o4 .ln{position:absolute;left:60px;right:60px;top:13px;height:2px;background:var(--green)}
+.o4 .row{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;position:relative}
+.o4 .c{display:flex;flex-direction:column;align-items:center;gap:12px}
+.o4 .c .card{border-radius:20px;padding:16px;width:100%;display:flex;flex-direction:column;gap:10px;min-height:340px}
+
+/* 05 Expected vs what happened: two rows, the same four steps, the second breaking where Ben's Deli has no app */
+.o5{display:grid;grid-template-columns:330px 1fr;gap:26px;height:100%}
+.o5 .vcol{display:flex;flex-direction:column;gap:12px}
+.o5 .rows{display:flex;flex-direction:column;gap:14px}
+.o5 .rw{border-radius:20px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.o5 .flow{display:flex;align-items:center;gap:8px}
+.o5 .flow span{font:600 13px/1 var(--jak);padding:9px 12px;border-radius:999px;background:rgba(255,255,255,.85);box-shadow:0 0 0 1px rgba(52,4,20,.14);white-space:nowrap}
+.o5 .flow i{width:22px;height:2px;background:var(--green);flex:none}
+.o5 .flow .br{background:repeating-linear-gradient(90deg,var(--gold) 0 4px,transparent 4px 8px)}
+.o5 .flow .no{box-shadow:0 0 0 2px var(--gold);color:#6f6b64}
+</style></head><body>
+<div class="wrap">
+<h1>Fleet lab</h1>
+<p class="lede">Five ways to show slide 18, "Firstly, my Founder asked me to ship a navigation-first model to 52 internal testers", in the deck's current language. Same facts as the slide; the 30-use-case video is shown whole. Press Play to see each arrive. Tell me the number.</p>
+<div id="opts"></div>
+</div>
+<script>
+const head='<p class="hd">Firstly, my Founder asked me to ship <em>a navigation&#8209;first model to 52 internal testers.</em></p>';
+const frame=b=>`<div class="frame"><div class="sl">${head}<div class="body">${b}</div><div class="ft"><span>18 &nbsp; Testing</span><span>Eden Case Study</span></div></div></div>`;
+const vid='<div class="vid"><video src="media/usecases.mp4" poster="media/usecases.jpg" muted loop autoplay playsinline></video><span class="cnt">30 use cases</span></div>';
+const steps='<div class="steps"><span>Has a task</span><i>&rarr;</i><span>Opens an app</span><i>&rarr;</i><span>Gives a command</span><i>&rarr;</i><span>Reads the answer</span></div>';
+const meas='<ul class="chk"><li>First-attempt task completion</li><li>Navigation friction</li><li>Apps, or saying what they wanted</li></ul>';
+const ben='<p class="qt">&ldquo;Clover, when does <b>Ben&rsquo;s Deli</b> open?&rdquo;</p><p class="x">Navigation&#8209;first has nowhere to send this: there is no built&#8209;in app for it on the HUD.</p>';
+const d=s=>`data-d="${s}"`;
+const O=[
+ ['01','Three glass panes','Hypothesis, test and result as three glass panes on the green line, each numbered with a plum bead; the result pane is mixed glass.',
+  `<div class="o1"><i class="ln gr" ${d(.1)}></i><div class="row">
+   <div class="p gw glass an" ${d(.3)}><span class="k">1</span><span class="tag">The hypothesis</span><p class="h">Familiar app navigation would make new hardware easier to learn.</p>${steps}</div>
+   <div class="p gs glass an" ${d(.5)}><span class="k">2</span><span class="tag">What I tested</span>${vid}<p class="sub">Navigation&#8209;first glasses went to 52 internal testers, measuring:</p>${meas}</div>
+   <div class="p gx glass an" ${d(.7)}><span class="k">3</span><span class="tag p">What testers showed</span><div style="display:flex;align-items:baseline;gap:10px"><span class="num">87%</span><span class="sub">spoke fluidly, not in app commands</span></div><div class="gw glass" style="border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:6px"><span class="tag">One tester asked</span>${ben}</div></div></div></div>`],
+ ['02','The verdict','The hypothesis on the left, struck through with a plum "Disproved" stamp; the evidence on the right: the video, 87%, Ben’s Deli.',
+  `<div class="o2"><div class="l"><div class="hy gw glass an" ${d(.2)}><span class="stamp pp" ${d(1.4)}>Disproved</span><span class="tag">The hypothesis</span><p class="qt">Familiar app navigation would make new hardware easier to learn.</p>${steps}</div>
+   <div class="an" ${d(.45)}>${vid}</div><p class="sub an" ${d(.55)}>Shipped to 52 internal testers across 30 use cases.</p></div>
+   <div class="r gx glass an" ${d(.8)}><span class="tag p">What testers showed</span><div class="big"><span class="num">87%</span><span class="h" style="font-weight:500">spoke fluidly from the start, not in app commands</span></div><div class="gw glass" style="border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:6px"><span class="tag">One tester asked</span>${ben}</div>${meas}</div></div>`],
+ ['03','One big number','87% is the hero in a mixed-glass panel; the quote, the test and the hypothesis stack beside it.',
+  `<div class="o3"><div class="hero gx glass an" ${d(.2)}><span class="tag p">What testers showed</span><span class="num pp" ${d(.6)}>87%</span><p class="h" style="font-weight:500">of testers spoke fluidly from the start, not in app commands.</p></div>
+   <div class="side"><div class="card gw glass an" ${d(.5)}><span class="tag">One tester asked</span>${ben}</div>
+   <div class="card gs glass an" ${d(.7)} style="display:grid;grid-template-columns:230px 1fr;gap:14px;align-items:center">${vid}<div style="display:flex;flex-direction:column;gap:6px"><span class="tag">What I tested</span><p class="sub">Navigation&#8209;first glasses, 52 internal testers.</p></div></div>
+   <div class="card gw glass an" ${d(.9)}><span class="tag">The hypothesis</span>${steps}</div></div></div>`],
+ ['04','A test timeline','The three stages as plum beads on the green line, read left to right, each with its card beneath.',
+  `<div class="o4"><i class="ln gr" ${d(.1)}></i><div class="row">
+   ${[['1','The hypothesis','gw',`<p class="h">Familiar app navigation would make new hardware easier to learn.</p>${steps}`],
+      ['2','What I tested','gs',`${vid}<p class="sub">52 internal testers, measuring:</p>${meas}`],
+      ['3','What testers showed','gx',`<div style="display:flex;align-items:baseline;gap:10px"><span class="num">87%</span><span class="sub">spoke fluidly</span></div>${ben}`]].map(([k,t,c,b],n)=>`<div class="c"><span class="k pp" ${d(.4+n*.3)}>${k}</span><div class="card ${c} glass an" ${d(.55+n*.3)}><span class="tag ${n==2?'p':''}">${t}</span>${b}</div></div>`).join('')}</div></div>`],
+ ['05','Expected vs what happened','The same four steps twice: as planned, then as Ben’s Deli broke them at "opens an app", with the evidence on the left.',
+  `<div class="o5"><div class="vcol"><div class="an" ${d(.2)}>${vid}</div><p class="sub an" ${d(.3)}>Navigation&#8209;first glasses went to 52 internal testers.</p><div class="gx glass an" ${d(.5)} style="border-radius:20px;padding:16px 18px"><div style="display:flex;align-items:baseline;gap:10px"><span class="num">87%</span><span class="sub">spoke fluidly, not in app commands</span></div></div></div>
+   <div class="rows"><div class="rw gw glass an" ${d(.6)}><span class="tag">The hypothesis: what we expected</span><div class="flow"><span>Has a task</span><i></i><span>Opens an app</span><i></i><span>Gives a command</span><i></i><span>Reads the answer</span></div></div>
+   <div class="rw gm glass an" ${d(.9)}><span class="tag p">What testers did</span><div class="flow"><span>&ldquo;When does Ben&rsquo;s Deli open?&rdquo;</span><i class="br"></i><span class="no">No app to open</span><i class="br"></i><span class="no" style="opacity:.5">&hellip;</span></div><p class="x">Navigation&#8209;first has nowhere to send this: there is no built&#8209;in app for it on the HUD.</p></div>
+   <div class="rw gw glass an" ${d(1.1)}><span class="tag">Measured</span>${meas}</div></div></div>`]];
+document.getElementById('opts').innerHTML=O.map(([n,t,ds,h],k)=>`<section class="opt" id="o${k}"><p class="lab">${n} ${t}<small>${ds}</small><button data-k="${k}">Play</button></p>${frame(h)}</section>`).join('');
+const fit=()=>document.querySelectorAll('.frame').forEach(f=>{f.firstElementChild.style.transform=`scale(${f.clientWidth/1280})`});
+addEventListener('resize',fit);fit();
+document.querySelectorAll('.lab button').forEach(b=>b.onclick=()=>{const s=document.getElementById('o'+b.dataset.k);s.classList.remove('play');void s.offsetWidth;s.classList.add('play');});
+document.querySelectorAll('[data-d]').forEach(e=>e.style.animationDelay=e.dataset.d+'s');
+document.querySelectorAll('.opt').forEach(s=>s.classList.add('play'));
+</script>
+</body></html>

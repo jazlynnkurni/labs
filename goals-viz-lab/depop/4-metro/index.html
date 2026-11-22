@@ -1,0 +1,37 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Depop 4 · Metro</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;600;700&display=swap">
+<link rel="stylesheet" href="../../shared.css">
+<style>
+/* a transit diagram: two lines, each point a station, and the offer as the interchange where you change from
+   Discovery to Deal. Straight runs and 45 degree bends only */
+.top{left:0;right:0;top:72px;display:flex;justify-content:center}
+.map{left:0;top:0;width:1280px;height:720px}
+.map .ln{fill:none;stroke-width:10;stroke-linecap:round;stroke-linejoin:round}
+.map .d{stroke:var(--sage)}.map .z{stroke:var(--plum)}
+.map .tk{stroke-width:6}
+.map .ic{fill:#fff;stroke:var(--ink);stroke-width:5}
+.name{font-size:28px;line-height:1.25;color:var(--ink)}
+.st{width:200px;font:400 17px/1.45 var(--hel);color:var(--ink)}
+.chg{font:600 17px/1.3 var(--jak);color:var(--plum);text-align:right;width:180px}
+</style></head>
+<body><div id="stage">
+<div class="top"><h2 class="head" data-b="0">Depop&rsquo;s value comes from 2 main processes:</h2></div>
+<svg class="map" viewBox="0 0 1280 720" aria-hidden="true">
+  <path class="ln d" data-b="1" d="M96 340H470L590 460H640"/>
+  <path class="ln d tk" data-b="2" d="M160 340V326"/><path class="ln d tk" data-b="3" d="M380 340V326"/>
+  <path class="ln z" data-b="5" d="M640 460H690L810 580H1184"/>
+  <path class="ln z tk" data-b="6" d="M840 580V594"/><path class="ln z tk" data-b="7" d="M1020 580V594"/>
+  <g data-b="4"><circle class="ic" cx="640" cy="460" r="16"/></g>
+</svg>
+<h3 class="name" style="left:96px;top:364px" data-b="1">Discovery</h3>
+<p class="st" style="left:160px;top:262px" data-b="2">One-off pieces from 5 million active sellers</p>
+<p class="st" style="left:380px;top:262px" data-b="3">Filters for brand, size, colour and price</p>
+<p class="chg" style="left:436px;top:484px" data-b="4">making an offer</p>
+<h3 class="name" style="right:96px;top:520px" data-b="5">Deal</h3>
+<p class="st" style="left:840px;top:606px;width:170px" data-b="6">Offers and bags that agree a price</p>
+<p class="st" style="left:1020px;top:606px;width:164px" data-b="7">Checkout with payments and shipping built in</p>
+</div>
+<p class="tag">Depop 4 · Metro · click to play the build · <a href="../../">all formats</a></p>
+<script src="../../shared.js"></script>
+</body></html>

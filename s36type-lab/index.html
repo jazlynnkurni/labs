@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Slide 36 type</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap">
+<style>
+/* Slide 36 as type: the summary in a white glass capsule, three rows with drawn-in stabilo, results as big plum numbers */
+:root{--ink:#14171B;--plum:#340414;--jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1240px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:#6f6b64;margin:0 0 18px;max-width:90ch}
+button{font:600 13px var(--jak);padding:9px 14px;border-radius:999px;border:0;background:#fff;box-shadow:0 0 0 1px rgba(52,4,20,.15);cursor:pointer;margin-bottom:16px;color:var(--plum)}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 14px 30px -20px rgba(0,0,0,.3);overflow:hidden;position:relative}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:52px 72px 0;position:absolute;left:0;top:0}
+.hd{font:500 40px/1.12 var(--jak);letter-spacing:-.02em;margin:0;max-width:30ch}
+.hd em{font-style:normal;color:var(--plum)}
+.body{position:absolute;left:72px;right:72px;top:176px;height:440px;display:flex;flex-direction:column;align-items:center}
+.fn{position:absolute;left:72px;bottom:86px;margin:0;font:italic 300 13px var(--hel);color:#8a8780}
+.ft{position:absolute;left:72px;right:72px;bottom:40px;border-top:1px solid rgba(20,23,27,.12);padding-top:12px;display:flex;justify-content:space-between;font:400 13px var(--hel)}
+.ft span:first-child{color:var(--plum)}
+/* the summary capsule */
+.cap{font:600 17px/1 var(--jak);padding:14px 22px;border-radius:999px;color:var(--plum);
+  background:radial-gradient(circle at 30% 0,#fff,rgba(214,222,215,.7));box-shadow:inset 1px 1px 1px #fff,0 0 0 1px rgba(52,4,20,.12),0 12px 22px -12px rgba(52,4,20,.35)}
+/* the three rows */
+.rows{width:100%;margin-top:26px}
+.row{display:grid;grid-template-columns:200px 1fr;align-items:baseline;column-gap:28px;padding:15px 0;border-top:1px solid rgba(20,23,27,.12)}
+.row:last-child{border-bottom:1px solid rgba(20,23,27,.12)}
+.tg{font:600 12px/1.4 var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0}
+.ln{margin:0;font:500 20px/1.35 var(--jak);color:var(--ink)}
+mark{color:inherit;background:linear-gradient(transparent 58%,rgba(169,153,57,.38) 58%) no-repeat;background-size:0% 100%;padding:0 2px}
+/* the results */
+.res{display:flex;justify-content:center;gap:72px;margin-top:30px}
+.r{display:flex;align-items:center;gap:14px}
+.r b{font:600 40px/1 var(--jak);letter-spacing:-.02em;color:var(--plum);font-variant-numeric:tabular-nums}
+.r span:last-child{font:500 14px/1.3 var(--jak);color:#8a8780;max-width:170px}
+.orb{flex:none;width:32px;height:32px;border-radius:50%;box-shadow:inset 2px 2px 2px rgba(255,255,255,.95),inset 0 -10px 16px -10px rgba(52,4,20,.22),0 0 0 1px rgba(20,23,27,.06),0 10px 18px -12px rgba(52,4,20,.4)}
+.og{background:radial-gradient(circle at 30% 22%,#fff,rgba(214,222,215,.95) 55%,rgba(155,166,156,.75))}
+.om{background:radial-gradient(circle at 30% 22%,#fff,rgba(222,216,224,.95) 55%,rgba(130,122,133,.7))}
+.ob{background:radial-gradient(circle at 30% 22%,#fff,rgba(220,220,218,.9) 50%,transparent 80%),linear-gradient(135deg,rgba(155,166,156,.85),rgba(130,122,133,.85))}
+/* the order: capsule, each row with its stabilo, then the numbers count up */
+.go .cap,.go .row,.go .r{animation:rise .6s cubic-bezier(.22,1,.36,1) both}
+.go .cap{animation-delay:.3s}
+.go .row:nth-child(1){animation-delay:.7s}.go .row:nth-child(2){animation-delay:1s}.go .row:nth-child(3){animation-delay:1.3s}
+.go .row:nth-child(1) mark{animation:draw .7s cubic-bezier(.45,.05,.3,1) 1.15s both}
+.go .row:nth-child(2) mark{animation:draw .7s cubic-bezier(.45,.05,.3,1) 1.45s both}
+.go .row:nth-child(3) mark{animation:draw .7s cubic-bezier(.45,.05,.3,1) 1.75s both}
+.go .r:nth-child(1){animation-delay:2.2s}.go .r:nth-child(2){animation-delay:2.4s}.go .r:nth-child(3){animation-delay:2.6s}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes draw{to{background-size:100% 100%}}
+</style></head><body>
+<div class="wrap">
+<h1>Slide 36, as type</h1>
+<p class="lede">No new media: the summary as a white glass capsule, the three columns as rows with a gold stabilo drawn under each key phrase, and the results as big plum numbers on glass orbs that count up last.</p>
+<button id="re">Replay</button>
+<div class="frame"><div class="sl" id="sl">
+<p class="hd">In conclusion, I set the rules <em>for when Clover showed a screen.</em></p>
+<div class="body">
+ <span class="cap">An intent-led HUD and an iPhone app, sharing one agent</span>
+ <div class="rows">
+  <div class="row"><p class="tg">On the glasses</p><p class="ln"><mark>Three levels of support</mark>, six primitives with a fit function, and models for failure and interruption.</p></div>
+  <div class="row"><p class="tg">On the phone</p><p class="ln">The <mark>SwiftUI app</mark>, Modes, the search-led AI and the garden direction.</p></div>
+  <div class="row"><p class="tg">Around both</p><p class="ln">The <mark>Eden and Clover brand</mark>, and a voice prototype with Soniox.</p></div>
+ </div>
+ <div class="res">
+  <div class="r"><span class="orb og"></span><b data-n="52">52</b><span>internal testers wearing it</span></div>
+  <div class="r"><span class="orb om"></span><b data-n="-67" data-s="%">&minus;67%</b><span>unnecessary HUD interactions</span></div>
+  <div class="r"><span class="orb ob"></span><b>&#10003;</b><span>pushed and shipped, now on the HUD with our manufacturer</span></div>
+ </div>
+</div>
+<p class="fn">Interactions: user actions from a request to its answer. Per request, 6 fell to 2: (6 &minus; 2) &divide; 6 &times; 100 = 66.7%. No public launch yet.</p>
+<div class="ft"><span>36 &nbsp; Findings</span><span>Eden Case Study</span></div>
+</div></div>
+</div>
+<script>
+const sl=document.getElementById('sl'),fr=sl.parentElement;
+const fit=()=>sl.style.transform=`scale(${fr.clientWidth/1280})`;addEventListener('resize',fit);fit();
+function count(){ document.querySelectorAll('[data-n]').forEach((b,k)=>{ const n=+b.dataset.n,s=b.dataset.s||'',t0=performance.now()+2200+k*200,D=900;
+  const f=now=>{ const p=Math.max(0,Math.min(1,(now-t0)/D)),e=1-Math.pow(1-p,3),v=Math.round(n*e); b.textContent=(v<0?'−':'')+Math.abs(v)+s; if(p<1) requestAnimationFrame(f); };
+  b.textContent='0'+s; requestAnimationFrame(f); }); }
+function play(){ sl.classList.remove('go'); void sl.offsetWidth; sl.classList.add('go'); count(); }
+document.getElementById('re').onclick=play; play();
+</script>
+</body></html>

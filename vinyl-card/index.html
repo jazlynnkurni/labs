@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Card choreography</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#FAF9F7;--ink:#14171B;--ink2:rgba(20,23,27,.66);--ink3:rgba(20,23,27,.42);--hair:rgba(20,23,27,.16);--plate:#FAF9F7;--jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+html[data-theme="dark"]{--paper:#1C1A17;--ink:#FAF9F7;--ink2:rgba(250,249,247,.66);--ink3:rgba(250,249,247,.42);--hair:rgba(250,249,247,.16);--plate:#262320}
+html,body{margin:0;background:var(--paper);color:var(--ink);font:300 15.5px/1.62 var(--hel);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:56px 30px 96px}
+.label{font:600 10.5px/1.5 var(--jak);letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+h1{font:500 clamp(28px,4vw,44px)/1.12 var(--jak);letter-spacing:-.012em;margin:12px 0 0;max-width:22ch}
+p.lede{font-size:17px;line-height:1.62;color:var(--ink2);margin:16px 0 0;max-width:60ch}
+section{padding-top:72px}
+section .head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+section h2{font:500 clamp(22px,2.6vw,30px)/1.2 var(--jak);letter-spacing:-.012em;margin:12px 0 0;max-width:26ch}
+section .why{margin:0;max-width:50ch;color:var(--ink2);font-size:15px}
+.stage{position:relative;margin-top:32px;height:520px;border:1px solid var(--hair);overflow:hidden}
+.stage .hint{position:absolute;left:24px;bottom:18px;font:300 12.5px var(--hel);color:var(--ink3);pointer-events:none}
+/* the record */
+.rec{position:absolute;left:120px;top:140px;width:240px;height:240px;cursor:pointer;--shift:0px;transition:transform .55s cubic-bezier(.22,1,.36,1);transform:translateX(var(--shift))}
+.rec .disc{position:absolute;top:8px;left:26px;width:224px;height:224px;border-radius:50%;transition:transform .6s cubic-bezier(.22,1,.36,1);transform:translateX(var(--out,44px))}
+.rec .disc canvas{position:absolute;inset:-6%;width:112%;height:112%;display:block}
+.rec .sleeve{position:absolute;inset:0;border-radius:6px;overflow:hidden;background:#FAF9F7;box-shadow:0 0 0 .5px rgba(20,23,27,.10),0 1px 2px rgba(20,23,27,.06),0 10px 24px -8px rgba(20,23,27,.18),0 30px 60px -20px rgba(20,23,27,.28);color:#14171B}
+.rec .sleeve::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");mix-blend-mode:multiply;opacity:.55}
+.rec .sleeve .t{position:absolute;left:0;right:0;bottom:0;padding:12px 18px 14px;font:500 13px var(--jak);display:flex;justify-content:space-between;align-items:baseline}
+.rec .sleeve .t small{font:500 10.5px var(--jak);letter-spacing:.12em;color:rgba(20,23,27,.42)}
+.rec .sleeve .win{position:absolute;left:15%;top:48%;width:70%;aspect-ratio:1;transform:translateY(-50%);border-radius:50%;overflow:hidden;background:rgba(255,255,255,.55);transition:background .45s ease;box-shadow:inset 0 0 0 1px rgba(20,23,27,.10),inset 14px 4px 26px -8px rgba(20,23,27,.22),inset -6px -8px 18px -10px rgba(255,255,255,.9),inset 0 10px 30px rgba(255,255,255,.5)}
+.rec .sleeve .win .tint{position:absolute;inset:0;background:var(--lab);opacity:.22;mix-blend-mode:multiply;z-index:1;pointer-events:none;transition:opacity .45s ease}
+.rec .sleeve .win img{position:absolute;left:50%;top:50%;width:70%;height:70%;object-fit:contain;transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(var(--s));filter:blur(2.6px) saturate(.7) contrast(.9);opacity:.78;transition:filter .5s ease,opacity .5s ease}
+.rec .sleeve .win::after{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");mix-blend-mode:screen;opacity:.98;pointer-events:none;transition:opacity .5s ease;z-index:2}
+.rec.hot .sleeve .win{background:#fff}.rec.hot .sleeve .win .tint{opacity:0}.rec.hot .sleeve .win img{filter:none;opacity:1}.rec.hot .sleeve .win::after{opacity:0}
+/* the card: the live site's preview, 20px plate, 12px inset recording, caption */
+.pv{position:absolute;width:440px;opacity:0;pointer-events:none;z-index:5;border-radius:20px;padding:12px;background:var(--plate);outline:1px solid var(--hair);outline-offset:-1px;box-shadow:0 30px 80px -30px rgba(0,0,0,.35);will-change:transform,opacity,clip-path}
+.pv .m{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:var(--plate)}
+.pv .m video,.pv .m img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.pv .c{padding:16px 10px 8px}
+.pv .c b{display:block;font:500 20px/1.25 var(--jak);color:var(--ink)}
+.pv .c i{display:block;font:500 14px/1.4 var(--jak);font-style:normal;color:var(--ink3);margin:4px 0 8px}
+.pv .c span{display:block;font:300 15px/1.5 var(--hel);color:var(--ink2);max-width:40ch}
+.tools{display:flex;gap:16px;align-items:center;margin-top:48px;flex-wrap:wrap}
+label.chk{display:flex;gap:10px;align-items:center;font:500 12.5px var(--jak)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}.seg button{font:500 12px var(--jak);color:var(--ink);background:transparent;border:1px solid var(--hair);border-radius:999px;padding:6px 11px;cursor:pointer}.seg button[aria-pressed=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+</style></head><body>
+<div class="wrap">
+  <div class="label">Card choreography · five ways the preview joins the record</div>
+  <h1>The record moves, the card arrives with it.</h1>
+  <p class="lede">One record, the real pressing, on five stages. Hover it: in every case the disc slides out and spins up and the window clears. What differs is how the preview card comes in, timed against that motion so the two read as one gesture rather than two things happening. Pick the project with the buttons.</p>
+  <div class="seg" id="pick" style="margin-top:24px"></div>
+  <div id="stages"></div>
+  <div class="tools"><label class="chk"><input id="dark" type="checkbox"> dark mode</label></div>
+</div>
+<script>
+const M='http://localhost:5330';
+const P=[
+  {n:'01',t:'Fostr',img:'marks/fostr.png',role:'Founding design engineer',lab:'#9ba69c',st:'Live',s:'Building the brand, landing site and internal platform from 0 to 1',v:M+'/videos/work-fostr.mp4',pic:M+'/videos/work-fostr.jpg'},
+  {n:'02',t:'Halodoc',img:'marks/halodoc-mark.png',role:'Product designer',lab:'#A99939',st:'Shipped to 20M+ users',s:'Designing the onboarding journey for AI Prescription on mobile',v:M+'/videos/trim/work-halodoc.mp4',pic:M+'/videos/trim/work-halodoc.jpg'},
+  {n:'03',t:'Conduit Commerce',img:'marks/conduit-mark.png',role:'Product design lead',lab:'#340414',st:'Shipped',s:'Designing and shipping a B2B SaaS website for an AI-feature launch',v:M+'/videos/trim/work-conduit.mp4',pic:M+'/videos/trim/work-conduit.jpg'},
+  {n:'04',t:'Second Self',img:'marks/second-self.svg',role:'Design engineer',lab:'#827a85',st:'YHacks \u201926, 1st place',s:'Building an AI agent that lives on your own Mac',v:M+'/videos/second-self.mp4',pic:M+'/videos/second-self.jpg'},
+  {n:'05',t:'Manus AI',img:'marks/manus-mark.svg',role:'Product designer',lab:'#1C1A17',st:'Approved, in development',s:'Designing an AI community platform to drive adoption',v:M+'/videos/work-manus.mp4',pic:M+'/videos/work-manus.jpg'},
+  {n:'06',t:'Olive',img:'marks/olive.png',role:'Product designer',lab:'#9ba69c',st:'NYU UX Design-a-thon \u201925, 2nd place',s:'Designing an AI-powered carbon tracking app',v:M+'/videos/trim/work-olive.mp4',pic:M+'/videos/trim/work-olive.jpg'},
+  {n:'07',t:'SomiaCX',img:'marks/somiacx-mark.png',role:'Product designer',lab:'#A99939',st:'0 to 1',s:'Architecting a unified UVP system for three financial subsidiaries',pic:M+'/images/trim/work-somiacx.png'},
+];
+
+let TITLE_='',NUM_='';
+const TAU=Math.PI*2;
+const hash=(x,y,s)=>{const n=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return n-Math.floor(n);};
+/* ---- shared pieces ---- */
+function label(c,R,opts={}){ const r=R*.355; c.save(); c.rotate(opts.ang||0); c.translate(R*.004,R*.003);   /* labels are never dead centre: the wobble you see on a turntable */
+  c.fillStyle=opts.col||LAB; c.beginPath(); c.arc(0,0,r,0,TAU); c.fill();
+  /* paper label: a faint tooth and a bright pressed rim where the vinyl meets it */
+  c.save(); c.beginPath(); c.arc(0,0,r,0,TAU); c.clip(); c.globalAlpha=.12; for(let i=0;i<400;i++){ c.fillStyle=hash(i,1,5)>.5?'#fff':'#000'; c.fillRect((hash(i,2,5)-.5)*2*r,(hash(i,3,5)-.5)*2*r,1,1); } c.restore();
+  c.lineWidth=R*.012; c.strokeStyle='rgba(255,255,255,.55)'; c.beginPath(); c.arc(0,0,r-R*.006,0,TAU); c.stroke();
+  c.lineWidth=R*.006; c.strokeStyle='rgba(0,0,0,.35)'; c.beginPath(); c.arc(0,0,r+R*.004,0,TAU); c.stroke();
+  c.fillStyle='rgba(250,249,247,.95)'; c.textAlign='center'; c.textBaseline='middle';
+  c.font=`600 ${Math.round(R*.055)}px "Plus Jakarta Sans"`; c.fillText((TITLE_||'').toUpperCase(),0,-r*.40);
+  c.font=`500 ${Math.round(R*.040)}px "Plus Jakarta Sans"`; c.fillStyle='rgba(250,249,247,.75)'; c.fillText('SIDE A',0,r*.36); c.fillText((NUM_||'')+' · 33⅓',0,r*.56);
+  c.restore();
+  /* the spindle hole is the true centre; it does not move */
+  c.fillStyle='rgba(20,18,22,1)'; c.beginPath(); c.arc(0,0,R*.026,0,TAU); c.fill();
+  c.lineWidth=1; c.strokeStyle='rgba(255,255,255,.5)'; c.beginPath(); c.arc(0,R*.003,R*.026,0.2,Math.PI-.2); c.stroke();
+}
+function edge(c,R){ c.lineWidth=R*.012; c.strokeStyle='rgba(0,0,0,.55)'; c.beginPath(); c.arc(0,0,R-R*.004,0,TAU); c.stroke(); c.lineWidth=1; c.strokeStyle='rgba(255,255,255,.22)'; c.beginPath(); c.arc(0,0,R-R*.013,0,TAU); c.stroke(); }
+function shadow(c,R,dpr,dark){ c.shadowColor=dark?'rgba(0,0,0,.7)':'rgba(20,23,27,.42)'; c.shadowBlur=22*dpr; c.shadowOffsetY=10*dpr; c.fillStyle='#111'; c.beginPath(); c.arc(0,0,R,0,TAU); c.fill(); c.shadowColor='transparent'; }
+/* two light fans opposite each other, the way grooves catch a lamp; they stay fixed to the lamp while the disc turns */
+function fans(c,R,strength,width,lampA){
+  for(const [a,w] of [[lampA,1],[lampA+Math.PI,.72]]){ const g=c.createConicGradient(a-width/2,0,0); const s=strength*w;
+    g.addColorStop(0,'rgba(255,255,255,0)'); g.addColorStop(width/TAU*.35,`rgba(255,255,255,${s*.45})`); g.addColorStop(width/TAU*.5,`rgba(255,255,255,${s})`); g.addColorStop(width/TAU*.65,`rgba(255,255,255,${s*.45})`); g.addColorStop(width/TAU,'rgba(255,255,255,0)'); g.addColorStop(1,'rgba(255,255,255,0)');
+    c.fillStyle=g; c.fillRect(-R,-R,2*R,2*R); }
+}
+function grooveMask(c,R,inner,outer,gaps){
+  /* restricts to the grooved area, with the dead-wax and the gaps left alone */
+  c.beginPath(); c.arc(0,0,outer,0,TAU); c.arc(0,0,inner,0,TAU,true); c.clip('evenodd');
+}
+/* the things on a real disc that are not symmetric, so the turn can be seen: the lead-in and run-out
+   spirals, a few faint radial pressing streaks, a scatter of dust; drawn in the disc's own frame */
+function marks(c,R,ang,light){
+  c.save(); c.rotate(ang);
+  c.strokeStyle=light?'rgba(0,0,0,.14)':'rgba(255,255,255,.16)'; c.lineWidth=.9;
+  c.beginPath(); for(let t=0;t<TAU*2.5;t+=.04){ const r=R*.965-t/(TAU*2.5)*R*.02; c.lineTo(Math.cos(t)*r,Math.sin(t)*r); } c.stroke();            /* lead-in */
+  c.beginPath(); for(let t=0;t<TAU*3;t+=.04){ const r=R*.42-t/(TAU*3)*R*.025; c.lineTo(Math.cos(t)*r,Math.sin(t)*r); } c.stroke();                 /* run-out */
+  c.strokeStyle=light?'rgba(0,0,0,.05)':'rgba(255,255,255,.03)'; c.lineWidth=R*.02;
+  for(const a of [.4,1.9,3.3,4.6,5.7]){ c.beginPath(); c.moveTo(Math.cos(a)*R*.42,Math.sin(a)*R*.42); c.lineTo(Math.cos(a+.05)*R*.95,Math.sin(a+.05)*R*.95); c.stroke(); }   /* pressing streaks */
+  c.fillStyle=light?'rgba(0,0,0,.35)':'rgba(255,255,255,.4)'; for(let i=0;i<34;i++){ const a=hash(i,1,9)*TAU, r=R*(.43+hash(i,2,9)*.5); c.fillRect(Math.cos(a)*r,Math.sin(a)*r,1,1); }
+  c.restore();
+}
+/* ---- a general pressed disc: every groove a V in a height field, shaded by one lamp. opts: body, lab, lamp
+   (angle), pitch (px), spec, trans (0 opaque vinyl .. 1 translucent coloured), streak */
+function pressedDraw(opts){
+  const cache=new Map();
+  return function(c,R,ang,dark){
+    const W=Math.round(R*2);
+    if(!cache.has(W)){ const b=document.createElement('canvas'); b.width=b.height=W; const d=b.getContext('2d').createImageData(W,W), px=d.data;
+      const la=opts.lamp??-2.2, LX=Math.cos(la)*.9, LY=Math.sin(la)*.9, LZ=opts.lz??.36, m=Math.hypot(LX,LY,LZ), lx=LX/m,ly=LY/m,lz=LZ/m;
+      const pitch=opts.pitch??1.25, body=opts.body, lab=opts.lab, trans=opts.trans??0, spec=opts.spec??.9;
+      for(let y=0;y<W;y++) for(let x=0;x<W;x++){ const dx=x-W/2+.5, dy=y-W/2+.5, r=Math.hypot(dx,dy), o=(y*W+x)*4; if(r>R){ px[o+3]=0; continue; }
+        const u=r/R; let dh=0;
+        if(u>.395&&u<.965){ const p=r/pitch; const f=p-Math.floor(p); dh=(f<.5?-1:1)*(opts.depth??1.6); }
+        if(u<=.355&&u>.345) dh=-6; if(u>.965) dh=(u-.965)*-40;
+        const nx=dx/r*dh, ny=dy/r*dh, nl=Math.hypot(nx,ny,1), nnx=-nx/nl, nny=-ny/nl, nnz=1/nl;
+        const diff=Math.max(0,nnx*lx+nny*ly+nnz*lz); const hx=lx,hy=ly,hz=lz+1,hm=Math.hypot(hx,hy,hz); const sp=Math.pow(Math.max(0,nnx*hx/hm+nny*hy/hm+nnz*hz/hm),28);
+        let col=u<=.355?lab:body; let k=.55+.45*diff;
+        if(trans>0&&u>.355){ /* translucent: thinner toward the rim reads lighter, the grooves scatter the light so the fans are softer */ const th=1-(u-.355)/.61; k=.80+.22*diff; col=[col[0]+(255-col[0])*(1-th)*trans*.35,col[1]+(255-col[1])*(1-th)*trans*.35,col[2]+(255-col[2])*(1-th)*trans*.35]; }
+        const s=sp*(u<=.355?.25:spec*(1-trans*.55))*255;
+        px[o]=Math.min(255,col[0]*k+s); px[o+1]=Math.min(255,col[1]*k+s); px[o+2]=Math.min(255,col[2]*k+s); px[o+3]=255; }
+      b.getContext('2d').putImageData(d,0,0); cache.set(W,b); }
+    c.save(); c.rotate(ang); c.drawImage(cache.get(W),-R,-R,2*R,2*R); c.restore();
+    marks(c,R,ang,!!opts.light);
+    c.save(); c.rotate(ang); c.translate(R*.004,R*.003); c.fillStyle=opts.text||'rgba(250,249,247,.95)'; c.textAlign='center'; c.textBaseline='middle'; const r=R*.355; c.font=`600 ${Math.round(R*.055)}px "Plus Jakarta Sans"`; c.fillText((TITLE_||'').toUpperCase(),0,-r*.40); c.font=`500 ${Math.round(R*.040)}px "Plus Jakarta Sans"`; c.globalAlpha=.75; c.fillText('SIDE A',0,r*.36); c.fillText((NUM_||'')+' · 33⅓',0,r*.56); c.globalAlpha=1;
+    c.lineWidth=R*.012; c.strokeStyle='rgba(255,255,255,.5)'; c.beginPath(); c.arc(0,0,r-R*.006,0,TAU); c.stroke(); c.restore();
+    c.fillStyle='#141216'; c.beginPath(); c.arc(0,0,R*.026,0,TAU); c.fill(); edge(c,R);
+  };
+}
+
+const hexRGB=h=>{const n=parseInt(h.slice(1),16);return [(n>>16)&255,(n>>8)&255,n&255];};
+/* THE PRESSINGS TAKE TURNS: black vinyl under three lights, and the three translucent colours, the label in each project's colour */
+/* the lamp sits upper RIGHT here: the disc peeks out of the sleeve's right side, so that is the crescent
+   that must carry the lit fan, not the half hidden behind the cover */
+const PRESS=[
+  {kind:'P1',opt:{body:[16,15,18],lamp:-.7,lz:.3,spec:1.1,depth:1.8}},
+  {kind:'C1',opt:{body:[158,172,160],lamp:-.7,lz:.55,spec:.7,trans:.8,light:true}},
+  {kind:'P2',opt:{body:[22,21,25],lamp:-1.2,lz:.9,spec:.35,depth:1.2}},
+  {kind:'C2',opt:{body:[136,126,140],lamp:-.7,lz:.55,spec:.75,trans:.6,light:true}},
+  {kind:'P3',opt:{body:[14,13,16],lamp:-.4,lz:.28,spec:.9,pitch:2.2,depth:2.2}},
+  {kind:'C3',opt:{body:[186,164,84],lamp:-.7,lz:.55,spec:.8,trans:.7,light:true}},
+  {kind:'P1',opt:{body:[16,15,18],lamp:-.7,lz:.3,spec:1.1,depth:1.8}},
+];
+const DISCS=[];
+function mountDisc(el,p,i){ const cv=el.querySelector('.disc canvas'), c=cv.getContext('2d'); const pr=PRESS[i%PRESS.length];
+  const lab=hexRGB(p.lab); const darkLab=lab[0]+lab[1]+lab[2]<300;
+  const draw=pressedDraw(Object.assign({lab,text:darkLab?'rgba(250,249,247,.95)':'rgba(20,23,27,.85)'},pr.opt));
+  const S={el,cv,c,draw,ang:0,vel:0,raf:0,title:p.t,num:p.n}; DISCS.push(S); wakeDisc(S); return S; }
+function wakeDisc(S){ if(!S.raf) S.raf=requestAnimationFrame(()=>frameDisc(S)); }
+function frameDisc(S){ S.raf=0; const dpr=Math.min(2,devicePixelRatio||1), r=S.cv.getBoundingClientRect(), W=Math.round(r.width*dpr); if(!W) return; if(S.cv.width!==W){ S.cv.width=S.cv.height=W; }
+  const hot=S.el.classList.contains('hot')||S.el.matches(':hover'); S.vel+=((hot?.06:0)-S.vel)*.05; S.ang+=S.vel;
+  const c=S.c, R=W/2/1.12, dark=document.documentElement.getAttribute('data-theme')==='dark';
+  c.setTransform(1,0,0,1,0,0); c.clearRect(0,0,W,W); c.save(); c.translate(W/2,W/2);
+  TITLE_=S.title; NUM_=S.num; shadow(c,R,dpr,dark); S.draw(c,R,S.ang,dark); c.restore();
+  if(Math.abs(S.vel)>.0004||hot) S.raf=requestAnimationFrame(()=>frameDisc(S)); }
+const MARKS={"Fostr": {"x": 1.1417282430213465, "y": 6.055008210180624, "s": 0.96}, "Halodoc": {"x": -1.1987977756892234, "y": 7.936018431495406, "s": 0.84}, "Conduit Commerce": {"x": 4.200116175856309, "y": 1.5476516812865497, "s": 0.93}, "Second Self": {"x": 1.092412019632414, "y": 48.66397765246451, "s": 2}, "Manus AI": {"x": 0.6637687969924817, "y": -0.3527699456975781, "s": 1.11}, "Olive": {"x": 21.35139280492899, "y": 1.1960239139515494, "s": 1.04}, "SomiaCX": {"x": 6.520696271929828, "y": -5.412130586883876, "s": 1.24}};
+
+const ease='cubic-bezier(.22,1,.36,1)';
+/* each choreography: enter(pv, rec) and leave(pv, rec) using the Web Animations API, so timing against the record's own
+   .55s slide is explicit. The card lands at x = record right + 28, vertically centred on the record. */
+const V=[
+  { id:'rise', head:'Rise with the disc', name:'01 · Rise with the disc', why:'The card comes up from behind the record on the same curve the disc slides on, a hair later, like a second sheet pulled from the same sleeve. Fade and a 24px rise, 480ms, starting 120ms after the hover.',
+    enter(pv,rec){ pv.animate([{opacity:0,transform:'translateY(24px) scale(.96)'},{opacity:1,transform:'none'}],{duration:480,delay:120,easing:ease,fill:'both'}); },
+    leave(pv){ pv.animate([{opacity:1,transform:'none'},{opacity:0,transform:'translateY(14px) scale(.98)'}],{duration:260,easing:'ease',fill:'both'}); } },
+  { id:'push', head:'Pushed out by the disc', name:'02 · Pushed out by the disc', why:'The disc itself seems to push the card out: the card starts tucked at the disc\'s edge, clipped to nothing, and is revealed left to right as the disc travels, so the recording appears to be printed on the air the record moves through.',
+    enter(pv,rec){ pv.animate([{opacity:1,clipPath:'inset(0 100% 0 0 round 20px)',transform:'translateX(-40px)'},{opacity:1,clipPath:'inset(0 0% 0 0 round 20px)',transform:'none'}],{duration:620,delay:40,easing:ease,fill:'both'}); },
+    leave(pv){ pv.animate([{opacity:1,clipPath:'inset(0 0% 0 0 round 20px)'},{opacity:1,clipPath:'inset(0 100% 0 0 round 20px)',transform:'translateX(-24px)'}],{duration:320,easing:'ease',fill:'both'}); } },
+  { id:'spin', head:'Spun out', name:'03 · Spun out', why:'The card inherits the disc\'s rotation: it arrives with a small turn that unwinds as it settles, pivoting from its left edge nearest the record, so the spin-up of the disc carries into the card and dies there.',
+    enter(pv,rec){ pv.style.transformOrigin='0% 50%'; pv.animate([{opacity:0,transform:'rotate(-6deg) scale(.94) translateX(-20px)'},{opacity:1,transform:'rotate(.6deg) scale(1.005)',offset:.7},{opacity:1,transform:'none'}],{duration:640,delay:80,easing:ease,fill:'both'}); },
+    leave(pv){ pv.animate([{opacity:1,transform:'none'},{opacity:0,transform:'rotate(-3deg) scale(.97) translateX(-12px)'}],{duration:280,easing:'ease',fill:'both'}); } },
+  { id:'lift', head:'Record lifts, card beneath', name:'04 · Record lifts, card beneath', why:'The whole record lifts a little as the disc comes out, and the card slides in under it from the right, low and flat, like a sleeve note pulled from the shelf. The card is the ground, the record is the object.',
+    enter(pv,rec){ rec.animate([{transform:'translateX(var(--shift))'},{transform:'translateX(var(--shift)) translateY(-10px)'}],{duration:500,easing:ease,fill:'both'}); pv.style.zIndex='1'; pv.animate([{opacity:0,transform:'translateX(60px)'},{opacity:1,transform:'none'}],{duration:560,delay:60,easing:ease,fill:'both'}); },
+    leave(pv,rec){ rec.animate([{transform:'translateX(var(--shift)) translateY(-10px)'},{transform:'translateX(var(--shift))'}],{duration:400,easing:ease,fill:'both'}); pv.animate([{opacity:1,transform:'none'},{opacity:0,transform:'translateX(30px)'}],{duration:260,easing:'ease',fill:'both'}); } },
+  { id:'stagger', head:'Frame, recording, words', name:'05 · Staggered: frame, then recording, then words', why:'The card arrives in three beats timed to the disc: the plate first as the disc starts to move, the recording fades up inside it as the disc reaches full slide, the caption last as the spin settles. Nothing moves far; it assembles.',
+    enter(pv,rec){ pv.animate([{opacity:0,transform:'scale(.97)'},{opacity:1,transform:'none'}],{duration:380,delay:40,easing:ease,fill:'both'});
+      pv.querySelector('.m').animate([{opacity:0,transform:'scale(1.03)'},{opacity:1,transform:'none'}],{duration:520,delay:260,easing:ease,fill:'both'});
+      pv.querySelector('.c').animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:420,delay:480,easing:ease,fill:'both'}); },
+    leave(pv){ pv.animate([{opacity:1},{opacity:0}],{duration:240,easing:'ease',fill:'both'}); pv.querySelector('.m').animate([{opacity:1},{opacity:0}],{duration:200,fill:'both'}); pv.querySelector('.c').animate([{opacity:1},{opacity:0}],{duration:200,fill:'both'}); } },
+];
+let cur=2;   /* Conduit by default: a black pressing with a recording */
+const stages=[];
+function stage(v){
+  const sec=document.createElement('section'); sec.innerHTML=`<div class="head"><div><div class="label">${v.name}</div><h2>${v.head}</h2></div><p class="why">${v.why}</p></div><div class="stage"><div class="pv"><div class="m"></div><div class="c"><b></b><i></i><span></span></div></div><div class="hint">hover the record</div></div>`;
+  document.getElementById('stages').appendChild(sec);
+  const st=sec.querySelector('.stage'), pv=sec.querySelector('.pv'); let rec=null, disc=null, media=null;
+  function build(){ if(rec) rec.remove(); const p=P[cur], m=MARKS[p.t]||{x:0,y:0,s:1}; rec=document.createElement('div'); rec.className='rec'; rec.dataset.i=cur; rec.style.setProperty('--lab',p.lab);
+    rec.innerHTML=`<div class="disc"><canvas></canvas></div><div class="sleeve"><div class="win"><div class="tint"></div><img src="${p.img}" alt="" style="--x:${m.x}%;--y:${m.y}%;--s:${m.s}"></div><div class="t"><span>${p.t}</span><small>${p.n}</small></div></div>`;
+    st.insertBefore(rec,pv); disc=mountDisc(rec,p,cur);
+    pv.querySelector('b').textContent=p.t; pv.querySelector('i').textContent=p.role+' · '+p.st; pv.querySelector('span').textContent=p.s;
+    const mm=pv.querySelector('.m'); mm.innerHTML=''; if(p.v){ media=document.createElement('video'); media.muted=true; media.loop=true; media.playsInline=true; media.preload='auto'; media.poster=p.pic; media.src=p.v; } else { media=document.createElement('img'); media.src=p.pic; } mm.appendChild(media);
+    const r=rec.getBoundingClientRect(), s=st.getBoundingClientRect(); pv.style.left=(r.right-s.left-130+28)+'px'; pv.style.top=(r.top-s.top+r.height/2)+'px'; pv.style.transform='none'; pv.style.marginTop='-'+(pv.offsetHeight/2)+'px';
+    rec.addEventListener('pointerenter',()=>{ rec.classList.add('hot'); rec.style.setProperty('--shift','-130px'); rec.style.setProperty('--out','92px'); wakeDisc(disc); v.enter(pv,rec); media.play&&media.play().catch(()=>{}); });
+    rec.addEventListener('pointerleave',()=>{ rec.classList.remove('hot'); rec.style.setProperty('--shift','0px'); rec.style.setProperty('--out','44px'); wakeDisc(disc); v.leave(pv,rec); media.pause&&media.pause(); });
+  }
+  build(); stages.push({build});
+}
+V.forEach(stage);
+const pick=document.getElementById('pick'); P.forEach((p,i)=>{ const b=document.createElement('button'); b.textContent=p.t; b.setAttribute('aria-pressed',i===cur); b.addEventListener('click',()=>{ cur=i; pick.querySelectorAll('button').forEach((x,k)=>x.setAttribute('aria-pressed',k===i)); stages.forEach(s=>s.build()); }); pick.appendChild(b); });
+document.getElementById('dark').addEventListener('change',e=>{ document.documentElement.setAttribute('data-theme',e.target.checked?'dark':'light'); DISCS.forEach(wakeDisc); });
+</script>
+</body></html>

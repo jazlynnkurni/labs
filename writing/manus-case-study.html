@@ -1,0 +1,251 @@
+<html><body><h1>Manus AI community redesign</h1>
+<p><i>Case study text in the structure of Bella Rinne's New York Times onboarding case study. Section labels, headlines and body follow her moves one for one. Image slots name the file in the deck repo (assets/manus) where one exists.</i></p>
+<hr>
+<p style="color:#7a8aa6;font-size:10pt">Summary</p>
+<h2>Redesigning the Manus AI community so new users stay.</h2>
+<p>The community redesign gave the Manus community a front door. New users had been landing on an archive of past events and leaving within seconds, with the products listed only as names in the footer. Users arrive during high-traffic moments, a hackathon or a product launch, and they stay because of <b>an AI-guided path ranked by fit</b>, <b>a reason attached to every recommendation</b>, and <b>one dashboard that holds their role, events and contributions</b>.</p>
+<p>I conceptualised, researched, designed and shipped the community dashboard and its AI-guided paths as the sole designer, through 13 interviews, three rounds of usability testing and two research-led pivots. <b>Retention rose from 30% to 65 to 70%</b> among internal testers once the AI-guided architecture was rolled out to them, time on site rose 2.1 times, and 80% reported more clarity on where to start and how to contribute. The redesign is approved and in production ahead of public launch.</p>
+<p style="color:#b03030"><b>INSERT HERO VIDEO HERE: manus-hero.mp4, the shipped community page in a laptop frame</b></p>
+<hr>
+<p style="color:#7a8aa6;font-size:10pt">Context</p>
+<h2>Manus was shipping capabilities faster than its users could learn them, and the only teaching channel was a notification badge.</h2>
+<p>During the 1.5 Max launch, which brought a Figma MCP connector and personalised GenAI customisation, the founder's bet was that user-generated video would spread education. The videos drew views and downloads, yet the share of users who went on to use the capability a video demonstrated stayed low. UGC was spreading awareness rather than understanding.</p>
+<p>Through the winter, people were messaging me on LinkedIn two or three times a week asking how to get involved with Manus. The community page was where they landed, and it was converting almost none of them. That was where I found my task.</p>
+<p style="color:#b03030"><b>INSERT IMAGE HERE: a cropped grid of the LinkedIn messages, names blurred</b></p>
+<hr>
+<p style="color:#7a8aa6;font-size:10pt">Opportunity</p>
+<h2>Capitalising on high traffic from the 1.5 Max launch and the Meta acquisition to capture a new user's interest in capabilities, roles and ways to contribute, and continuously serving them the next step that suits their needs.</h2>
+<p>When I compared UGC engagement with feature activation in November 2025 and then sat down with the community lead, we found that the biggest gap for launch-season users was between watching and doing: "high views and downloads with <b>low activation</b> told me UGC was spreading awareness, not understanding" (<i>Featured-Capability Activation Rate, internal analysis</i>). The community page had the same shape, high discoverability and low conversion.</p>
+<p>We anticipated an influx of curious users registering and reaching out in the weeks around the launch and the acquisition news, and planned to meet these new users where they were, by both positioning the community page as the place to see what Manus can do, while also exposing them to roles and events they could join to sustain engagement. We will collect signals about <b>what each user does and wants to build</b> so we can act beyond this launch cycle without appearing to miss this unique moment.</p>
+<p style="color:#b03030"><b>INSERT IMAGE HERE: old-community.png, the community page before the redesign, with the three funnel callouts: click-through high, retention low, conversion flat</b></p>
+<hr>
+<p style="color:#7a8aa6;font-size:10pt">Discovery</p>
+<h2>What are new users actually failing at?</h2>
+<p>I ran 13 user interviews and a competitive audit to get a better understanding of how newcomers and power users experienced the community page and what Manus could do for them. This research offered insights into what we should consider in our initial designs.</p>
+<p>☞ New users... <b>cannot tell what Manus can do for them, so they do not know where to begin.</b></p>
+<ul>
+<li>Non-technical newcomers could not identify what Manus could do for them. The six products appeared only as names in the footer, with nothing showing what any of them does. <i>Newcomer interviews, 5 of 13, ages 22 to 35</i></li>
+<li>"I've been using Manus for weeks, but sometimes I can't keep up with the constant upgrades like its 1.5 Max series. The community doesn't help with that at all, it's just a list of past events." <i>Manus user interviewee</i></li>
+<li>"I opened the community page and just didn't know what I was supposed to do. There's no indication of where to start or what counts as participating." <i>Manus community member</i></li>
+</ul>
+<p>☞ Power users... <b>want to contribute but have no pathway and no signal that their work is seen.</b></p>
+<ul>
+<li>They have no structured way to share what they build and want visibility and credibility for it. Without a route in, they stay passive. <i>Power user interviews, 8 of 13, ages 25 to 40+</i></li>
+<li>"I want to contribute and share what I've built, but I have no idea if anyone will see it or if it even matters. There's no feedback, no signal that my work is visible." <i>Manus community member</i></li>
+</ul>
+<p>☞ Across the market, no community... <b>is both fast to update and built for lasting contribution.</b></p>
+<ul>
+<li>Forums and docs are searchable but slow and quiet. Chat communities are fast but scattered. Gamified platforms reward activity over impact. <i>Competitive audit</i></li>
+<li>That gap became our two design questions. How might we make AI capabilities legible to everyday users? How might we turn passive members into active contributors? <i>Design questions</i></li>
+</ul>
+<p style="color:#b03030"><b>INSERT DIAGRAM HERE: the competitive audit 2x2, slow to fast on one axis, fleeting to lasting on the other, with the Manus gap marked</b></p>
+<hr>
+<p style="color:#7a8aa6;font-size:10pt">Deliverables</p>
+<h2>So, how do we create a community that shows new users what Manus can do and gives them a way in?</h2>
+<p>We proposed a new <b>community dashboard</b> that holds a user's role, active path, upcoming events and pending contributions in one place. That role is reflected in an <b>AI-guided path</b>, a continuous guidance layer that infers each user's role, focus area and mode from what they do and recommends a next step with a reason.</p>
+<p>The path also houses <b>role-agnostic recommendations</b> ranked by fit, so hackathons, ambassador programmes and campus leadership surface at login without a redesign each time a role is added. There is a clear connection between the dashboard and the events calendar, encouraging users to make a first contribution rather than browse an archive.</p>
+<p style="color:#b03030"><b>INSERT DIAGRAM HERE: journey-flow.png, the user flow from login through role inference to first contribution</b></p>
+<p>I mapped the journey with the product manager and the engineers so that every opportunity the AI surfaces has an owner and an API behind it. All paths lead back to a first meaningful contribution.</p>
+<hr>
+<p style="color:#7a8aa6;font-size:10pt">Community Solution</p>
+<h2>Anticipating user behaviours and designing to meet their needs.</h2>
+<p>Based on our research of anticipated user behaviour, I organised my designs according to three core pillars of an effective community: Legibility on Arrival, Guidance over Game Mechanics, and A Reason on Every Pick.</p>
+<p><b>Legibility on Arrival</b></p>
+<p>Non-technical users could not identify what Manus could do for them from a list of names. Let us show each capability doing something on the first screen, before asking the user for anything.</p>
+<p><b>Guidance over Game Mechanics</b></p>
+<p>While our users wanted a way in, they did not want a second system to decode. Points and levels add cognitive load on top of the product. A guided next step removes it.</p>
+<p><b>A Reason on Every Pick</b></p>
+<p>An unexplained AI suggestion is a guess with confidence. Every recommendation carries a "why this matters" so users can see the fit and trust the ranking, and so they can tell us when it is wrong.</p>
+<hr>
+<p style="color:#7a8aa6;font-size:10pt">Community Solution // Design Iterations</p>
+<h2>A home page that tells new users what Manus can do and where to begin.</h2>
+<p>There were plenty of design routes to take for this page. After my exploration, I realised there was not a clear solution; we could either motivate people to engage through rewards and progression, or simplify the page down to a clear static overview of the products and the ways to take part.</p>
+<p style="color:#b03030"><b>INSERT IMAGE HERE: gamified-prototype.png</b></p>
+<p>Very first iteration, built in Lovable for rapid feedback. I explored engagement through points, levels, quests and role progression, modelled on the Claude Code community.</p>
+<p style="color:#b03030"><b>INSERT IMAGE HERE: whiteboard-crop.png, the four low-fidelity sketches</b></p>
+<p>My early iterations then moved to a static structure: an AI search bar to promote the product, explore and event calls to action, a role status page after login, and manual event uploads through Luma so engineering could launch reliably. Four sketches on a whiteboard became the second direction.</p>
+<hr>
+<p style="color:#7a8aa6;font-size:10pt">Community // User Research</p>
+<h2>Testing two extreme designs, and finding the answer somewhere in the middle.</h2>
+<p>Our interviews were not enough to be confident about a design direction, <b>so we ran usability testing on both extremes</b> to explore our options, with qualitative data to support our final decision.</p>
+<p>The goal of this testing was to compare two strategies for holding a new user. Participants reacted to two prototypes, one that motivated through game mechanics and one that clarified through a clean static structure, with the static version launched internally and tested at six breakpoints.</p>
+<p style="color:#b03030"><b>INSERT IMAGE HERE: gamified-prototype.png</b></p>
+<p><b>Gamified Community:</b></p>
+<p>This is the motivation extreme. Points, levels, quests and role progression reward activity, and the page is organised around what a user has earned rather than what Manus can do.</p>
+<p style="color:#b03030"><b>INSERT IMAGE HERE: static-page-full.png</b></p>
+<p><b>Static Community:</b></p>
+<p>This is the clarity extreme. The products are made legible on arrival, with a role selector, three feature cards, an AI search bar, a hackathon countdown and a global distribution map. Nothing is personalised.</p>
+<hr>
+<p style="color:#7a8aa6;font-size:10pt">Community // Research Findings</p>
+<h2>Participants rejected both extremes, for opposite reasons.</h2>
+<p>The conclusion of our research was that users found the gamified version overwhelming and could not say what any of it was for, while the static version was clear at first glance and still lost seven of ten users within minutes.</p>
+<p>Explore the drop-downs below for some key findings:</p>
+<p><b>Finding 1: Gamification is Overwhelming</b></p>
+<p>Testers of the gamified prototype reported confusion about getting around the page and described the experience as cognitively overwhelming. Rewards had added a second thing to understand on top of the product itself.</p>
+<p><b>Finding 2: Mechanics Had No Visible Purpose</b></p>
+<p>Testers were unclear what the game mechanics were for and how role progression worked. Motivation turned out to be the wrong problem. Understanding was the problem.</p>
+<p><b>Finding 3: Static is Clear but Inert</b></p>
+<p>Seven out of ten users disengaged quickly from the static version. They spent little time on the role selector and the three feature cards, the elements we had designed most carefully.</p>
+<p><b>Finding 4: Motion Reads as Life</b></p>
+<p>Users lingered on the hackathon countdown and the global distribution map, the only two elements on the page that moved. They were scanning for evidence the place was alive.</p>
+<p><b>Finding 5: Relevance Holds Attention</b></p>
+<p>When we put an AI-guided path in front of the same users, it won on click-through against the static page. Users were drawn to interactivity that felt current and personally about them.</p>
+<hr>
+<p style="color:#7a8aa6;font-size:10pt">Community // More Explorations</p>
+<h2>Based on this feedback, I needed to explore a guided approach to the community.</h2>
+<p><b>I needed to find a design that felt alive and personally relevant on arrival, but still gave users a clear, low-effort way to take part.</b> My first line of thinking was to keep the roles visible, but let the AI pick the path for each user so people do not have to decode nine roles before they start.</p>
+<p>I explored the recommendation cards in three rounds, each one answering a problem the previous round created.</p>
+<p style="color:#b03030"><b>INSERT IMAGE HERE: the Choose Your Path role grid from slide 15, nine roles</b></p>
+<p><b>Iteration 1: Choose Your Path</b></p>
+<p>Pros:</p>
+<ul>
+<li>Shows every way in at once</li>
+<li>Names the roles explicitly, so power users can find theirs</li>
+<li>Keeps role selection as a visible, deliberate step</li>
+</ul>
+<p>Cons:</p>
+<ul>
+<li>Nine choices on arrival, the same overload we had just removed</li>
+<li>Users must already know what a role means to pick it</li>
+<li>In testing, the role selector was where users spent the least time</li>
+</ul>
+<p style="color:#b03030"><b>INSERT IMAGE HERE: hackathon-card-before.png, the fixed three-card layout</b></p>
+<p><b>Iteration 2: Fixed Three-Card Recommendations</b></p>
+<p>Pros:</p>
+<ul>
+<li>Won on click-through against the static version</li>
+<li>One card per opportunity is easy to scan</li>
+<li>Each card carries a reason, which users cited as why they stayed</li>
+</ul>
+<p>Cons:</p>
+<ul>
+<li>One new role breaks the layout</li>
+<li>Every added role needs a manual design update</li>
+<li>My PM mentioned more roles were coming, which made this a maintenance cost disguised as a design</li>
+</ul>
+<p style="color:#b03030"><b>INSERT IMAGE HERE: hackathon-card-after.png, the role-agnostic template with Open Builder, Ambassador, Campus Leader and Regional Hub</b></p>
+<p><b>Iteration 3: Role-Agnostic Template</b></p>
+<p>Pros:</p>
+<ul>
+<li>New roles slot in without a redesign</li>
+<li>The same card works for Open Builder, Ambassador, Campus Leader and Regional Hub</li>
+<li>Every card keeps its "why this matters" line</li>
+</ul>
+<p>Cons:</p>
+<ul>
+<li>I gave up precise control of a layout that had already tested well</li>
+<li>The cards depend on the inference layer getting the role right</li>
+<li>Only the hackathon card shipped; the other three are illustrative</li>
+</ul>
+<hr>
+<p style="color:#7a8aa6;font-size:10pt">Community // Final Design</p>
+<h2>The final design was a single dashboard with an AI-guided path and role-agnostic recommendations.</h2>
+<p>I was able to find a solution that satisfied the wants of our users: the final design holds a user's role, active path, upcoming events and pending contributions in one place, with reminders surfacing when something needs attention. Each path is ranked by fit to the user, and every pick says why.</p>
+<p>The recommendations also follow a role-agnostic template, so the AI can surface hackathons, ambassador programmes and campus leadership at login, including roles that do not exist yet. This pushes guidance across the community rather than into one feature, and unites the dashboard, the paths and the events under one home.</p>
+<p>In sum, this design is legible and alive, and gives the user a clear next step toward contributing without asking them to decode a system first.</p>
+<p style="color:#b03030"><b>INSERT VIDEO HERE: manus-solution-1-dashboard.mp4, the dashboard in a laptop frame</b></p>
+<p><b>Final Community Dashboard</b></p>
+<ul>
+<li>Role, path, events and contributions sit in one place, with reminders when something needs attention</li>
+<li>"Recommended this week" is prioritised by fit, not engagement, with a reason on every pick</li>
+<li>New roles appear through the same card without a redesign</li>
+</ul>
+<hr>
+<p style="color:#7a8aa6;font-size:10pt">Your Path Solution</p>
+<h2>Creating a guided path where users see their role reflected back to them.</h2>
+<p>While the dashboard is invaluable for giving users one home, it is just as important for us to continuously serve them the right next step, meaning a newcomer should always see one thing worth doing, and a power user should always see where their work goes. The next step, then, was to facilitate stakeholder sessions involving engineering, the community and go-to-market team, and the product managers. There, we mapped what each team wanted and what worried them.</p>
+<p>Due to launch timing, we ideated across surfaces we could ship reliably. We eliminated ideas that depended on scraping events from third parties or on fragile automation.</p>
+<p>This led us to the AI-guided path as the surface where we could test our guidance hypothesis.</p>
+<p style="color:#b03030"><b>INSERT IMAGE HERE: the stakeholder map from slide 17, redrawn: Engineering, Community and GTM, Product Manager, each with Wanted and Concerns</b></p>
+<hr>
+<p style="color:#7a8aa6;font-size:10pt">Your Path // Design Decisions</p>
+<h2>Why an AI-guided path?</h2>
+<ul>
+<li>✓ Won on click-through against the static page in our third round of usability testing.</li>
+<li>✓ Every recommendation has an owner and an API, so the community team can ship it without scraping Luma or any third party.</li>
+</ul>
+<p>And in the third round, our static page...</p>
+<ol>
+<li>Lost seven out of ten users quickly</li>
+</ol>
+<ul>
+<li>They spent little time on the role selector and the three feature cards</li>
+</ul>
+<ol>
+<li>Held users on exactly two elements</li>
+</ol>
+<ul>
+<li>The live countdown and the pulsing map, the only two things on the page that moved</li>
+</ul>
+<p>The original static design organised the page around products and roles, as well as entry points for events through Luma.</p>
+<p>We gauged user feedback on different versions of the path, and learned that users consistently went to whatever felt current and about them. We needed every element on the page to be one of those two things.</p>
+<blockquote><i>"I opened the community page and just didn't know what I was supposed to do. There's no indication of where to start or what counts as participating."</i></blockquote>
+<blockquote><i>Manus community member</i></blockquote>
+<blockquote><i>"I want to contribute and share what I've built, but I have no idea if anyone will see it or if it even matters. There's no feedback, no signal that my work is visible."</i></blockquote>
+<blockquote><i>Manus community member</i></blockquote>
+<p><b>What we decided</b></p>
+<ul>
+<li>Event hosting: an explicit "Host an Event" button and a manual submission flow. Consent is clear and nothing is scraped from third parties.</li>
+<li>Role architecture: modular components let roles be added or removed without a redesign.</li>
+</ul>
+<p style="color:#b03030"><b>INSERT VIDEO HERE: ship-paths.png or pivot-walkthrough.mp4, the Your Path screen in a laptop frame</b></p>
+<p><b>Final Your Path Design</b></p>
+<ul>
+<li>The AI infers each user's role, focus area and mode from what they do</li>
+<li>"Recommended this week" is ranked by fit, with "why this matters" on every pick</li>
+<li>Users can move between Dashboard, Your Path and Recommendations with tabs</li>
+</ul>
+<hr>
+<p style="color:#7a8aa6;font-size:10pt">Strategy Execution</p>
+<h2>Gathering signals on what each user does at login, and using them to route newcomers to a first step and power users to a place to be seen.</h2>
+<p>With the public launch of this new community architecture, we hope to learn the following:</p>
+<ol>
+<li>What impact does inferring role, focus and mode from behaviour, rather than asking users to pick a role, have on retention?</li>
+<li>Does attaching a reason to every recommendation improve clarity on where to start and how to contribute?</li>
+<li>Does a role-agnostic template hold up as the community adds roles that did not exist at launch?</li>
+</ol>
+<p style="color:#b03030"><b>INSERT VIDEO HERE: manus-interaction-walkthrough.mp4</b></p>
+<p>Final flow of login, role inference and the corresponding recommendations appearing in Your Path.</p>
+<hr>
+<p style="color:#7a8aa6;font-size:10pt">Success Metrics</p>
+<h2>We hypothesised this work would increase clarity and drive retention.</h2>
+<p>Users will have a clearer picture of what Manus can do for them while also being shown a next step that matches what they have already done. Here is how we will know if our hypothesis is correct:</p>
+<p><b>Success Metrics for Newcomers:</b></p>
+<p>We will see an increase in...</p>
+<ul>
+<li>Retention (primary metric)</li>
+<li>Time on site</li>
+<li>Paths started in the first session</li>
+<li>Self-reported clarity on where to start</li>
+</ul>
+<p><b>Success Metrics for Power Users:</b></p>
+<p>We will also see an increase in...</p>
+<ul>
+<li>Contributions submitted</li>
+<li>Events hosted through "Host an Event"</li>
+<li>Return visits</li>
+<li>Self-reported relevance of recommendations</li>
+</ul>
+<p><b>What we saw in internal testing</b></p>
+<ul>
+<li>Retention rose from 30% to 65 to 70%</li>
+<li>Time on site rose 2.1 times</li>
+<li>80% reported more clarity on where to start and how to contribute</li>
+<li>75% described it as more personally relevant than the static version</li>
+</ul>
+<p><i>Live data from internal testing users at Manus after the AI-guided architecture was rolled out to them. The redesign is approved and in production, and has not yet launched publicly.</i></p>
+<hr>
+<p style="color:#7a8aa6;font-size:10pt">Future of the Community</p>
+<h2>How can we scale this work across Manus?</h2>
+<p>Once the redesign ships publicly and we learn from real traffic, we can invest more in expanding the guidance layer. A few examples of additional concepts we could explore validation for include but are not limited to...</p>
+<ul>
+<li>Lightweight feedback on every pick, a thumbs up or down, so the AI's decisions become more transparent and correctable</li>
+<li>Tracking days from joining to first meaningful action, a better measure of real contribution than time on site</li>
+<li>Surfacing roles at login that do not exist yet, so the community can grow without a redesign</li>
+<li>Finishing development and public launch, including the illustrative cards beyond the hackathon</li>
+</ul>
+<p style="color:#b03030"><b>INSERT IMAGE HERE: the concept mockups from slide 23, the "Useful pick?" control and the time-to-first-action chart</b></p>
+<hr>
+<h2>Thanks for reading!</h2>
+<h2>Any questions? Email me.</h2>
+<p style="color:#7a8aa6;font-size:10pt">Back to Case Studies</p></body></html>

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent jobs lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Five layouts for Clover slide 13, "one agent with different jobs", aimed at the feedback that the slide is hard
+   to scan. Same words and media as the deck; what changes is the order the eye takes through them. */
+:root{--ink:#14171B;--moss:#3E4F1A;--olive:#6B7A3A;--sage:#C4D4A4;--tint:#F1F4E8;--hair:rgba(20,23,27,.14);--mute:#4a4740;
+  --jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1340px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:#6f6b64;margin:0 0 26px;max-width:80ch}
+.opt{margin-bottom:34px}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--moss);margin:0 0 10px}
+.lab small{font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:#6f6b64;margin-left:8px}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 18px 40px -24px rgba(0,0,0,.3);overflow:hidden}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:58px 72px 0;position:relative}
+.hd{font:500 44px/1.08 var(--jak);letter-spacing:-.03em;margin:0;max-width:30ch}
+.hd em{font-style:normal;color:var(--moss)}
+.ft{position:absolute;left:72px;right:72px;bottom:30px;border-top:1px solid var(--hair);padding-top:12px;display:flex;justify-content:space-between;font:400 14px var(--hel)}
+.ft span:first-child{color:var(--moss)}
+.tag{font:600 11.5px var(--jak);letter-spacing:.09em;text-transform:uppercase;color:var(--moss)}
+.m{position:relative;border-radius:12px;overflow:hidden;background:#111;box-shadow:0 14px 30px -20px rgba(20,23,27,.55)}
+.m video,.m img{display:block;width:100%;height:100%;object-fit:cover}
+.m.lt{background:#F3F1EC}.m.lt img{object-fit:contain}
+.ph{border-radius:22px;background:none;box-shadow:none}.ph video{object-fit:contain}
+.dev{font:600 24px/1.2 var(--jak);letter-spacing:-.015em;margin:0}
+.inv{font:400 14.5px/1.45 var(--hel);color:var(--mute);margin:4px 0 0}
+ul.j{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+ul.j li{font:500 15.5px/1.3 var(--jak);padding-left:22px;position:relative}
+ul.j li::before{content:"";position:absolute;left:2px;top:.42em;width:9px;height:9px;border-radius:50%;background:var(--moss)}
+ul.s li::before{background:none;border:2px solid var(--moss);width:7px;height:7px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chips span{font:500 14px/1 var(--jak);padding:8px 12px;border-radius:999px;border:1.5px solid var(--moss);color:var(--ink);background:#fff}
+.chips.f span{background:var(--moss);color:#fff;border-color:var(--moss)}
+
+/* 01 Side by side table: the same three rows for each device, read across */
+.o1 .tb{margin-top:26px;display:grid;grid-template-columns:150px 1fr 1fr;column-gap:28px}
+.o1 .tb>div{border-top:1px solid var(--hair);padding:9px 0}
+.o1 .tb .rh{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--olive);padding-top:15px}
+.o1 .tb .top{border-top:0;padding-top:0}
+.o1 .media{display:flex;gap:10px;height:132px}
+.o1 .media .m{flex:1}.o1 .media .ph{flex:none;width:70px}
+.o1 .shared{grid-column:2/4;background:var(--tint);border-radius:12px;padding:12px 16px!important;border-top:0!important;display:flex;align-items:center;gap:16px;margin-top:6px}
+
+/* 02 Mirror: two columns with one picture each, the jobs as bullets, shared spanning the bottom */
+.o2 .cols{margin-top:26px;display:grid;grid-template-columns:1fr 1fr;gap:40px}
+.o2 .c{display:grid;grid-template-columns:200px 1fr;gap:22px;align-items:start}
+.o2 .c .m{height:230px}.o2 .c .ph{width:110px;height:240px;margin:0 auto}
+.o2 .c .tag{display:block;margin:14px 0 8px}
+.o2 .sh{margin-top:22px;display:flex;align-items:center;gap:18px;border-top:2px solid var(--moss);padding-top:14px}
+
+/* 03 Hub: the one agent in the middle, each device's jobs branching off it */
+.o3 .hub{margin-top:18px;display:grid;grid-template-columns:1fr 290px 1fr;gap:26px;align-items:center}
+.o3 .side{display:grid;gap:12px}
+.o3 .side .m{height:170px}.o3 .side.r .m{height:190px;width:88px}
+.o3 .side.r .top{display:flex;gap:14px;align-items:flex-start}
+.o3 .core{position:relative;border-radius:50%;width:290px;height:290px;background:var(--moss);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px}
+.o3 .core .tag{color:var(--sage)}.o3 .core b{font:600 26px/1.15 var(--jak);margin:6px 0 12px}
+.o3 .core ul{list-style:none;margin:0;padding:0;font:500 14px/1.6 var(--jak)}
+.o3 .core::before,.o3 .core::after{content:"";position:absolute;top:50%;width:26px;height:2px;background:var(--moss)}
+.o3 .core::before{right:100%}.o3 .core::after{left:100%}
+
+/* 04 Two lanes: one horizontal lane per device, the shared agent as a band joining them on the right */
+.o4 .lanes{margin-top:22px;display:grid;grid-template-columns:1fr 250px;gap:18px}
+.o4 .ln{display:grid;grid-template-columns:230px 1fr;gap:22px;align-items:center;padding:14px 0;border-top:1px solid var(--hair)}
+.o4 .ln:first-child{border-top:2px solid var(--moss)}
+.o4 .ln .m{height:150px}.o4 .ln .mm{display:flex;gap:8px;height:160px}.o4 .ln .mm .ph{width:74px;flex:none}.o4 .ln .mm .m.lt{flex:1;height:100%}
+.o4 .ln .tag{display:block;margin:10px 0 7px}
+.o4 .band{grid-row:1/3;grid-column:2;background:var(--tint);border-radius:16px;padding:20px;display:flex;flex-direction:column;justify-content:center}
+.o4 .band b{font:600 20px/1.2 var(--jak);margin:6px 0 12px}
+
+/* 05 Split with a spine: the shared list runs down the middle as a labelled spine, the jobs mirror it as chips */
+.o5 .sp{margin-top:22px;display:grid;grid-template-columns:1fr 220px 1fr;gap:0;align-items:stretch}
+.o5 .side{padding:0 28px}.o5 .side:first-child{padding-left:0;text-align:right}.o5 .side:last-child{padding-right:0}
+.o5 .side .m{height:170px;margin-bottom:14px}
+.o5 .side:last-child .mm{display:flex;gap:8px;height:170px;margin-bottom:14px}.o5 .mm .ph{width:78px;flex:none}.o5 .mm .m.lt{flex:1;height:100%;margin:0}
+.o5 .side:first-child .chips{justify-content:flex-end}
+.o5 .side .tag{display:block;margin:12px 0 8px}
+.o5 .spine{border-left:2px solid var(--moss);border-right:2px solid var(--moss);background:var(--tint);padding:16px 18px;display:flex;flex-direction:column;justify-content:center;text-align:center}
+.o5 .spine b{font:600 19px/1.2 var(--jak);margin:6px 0 12px}
+.o5 .spine ul{list-style:none;padding:0;margin:0;display:grid;gap:9px;font:500 14.5px/1.3 var(--jak)}
+</style></head><body>
+<div class="wrap">
+<h1>Agent jobs lab</h1>
+<p class="lede">Five layouts for slide 13, after the feedback "I like this content but the design is hard to follow; make it easier to scan." Same words and media as the deck. The jobs are split into short items so they can be scanned. Tell me the number.</p>
+<div id="opts"></div>
+</div>
+<script>
+const head='<p class="hd">So I gave the glasses and the iPhone app <em>one agent with different jobs.</em></p>';
+const foot='<div class="ft"><span>13 &nbsp; Discovery</span><span>Eden Case Study</span></div>';
+const G={dev:'The glasses',inv:'An app dashboard invites the user to pick an app, give a command and read the answer.',jobs:['Spoken requests','Glanceable answers','Context while the user is busy']};
+const P={dev:'The iPhone app',inv:'An app list invites the user to switch on each HUD app from the phone.',jobs:['Onboarding','Modes','Summaries','Search','Error recovery','Device settings']};
+const SH=['One agent identity','One memory','The same preferences','The same visual principles'];
+const vg='<div class="m"><video src="media/hudbg.mp4" poster="media/hudbg.jpg" muted loop autoplay playsinline></video></div>';
+const vp='<div class="m ph"><video src="media/appfirst.mp4" poster="media/appfirst.jpg" muted loop autoplay playsinline></video></div>';
+const lofi='<div class="m lt"><img src="media/app-lofi.png" alt=""></div>';
+const wire='<div class="m lt"><img src="media/app-wireframes.png" alt=""></div>';
+const ul=(a,c='j')=>`<ul class="${c}">${a.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+const chips=(a,f)=>`<div class="chips${f?' f':''}">${a.map(x=>`<span>${x}</span>`).join('')}</div>`;
+const O=[
+ ['01','Side by side table','The same three rows for each device, so the eye reads straight across.',
+  `<div class="o1">${head}<div class="tb">
+   <div class="top"></div><div class="top"><div class="media">${vg}</div></div><div class="top"><div class="media">${vp}${lofi}${wire}</div></div>
+   <div class="rh">Device</div><div><p class="dev">${G.dev}</p></div><div><p class="dev">${P.dev}</p></div>
+   <div class="rh">Before</div><div><p class="inv" style="margin:0">${G.inv}</p></div><div><p class="inv" style="margin:0">${P.inv}</p></div>
+   <div class="rh">Its jobs</div><div>${chips(G.jobs,1)}</div><div>${chips(P.jobs,1)}</div>
+   <div class="rh" style="border:0"></div><div class="shared"><span class="tag">Kept shared</span>${chips(SH)}</div></div></div>`],
+ ['02','Mirror','One picture per device, its jobs as bullets, and the shared agent as one line across the bottom.',
+  `<div class="o2">${head}<div class="cols">
+   <div class="c">${vg}<div><p class="dev">${G.dev}</p><p class="inv">${G.inv}</p><span class="tag">What I gave it</span>${ul(G.jobs)}</div></div>
+   <div class="c">${vp}<div><p class="dev">${P.dev}</p><p class="inv">${P.inv}</p><span class="tag">What I gave it</span>${ul(P.jobs)}</div></div></div>
+   <div class="sh"><span class="tag">Kept shared</span>${chips(SH)}</div></div>`],
+ ['03','Hub','The one agent in the middle, each device and its jobs on either side of it.',
+  `<div class="o3">${head}<div class="hub">
+   <div class="side">${vg}<div><p class="dev">${G.dev}</p><p class="inv">${G.inv}</p></div>${chips(G.jobs,1)}</div>
+   <div class="core"><span class="tag">Kept shared</span><b>One agent</b>${ul(SH.slice(1).concat([]),'')}</div>
+   <div class="side r"><div class="top">${vp}<div><p class="dev">${P.dev}</p><p class="inv">${P.inv}</p></div></div>${chips(P.jobs,1)}</div></div></div>`],
+ ['04','Two lanes','A lane per device, read left to right, with the shared agent as a band joining both lanes.',
+  `<div class="o4">${head}<div class="lanes">
+   <div class="ln">${vg}<div><p class="dev">${G.dev}</p><p class="inv">${G.inv}</p><span class="tag">What I gave it</span>${chips(G.jobs,1)}</div></div>
+   <div class="ln" style="grid-column:1"><div class="mm">${vp}${lofi}</div><div><p class="dev">${P.dev}</p><p class="inv">${P.inv}</p><span class="tag">What I gave it</span>${chips(P.jobs,1)}</div></div>
+   <div class="band"><span class="tag">Kept shared</span><b>One agent across both</b>${ul(SH,'j s')}</div></div></div>`],
+ ['05','Spine','The shared agent runs down the middle; each device mirrors it with its own jobs as chips.',
+  `<div class="o5">${head}<div class="sp">
+   <div class="side">${vg}<p class="dev">${G.dev}</p><p class="inv">${G.inv}</p><span class="tag">What I gave it</span>${chips(G.jobs,1)}</div>
+   <div class="spine"><span class="tag">Kept shared</span><b>One agent</b>${ul(SH,'')}</div>
+   <div class="side"><div class="mm">${vp}${lofi}</div><p class="dev">${P.dev}</p><p class="inv">${P.inv}</p><span class="tag">What I gave it</span>${chips(P.jobs,1)}</div></div></div>`]];
+document.getElementById('opts').innerHTML=O.map(([n,t,d,h])=>`<section class="opt"><p class="lab">${n} ${t}<small>${d}</small></p><div class="frame"><div class="sl">${h}${foot}</div></div></section>`).join('');
+const fit=()=>document.querySelectorAll('.frame').forEach(f=>{f.firstElementChild.style.transform=`scale(${f.clientWidth/1280})`});
+addEventListener('resize',fit);fit();
+</script>
+</body></html>

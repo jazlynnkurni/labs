@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fuse lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Five ways to show Clover slide 20 (the two founders' models fused into one HUD system: 30 use cases to 69, small
+   components covering 95%) in the deck's language, open layouts, videos shown whole, no bento boxes. */
+:root{--ink:#14171B;--plum:#340414;--gold:#A99939;--hair:rgba(20,23,27,.12);--mute:#6f6b64;--green:#6F7C70;
+  --sage:#9ba69c;--mauve:#827a85;--sage-lt:rgba(214,222,215,.9);--mauve-lt:rgba(222,216,224,.9);
+  --jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1340px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:#6f6b64;margin:0 0 26px;max-width:92ch}
+.opt{margin-bottom:40px}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0 0 10px}
+.lab small{font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:#6f6b64;margin-left:8px}
+.lab button{margin-left:10px;font:600 11.5px var(--jak);padding:6px 11px;border-radius:999px;border:1.5px solid var(--plum);background:#fff;color:var(--plum);cursor:pointer;text-transform:none;letter-spacing:0}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 18px 40px -24px rgba(0,0,0,.3);overflow:hidden;position:relative}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:52px 72px 0;position:absolute;left:0;top:0}
+.hd{font:500 42px/1.12 var(--jak);letter-spacing:-.02em;margin:0;max-width:30ch;height:96px}
+.hd em{font-style:normal;color:var(--plum)}
+.body{position:absolute;left:72px;right:72px;top:180px;height:440px}
+.ft{position:absolute;left:72px;right:72px;bottom:40px;border-top:1px solid var(--hair);padding-top:12px;display:flex;justify-content:space-between;font:400 13px var(--hel)}
+.ft span:first-child{color:var(--plum)}
+.tag{font:600 13px/1.4 var(--jak);letter-spacing:.06em;text-transform:uppercase;color:#8a8780}.tag.p{color:var(--plum)}
+.v{position:relative;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 14px 28px -18px rgba(20,23,27,.5)}
+.v video{display:block;width:100%;height:100%;object-fit:contain}
+.v.a{aspect-ratio:1372/750}.v.b{aspect-ratio:1440/860}
+.v .cnt{position:absolute;left:10px;top:10px;font:600 12px/1 var(--jak);padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.92);color:var(--plum)}
+.num{font:500 56px/1 var(--jak);letter-spacing:-.03em;color:var(--plum)}
+.flow{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+.flow span{font:600 12.5px/1 var(--jak);padding:8px 11px;border-radius:999px;background:#fff;box-shadow:0 0 0 1px rgba(52,4,20,.14);white-space:nowrap}
+.flow.s span{background:var(--sage-lt)}.flow.m span{background:var(--mauve-lt)}
+.flow i{width:16px;height:2px;background:var(--green);flex:none}
+.who{font:500 14px/1.35 var(--jak);color:var(--ink);margin:0}.who b{font:600 13px var(--jak);color:var(--mute);margin-right:6px}
+.bead{display:inline-grid;place-items:center;border-radius:50%;color:#fff;font:600 20px var(--jak);
+  background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.6),rgba(255,255,255,0) 70%),radial-gradient(circle at 50% 65%,#6a2a3f,#340414 70%);box-shadow:0 8px 16px -6px rgba(52,4,20,.55)}
+.key{font:500 17px/1.4 var(--jak);color:var(--ink);margin:0}.key b{color:var(--plum);font-weight:600}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes inL{from{opacity:0;transform:translateX(-70px)}to{opacity:1;transform:none}}
+@keyframes inR{from{opacity:0;transform:translateX(70px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes drop{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes cnt{from{--n:30}to{--n:69}}
+.play .an{animation:up .55s ease both}.play .aL{animation:inL .75s cubic-bezier(.3,.7,.2,1) both}.play .aR{animation:inR .75s cubic-bezier(.3,.7,.2,1) both}.play .pp{animation:pop .6s cubic-bezier(.33,1.18,.37,1) both}
+.play .gr{transform-origin:left;animation:grow .7s cubic-bezier(.3,.7,.2,1) both}.play .dr{transform-origin:top;animation:drop .5s cubic-bezier(.3,.7,.2,1) both}
+
+/* 01 Two streams merge: both models flow into one plus bead, out of it comes the fused system */
+.o1{display:grid;grid-template-columns:auto 110px 1fr;gap:0;align-items:center;height:100%}
+.o1 .src{display:flex;flex-direction:column;gap:30px}
+.o1 .src>div{display:flex;flex-direction:column;gap:8px}
+.o1 .v.a{width:330px}
+.o1 .mid{position:relative;height:100%}
+.o1 svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.o1 .bead{position:absolute;left:50%;top:50%;width:62px;height:62px;margin:-31px 0 0 -31px;font-size:26px}
+.o1 .out{display:flex;flex-direction:column;gap:10px}
+.o1 .v.b{width:100%}.o1 .flow span{font-size:12px;padding:7px 9px}
+
+/* 02 The equation */
+.o2{display:flex;flex-direction:column;gap:22px;height:100%}
+.o2 .eq{display:grid;grid-template-columns:1fr 50px 1fr 50px 1.1fr;align-items:center}
+.o2 .t{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.o2 .op{font:300 44px/1 var(--jak);color:var(--gold);text-align:center}
+.o2 .key{border-top:2px solid var(--green);padding-top:14px}
+
+/* 03 30 grows to 69 */
+.o3{display:grid;grid-template-columns:1fr 1fr;gap:40px;height:100%}
+.o3 .c{display:flex;flex-direction:column;gap:10px}.o3 .v{height:200px;align-self:flex-start}
+.o3 .bar{height:14px;border-radius:999px;background:rgba(20,23,27,.06);overflow:hidden}
+.o3 .bar i{display:block;height:100%;border-radius:999px;transform-origin:left}
+.o3 .bar.a i{width:43.5%;background:linear-gradient(90deg,#c7cec8,var(--sage))}
+.o3 .bar.b i{width:100%;background:linear-gradient(90deg,var(--sage),var(--mauve))}
+.o3 .row{display:flex;align-items:baseline;gap:12px}
+
+/* 04 One spine: the four steps of each model, rail and rail, joined at "Answers" */
+.o4{display:grid;grid-template-columns:1fr 420px;gap:34px;height:100%}
+.o4 .rails{display:flex;flex-direction:column;justify-content:center;gap:26px}
+.o4 .rl{display:flex;flex-direction:column;gap:8px}
+.o4 .join{display:flex;align-items:center;gap:12px}
+.o4 .join i{flex:1;height:2px;background:var(--green)}
+
+/* 05 Components: the HUD system as small glass tiles that fill to 95% */
+.o5{display:grid;grid-template-columns:440px 1fr;gap:34px;height:100%;align-items:start}
+.o5 .grid{display:grid;grid-template-columns:repeat(20,1fr);gap:4px}.o5 .c .flow span{font-size:11px;padding:6px 7px}.o5 .c .flow i{width:10px}
+.o5 .grid i{aspect-ratio:1;border-radius:5px;background:linear-gradient(160deg,#fff,var(--sage-lt) 55%,var(--mauve-lt));box-shadow:inset 1px 1px 1px #fff,0 0 0 1px rgba(20,23,27,.06)}
+.o5 .grid i.e{background:none;box-shadow:inset 0 0 0 1.5px rgba(20,23,27,.12)}
+.o5 .c{display:flex;flex-direction:column;gap:14px}
+</style></head><body>
+<div class="wrap">
+<h1>Fuse lab</h1>
+<p class="lede">Five ways to show slide 20, "Instead of scrapping the first HUD, I fused it with intent-first, so one system serves both", in the deck's current language: open layouts, no boxes, both videos shown whole. Press Play to see each arrive. Tell me the number.</p>
+<div id="opts"></div>
+</div>
+<script>
+const head='<p class="hd">Instead of scrapping the first HUD, I fused it <em>with intent&#8209;first, so one system serves both.</em></p>';
+const frame=b=>`<div class="frame"><div class="sl">${head}<div class="body">${b}</div><div class="ft"><span>20 &nbsp; Testing</span><span>Eden Case Study</span></div></div></div>`;
+const vA='<div class="v a"><video src="media/usecases-trim.mp4" poster="media/usecases-trim.jpg" muted loop autoplay playsinline></video><span class="cnt">30 use cases</span></div>';
+const vB='<div class="v b"><video src="media/hudsystem.mp4" poster="media/hudsystem.jpg" muted loop autoplay playsinline></video><span class="cnt">69 use cases</span></div>';
+const FA=['Has a task','Opens an app','Gives a command','Reads the answer'], FB=['Speaks naturally','Clover reads intent','Picks a capability','Answers'];
+const fl=(a,c)=>`<div class="flow ${c}">${a.map(x=>`<span>${x}</span>`).join('<i></i>')}</div>`;
+const wA='<p class="who"><b>Co&#8209;Founder 1</b>Navigation&#8209;first</p>', wB='<p class="who"><b>Co&#8209;Founder 2</b>Intent&#8209;first</p>';
+const KEY='<p class="key"><b>The key:</b> a scalable HUD system of <b>small, minimal visual components</b> that covers <b>95% of use cases</b>.</p>';
+const d=s=>`data-d="${s}"`;
+const O=[
+ ['01','Two streams merge','Each founder’s model as a flow on the left; both lines run into one plum + bead and out of it comes the fused system.',
+  `<div class="o1"><div class="src"><div class="aL" ${d(.2)}>${wA}${fl(FA,'s')}</div><div class="aL" ${d(.45)}>${wB}${fl(FB,'m')}</div></div>
+   <div class="mid"><svg viewBox="0 0 100 440" preserveAspectRatio="none"><path d="M4 186 H30 V220 H50 M4 254 H30 V220 M50 220 H100" fill="none" stroke="#6F7C70" stroke-width="2" vector-effect="non-scaling-stroke"/></svg><span class="bead pp" ${d(.9)}>+</span></div>
+   <div class="out an" ${d(1.2)}>${vB}<span class="tag p">One system serves both</span>${KEY}</div></div>`],
+ ['02','The equation','Before + after = the fused system, read as one line; the key sits under it on the green rule.',
+  `<div class="o2"><div class="eq"><div class="t aL" ${d(.2)}>${vA}${wA}</div><span class="op pp" ${d(.6)}>+</span><div class="t an" ${d(.8)}><div class="v b" style="width:100%">${''}<video src="media/hudsystem.mp4" muted loop autoplay playsinline></video></div>${wB}</div><span class="op pp" ${d(1.1)}>=</span>
+   <div class="t aR" ${d(1.3)}><span class="num">69</span><span class="tag p">use cases, one HUD system</span><span class="tag">95% covered by small components</span></div></div>
+   <div class="an" ${d(1.6)}>${KEY}</div></div>`],
+ ['03','30 grows to 69','The two videos with a bar beneath each: navigation-first fills 30 of 69, the fused system fills all 69.',
+  `<div class="o3"><div class="c aL" ${d(.2)}>${vA}${wA}<div class="row"><span class="num" style="font-size:40px">30</span><span class="tag">use cases</span></div><div class="bar a"><i class="gr" ${d(.7)}></i></div>${fl(FA,'s')}</div>
+   <div class="c aR" ${d(.4)}>${vB.replace('69 use cases','Fused')}<p class="who"><b>Fused</b>Both founders&rsquo; models</p><div class="row"><span class="num" style="font-size:40px">69</span><span class="tag p">use cases &middot; 95% from small components</span></div><div class="bar b"><i class="gr" ${d(1)}></i></div>${fl(FB,'m')}</div></div>`],
+ ['04','Two rails, one answer','The two flows as rails that meet at the answer, beside the fused HUD system.',
+  `<div class="o4"><div class="rails"><div class="rl aL" ${d(.2)}>${wA}${fl(FA,'s')}</div><div class="join an" ${d(.7)}><i class="gr"></i><span class="bead" style="width:46px;height:46px">+</span><i class="gr"></i></div><div class="rl aL" ${d(.45)}>${wB}${fl(FB,'m')}</div><div class="an" ${d(1.1)}>${KEY}</div></div>
+   <div class="aR" ${d(.9)} style="display:flex;flex-direction:column;gap:10px">${vB}<span class="tag p">The fused HUD system</span></div></div>`],
+ ['05','Small components','The system drawn as 100 small glass tiles; 95 fill in to show the coverage, beside the video and the two models.',
+  `<div class="o5"><div class="c aL" ${d(.2)}>${vB}${wA.replace('<p class="who">','<p class="who" style="font-size:13px">')}${fl(FA,'s')}${wB.replace('<p class="who">','<p class="who" style="font-size:13px">')}${fl(FB,'m')}</div>
+   <div class="c"><div class="row an" ${d(.4)} style="display:flex;align-items:baseline;gap:12px"><span class="num">95%</span><span class="tag p">of use cases from small components</span></div>
+   <div class="grid">${Array.from({length:100},(_,k)=>`<i class="${k>=95?'e':''} pp" ${d((.6+k*.012).toFixed(3))}></i>`).join('')}</div>${KEY}</div></div>`]];
+document.getElementById('opts').innerHTML=O.map(([n,t,ds,h],k)=>`<section class="opt" id="o${k}"><p class="lab">${n} ${t}<small>${ds}</small><button data-k="${k}">Play</button></p>${frame(h)}</section>`).join('');
+const fit=()=>document.querySelectorAll('.frame').forEach(f=>{f.firstElementChild.style.transform=`scale(${f.clientWidth/1280})`});
+addEventListener('resize',fit);fit();
+document.querySelectorAll('[data-d]').forEach(e=>e.style.animationDelay=e.dataset.d+'s');
+document.querySelectorAll('.lab button').forEach(b=>b.onclick=()=>{const s=document.getElementById('o'+b.dataset.k);s.classList.remove('play');void s.offsetWidth;s.classList.add('play');});
+document.querySelectorAll('.opt').forEach(s=>s.classList.add('play'));
+</script>
+</body></html>

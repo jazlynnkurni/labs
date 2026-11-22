@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4 · Ledger</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;600;700&display=swap">
+<link rel="stylesheet" href="../shared.css">
+<style>
+/* the table turned on its side: one ruled row per goal, read left to right as goal, flow, evidence, on a visible grid
+   whose lines run to the foot like the live slide. The key fact in each line carries the plum */
+.top{left:96px;top:72px;width:1000px}
+.top .head{text-align:left}
+.h{left:0;width:1280px;height:1px;background:var(--hair)}
+.v{top:216px;bottom:0;width:1px;background:var(--hair)}
+.row{left:0;width:1280px;height:152px;display:grid;grid-template-columns:304px 320px 1fr;align-items:center;padding:0 96px}
+.row .lab{padding-right:24px}
+.row h3{font-size:28px;line-height:1.2;color:var(--ink);padding-left:40px}
+.row .ev{font:400 20px/1.45 var(--hel);color:var(--ink);padding-left:40px;max-width:504px}
+.row .ev b{font-weight:600;color:var(--plum)}
+.r1{top:216px}.r2{top:368px}.r3{top:520px}
+</style></head>
+<body><div id="stage">
+<div class="top"><h2 class="head" data-b="0">According to <span class="hl">ClassPass&rsquo;s 2026 Industry Impact Report</span>, these are the company&rsquo;s <span class="hl">business goals</span>:</h2></div>
+<div class="h" style="top:216px"></div><div class="h" style="top:368px"></div><div class="h" style="top:520px"></div>
+<div class="v" style="left:400px"></div><div class="v" style="left:720px"></div>
+<div class="row r1"><p class="lab g1" data-b="2">Wellness beyond fitness</p><h3 data-b="3">Finding a class</h3>
+  <p class="ev" data-b="4">Wellness bookings grew <b>37%</b> in 2025, as fast as fitness</p></div>
+<div class="row r2"><p class="lab g2" data-b="5">AI integration</p><h3 data-b="6">Support chat</h3>
+  <p class="ev" data-b="7">AI already sets class spots and credit prices, and <b>now answers members</b></p></div>
+<div class="row r3"><p class="lab g3" data-b="8">Retention</p><h3 data-b="9">Rating a class</h3>
+  <p class="ev" data-b="10"><b>80%</b> of members who join after a trial go back to a studio they tried</p></div>
+</div>
+<p class="tag">4 · Ledger · click to play the build · <a href="../">all five</a></p>
+<script src="../shared.js"></script>
+</body></html>

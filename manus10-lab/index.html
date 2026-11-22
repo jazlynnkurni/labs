@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Manus slide 10 lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap">
+<style>
+/* Five directions for Manus slide 10, the featured-capability activation rate, in the Clover deck's system:
+   open layouts, hairlines, plum emphasis, the gold felt-tip marker drawn in, liquid glass, one-by-one motion.
+   No stage counts exist, so the visuals show the shape of the funnel, never values. */
+:root{--ink:#14171B;--plum:#340414;--gold:#A99939;--green:#6F7C70;--hair:rgba(20,23,27,.14);--mute:#8a8780;
+  --jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1240px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:#6f6b64;margin:0 0 30px;max-width:95ch}
+.opt{margin-bottom:54px}
+.lab{display:flex;align-items:baseline;gap:12px;margin:0 0 12px}
+.lab b{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum)}
+.lab small{font:400 13px var(--hel);color:#6f6b64}
+.lab button{margin-left:auto;font:600 12px var(--jak);padding:7px 12px;border-radius:999px;border:0;background:#fff;color:var(--plum);box-shadow:0 0 0 1px rgba(52,4,20,.15);cursor:pointer}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 14px 30px -20px rgba(0,0,0,.3);overflow:hidden;position:relative}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:52px 72px 0;position:absolute;left:0;top:0}
+.hd{font:500 42px/1.12 var(--jak);letter-spacing:-.02em;margin:0;max-width:30ch}
+.hd em{font-style:normal;color:var(--plum)}
+.body{position:absolute;left:72px;right:72px;top:212px;height:400px}
+.fn{position:absolute;left:72px;bottom:86px;margin:0;font:italic 300 13px var(--hel);color:var(--mute)}
+.ft{position:absolute;left:72px;right:72px;bottom:40px;border-top:1px solid var(--hair);padding-top:12px;display:flex;justify-content:space-between;font:400 13px var(--hel)}
+.ft span:first-child{color:var(--plum)}
+.tag{margin:0;font:600 12px/1.4 var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.h{margin:0;font:600 19px/1.3 var(--jak);color:var(--ink)}
+.p{margin:0;font:300 16px/1.45 var(--hel);color:var(--ink)}
+.em{color:var(--plum);font-weight:600}
+/* the deck's marker: the ragged gold felt-tip from the problem statement, swept on left to right */
+mark{color:inherit;padding:0 .08em;margin:0 -.08em;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M6 6 C 60 2, 140 9, 200 5 S 330 3, 394 7 L 397 32 C 340 37, 250 30, 190 35 S 70 38, 4 33 Z' fill='%23A99939' opacity='.42'/><path d='M12 9 C 90 4, 180 12, 260 8 S 360 6, 390 10 L 392 29 C 320 33, 230 27, 150 31 S 60 34, 10 30 Z' fill='%23A99939' opacity='.2'/></svg>") no-repeat 0 55%/0% 1.08em;
+  background-color:transparent;-webkit-box-decoration-break:clone;box-decoration-break:clone;mix-blend-mode:multiply}
+.go mark{animation:mk .8s cubic-bezier(.3,.7,.2,1) var(--m,1.6s) both}
+@keyframes mk{from{background-size:0% 1.08em}to{background-size:100% 1.08em}}
+/* Clover slide 6's liquid-glass icon circle */
+.gl6{position:relative;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;isolation:isolate;color:var(--plum);flex:none;
+  background:rgba(255,255,255,.18);backdrop-filter:blur(3px) saturate(180%) brightness(1.06);-webkit-backdrop-filter:blur(3px) saturate(180%) brightness(1.06);
+  box-shadow:inset 1.5px 1.5px 1px rgba(255,255,255,.85),inset -1px -1px 1px rgba(255,255,255,.3),0 0 0 1px rgba(255,255,255,.5),0 2px 3px rgba(20,23,27,.05),0 16px 32px -14px rgba(52,4,20,.35)}
+.gl6::before{content:"";position:absolute;inset:-14px;border-radius:50%;z-index:-1;background:radial-gradient(circle at 35% 35%,#DCE3DC,rgba(111,124,112,.35) 45%,rgba(169,153,57,.2) 70%,transparent 72%)}
+.gl6.m::before{background:radial-gradient(circle at 35% 35%,#E8D3DA,rgba(52,4,20,.18) 45%,rgba(169,153,57,.2) 70%,transparent 72%)}
+.gl6.g::before{background:radial-gradient(circle at 35% 35%,#E2D8AE,rgba(169,153,57,.35) 45%,rgba(111,124,112,.25) 70%,transparent 72%)}
+.gl6::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;background:radial-gradient(55% 40% at 50% 14%,rgba(255,255,255,.75),rgba(255,255,255,0) 72%)}
+.gl6 svg{width:44px;height:44px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;position:relative;z-index:1}
+.gl6.s{width:64px;height:64px}.gl6.s svg{width:30px;height:30px}.gl6.s::before{inset:-10px}
+/* white glass capsule */
+.cap{display:inline-flex;align-items:center;white-space:nowrap;font:600 15px/1 var(--jak);padding:12px 18px;border-radius:999px;color:var(--plum);
+  background:radial-gradient(circle at 30% 0,#fff,rgba(214,222,215,.7));box-shadow:inset 1px 1px 1px #fff,0 0 0 1px rgba(52,4,20,.12),0 12px 22px -12px rgba(52,4,20,.35)}
+.cap.m{background:radial-gradient(circle at 30% 0,#fff,rgba(222,216,224,.75))}
+.cap.g{background:radial-gradient(circle at 30% 0,#fff,rgba(226,216,174,.7))}
+/* motion: everything arrives one by one in reading order */
+.a{opacity:0}
+.go .a{animation:rise .6s cubic-bezier(.22,1,.36,1) var(--d,0s) both}
+.go .gl6.a{animation:glin .7s cubic-bezier(.33,1.18,.37,1) var(--d,0s) both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes glin{from{opacity:0;transform:translateY(16px) scale(.85)}to{opacity:1;transform:none}}
+.draw{transform-origin:left;transform:scaleX(0)}
+.go .draw{animation:drawx var(--t,.9s) cubic-bezier(.3,.7,.2,1) var(--d,0s) both}
+@keyframes drawx{to{transform:scaleX(1)}}
+.go svg .dp{stroke-dasharray:1;stroke-dashoffset:1;animation:dp var(--t,1.2s) cubic-bezier(.45,.05,.3,1) var(--d,0s) forwards}
+@keyframes dp{to{stroke-dashoffset:0}}
+svg .dp{stroke-dasharray:1;stroke-dashoffset:1}
+
+/* 01 three glass circles on the green line, the last leg broken where users drop out */
+.d1{display:grid;grid-template-columns:repeat(3,1fr);column-gap:48px;position:relative;height:100%}
+.d1 .ln{position:absolute;top:48px;height:3px}
+.d1 .ln.g{left:calc((100% - 96px)/6);width:calc((100% - 96px)/3 + 48px);background:var(--green)}
+.d1 .ln.x{left:calc((100% - 96px)/2 + 48px);width:calc((100% - 96px)/3 + 48px);background:repeating-linear-gradient(90deg,rgba(20,23,27,.28) 0 8px,transparent 8px 16px);height:2px;top:49px}
+.d1 .gapl{position:absolute;top:2px;left:calc((100% - 96px)/2 + 48px);width:calc((100% - 96px)/3 + 48px);text-align:center}
+.d1 .gapl span{font:600 13px/1.4 var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum)}
+.d1 .col{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;position:relative;z-index:1}
+.d1 .col .h{margin-top:14px}
+.d1 .col .p{max-width:30ch;color:#4a4744;font-size:15px}
+.d1 .fx{position:absolute;left:0;right:0;top:320px;text-align:center;padding-top:16px;border-top:1px solid var(--hair);font-size:17px}
+
+/* 02 a funnel drawn in the green line, narrowing to the activation gap */
+.d2{position:relative;height:100%}
+.d2 svg.fun{position:absolute;left:0;top:0;width:1136px;height:250px;overflow:visible}
+.d2 svg.fun path{fill:none;stroke:var(--green);stroke-width:3;stroke-linecap:round}
+.d2 svg.fun line{stroke:var(--hair);stroke-width:1}
+.d2 .st{position:absolute;top:0;height:250px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.d2 .src{position:absolute;top:276px;display:flex;flex-direction:column;gap:4px;text-align:center;align-items:center}
+
+/* 03 the formula as the hero */
+.d3{display:flex;flex-direction:column;align-items:center;height:100%}
+.d3 .eq{display:flex;align-items:center;gap:40px;margin-top:6px}
+.d3 .lhs{font:500 56px/1 var(--jak);letter-spacing:-.03em;color:var(--ink);white-space:nowrap}
+.d3 .frac{display:flex;flex-direction:column;align-items:center}
+.d3 .frac .num,.d3 .frac .den{font:500 28px/1.25 var(--jak);letter-spacing:-.015em;color:var(--plum);padding:6px 0;text-align:center}
+.d3 .frac .den{color:var(--ink)}
+.d3 .frac .bar{width:100%;height:3px;background:var(--plum)}
+.d3 .srcs{display:grid;grid-template-columns:repeat(3,1fr);column-gap:36px;width:100%;margin-top:70px}
+.d3 .srcs>div{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.d3 .srcs .p{font-size:14px;color:#4a4744;max-width:30ch}
+
+/* 04 the journey on one line, broken where acquired users stop */
+.d4{position:relative;height:100%}
+.d4 .ln{position:absolute;top:92px;height:3px;background:var(--green)}
+.d4 .brk{position:absolute;top:118px;left:680px;width:150px;height:70px}
+.d4 .brk svg{width:100%;height:100%;overflow:visible}
+.d4 .stop{position:absolute;top:60px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;width:300px;margin-left:-150px}
+.d4 .stop .h{margin-top:12px}
+.d4 .stop .p{font-size:14px;color:#4a4744;max-width:28ch}
+.d4 .gapl{position:absolute;top:50px;left:680px;width:150px;white-space:nowrap;text-align:center}
+.d4 .gapl span{font:600 13px/1.4 var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum)}
+
+/* 05 what we could see, a hairline, what we needed to see (the slide 36 family) */
+.d5{display:grid;grid-template-columns:1fr 1px 1fr;column-gap:64px;height:350px;align-items:center}
+.d5 .sp{align-self:stretch;background:var(--hair)}
+.d5 .side{display:flex;flex-direction:column;gap:18px}
+.d5 .side .tag{margin-bottom:2px}
+.d5 .row{display:flex;align-items:center;gap:18px;padding:12px 0;border-top:1px solid var(--hair)}
+.d5 .row:first-of-type{border-top:0}
+.d5 .row .h{font-size:20px}
+.d5 .row .p{font-size:14px;color:var(--mute)}
+.d5 .big{font:500 34px/1.2 var(--jak);letter-spacing:-.02em;color:var(--ink);margin:0}
+.d5 .fr2{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.d5 .fr2 .num{font:500 20px/1.3 var(--jak);color:var(--plum)}
+.d5 .fr2 .bar{height:2px;background:var(--plum);width:100%}
+.d5 .fr2 .den{font:500 20px/1.3 var(--jak);color:var(--ink)}
+</style></head><body>
+<div class="wrap">
+<h1>Manus slide 10, five directions</h1>
+<p class="lede">The featured-capability activation rate, in the Clover deck's system: open layouts, hairlines, plum, the gold marker drawn in, liquid glass, one-by-one motion. There are no counts for each stage, so nothing shows a value; the visuals show where the journey breaks. Each frame has a Replay. Tell me the number.</p>
+<div id="opts"></div>
+</div>
+<script>
+const I={
+ play:'<svg viewBox="0 0 48 48"><rect x="6" y="11" width="36" height="26" rx="6"/><path d="M21 19l9 5-9 5z"/></svg>',
+ down:'<svg viewBox="0 0 48 48"><path d="M24 8v22"/><path d="M15 22l9 9 9-9"/><path d="M10 38h28"/></svg>',
+ tap:'<svg viewBox="0 0 48 48"><path d="M20 30V14a3 3 0 0 1 6 0v12"/><path d="M26 22a3 3 0 0 1 6 0v4"/><path d="M32 24a3 3 0 0 1 6 0v8c0 6-4 10-10 10h-3c-4 0-6-2-8-5l-5-8a3 3 0 0 1 5-3l3 4"/><path d="M14 9l-3-3M30 9l3-3M22 5V2"/></svg>'};
+const HEAD=`<p class="hd">The data pinpointed that the failure was in <em>converting acquired users to active users.</em></p>`;
+const FT=`<div class="ft"><span>10 &nbsp; Discovery</span><span>Manus AI case study</span></div>`;
+const S=[
+ {i:'play',c:'',h:'Watched a UGC video',src:'UGC and social platform data',p:'Views, watch time and click-throughs, each video tagged by hand for the 1.5 Max capability it featured.'},
+ {i:'down',c:'g',h:'Downloaded Manus',src:'Acquisition and attribution data',p:'UTM links, deep links and referral codes tie each download to its video.'},
+ {i:'tap',c:'m',h:'Used the capability the video showed',src:'In-app event data',p:'Feature-level events show whether, how often and how soon.'}];
+const FORM=`Activation rate = users who <mark>used the featured capability</mark> &divide; users who downloaded after watching that video.`;
+const D=[
+ ['01','Three glass circles on one line','Clover slide 6\'s glass circles for the three stages. The green line runs from watching to downloading, then breaks into a grey dash where acquired users stop; the gap is named above it.',
+  `${HEAD}<div class="body"><div class="d1">
+   <i class="ln g draw" style="--d:1.2s;--t:.8s"></i><i class="ln x draw" style="--d:2s;--t:.8s"></i>
+   <p class="gapl a" style="--d:2.4s"><span><mark style="--m:2.7s">The activation gap</mark></span></p>
+   ${S.map((s,k)=>`<div class="col"><span class="gl6 ${s.c} a" style="--d:${.4+k*.35}s">${I[s.i]}</span><p class="h a" style="--d:${.55+k*.35}s">${s.h}</p><p class="tag a" style="--d:${.65+k*.35}s">${s.src}</p><p class="p a" style="--d:${.75+k*.35}s">${s.p}</p></div>`).join('')}
+   <p class="p fx a" style="--d:3.2s">${FORM.replace('<mark>','<mark style="--m:3.6s">')}</p></div></div>
+   <p class="fn a" style="--d:3.4s">Featured-capability activation rate, measured in November 2025.</p>${FT}`],
+ ['02','A funnel in the green line','Two green lines draw the funnel and narrow at the last stage, so the drop reads as a shape, with no numbers. Each stage\'s data source sits beneath it as a grey label.',
+  `${HEAD}<div class="body"><div class="d2">
+   <svg class="fun" viewBox="0 0 1136 250"><path class="dp" pathLength="1" style="--d:.4s;--t:1.4s" d="M0 10 L380 10 C 560 10, 600 64, 760 76 L1136 82"/><path class="dp" pathLength="1" style="--d:.4s;--t:1.4s" d="M0 240 L380 240 C 560 240, 600 186, 760 174 L1136 168"/>
+    <line x1="378" y1="20" x2="378" y2="230"/><line x1="758" y1="84" x2="758" y2="166"/></svg>
+   ${[[0,378,0],[378,380,1],[758,378,2]].map(([x,w,k])=>`<div class="st a" style="left:${x}px;width:${w}px;--d:${1+k*.35}s"><p class="h" style="${k==2?'font-size:16px;max-width:22ch':''}">${S[k].h}</p>${k==2?'':''}</div>`).join('')}
+   <p class="a" style="position:absolute;left:758px;width:378px;top:190px;text-align:center;--d:2.3s"><span class="tag" style="color:var(--plum)"><mark style="--m:2.6s">The activation gap</mark></span></p>
+   ${[[0,378,0],[378,380,1],[758,378,2]].map(([x,w,k])=>`<div class="src a" style="left:${x}px;width:${w}px;--d:${1.5+k*.3}s"><p class="tag">${S[k].src}</p><p class="p" style="font-size:14px;color:#4a4744;max-width:32ch">${S[k].p}</p></div>`).join('')}
+   </div></div>
+   <p class="fn a" style="--d:3s">Activation rate = users who used the featured capability &divide; users who downloaded after watching that video. Measured in November 2025.</p>${FT}`],
+ ['03','The formula as the hero','The measure itself, large: activation rate equals a plum fraction, with the part that matters marked in gold. The three data sources sit beneath as white glass capsules, each with its one line.',
+  `${HEAD}<div class="body"><div class="d3">
+   <p class="tag a" style="--d:.3s">Featured-capability activation rate</p>
+   <div class="eq"><span class="lhs a" style="--d:.5s">Activation rate =</span><div class="frac"><span class="num a" style="--d:.8s">users who <mark style="--m:1.6s">used the featured capability</mark></span><i class="bar draw" style="--d:1s;--t:.7s"></i><span class="den a" style="--d:1.2s">users who downloaded after watching that video</span></div></div>
+   <div class="srcs">${S.map((s,k)=>`<div><span class="cap ${s.c} a" style="--d:${2+k*.25}s">${s.src}</span><p class="p a" style="--d:${2.15+k*.25}s">${s.p}</p></div>`).join('')}</div></div></div>
+   <p class="fn a" style="--d:2.9s">Measured in November 2025.</p>${FT}`],
+ ['04','One journey, broken at the last step','The journey as one green line with three glass stops. It draws from watching to downloading, then breaks before the last stop: the activation gap, marked in gold, is where acquired users stopped.',
+  `${HEAD}<div class="body"><div class="d4">
+   <i class="ln draw" style="left:228px;width:452px;--d:1s;--t:.9s"></i><i class="ln draw" style="left:700px;width:208px;--d:2s;--t:.5s;background:repeating-linear-gradient(90deg,rgba(20,23,27,.28) 0 8px,transparent 8px 16px);height:2px;top:93px"></i>
+      <p class="gapl a" style="--d:2.1s"><span><mark style="--m:2.4s">The activation gap</mark></span></p>
+   ${S.map((s,k)=>`<div class="stop" style="left:${[228,568,908][k]}px"><span class="gl6 s ${s.c} a" style="--d:${.4+k*.4}s">${I[s.i]}</span><p class="h a" style="--d:${.55+k*.4}s">${s.h}</p><p class="tag a" style="--d:${.65+k*.4}s">${s.src}</p><p class="p a" style="--d:${.75+k*.4}s">${s.p}</p></div>`).join('')}
+   </div></div>
+   <p class="fn a" style="--d:3s">Activation rate = users who used the featured capability &divide; users who downloaded after watching that video. Measured in November 2025.</p>${FT}`],
+ ['05','What we could see, what we needed to see','In the slide 36 layout: on the left the two stages the existing data already covered, a thin grey divider, and on the right the stage that decided success, with the measure as a plum fraction and the gap marked in gold.',
+  `${HEAD}<div class="body"><div class="d5">
+   <div class="side"><p class="tag a" style="--d:.3s">Watching and downloading</p>
+    ${S.slice(0,2).map((s,k)=>`<div class="row a" style="--d:${.5+k*.3}s"><span class="gl6 s ${s.c}">${I[s.i]}</span><div><p class="h">${s.h}</p><p class="p">${s.src}</p></div></div>`).join('')}</div>
+   <span class="sp a" style="--d:1.2s"></span>
+   <div class="side"><p class="tag a" style="--d:1.4s;color:var(--plum)"><mark style="--m:1.8s">The activation gap</mark></p>
+    <div class="row a" style="--d:1.6s"><span class="gl6 s m">${I.tap}</span><div><p class="h">${S[2].h}</p><p class="p">${S[2].src}: whether, how often and how soon</p></div></div>
+    <div class="fr2 a" style="--d:2.1s"><p class="tag">Activation rate</p><span class="num">users who used the featured capability</span><i class="bar"></i><span class="den">users who downloaded after watching that video</span></div></div>
+   </div></div>
+   <p class="fn a" style="--d:2.6s">Featured-capability activation rate, measured in November 2025. Each video was tagged by hand for the 1.5 Max capability it featured.</p>${FT}`]];
+document.getElementById('opts').innerHTML=D.map(([n,t,d,b])=>`<div class="opt"><div class="lab"><b>${n} &nbsp;${t}</b><small>${d}</small><button>Replay</button></div><div class="frame"><div class="sl">${b}</div></div></div>`).join('');
+const fit=()=>document.querySelectorAll('.frame').forEach(f=>f.querySelector('.sl').style.transform=`scale(${f.clientWidth/1280})`);
+addEventListener('resize',fit);fit();
+const play=sl=>{sl.classList.remove('go');void sl.offsetWidth;sl.classList.add('go');};
+document.querySelectorAll('.opt').forEach(o=>{const sl=o.querySelector('.sl');o.querySelector('button').onclick=()=>play(sl);play(sl);});
+</script>
+</body></html>

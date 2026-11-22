@@ -1,0 +1,44 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>1 · Big numbers</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;600;700&display=swap">
+<link rel="stylesheet" href="../shared.css">
+<style>
+/* the live slide's table, kept, with each column's evidence promoted to a hero figure that fills the empty space */
+.ctr{left:0;right:0;top:0;height:720px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px}
+.ctr .head{max-width:1000px;padding:0 140px;box-sizing:content-box}
+.gl{display:grid;grid-template-columns:repeat(3,360px);border-top:1px solid var(--hair)}
+.gc{position:relative;display:flex;flex-direction:column;border-left:1px solid var(--hair)}
+.gc:last-child{border-right:1px solid var(--hair)}
+.gc::after,.gc:last-child::before{content:"";position:absolute;top:100%;width:1px;height:720px;background:var(--hair)}
+.gc::after{left:-1px}.gc:last-child::before{right:-1px}
+.gc .lab{padding:24px 32px;border-bottom:1px solid var(--hair)}
+.bd{padding:32px 32px 0;display:flex;flex-direction:column}
+/* the hero: Jakarta Light like the title slides, one cap height for all three so the row reads as one line */
+.big{font:300 104px/96px var(--jak);letter-spacing:-.045em;color:var(--ink);height:96px;margin-left:-6px}
+.big small{font-size:.5em;letter-spacing:-.02em;margin-left:2px;vertical-align:.72em}
+/* AI has no single figure in the report, so its hero is what AI does, in order, the newest job in plum */
+.jobs{height:96px;display:flex;flex-direction:column;justify-content:space-between;font:500 22px/24px var(--jak);letter-spacing:-.015em;color:var(--ink3)}
+.jobs b{font-weight:600;color:var(--plum)}
+.rule{height:1px;background:var(--hair);margin:24px 0}
+.gc h3{font-size:24px;line-height:1.25;color:var(--ink)}
+.gc .body{margin-top:8px}
+</style></head>
+<body><div id="stage">
+<div class="ctr">
+  <h2 class="head" data-b="0">According to <span class="hl">ClassPass&rsquo;s 2026 Industry Impact Report</span>, these are the company&rsquo;s <span class="hl">business goals</span>:</h2>
+  <div class="gl">
+    <div class="gc g1"><p class="lab" data-b="2">Wellness beyond fitness</p><div class="bd">
+      <p class="big tnum" data-b="3">37<small>%</small></p><div class="rule"></div>
+      <h3 data-b="4">Finding a class</h3><p class="body" data-b="4">Wellness bookings grew 37% in 2025, as fast as fitness</p></div></div>
+    <div class="gc g2"><p class="lab" data-b="5">AI integration</p><div class="bd">
+      <div class="jobs" data-b="6"><span>Class spots</span><span>Credit prices</span><b>Member answers</b></div><div class="rule"></div>
+      <h3 data-b="7">Support chat</h3><p class="body" data-b="7">AI already sets class spots and credit prices, and now answers members</p></div></div>
+    <div class="gc g3"><p class="lab" data-b="8">Retention</p><div class="bd">
+      <p class="big tnum" data-b="9">80<small>%</small></p><div class="rule"></div>
+      <h3 data-b="10">Rating a class</h3><p class="body" data-b="10">80% of members who join after a trial go back to a studio they tried</p></div></div>
+  </div>
+</div>
+</div>
+<p class="tag">1 · Big numbers · click to play the build · <a href="../">all five</a></p>
+<script src="../shared.js"></script>
+</body></html>

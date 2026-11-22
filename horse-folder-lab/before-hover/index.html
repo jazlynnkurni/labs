@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Horse folder</title>
+<style>
+  :root { --s: min(78vmin, 680px); }
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  body { display: grid; place-items: center; }
+  /* the folder's box is the reference's 736 grid; the folder itself sits from 93 to 646 of it,
+     and the reflection hangs below, so the pair is centred as one                          */
+  .scene { position: relative; width: var(--s); height: var(--s); margin-top: calc(var(--s) * -0.06); margin-bottom: calc(var(--s) * 0.18); }
+  .scene > div { position: absolute; inset: 0; }
+  /* the floor: the same folder mirrored about its bottom edge, faint, soft, fading out, as on the boxing lab's floor */
+  .mirror {
+    transform-origin: 50% calc(646 / 736 * 100%); transform: scaleY(-1);
+    opacity: .12; filter: blur(calc(var(--s) * 0.007));
+    -webkit-mask-image: linear-gradient(to bottom, transparent 52%, #000 87.6%, transparent 87.8%);
+            mask-image: linear-gradient(to bottom, transparent 52%, #000 87.6%, transparent 87.8%);
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+  <div class="scene">
+    <div class="mirror" id="mirror" aria-hidden="true"></div>
+    <div id="folder"></div>
+  </div>
+<script type="module">
+  import { mountProcession } from './procession.js';
+  mountProcession(document.getElementById('folder'), { finish: true, travel: true, mirror: document.getElementById('mirror') });
+</script>
+</body>
+</html>

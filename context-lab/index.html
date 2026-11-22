@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Context lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Five ways to show Clover slide 3 (what Eden asked, what I discovered, how I answered) with visuals instead of
+   paragraphs, since the words live in the talk track. In the Manus colourway: plum, gold, green-grey, cream. */
+:root{--ink:#14171B;--plum:#340414;--gold:#A99939;--green:#6F7C70;--cream:#F5F1E1;--hair:rgba(20,23,27,.14);--mute:#5b5852;
+  --jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1340px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:#6f6b64;margin:0 0 26px;max-width:84ch}
+.opt{margin-bottom:38px}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0 0 10px}
+.lab small{font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:#6f6b64;margin-left:8px}
+.row3{display:grid;grid-template-columns:1fr;gap:18px;max-width:900px}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 18px 40px -24px rgba(0,0,0,.3);overflow:hidden}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:52px 72px 0;position:relative}
+.hd{font:500 42px/1.12 var(--jak);letter-spacing:-.02em;margin:0;max-width:34ch}
+.hd em{font-style:normal;color:var(--plum)}
+.ft{position:absolute;left:72px;right:72px;bottom:40px;border-top:1px solid var(--hair);padding-top:12px;display:flex;justify-content:space-between;font:400 13px var(--hel)}
+.ft span:first-child{color:var(--plum)}
+.tag{font:600 13px/1.4 var(--jak);letter-spacing:.06em;text-transform:uppercase;color:var(--plum)}
+.ic{width:56px;height:56px;color:var(--plum);flex:none}
+.ic.lg{width:92px;height:92px}
+.ic svg{width:100%;height:100%;display:block;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.cap{font:600 19px/1.3 var(--jak);margin:0}
+.sub{font:400 13px/1.4 var(--hel);color:var(--mute);margin:3px 0 0}
+.pill{display:inline-flex;align-items:center;gap:6px;font:600 13px/1 var(--jak);padding:8px 12px;border-radius:999px;border:1.5px solid var(--plum);color:var(--plum);background:#fff}
+.pill.f{background:var(--plum);color:#fff}
+.pill.x{border-color:var(--hair);color:#8a8780;text-decoration:line-through;text-decoration-color:var(--plum)}
+.num{font:500 56px/1 var(--jak);letter-spacing:-.03em;color:var(--plum)}
+.num.s{font-size:34px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;border-top:2px solid var(--plum);padding-top:14px}
+.stats div{display:flex;align-items:baseline;gap:12px}
+.stats p{margin:0;font:600 15px/1.3 var(--jak)}
+
+/* 01 Icon triptych */
+.o1 .cols{margin-top:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.o1 .c{background:var(--cream);border-radius:20px;padding:24px;min-height:300px;display:flex;flex-direction:column;gap:16px}
+.o1 .chips{display:flex;flex-wrap:wrap;gap:8px}
+.o1 .stats{margin-top:26px}
+
+/* 02 Three steps with arrows */
+.o2 .flow{margin-top:44px;display:grid;grid-template-columns:1fr 60px 1fr 60px 1fr;align-items:start}
+.o2 .st{text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+.o2 .disc{width:132px;height:132px;border-radius:50%;background:var(--cream);display:grid;place-items:center;border:2px solid var(--plum)}
+.o2 .disc.f{background:var(--plum)}.o2 .disc.f .ic{color:#fff}
+.o2 .ar{height:132px;display:flex;align-items:center}.o2 .ar i{display:block;width:100%;height:2px;background:var(--plum);position:relative}
+.o2 .ar i::after{content:"";position:absolute;right:0;top:-5px;width:10px;height:10px;border-top:2px solid var(--plum);border-right:2px solid var(--plum);transform:rotate(45deg)}
+.o2 .chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;max-width:300px}
+.o2 .stats{margin-top:40px}
+
+/* 03 Split across three slides */
+.o3 .s1 .dev{margin-top:70px;display:flex;align-items:center;justify-content:center;gap:48px}.o3 .ic.xl{width:170px;height:170px}
+.o3 .s1 .plus{font:300 96px var(--jak);color:var(--gold)}
+.o3 .s1 .zero{margin-top:60px;display:flex;align-items:center;justify-content:center;gap:20px}.o3 .s1 .zero .pill{font-size:16px;padding:10px 16px}
+.o3 .s2 .split{margin-top:36px;display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:20px;overflow:hidden}
+.o3 .s2 .h{padding:40px;display:flex;flex-direction:column;gap:20px;min-height:400px;align-items:flex-start}.o3 .s2 .h .cap{font:500 34px/1.2 var(--jak)}
+.o3 .s2 .h:first-child{background:var(--cream)}.o3 .s2 .h:last-child{background:var(--plum);color:#fff}.o3 .s2 .h:last-child .ic,.o3 .s2 .h:last-child .tag{color:#fff}
+.o3 .s2 .h:last-child .sub{color:rgba(255,255,255,.75)}
+.o3 .s2 .pr{margin-top:14px;font:500 26px/1.25 var(--jak)}
+.o3 .s3 .path{margin-top:34px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.o3 .s3 .p{border:2px solid var(--plum);border-radius:20px;padding:26px;display:flex;flex-direction:column;gap:16px;min-height:380px}.o3 .s3 .p .ic{width:72px;height:72px}.o3 .s3 .p .num.s{font-size:56px}
+.o3 .s3 .p.bad{border-color:var(--hair)}.o3 .s3 .p.bad .ic{color:#8a8780}
+.o3 .s3 .p.good{background:var(--plum);color:#fff}.o3 .s3 .p.good .ic,.o3 .s3 .p.good .num{color:#fff}
+
+/* 04 Numbers board */
+.o4 .board{margin-top:38px;display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-top:2px solid var(--plum);border-bottom:1px solid var(--hair)}
+.o4 .cell{padding:22px 18px 24px;border-left:1px solid var(--hair);display:flex;flex-direction:column;gap:14px;min-height:300px}
+.o4 .cell:first-child{border-left:0;padding-left:0}
+.o4 .cell .ic{width:44px;height:44px}
+.o4 .grp{display:grid;grid-template-columns:1fr 3fr 1fr;margin-top:12px}
+.o4 .grp span{border-top:2px solid var(--gold);padding-top:8px}
+
+/* 05 Device map: the glasses and the phone in the middle, the story annotated around them */
+.o5 .map{margin-top:20px;position:relative;height:440px}
+.o5 .core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:30px}
+.o5 .ring{position:absolute;left:50%;top:50%;width:360px;height:360px;transform:translate(-50%,-50%);border-radius:50%;border:2px dashed var(--gold)}
+.o5 .an{position:absolute;width:300px;display:flex;gap:14px;align-items:flex-start}
+.o5 .an .ic{width:44px;height:44px}
+.o5 .a1{left:0;top:10px}.o5 .a2{left:0;top:250px}.o5 .a3{right:0;top:10px}.o5 .a4{right:0;top:250px}
+.o5 .an .t{display:flex;flex-direction:column;gap:6px}
+</style></head><body>
+<div class="wrap">
+<h1>Context lab</h1>
+<p class="lede">Five ways to show slide 3 (what Eden asked, what I discovered, how I answered) as visuals, in the Manus colourway. The words are only short tags, since you'll say the rest. Option 03 splits it across three slides. Tell me the number.</p>
+<div id="opts"></div>
+</div>
+<script>
+const I={
+ glasses:'<svg viewBox="0 0 64 64"><rect x="6" y="22" width="22" height="16" rx="7"/><rect x="36" y="22" width="22" height="16" rx="7"/><path d="M28 28q4-4 8 0M6 27 2 24M58 27l4-3"/><path d="M12 30h10" stroke-width="2.4"/></svg>',
+ phone:'<svg viewBox="0 0 64 64"><rect x="19" y="6" width="26" height="52" rx="6"/><path d="M28 11h8"/><rect x="24" y="18" width="16" height="9" rx="2"/><path d="M24 33h16M24 39h11"/></svg>',
+ agent:'<svg viewBox="0 0 64 64"><path d="M32 8l3.5 10.5L46 22l-10.5 3.5L32 36l-3.5-10.5L18 22l10.5-3.5z"/><path d="M48 38l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/><path d="M16 40l1.5 4.5L22 46l-4.5 1.5L16 52l-1.5-4.5L10 46l4.5-1.5z"/></svg>',
+ blank:'<svg viewBox="0 0 64 64"><rect x="10" y="10" width="44" height="44" rx="6" stroke-dasharray="4 4"/><path d="M24 32h16M32 24v16"/></svg>',
+ quiet:'<svg viewBox="0 0 64 64"><path d="M20 44V30a12 12 0 0 1 24 0v14l4 4H16z"/><path d="M28 52a4 4 0 0 0 8 0"/><path d="M10 12l44 44"/></svg>',
+ glance:'<svg viewBox="0 0 64 64"><path d="M4 32s10-16 28-16 28 16 28 16-10 16-28 16S4 32 4 32z"/><circle cx="32" cy="32" r="7"/></svg>',
+ deep:'<svg viewBox="0 0 64 64"><rect x="10" y="12" width="44" height="40" rx="5"/><path d="M18 22h28M18 30h28M18 38h20M18 46h12"/></svg>',
+ test:'<svg viewBox="0 0 64 64"><circle cx="22" cy="22" r="7"/><circle cx="42" cy="22" r="7"/><path d="M9 48c1-8 6-13 13-13s12 5 13 13M29 48c1-8 6-13 13-13s12 5 13 13"/></svg>',
+ talk:'<svg viewBox="0 0 64 64"><path d="M10 14h32a4 4 0 0 1 4 4v16a4 4 0 0 1-4 4H24l-9 8v-8h-5a4 4 0 0 1-4-4V18a4 4 0 0 1 4-4z"/><path d="M50 26h4a4 4 0 0 1 4 4v14a4 4 0 0 1-4 4h-3v7l-8-7H34"/></svg>',
+ nav:'<svg viewBox="0 0 64 64"><rect x="8" y="8" width="20" height="20" rx="4"/><rect x="36" y="8" width="20" height="20" rx="4"/><rect x="8" y="36" width="20" height="20" rx="4"/><rect x="36" y="36" width="20" height="20" rx="4"/></svg>',
+ intent:'<svg viewBox="0 0 64 64"><path d="M12 30h24M28 22l8 8-8 8"/><circle cx="46" cy="30" r="10"/><path d="M42 30l3 3 6-6"/></svg>',
+ code:'<svg viewBox="0 0 64 64"><path d="M22 20 10 32l12 12M42 20l12 12-12 12M36 14 28 50"/></svg>',
+ brand:'<svg viewBox="0 0 64 64"><circle cx="24" cy="24" r="10"/><circle cx="40" cy="24" r="10"/><circle cx="24" cy="40" r="10"/><circle cx="40" cy="40" r="10"/><path d="M32 32l8 22"/></svg>',
+ hud:'<svg viewBox="0 0 64 64"><rect x="8" y="14" width="48" height="36" rx="8"/><rect x="16" y="22" width="20" height="6" rx="3"/><path d="M16 34h28M16 40h18"/></svg>',
+ cross:'<svg viewBox="0 0 64 64"><path d="M18 18l28 28M46 18 18 46"/></svg>'};
+const ic=(k,c='')=>`<span class="ic ${c}">${I[k]}</span>`;
+const head='<p class="hd">Eden asked how to make a proactive AI agent useful <em>without taking control away from its user.</em></p>';
+const foot=n=>`<div class="ft"><span>${n} &nbsp; Context</span><span>Eden Case Study</span></div>`;
+const stats=`<div class="stats"><div><span class="num s">52</span><p>internal testers</p></div><div><span class="num s">8</span><p>usability sessions</p></div><div><span class="num s">&minus;67%</span><p>unnecessary HUD interactions</p></div></div>`;
+const frame=(h,n='03')=>`<div class="frame"><div class="sl">${h}${foot(n)}</div></div>`;
+const O=[
+ ['01','Icon triptych','Three cream panels, an icon pair and a few tags each; the three figures underneath.',frame(
+  `<div class="o1">${head}<div class="cols">
+   <div class="c"><span class="tag">What Eden asked</span><div style="display:flex;gap:10px">${ic('glasses')}${ic('phone')}${ic('agent')}</div><p class="cap">A proactive agent across glasses and phone</p><div class="chips"><span class="pill x">Interaction model</span><span class="pill x">Brand</span><span class="pill x">Design system</span></div></div>
+   <div class="c"><span class="tag">What I discovered</span><div style="display:flex;gap:10px">${ic('quiet')}${ic('glance')}${ic('deep')}</div><p class="cap">Help without interruption</p><div class="chips"><span class="pill">Glance on the glasses</span><span class="pill">Depth on the phone</span></div></div>
+   <div class="c"><span class="tag">How I answered</span><div style="display:flex;gap:10px">${ic('intent')}${ic('code')}${ic('brand')}</div><p class="cap">Intent-first, built and branded</p><div class="chips"><span class="pill f">HUD 30 &rarr; 69</span><span class="pill f">SwiftUI app</span><span class="pill f">Eden + Clover</span></div></div>
+   </div>${stats}</div>`)],
+ ['02','Three steps','One large icon disc per step, an arrow between, three short tags under each.',frame(
+  `<div class="o2">${head}<div class="flow">
+   <div class="st"><div class="disc">${ic('agent','lg')}</div><span class="tag">Asked</span><p class="cap">Make it proactive, not intrusive</p><div class="chips"><span class="pill x">Interaction model</span><span class="pill x">Brand</span><span class="pill x">System</span></div></div>
+   <div class="ar"><i></i></div>
+   <div class="st"><div class="disc">${ic('quiet','lg')}</div><span class="tag">Discovered</span><p class="cap">Help without interruption</p><div class="chips"><span class="pill">Glance</span><span class="pill">Depth</span></div></div>
+   <div class="ar"><i></i></div>
+   <div class="st"><div class="disc f">${ic('intent','lg')}</div><span class="tag">Answered</span><p class="cap">Intent-first, across both devices</p><div class="chips"><span class="pill f">30 &rarr; 69</span><span class="pill f">SwiftUI</span><span class="pill f">Brand</span></div></div>
+   </div>${stats}</div>`)],
+ ['03','Three slides','Asked, discovered and answered each get their own slide, each built around one picture.',`<div class="row3">
+  ${frame(`<div class="o3"><div class="s1"><p class="hd">Eden asked for <em>a proactive AI agent.</em></p>
+    <div class="dev">${ic('glasses','xl')}<span class="plus">+</span>${ic('phone','xl')}<span class="plus">=</span>${ic('agent','xl')}</div>
+    <div class="zero"><span class="num">0&rarr;1</span><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="pill x">Interaction model</span><span class="pill x">Brand</span><span class="pill x">Design system</span></div></div></div></div>`)}
+  ${frame(`<div class="o3"><div class="s2"><p class="hd">I discovered testers wanted <em>help without interruption.</em></p>
+    <div class="split"><div class="h">${ic('glasses','lg')}<span class="tag">On the glasses</span>${ic('glance')}<p class="cap">Glanceable moments</p></div>
+    <div class="h">${ic('phone','lg')}<span class="tag">On the phone</span>${ic('deep')}<p class="cap">Deeper tasks</p></div></div></div></div>`,'04')}
+  ${frame(`<div class="o3"><div class="s3"><p class="hd">So I answered with <em>intent-first, built end to end.</em></p>
+    <div class="path"><div class="p bad">${ic('nav')}<span class="tag">Navigation-first</span><span class="num s">52</span><p class="sub">testers, then it failed</p></div>
+    <div class="p good">${ic('intent')}<span class="tag" style="color:#fff">Intent-first</span><span class="num s">30&rarr;69</span><p class="sub" style="color:rgba(255,255,255,.75)">use cases</p></div>
+    <div class="p">${ic('code')}<span class="tag">Built</span><p class="cap">SwiftUI app and Dynamic Island</p></div>
+    <div class="p">${ic('brand')}<span class="tag">Branded</span><p class="cap">Eden and Clover</p></div></div></div></div>`,'05')}
+  </div>`],
+ ['04','Numbers board','Five figures, each with an icon and two words, grouped under asked, discovered and answered.',frame(
+  `<div class="o4">${head}<div class="board">
+   <div class="cell">${ic('blank')}<span class="num">0&rarr;1</span><p class="cap">No model, brand or system</p></div>
+   <div class="cell">${ic('test')}<span class="num">52</span><p class="cap">Internal testers</p></div>
+   <div class="cell">${ic('talk')}<span class="num">8</span><p class="cap">Usability sessions</p></div>
+   <div class="cell">${ic('hud')}<span class="num">30&rarr;69</span><p class="cap">HUD use cases</p></div>
+   <div class="cell">${ic('intent')}<span class="num">&minus;67%</span><p class="cap">Unnecessary HUD interactions</p></div></div>
+   <div class="grp"><span class="tag">Asked</span><span class="tag">Discovered and tested</span><span class="tag">Answered</span></div></div>`)],
+ ['05','Device map','The glasses and the phone at the centre on one agent, the story annotated around them.',frame(
+  `<div class="o5">${head}<div class="map"><div class="ring"></div>
+   <div class="core">${ic('glasses','lg')}${ic('agent')}${ic('phone','lg')}</div>
+   <div class="an a1">${ic('blank')}<div class="t"><span class="tag">Asked</span><p class="cap">Proactive, with no model, brand or system yet</p></div></div>
+   <div class="an a2">${ic('quiet')}<div class="t"><span class="tag">Discovered</span><p class="cap">Glance on the glasses, depth on the phone</p></div></div>
+   <div class="an a3">${ic('intent')}<div class="t"><span class="tag">Answered</span><p class="cap">Intent-first HUD, 30 &rarr; 69 use cases</p></div></div>
+   <div class="an a4">${ic('code')}<div class="t"><span class="tag">Built</span><p class="cap">SwiftUI app, Island and the brand</p></div></div>
+   </div></div>`)]];
+document.getElementById('opts').innerHTML=O.map(([n,t,d,h])=>`<section class="opt"><p class="lab">${n} ${t}<small>${d}</small></p>${h}</section>`).join('');
+const fit=()=>document.querySelectorAll('.frame').forEach(f=>{f.firstElementChild.style.transform=`scale(${f.clientWidth/1280})`});
+addEventListener('resize',fit);fit();
+</script>
+</body></html>

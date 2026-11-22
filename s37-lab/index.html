@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Slide 37 lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap">
+<style>
+/* Five directions for slide 37, next steps. Deck language: plum, gold stabilo, thin grey hairlines, white glass capsule,
+   grey italic footnote. No boxes, no connector lines, no orbs. */
+:root{--ink:#14171B;--plum:#340414;--mute:#8a8780;--hair:rgba(20,23,27,.14);--jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1240px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:#6f6b64;margin:0 0 28px;max-width:92ch}
+.opt{margin-bottom:56px}
+.bar{display:flex;align-items:center;gap:14px;margin:0 0 12px}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0}
+.lab small{font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:#6f6b64;margin-left:8px}
+button{font:600 12px var(--jak);padding:7px 12px;border-radius:999px;border:0;background:#fff;box-shadow:0 0 0 1px rgba(52,4,20,.15);cursor:pointer;color:var(--plum);flex:none}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 14px 30px -20px rgba(0,0,0,.3);overflow:hidden;position:relative}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:52px 72px 0;position:absolute;left:0;top:0}
+.hd{font:500 40px/1.12 var(--jak);letter-spacing:-.02em;margin:0}
+.hd em{font-style:normal;color:var(--plum)}
+.body{position:absolute;left:72px;right:72px;top:150px;height:470px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.fn{position:absolute;left:72px;right:72px;bottom:86px;margin:0;font:italic 300 13px/1.45 var(--hel);color:var(--mute)}
+.ft{position:absolute;left:72px;right:72px;bottom:40px;border-top:1px solid var(--hair);padding-top:12px;display:flex;justify-content:space-between;font:400 13px var(--hel)}
+.ft span:first-child{color:var(--plum)}
+.cap{display:inline-flex;align-items:center;white-space:nowrap;font:600 17px/1 var(--jak);padding:14px 22px;border-radius:999px;color:var(--plum);
+  background:radial-gradient(circle at 30% 0,#fff,rgba(214,222,215,.7));box-shadow:inset 1px 1px 1px #fff,0 0 0 1px rgba(52,4,20,.12),0 12px 22px -12px rgba(52,4,20,.35)}
+.tag{margin:0;font:600 12px/1.4 var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum)}
+.tag.g{color:var(--mute)}
+.q{margin:0;font:600 22px/1.25 var(--jak);color:var(--ink)}
+.row{padding:12px 0;border-top:1px solid var(--hair);font:400 18px/1.35 var(--jak);color:var(--ink)}
+.rows .row:last-child{border-bottom:1px solid var(--hair)}
+.star{margin:0;font:600 34px/1.2 var(--jak);letter-spacing:-.02em;color:var(--ink)}
+mark{color:inherit;background:linear-gradient(transparent 58%,rgba(169,153,57,.38) 58%) no-repeat;background-size:0% 100%;padding:0 2px}
+.a{opacity:0}
+.go .a{animation:rise .65s cubic-bezier(.22,1,.36,1) var(--d,0s) both}
+.go mark{animation:draw .7s cubic-bezier(.45,.05,.3,1) var(--m,1s) both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes draw{to{background-size:100% 100%}}
+
+/* 01 the north star as a hero line, two columns of rows beneath */
+.d1 .star{text-align:center;max-width:24ch;font-size:40px}
+.d1 .lbl{margin:0 0 14px}
+.d1 .cols{display:grid;grid-template-columns:1fr 1fr;column-gap:56px;width:100%;margin-top:40px}
+.d1 .cols .tag{margin-bottom:10px}
+/* 02 slide-36 family: the north star left, a thin divider, the two groups right */
+.d2{flex-direction:row!important;align-items:center}
+.d2 .lt{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;padding-right:56px}
+.d2 .lt .star{font-size:46px;max-width:13ch}
+.d2 .sp{align-self:stretch;width:1px;background:var(--hair);margin:30px 0}
+.d2 .rt{flex:1;display:flex;flex-direction:column;gap:26px;padding-left:56px}
+.d2 .rt .q{margin-bottom:8px;font-size:20px}
+.d2 .rt .row{font-size:16px;padding:9px 0}
+/* 03 two questions side by side under the capsule */
+.d3 .cols{display:grid;grid-template-columns:1fr 1fr;column-gap:64px;width:100%;margin-top:40px}
+.d3 .q{font-size:30px;letter-spacing:-.02em;margin:8px 0 18px}
+/* 04 the checklist: six measures that tick in, grouped */
+.d4 .lbl{margin:0 0 6px}
+.d4 .star{font-size:28px;text-align:center}
+.d4 .cols{display:grid;grid-template-columns:1fr 1fr;column-gap:56px;width:100%;margin-top:30px}
+.d4 .cols .tag{margin-bottom:8px}
+.d4 .ck{display:flex;align-items:center;gap:14px}
+.d4 .ck i{flex:none;width:22px;height:22px;border-radius:6px;box-shadow:inset 0 0 0 1.5px rgba(20,23,27,.28);position:relative}
+.d4 .ck i::after{content:"";position:absolute;left:7px;top:3px;width:6px;height:11px;border:solid var(--plum);border-width:0 2px 2px 0;transform:rotate(45deg) scale(0);transform-origin:center}
+.go .d4 .ck i::after{animation:tick .35s cubic-bezier(.3,1.6,.5,1) var(--t) both}
+@keyframes tick{to{transform:rotate(45deg) scale(1)}}
+/* 05 the measure as a sum: the north star split into its two halves */
+.d5 .eq{display:flex;align-items:center;justify-content:center;gap:28px;width:100%}
+.d5 .part{flex:1;max-width:460px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.d5 .part .q{font-size:26px;letter-spacing:-.02em;margin:6px 0 16px}
+.d5 .part .rows{width:100%;text-align:left}
+.d5 .op{font:300 64px/1 var(--jak);color:rgba(20,23,27,.3)}
+.d5 .star{font-size:32px;text-align:center;margin-top:30px;padding-top:24px;border-top:1px solid var(--hair);width:100%}
+</style></head><body>
+<div class="wrap">
+<h1>Slide 37 lab, next steps</h1>
+<p class="lede">Five directions for the next-round measures. Every one keeps the north-star metric, the two questions and all six measures, with one small grey "Next round" label instead of six pills. No boxes, no orbs, no connector lines; thin grey hairlines and the gold stabilo only.</p>
+<div id="opts"></div>
+</div>
+<script>
+const HD=`<p class="hd">Next <em>Steps.</em></p>`;
+const FN=`I will run these measures with the 52 internal testers now wearing the glasses. I left out time on the glasses on purpose, since Clover aims to reduce screen time.`;
+const STAR=`Time from a request to <mark style="--m:VAR">accurate, useful information</mark>`;
+const A=['Task completion rate','Success on the first attempt','Recovery after a failed step'];
+const B=['Time spent looking at the display','Clarifying questions the user did not need','Phone pickups'];
+const QA='Did the task work?', QB='What did it cost the user&rsquo;s attention?';
+const rows=(L,d,s=.12)=>`<div class="rows">${L.map((t,k)=>`<div class="row a" style="--d:${(d+k*s).toFixed(2)}s">${t}</div>`).join('')}</div>`;
+const star=(m,d,c='')=>`<p class="star a ${c}" style="--d:${d}s">${STAR.replace('VAR',m+'s')}</p>`;
+const D=[
+ ['01','The north star, then the two questions','The north-star metric as the hero line with its key phrase in gold, then the two questions as columns of hairline rows.',
+  `<div class="body d1"><p class="tag g lbl a" style="--d:.2s">Next round &middot; my north-star metric</p>${star(1.1,.3)}
+   <div class="cols"><div><p class="tag a" style="--d:1.2s">${QA}</p>${rows(A,1.35)}</div><div><p class="tag a" style="--d:1.5s">${QB}</p>${rows(B,1.65)}</div></div></div>`],
+ ['02','Slide 36 family','The north-star metric centred on the left, a thin grey divider, and the two questions with their measures stacked on the right.',
+  `<div class="body d2"><div class="lt"><p class="tag g a" style="--d:.2s">My north-star metric</p>${star(1,.3)}<p class="tag g a" style="--d:.6s">Next round, with the 52 testers</p></div><span class="sp a" style="--d:.8s"></span>
+   <div class="rt"><div><p class="q a" style="--d:1.1s">${QA}</p>${rows(A,1.25)}</div><div><p class="q a" style="--d:1.6s">${QB}</p>${rows(B,1.75)}</div></div></div>`],
+ ['03','Two questions, side by side','The north-star metric in a white glass capsule, then the two questions as big headings, each with its three measures.',
+  `<div class="body d3"><span class="cap a" style="--d:.3s">North star: time from a request to accurate, useful information</span>
+   <div class="cols"><div><p class="tag g a" style="--d:.7s">Next round</p><p class="q a" style="--d:.8s">${QA}</p>${rows(A,1)}</div><div><p class="tag g a" style="--d:.9s">Next round</p><p class="q a" style="--d:1s">${QB.replace('the user&rsquo;s','their')}</p>${rows(B,1.2)}</div></div></div>`],
+ ['04','The next-round checklist','The six measures as a checklist that ticks in one by one, grouped under the two questions, the north-star metric above.',
+  `<div class="body d4"><p class="tag g lbl a" style="--d:.2s">Next round</p>${star(1,.3)}
+   <div class="cols">${[[QA,A,1.1],[QB,B,1.5]].map(([q,L,d],g)=>`<div><p class="tag a" style="--d:${d}s">${q}</p><div class="rows">${L.map((t,k)=>`<div class="row ck a" style="--d:${(d+.12+k*.12).toFixed(2)}s;--t:${(2.2+g*.75+k*.25).toFixed(2)}s"><i></i>${t}</div>`).join('')}</div></div>`).join('')}</div></div>`],
+ ['05','Two halves of one measure','The two questions as the two halves of the north-star metric, joined by a light plus; the metric itself closes the slide as the sum.',
+  `<div class="body d5"><div class="eq"><div class="part"><p class="tag g a" style="--d:.2s">Did it work</p><p class="q a" style="--d:.3s">${QA}</p>${rows(A,.5)}</div>
+   <span class="op a" style="--d:.9s">+</span>
+   <div class="part"><p class="tag g a" style="--d:1s">What it cost</p><p class="q a" style="--d:1.1s">${QB.replace('the user&rsquo;s','their')}</p>${rows(B,1.3)}</div></div>
+   ${star(2.3,1.8)}</div>`]];
+document.getElementById('opts').innerHTML=D.map(([n,t,d,b],k)=>`<div class="opt"><div class="bar"><p class="lab">${n} &nbsp;${t}<small>${d}</small></p><button data-k="${k}">Replay</button></div><div class="frame"><div class="sl">${HD}${b}<p class="fn">${FN}</p><div class="ft"><span>37 &nbsp; Findings</span><span>Eden Case Study</span></div></div></div></div>`).join('');
+const sls=[...document.querySelectorAll('.sl')];
+const fit=()=>sls.forEach(s=>s.style.transform=`scale(${s.parentElement.clientWidth/1280})`);addEventListener('resize',fit);fit();
+function play(sl){ sl.classList.remove('go'); void sl.offsetWidth; sl.classList.add('go'); }
+document.querySelectorAll('button[data-k]').forEach(b=>b.onclick=()=>play(sls[+b.dataset.k]));
+sls.forEach(play);
+</script>
+</body></html>

@@ -1,0 +1,12 @@
+Subject: Response to the Week 8 and 9 readings
+
+Dear Professor [name],
+
+During my internship at Manus, the company had a standing answer to how to teach users new features: make more short videos. It had worked once, early on, when a few videos drew a wave of downloads, and every launch after that got the same treatment without anyone asking whether it still did what it had done the first time. I did not have a better instinct. What I had was a spreadsheet. I tagged each video by the feature it showed, followed the downloads through the attribution links, and checked whether those people ever used the feature. Views were high. Use of the feature was close to nothing. The only way to see that the videos had stopped paying off was to lay out every step between watching and doing.
+
+The readings describe the two ways that decision can be made. Model-free learning stores a cached value for an action from past reward and repeats it; model-based decision-making builds an internal map of how actions lead to outcomes and plans over it, at a higher computational cost (Drummond & Niv, 2020). The team's habit was the first, and my spreadsheet was a crude version of the second. Gillan et al. (2015) tested whether the second protects against the first. Participants completed the two-step task, where the degree to which choices track the known transition structure indexes model-based control, and an instrumental task in which a previously rewarded outcome was devalued. Habit was measured as slips of action, continuing to respond for the now worthless outcome, against responses for outcomes that still had value. People higher in model-based control made fewer slips. Wilson and Collins (2019) are about building that map honestly: simulate the model before fitting it, check that its parameters can be recovered, and compare it against simpler alternatives before trusting it. My spreadsheet skipped most of those rules and still beat the habit, which is roughly what Gillan et al. would predict.
+
+One question for class: Drummond and Niv argue that the model itself may be learned by trial and error, so is the useful distinction between two systems, or between learning and deciding? And one experiment: give half the participants in a slips-of-action task a visible map of the action-outcome chain, the way a dashboard did for my team, and test whether seeing the structure reduces slips in people who score low on model-based control.
+
+Best,
+Jazlynn Kurniandra

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ascii-horse-lab · gallop</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #868482; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script type="module">
+/* ascii-horse-lab: the chalk-lab horse on its own, drawn in ASCII and shot like stop motion.
+   The gallop rig is the same one (gallop.js). Each frame the horse is rasterised into a
+   character grid at 4x4 samples a cell; a cell on the outline takes the stroke that follows
+   the outline's direction there (- _ | / \), a cell inside takes a rubbed fill (. : ;), and
+   the far legs are pressed lighter. Stop motion: ten frames a second, eight drawings a stride,
+   the horse steps forward a whole drawing at a time, and every frame is drawn again by hand,
+   so the grid jitters a little and the fill boils even when nothing else moves.             */
+import { pose, SPEED, STRIDE } from './gallop.js';
+
+const FPS = 10, DRAWINGS = 8;
+const ADV = SPEED * STRIDE / DRAWINGS;             // withers heights per drawing, so a planted hoof stays planted
+const FONT = 15, LINE = 'rgba(232,242,255,1)', FILL = 'rgba(232,242,255,.5)', FAR = 0.55;
+const FILLS = ['.', ':', ':', '.', ';', ':'];
+const TAU = Math.PI * 2;
+
+const cv = document.getElementById('c'), cx = cv.getContext('2d');
+const RN = document.createElement('canvas'), rn = RN.getContext('2d', { willReadFrequently: true });
+const RF = document.createElement('canvas'), rf = RF.getContext('2d', { willReadFrequently: true });
+let W, H, dpr, cw, ch, cols, rows, S, lastN = -1;
+
+function hash(a) { a = (a ^ 61) ^ (a >>> 16); a = a + (a << 3); a ^= a >>> 4; a = Math.imul(a, 0x27d4eb2d); a ^= a >>> 15; return (a >>> 0) / 4294967296; }
+const font = () => `${FONT}px ui-monospace, "SF Mono", Menlo, monospace`;
+
+function setup() {
+  W = innerWidth; H = innerHeight; dpr = Math.min(2, devicePixelRatio || 1);
+  cv.width = W * dpr; cv.height = H * dpr;
+  cx.font = font(); cw = cx.measureText('M').width; ch = Math.round(FONT * 1.2);
+  cols = Math.floor(W / cw); rows = Math.floor(H / ch);
+  RN.width = RF.width = cols * 4; RN.height = RF.height = rows * 4;
+  S = Math.min(H * 0.42, W / 4.2);
+  lastN = -1;
+}
+
+/* the same drawing code as chalk-lab, into a raster */
+function spline(c, P, closed = true) {
+  const n = P.length, g = i => closed ? P[(i + n) % n] : P[Math.max(0, Math.min(n - 1, i))];
+  c.moveTo(P[0][0], P[0][1]);
+  for (let i = 0; i < (closed ? n : n - 1); i++) {
+    const p0 = g(i - 1), p1 = g(i), p2 = g(i + 1), p3 = g(i + 2);
+    c.bezierCurveTo(p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6, p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6, p2[0], p2[1]);
+  }
+  if (closed) c.closePath();
+}
+function quad(c, a, b, wa, wb) {
+  const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l;
+  c.beginPath(); c.moveTo(a[0] + nx * wa / 2, a[1] + ny * wa / 2); c.lineTo(b[0] + nx * wb / 2, b[1] + ny * wb / 2);
+  c.lineTo(b[0] - nx * wb / 2, b[1] - ny * wb / 2); c.lineTo(a[0] - nx * wa / 2, a[1] - ny * wa / 2); c.closePath(); c.fill();
+}
+const disc = (c, p, w) => { c.beginPath(); c.arc(p[0], p[1], w / 2, 0, TAU); c.fill(); };
+function shapes(c, list, D) {
+  c.fillStyle = '#fff';
+  for (const sh of list) {
+    if (sh.chain) {
+      const [A, J, F, T] = sh.chain.map(D), w = sh.w.map(v => v * S);
+      quad(c, A, J, w[0], w[1]); quad(c, J, F, w[2], w[3]); quad(c, F, T, w[3], w[4]);
+      disc(c, A, w[0]); disc(c, J, w[1]); disc(c, F, w[3]); disc(c, T, w[4]);
+    } else {
+      c.beginPath(); const P = sh.pts.map(D);
+      if (sh.smooth) spline(c, P); else { P.forEach((q, i) => i ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1])); c.closePath(); }
+      c.fill();
+    }
+  }
+}
+function coverage(c) {
+  const d = c.getImageData(0, 0, cols * 4, rows * 4).data, C = new Float32Array(cols * rows), rw = cols * 4;
+  for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+    let s = 0;
+    for (let y = 0; y < 4; y++) { const o = ((j * 4 + y) * rw + i * 4) * 4 + 3; s += d[o] + d[o + 4] + d[o + 8] + d[o + 12]; }
+    C[j * cols + i] = s / (16 * 255);
+  }
+  return C;
+}
+
+/* which character a cell gets: the outline's direction from the coverage gradient round it */
+function glyph(C, i, j, n) {
+  const at = (x, y) => (x < 0 || y < 0 || x >= cols || y >= rows) ? 0 : C[y * cols + x];
+  if (at(i, j) < 0.2) return null;
+  let inside = true;
+  for (let y = -1; y <= 1; y++) for (let x = -1; x <= 1; x++) if (at(i + x, j + y) < 0.8) inside = false;
+  if (inside) return { c: FILLS[(hash(i * 7919 + j * 104729 + n * 31) * FILLS.length) | 0], line: false };
+  // structure tensor of the coverage gradient round the cell, in screen pixels (cells are taller than wide)
+  let a = 0, b = 0, d = 0;
+  for (let y = -1; y <= 1; y++) for (let x = -1; x <= 1; x++) {
+    const gx = (at(i + x + 1, j + y) - at(i + x - 1, j + y)) / (2 * cw), gy = (at(i + x, j + y + 1) - at(i + x, j + y - 1)) / (2 * ch);
+    a += gx * gx; b += gy * gy; d += gx * gy;
+  }
+  if (a + b < 1e-9) return { c: FILLS[(hash(i * 7919 + j * 104729 + n * 31) * FILLS.length) | 0], line: false };
+  let th = (0.5 * Math.atan2(2 * d, a - b) * 180 / Math.PI) + 90;   // the gradient's direction, turned a quarter: the line's; y runs down
+  th = ((th % 180) + 180) % 180;
+  let c;
+  if (th < 22.5 || th >= 157.5) c = at(i, j + 1) > at(i, j - 1) ? '_' : '-';
+  else if (th < 67.5) c = '\\';
+  else if (th < 112.5) c = '|';
+  else c = '/';
+  return { c, line: true };
+}
+
+function render(t) {
+  const n = Math.floor(t * FPS);
+  if (n === lastN) return; lastN = n;
+  const p = (n % DRAWINGS) / DRAWINGS, loop = W + 3 * S;
+  const X = ((n * ADV * S) % loop) - 1.4 * S, Y = H * 0.5 + S * 0.75;
+  const jx = (hash(n * 3 + 1) - 0.5) * 0.5 * cw, jy = (hash(n * 3 + 2) - 0.5) * 0.4 * ch;   // the hand never puts it back in quite the same place
+  const D = q => [X + jx + q[0] * S, Y + jy - q[1] * S];
+  const P = pose(p);
+  for (const r of [rn, rf]) { r.setTransform(1, 0, 0, 1, 0, 0); r.clearRect(0, 0, cols * 4, rows * 4); r.setTransform(4 / cw, 0, 0, 4 / ch, 0, 0); }
+  shapes(rn, P.near, D); shapes(rf, P.far, D);
+  rn.strokeStyle = '#fff'; rn.lineCap = rn.lineJoin = 'round'; rn.lineWidth = 0.45 * cw;
+  for (const st of P.strokes) { rn.beginPath(); spline(rn, st.pts.map(D), false); rn.stroke(); }
+  const CN = coverage(rn), CF = coverage(rf);
+
+  cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, W, H);
+  cx.font = font(); cx.textBaseline = 'top';
+  for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+    let g = glyph(CN, i, j, n), far = false;
+    if (!g) { g = glyph(CF, i, j, n); far = true; }
+    if (!g) continue;
+    cx.globalAlpha = far ? FAR : 1; cx.fillStyle = g.line ? LINE : FILL;
+    cx.fillText(g.c, i * cw, j * ch);
+  }
+  cx.globalAlpha = 1;
+}
+
+const still = new URLSearchParams(location.search).get('t');   // ?t=1.2 holds one frame, for checks
+let rt;
+addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { setup(); render(still !== null ? +still : performance.now() / 1000); }, 120); });
+setup();
+if (still !== null) render(+still);
+else { const f = now => { render(now / 1000); requestAnimationFrame(f); }; requestAnimationFrame(f); }
+</script>
+</body>
+</html>

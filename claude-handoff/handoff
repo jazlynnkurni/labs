@@ -1,0 +1,549 @@
+#!/usr/bin/env python3
+"""
+Claude account handoff kit.
+
+  ./handoff                 check (default): is the handoff ready? Changes nothing.
+  ./handoff inventory       rebuild INVENTORY.md (skills, plugins, MCP, memory, repos). Writes only that file.
+  ./handoff init [path]     after switching: confirm the account, run the check, print or --launch the resume prompt.
+  ./handoff quarantine      list company skills and taste files that load in every session.
+  ./handoff quarantine --apply   move them to ~/.claude/handoff-quarantine/<time>/ (reversible).
+  ./handoff restore [--apply]    put the newest quarantine back.
+
+Reads handoff.config.json beside this file. Never prints credentials, emails or file contents.
+"""
+
+from __future__ import annotations
+
+import datetime as dt
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+KIT = Path(__file__).resolve().parent
+HOME = Path.home()
+CLAUDE = HOME / ".claude"
+CONFIG = json.loads((KIT / "handoff.config.json").read_text())
+COMPANY = CONFIG["company"]
+QUARANTINE = CLAUDE / "handoff-quarantine"
+DOCS = ["README.md", "HANDOFF.md", "APPROVALS.md", "INVENTORY.md"]
+
+GREEN, YELLOW, RED, DIM, BOLD, RESET = ("\033[32m", "\033[33m", "\033[31m", "\033[2m", "\033[1m", "\033[0m") if sys.stdout.isatty() else ("",) * 6
+
+SECRET_PATTERNS = [
+    re.compile(p)
+    for p in (
+        r"sk-ant-[A-Za-z0-9_-]{12,}",
+        r"\bsk-(?:proj-)?[A-Za-z0-9_-]{24,}",
+        r"\bgh[pousr]_[A-Za-z0-9]{24,}",
+        r"\bcog_[A-Za-z0-9_-]{12,}",
+        r"\bAKIA[0-9A-Z]{16}\b",
+        r"-----BEGIN [A-Z ]*PRIVATE KEY-----",
+        r"(?im)^\s*[A-Z][A-Z0-9_]*(?:KEY|TOKEN|SECRET|PASSWORD)\s*=\s*\S{12,}",
+    )
+]
+
+
+def expand(p: str) -> Path:
+    return Path(os.path.expanduser(p))
+
+
+def tilde(p: Path | str) -> str:
+    s = str(p)
+    return "~" + s[len(str(HOME)):] if s.startswith(str(HOME)) else s
+
+
+def project_key(path: Path) -> str:
+    """Claude Code names a project's folder under ~/.claude/projects this way."""
+    return re.sub(r"[^A-Za-z0-9]", "-", str(path))
+
+
+def run(cmd: list[str], cwd: Path | None = None, timeout: int = 20) -> tuple[int, str]:
+    try:
+        r = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=timeout)
+        return r.returncode, (r.stdout or "") + (r.stderr or "")
+    except (OSError, subprocess.TimeoutExpired) as e:
+        return 1, str(e)
+
+
+def is_company_path(p: Path) -> bool:
+    s = str(p)
+    return any(s.startswith(str(expand(pre))) for pre in COMPANY["path_prefixes"])
+
+
+class Report:
+    def __init__(self) -> None:
+        self.problems = 0
+        self.warnings = 0
+
+    def section(self, title: str) -> None:
+        print(f"\n{BOLD}{title}{RESET}")
+
+    def ok(self, msg: str) -> None:
+        print(f"  {GREEN}ok{RESET}    {msg}")
+
+    def warn(self, msg: str) -> None:
+        self.warnings += 1
+        print(f"  {YELLOW}check{RESET} {msg}")
+
+    def fail(self, msg: str) -> None:
+        self.problems += 1
+        print(f"  {RED}fix{RESET}   {msg}")
+
+    def note(self, msg: str) -> None:
+        print(f"  {DIM}·     {msg}{RESET}")
+
+
+# ---------------------------------------------------------------- account
+
+
+def account() -> dict:
+    code, out = run(["claude", "auth", "status"])
+    try:
+        d = json.loads(out[out.index("{"):])
+    except ValueError:
+        return {"loggedIn": False, "error": out.strip()[:200]}
+    # Keep only non-identifying fields. Never the email.
+    return {k: d.get(k) for k in ("loggedIn", "authMethod", "orgId", "orgName", "apiProvider")}
+
+
+def account_kind(acc: dict) -> str:
+    if not acc.get("loggedIn"):
+        return "signed out"
+    if acc.get("orgId") in COMPANY["claude_org_ids"] or acc.get("orgName") in COMPANY["claude_org_names"]:
+        return "company"
+    return "personal"
+
+
+# ---------------------------------------------------------------- skills
+
+
+def frontmatter(md: Path) -> dict:
+    text = md.read_text(errors="replace")
+    m = re.match(r"^---\n(.*?)\n---", text, re.S)
+    out: dict = {}
+    if m:
+        for line in m.group(1).splitlines():
+            if ":" in line and not line.startswith(" "):
+                k, v = line.split(":", 1)
+                out[k.strip()] = v.strip().strip('"')
+    return out
+
+
+TOOL_WORDS = ["ffmpeg", "playwright", "remotion", "node", "npm", "pnpm", "python3", "python", "git", "docker", "xcodebuild", "swift", "figma", "chromium", "sox"]
+
+
+def skill_info(d: Path) -> dict:
+    md = d / "SKILL.md"
+    fm = frontmatter(md) if md.exists() else {}
+    text = md.read_text(errors="replace") if md.exists() else ""
+    deps: set[str] = set()
+    for pkg in d.rglob("package.json"):
+        if "node_modules" in pkg.parts:
+            continue
+        try:
+            p = json.loads(pkg.read_text())
+            for k in list((p.get("dependencies") or {})) + list((p.get("devDependencies") or {})):
+                deps.add(f"npm:{k}")
+        except (ValueError, OSError):
+            pass
+    lower = text.lower()
+    tools = sorted({w for w in TOOL_WORDS if re.search(rf"\b{re.escape(w)}\b", lower)})
+    paths = sorted(set(re.findall(r"(?:~|/Users/[A-Za-z0-9._-]+)/[A-Za-z0-9._/-]+", text)))
+    paths = [tilde(expand(p) if p.startswith("~") else Path(p)) for p in paths]
+    name = d.name
+    if name in COMPANY["skills"]:
+        cls = "company"
+    elif name in COMPANY.get("skills_mentioning_company", []):
+        cls = "mixed"
+    else:
+        cls = "personal"
+    top = sorted(x.name + ("/" if x.is_dir() else "") for x in d.iterdir() if x.name not in ("node_modules", ".DS_Store"))
+    desc = fm.get("description", "")
+    first = re.split(r"(?<=\.)\s", desc, maxsplit=1)[0] if desc else ""
+    return {
+        "name": name,
+        "valid": bool(fm.get("name") and fm.get("description")),
+        "description": first if len(first) <= 170 else first[:169].rstrip() + "…",
+        "class": cls,
+        "files": top,
+        "tools": tools,
+        "deps": sorted(deps),
+        "paths": [p for p in paths if "/skills/" not in p][:8],
+    }
+
+
+def local_skills() -> list[dict]:
+    root = CLAUDE / "skills"
+    return [skill_info(d) for d in sorted(root.iterdir()) if d.is_dir() and d.name != "synced" and not d.name.startswith(".")]
+
+
+def synced_orgs() -> list[tuple[str, list[str]]]:
+    root = CLAUDE / "skills" / "synced"
+    out = []
+    if root.exists():
+        for d in sorted(root.iterdir()):
+            if d.is_dir():
+                out.append((d.name.split("_")[0], sorted(x.name for x in d.iterdir() if x.is_dir() and not x.name.startswith("."))))
+    return out
+
+
+# ---------------------------------------------------------------- inventory
+
+
+def memory_dirs() -> list[dict]:
+    out = []
+    for d in sorted((CLAUDE / "projects").iterdir()):
+        m = d / "memory"
+        if not m.is_dir():
+            continue
+        files = [f for f in m.glob("*.md") if f.name != "MEMORY.md"]
+        key = d.name
+        company = any(key.startswith(project_key(expand(p))) for p in COMPANY["path_prefixes"]) or any(o[:8] in key for o in COMPANY["claude_org_ids"])
+        label = key.replace(project_key(HOME), "~")
+        scratch = re.search(r"scratch-workspaces-.*-scratch-(\d{4}-\d{2}-\d{2})", key)
+        if scratch:
+            label = f"Claude desktop scratch session, {scratch.group(1)}"
+        elif label.startswith("~--agent-arena-experiments"):
+            label = "Agent Arena run workspace (created by a Claude Code agent run)"
+        out.append({"key": key, "label": label, "count": len(files), "class": "company" if company else "personal"})
+    return out
+
+
+def repo_state(path: Path) -> dict | None:
+    if not path.exists():
+        return None
+    code, top = run(["git", "-C", str(path), "rev-parse", "--show-toplevel"])
+    if code != 0:
+        return {"path": tilde(path), "git": False}
+    rc, remote = run(["git", "-C", str(path), "remote", "get-url", "origin"])
+    remote = re.sub(r"//[^@/]+@", "//", remote.strip()) if rc == 0 else ""
+    rc, branch = run(["git", "-C", str(path), "rev-parse", "--abbrev-ref", "HEAD"])
+    branch = branch if rc == 0 else "no commits yet"
+    _, status = run(["git", "-C", str(path), "status", "--porcelain"])
+    rc, ahead = run(["git", "-C", str(path), "rev-list", "--count", "@{u}..HEAD"])
+    ahead = ahead if rc == 0 else ""
+    return {
+        "path": tilde(path),
+        "git": True,
+        "remote": remote if remote and "fatal" not in remote else "",
+        "branch": branch.strip(),
+        "dirty": len([l for l in status.splitlines() if l.strip()]),
+        "unpushed": int(ahead.strip()) if ahead.strip().isdigit() else None,
+    }
+
+
+def unique_repos(paths: list[Path]) -> list[Path]:
+    """Drop paths that live inside a repo already listed (Agent Arena sits inside labs)."""
+    seen: set[str] = set()
+    out: list[Path] = []
+    for p in sorted(paths, key=lambda x: len(str(x))):
+        code, top = run(["git", "-C", str(p), "rev-parse", "--show-toplevel"])
+        key = top.strip() if code == 0 else str(p)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(p)
+    order = {str(p): i for i, p in enumerate(paths)}
+    return sorted(out, key=lambda x: order[str(x)])
+
+
+def company_repos() -> list[Path]:
+    seen: list[Path] = []
+    for pre in COMPANY["path_prefixes"]:
+        base = expand(pre)
+        if base.exists() and base.is_dir() and not pre.endswith("-"):
+            seen.append(base)
+        else:
+            parent, stem = base.parent, base.name
+            if parent.exists():
+                seen += sorted(p for p in parent.iterdir() if p.is_dir() and p.name.startswith(stem))
+    return seen
+
+
+def write_inventory() -> Path:
+    acc = account()
+    lines = [
+        "# Inventory",
+        "",
+        f"Generated by `./handoff inventory` on {dt.datetime.now():%Y-%m-%d %H:%M}. Do not edit by hand; rerun the command.",
+        "",
+        f"Active Claude account when generated: **{acc.get('orgName') or 'unknown'}** ({account_kind(acc)}, {acc.get('authMethod') or 'unknown method'}).",
+        "",
+        "## Local skills (`~/.claude/skills`)",
+        "",
+        "These live on disk and load for whichever account is signed in. **company** means the skill carries company material and needs your approval before use under the personal account.",
+        "",
+        "| Skill | Class | What it does | Tools it calls | Packages | Paths it uses |",
+        "|---|---|---|---|---|---|",
+    ]
+    for s in local_skills():
+        lines.append(
+            f"| `{s['name']}` | {s['class']} | {s['description'].replace('|', '/')} | {', '.join(s['tools']) or 'none'} | {', '.join(d.replace('npm:', '') for d in s['deps']) or 'none'} | {', '.join(s['paths']) or 'none'} |"
+        )
+    lines += ["", "## Skills provided by a claude.ai account (`~/.claude/skills/synced`)", "", "These are synced from the signed-in organisation. They are replaced when you switch accounts, not copied.", ""]
+    for org, names in synced_orgs():
+        who = "company org" if org in COMPANY["claude_org_ids"] else "another account used on this Mac"
+        lines.append(f"* `{org[:8]}…` ({who}): {', '.join(names)}")
+    lines += ["", "## Plugins", ""]
+    try:
+        inst = json.loads((CLAUDE / "plugins" / "installed_plugins.json").read_text())
+        plugins = inst.get("plugins", inst)
+        for name in sorted(plugins):
+            lines.append(f"* `{name}` (installed locally, carries over)")
+    except (OSError, ValueError):
+        lines.append("* could not read installed_plugins.json")
+    lines += ["* Org-synced plugins in `~/.claude/plugins/synced` (for example figma, cowork-plugin-management) are replaced on switch.", "", "## Local MCP servers", ""]
+    try:
+        cj = json.loads((HOME / ".claude.json").read_text())
+        for n in (cj.get("mcpServers") or {}):
+            lines.append(f"* `{n}` (user scope, carries over)")
+        for proj, v in (cj.get("projects") or {}).items():
+            for n in (v.get("mcpServers") or {}):
+                lines.append(f"* `{n}` (only in {tilde(proj)}, carries over)")
+    except (OSError, ValueError):
+        lines.append("* could not read ~/.claude.json")
+    lines += ["* claude.ai connectors (Google Drive, Docs, Sheets, Meetings, Claude Docs, Figma and Vercel sign-ins) belong to the account and must be reconnected.", "", "## Project memory (`~/.claude/projects/*/memory`)", "", "| Project folder | Memories | Class |", "|---|---|---|"]
+    for m in memory_dirs():
+        lines.append(f"| `{m['label']}` | {m['count']} | {m['class']} |")
+    lines += ["", "## Repositories", "", "| Path | Remote | Branch | Uncommitted | Unpushed | Class |", "|---|---|---|---|---|---|"]
+    personal_paths = [expand(p["path"]) for p in CONFIG["personal"]["projects"]]
+    for path in unique_repos([p for p in personal_paths if p.exists()]) + company_repos():
+        st = repo_state(path)
+        if not st:
+            continue
+        cls = "company" if is_company_path(path) else "personal"
+        if not st["git"]:
+            lines.append(f"| `{st['path']}` | not a repo | | | | {cls} |")
+            continue
+        lines.append(f"| `{st['path']}` | {st['remote'] or 'none'} | {st['branch']} | {st['dirty']} | {st['unpushed'] if st['unpushed'] is not None else 'n/a'} | {cls} |")
+    out = KIT / "INVENTORY.md"
+    out.write_text("\n".join(lines) + "\n")
+    return out
+
+
+# ---------------------------------------------------------------- check
+
+
+def check(report: Report) -> None:
+    acc = account()
+    kind = account_kind(acc)
+    report.section("Account")
+    if not acc.get("loggedIn"):
+        report.warn("Claude Code is signed out.")
+    else:
+        msg = f"Signed in to {acc.get('orgName') or 'an account'} ({kind}, {acc.get('authMethod')})."
+        report.ok(msg) if kind == "personal" else report.note(msg + " Still the company account; fine before switching.")
+
+    report.section("Handoff documents")
+    for d in DOCS:
+        p = KIT / d
+        if not p.exists():
+            report.fail(f"{d} is missing" + (" (run ./handoff inventory)" if d == "INVENTORY.md" else ""))
+            continue
+        age = (dt.datetime.now() - dt.datetime.fromtimestamp(p.stat().st_mtime)).days
+        report.ok(f"{d} ({age} days old)") if age <= 7 else report.warn(f"{d} is {age} days old. Review it before switching.")
+    newest_memory = max((f.stat().st_mtime for f in (CLAUDE / "projects").glob("*/memory/*.md")), default=0)
+    handoff_doc = KIT / "HANDOFF.md"
+    if handoff_doc.exists() and newest_memory > handoff_doc.stat().st_mtime:
+        report.warn("A memory file changed after HANDOFF.md was written. Skim HANDOFF.md for anything outdated.")
+    for d in DOCS:
+        p = KIT / d
+        if p.exists():
+            text = p.read_text(errors="replace")
+            if any(r.search(text) for r in SECRET_PATTERNS):
+                report.fail(f"{d} contains something shaped like a credential. Remove it.")
+    report.ok("No credential-shaped strings in the handoff documents.") if report.problems == 0 else None
+
+    report.section("Projects resume without this conversation")
+    for proj in CONFIG["personal"]["projects"]:
+        path = expand(proj["path"])
+        if not path.exists():
+            report.warn(f"{proj['name']}: {tilde(path)} does not exist")
+            continue
+        guide = [n for n in ("CLAUDE.md", "AGENTS.md") if (path / n).exists()]
+        if guide:
+            report.ok(f"{proj['name']}: {', '.join(guide)}")
+        else:
+            report.note(f"{proj['name']}: no CLAUDE.md here; relies on the global CLAUDE.md and memory")
+    arena = expand("~/Desktop/labs/agent-arena")
+    if arena.exists():
+        mem = CLAUDE / "projects" / project_key(expand("~/Desktop/labs")) / "memory" / "agent-arena.md"
+        report.ok("Agent Arena memory is where a session in ~/Desktop/labs loads it") if mem.exists() else report.fail("Agent Arena memory is not in the ~/Desktop/labs memory folder")
+
+    report.section("Skills")
+    skills = local_skills()
+    bad = [s["name"] for s in skills if not s["valid"]]
+    report.ok(f"{len(skills)} local skills, all with a name and description") if not bad else report.fail(f"Missing name or description in SKILL.md: {', '.join(bad)}")
+    active_company = [s["name"] for s in skills if s["class"] == "company"]
+    if active_company:
+        report.note(f"Company skills that will still load after switching: {', '.join(active_company)} (see APPROVALS.md, or ./handoff quarantine)")
+
+    report.section("Tools on this Mac")
+    for t in CONFIG["required_tools"]:
+        report.ok(t) if shutil.which(t) or (HOME / ".local/bin" / t).exists() else report.fail(f"{t} is not on PATH")
+    missing_opt = [t for t in CONFIG["optional_tools"] if not (shutil.which(t) or (HOME / ".local/bin" / t).exists())]
+    if missing_opt:
+        report.note(f"Optional, not found: {', '.join(missing_opt)}")
+    code, _ = run(["docker", "info"], timeout=8)
+    if code != 0:
+        report.note("Docker is not running (Agent Arena then uses the macOS sandbox).")
+
+    report.section("Work in progress")
+    for path in unique_repos([expand(p["path"]) for p in CONFIG["personal"]["projects"] if expand(p["path"]).exists()]) + company_repos():
+        st = repo_state(path)
+        if not st or not st["git"]:
+            continue
+        cls = "company" if is_company_path(path) else "personal"
+        bits = []
+        if st["dirty"]:
+            bits.append(f"{st['dirty']} uncommitted")
+        if st["unpushed"]:
+            bits.append(f"{st['unpushed']} unpushed")
+        if bits:
+            msg = f"{st['path']} ({cls}, {st['branch']}): {', '.join(bits)}"
+            report.warn(msg + (". Commit or stash under the company account, per company rules." if cls == "company" else ". Stays on disk; nothing is lost by switching."))
+
+
+def cmd_check() -> int:
+    r = Report()
+    print(f"{BOLD}Claude account handoff check{RESET}  {DIM}{tilde(KIT)}{RESET}")
+    check(r)
+    print()
+    if r.problems:
+        print(f"{RED}{r.problems} to fix{RESET}, {r.warnings} to review. Fix the red items before switching.")
+        return 1
+    print(f"{GREEN}Ready to switch.{RESET} {r.warnings} item(s) to review above. Nothing was changed.")
+    return 0
+
+
+# ---------------------------------------------------------------- init
+
+
+RESUME_PROMPT = (
+    "I just switched Claude accounts. Before doing anything else, read "
+    "~/Desktop/labs/claude-handoff/HANDOFF.md, APPROVALS.md and INVENTORY.md, then the CLAUDE.md in this folder if there is one. "
+    "Follow my global CLAUDE.md. Do not open, read or run anything under the company paths listed in APPROVALS.md unless I approve it in this chat. "
+    "Then tell me in a few lines where this project stands and what is next."
+)
+
+
+def cmd_init(args: list[str]) -> int:
+    launch = "--launch" in args
+    force = "--force" in args
+    target = next((a for a in args if not a.startswith("--")), None)
+    acc = account()
+    kind = account_kind(acc)
+    print(f"{BOLD}After switching{RESET}")
+    if kind == "company" and not force:
+        print(f"  {YELLOW}Still signed in to the company account ({acc.get('orgName')}).{RESET} Sign in with your personal account first, then rerun. (--force to skip)")
+        return 1
+    if kind == "signed out":
+        print(f"  {YELLOW}Claude Code is signed out.{RESET} Run: claude auth login")
+        return 1
+    print(f"  {GREEN}Signed in to {acc.get('orgName') or 'your personal account'} ({acc.get('authMethod')}).{RESET}")
+    r = Report()
+    check(r)
+    if r.problems:
+        print(f"\n{RED}Fix the items marked fix before continuing.{RESET}")
+        return 1
+    if target:
+        path = expand(target).resolve()
+        if is_company_path(path):
+            print(f"\n{RED}{tilde(path)} is a company path.{RESET} Not opening it under this account. Approve it in APPROVALS.md first.")
+            return 1
+    print(f"\n{BOLD}First message for the new session{RESET}\n\n{RESUME_PROMPT}\n")
+    if launch:
+        cwd = expand(target).resolve() if target else Path.cwd()
+        print(f"{DIM}Starting claude in {tilde(cwd)}…{RESET}")
+        os.chdir(cwd)
+        os.execvp("claude", ["claude", RESUME_PROMPT])
+    else:
+        print(f"{DIM}To start it for you: ./handoff init ~/Desktop/labs/agent-arena --launch{RESET}")
+    return 0
+
+
+# ---------------------------------------------------------------- quarantine
+
+
+def quarantine_targets() -> list[Path]:
+    targets = [CLAUDE / "skills" / s for s in COMPANY["skills"]]
+    targets += [CLAUDE / "jaz-taste" / f for f in COMPANY.get("taste_files", [])]
+    return [t for t in targets if t.exists()]
+
+
+def cmd_quarantine(args: list[str]) -> int:
+    apply = "--apply" in args
+    targets = quarantine_targets()
+    if not targets:
+        print("Nothing to quarantine: no company skills or taste files are active.")
+        return 0
+    print(f"{BOLD}Company material that loads in every session{RESET}")
+    for t in targets:
+        print(f"  {tilde(t)}")
+    if not apply:
+        print(f"\n{DIM}Dry run. Nothing moved. Add --apply to move these to {tilde(QUARANTINE)}/<time>/ (./handoff restore --apply puts them back).{RESET}")
+        return 0
+    dest = QUARANTINE / dt.datetime.now().strftime("%Y%m%d-%H%M%S")
+    dest.mkdir(parents=True)
+    manifest = []
+    for t in targets:
+        to = dest / t.relative_to(CLAUDE)
+        to.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(t), str(to))
+        manifest.append({"from": str(t), "to": str(to)})
+    (dest / "manifest.json").write_text(json.dumps(manifest, indent=2))
+    print(f"\n{GREEN}Moved {len(manifest)} item(s) to {tilde(dest)}.{RESET} Restore with ./handoff restore --apply")
+    return 0
+
+
+def cmd_restore(args: list[str]) -> int:
+    apply = "--apply" in args
+    batches = sorted(QUARANTINE.glob("*/manifest.json")) if QUARANTINE.exists() else []
+    if not batches:
+        print("No quarantine to restore.")
+        return 0
+    manifest = json.loads(batches[-1].read_text())
+    print(f"{BOLD}Restore {tilde(batches[-1].parent)}{RESET}")
+    clashes = [m for m in manifest if Path(m["from"]).exists()]
+    for m in manifest:
+        print(f"  {tilde(m['to'])} -> {tilde(m['from'])}")
+    if clashes:
+        print(f"{RED}These already exist again, so nothing was restored: {', '.join(tilde(m['from']) for m in clashes)}{RESET}")
+        return 1
+    if not apply:
+        print(f"\n{DIM}Dry run. Add --apply to move them back.{RESET}")
+        return 0
+    for m in manifest:
+        Path(m["from"]).parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(m["to"], m["from"])
+    batches[-1].rename(batches[-1].with_name("manifest.restored.json"))
+    print(f"{GREEN}Restored {len(manifest)} item(s).{RESET}")
+    return 0
+
+
+def main() -> int:
+    args = sys.argv[1:]
+    cmd = args[0] if args else "check"
+    rest = args[1:]
+    if cmd in ("check", "--check"):
+        return cmd_check()
+    if cmd == "inventory":
+        out = write_inventory()
+        print(f"Wrote {tilde(out)}")
+        return 0
+    if cmd == "init":
+        return cmd_init(rest)
+    if cmd == "quarantine":
+        return cmd_quarantine(rest)
+    if cmd == "restore":
+        return cmd_restore(rest)
+    print(__doc__)
+    return 0 if cmd in ("-h", "--help", "help") else 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())

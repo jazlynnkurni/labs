@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glaze press lab</title>
+<style>
+/* Tokens lifted from design.how/systems/glaze (light), with the dark set under .dark */
+:root{
+  --page:#fbfbfa;--paper:#fff;--shell:#f1f1f0;--field:#efefef;--ink:#050505;
+  --text-1:#050505cc;--text-2:#05050599;--text-3:#05050573;
+  --line:#0505051a;--line-faint:#0505050f;--line-control:#05050526;--hover:#0505050f;
+  --glass-ink-base:#000000a8;--glass-ink-text:#ffffffe6;--glass-ink-ring:#0000008f;
+  --glass-green-base:#065628e0;--glass-green-text:#ffffffe6;--glass-green-ring:#04401c8f;
+  --glass-coral-base:#962212e0;--glass-coral-text:#ffffffe6;--glass-coral-ring:#6e180c8f;
+  --glass-sheen:.12;--glass-sheen-hover:.16;--glass-core:.32;--glass-core-held:.44;
+  --glass-rim:.24;--glass-glaze:.06;--glass-gloss:.28;--glass-blur:6px;
+  --dur-glass-press:50ms;--dur-glass-release:200ms;--dur-state:160ms;--dur-spin:.8s;--dur-sweep:1.4s;
+  --ease-out:cubic-bezier(.2,.8,.2,1);
+  --ease-spring:linear(0,.22 6%,.6 13%,.9 20%,1.06 28%,1.09 34%,1.06 42%,1.01 52%,.99 62%,1);
+  --scale-press-glass:.99;--scale-press-flat:.99;
+  --gloss-inset:.28;--gloss-top:1.5px;--gloss-height:44%;
+  --control-sm:26px;--control:32px;--control-lg:36px;--radius-pill:999px;--radius-shell:14px;--radius-panel:11px;--line-width:1px;
+  --slow:1;
+}
+.dark{
+  --page:#0b0b0b;--paper:#141414;--shell:#111;--field:#1b1b1b;--ink:#fff;
+  --text-1:#ffffffe6;--text-2:#ffffff99;--text-3:#ffffff73;
+  --line:#ffffff1f;--line-faint:#ffffff12;--line-control:#ffffff2e;--hover:#ffffff12;
+  --glass-ink-base:#ffffff9e;--glass-ink-text:#050505e6;--glass-ink-ring:#ffffff3d;
+  --glass-green-base:#6ed796db;--glass-green-text:#050505e6;--glass-green-ring:#6ed79666;
+  --glass-coral-base:#f58c78db;--glass-coral-text:#050505e6;--glass-coral-ring:#f58c7866;
+  --glass-sheen:.16;--glass-sheen-hover:.24;--glass-core:0;--glass-core-held:.06;
+  --glass-rim:.4;--glass-glaze:.14;--glass-gloss:.6;
+}
+@media (prefers-reduced-motion:reduce){
+  :root{--dur-glass-press:0s;--dur-glass-release:0s;--dur-state:0s;--scale-press-glass:1;--scale-press-flat:1}
+}
+
+*{box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+body{margin:0;background:var(--page);color:var(--text-1);font:13px/1.45 -apple-system,"SF Pro Text",Inter,system-ui,sans-serif;letter-spacing:-.005em;transition:background-color var(--dur-state),color var(--dur-state)}
+h1,h2{text-wrap:balance;margin:0}
+p{text-wrap:pretty;margin:0}
+.num{font-variant-numeric:tabular-nums}
+
+/* Page */
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:16px;height:48px;padding:0 24px;background:color-mix(in srgb,var(--page) 86%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line-faint)}
+.top h1{font-size:13px;font-weight:600;color:var(--text-1)}
+.top nav{display:flex;gap:2px;margin-left:8px}
+.top nav a{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:6px;color:var(--text-2);text-decoration:none}
+.top nav a:hover{background:var(--hover);color:var(--text-1)}
+.top nav a kbd{font:inherit;color:var(--text-3);margin-right:6px}
+.top .right{margin-left:auto;display:flex;gap:8px}
+.wrap{max-width:1280px;margin:0 auto;padding:48px 24px 96px}
+.lede{max-width:560px;color:var(--text-2);margin-bottom:48px}
+.lede b{font-weight:500;color:var(--text-1)}
+
+section.d{padding:48px 0;border-top:1px solid var(--line-faint)}
+section.d header{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:24px;align-items:start;margin-bottom:24px}
+section.d h2{font-size:15px;font-weight:600}
+section.d h2 small{color:var(--text-3);font-weight:500;margin-right:8px}
+section.d .why{color:var(--text-2);max-width:520px}
+.stage{position:relative;display:flex;align-items:center;justify-content:center;gap:24px;min-height:220px;padding:40px;border-radius:var(--radius-shell);background:var(--shell);box-shadow:0 0 0 1px var(--line-faint) inset}
+.spec{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:16px;color:var(--text-3);font-size:12px}
+.spec span b{font-weight:500;color:var(--text-2)}
+
+/* Card chrome, as the voice note */
+.card{width:420px;max-width:100%;padding:16px;border-radius:var(--radius-panel);background:var(--paper);box-shadow:0 0 0 1px var(--line) ,0 1px 2px -1px rgba(0,0,0,.06),0 2px 4px 0 rgba(0,0,0,.04)}
+.card .meta{display:flex;justify-content:space-between;color:var(--text-3);font-size:12px;margin-bottom:10px}
+.card .meta .spin{display:inline-flex;align-items:center;gap:6px}
+.card .line{font-size:15px;line-height:1.3;color:var(--text-1);margin-bottom:14px}
+.card .line span{color:var(--text-3)}
+.card .row{display:flex;gap:8px}
+.card .row>*{flex:1}
+svg.spinner{width:11px;height:11px;animation:glaze-spin var(--dur-spin) linear infinite}
+@keyframes glaze-spin{to{transform:rotate(1turn)}}
+@keyframes glaze-sweep{0%{inset-inline-start:calc(var(--progress-sweep) * -1)}to{inset-inline-start:100%}}
+
+/* ---------- Flat button (Cancel) ---------- */
+.flat{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:var(--glass-h,var(--control));padding:0 12px;border:0;border-radius:var(--radius-pill);font:inherit;font-size:13px;font-weight:500;line-height:1;color:var(--text-1);background:var(--paper);box-shadow:0 0 0 1px var(--line-control);cursor:pointer;white-space:nowrap;user-select:none;-webkit-tap-highlight-color:transparent;transition:scale var(--dur-glass-release) var(--ease-out),background-color var(--dur-state)}
+@media (hover:hover){.flat:hover{background:color-mix(in srgb,var(--paper) 94%,var(--ink))}}
+.flat:active{scale:var(--scale-press-flat);transition-duration:var(--dur-glass-press)}
+
+/* ---------- Glass, ported one to one ---------- */
+.glass{
+  --gl-base:var(--glass-base,var(--glass-ink-base));--gl-text:var(--glass-text,var(--glass-ink-text));--gl-ring:var(--glass-ring,var(--glass-ink-ring));
+  --gl-sheen-now:var(--glass-sheen);--gl-core-now:var(--glass-core);--gl-glint-now:0;--gl-tint-now:0;--gl-glaze-hi:var(--glass-glaze);--gl-gloss:var(--glass-gloss);--gl-rim:var(--glass-rim);
+  position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  height:var(--glass-h,var(--control));padding:0 12px;border:0;border-radius:var(--radius-pill);
+  font:inherit;font-size:13px;font-weight:500;line-height:1;white-space:nowrap;user-select:none;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  color:var(--gl-text);background-color:var(--gl-base);
+  background-image:
+    linear-gradient(99deg,transparent 27.7%,rgb(255 255 255/var(--gl-glint-now)) 60.19%,transparent 86.06%),
+    radial-gradient(65.62% 65.62% at 50% 50%,rgb(0 0 0/var(--gl-core-now)),transparent),
+    linear-gradient(rgb(255 255 255/var(--gl-sheen-now)),transparent),
+    linear-gradient(rgb(255 255 255/var(--gl-glaze-hi)) 0%,rgb(255 255 255/calc(var(--gl-glaze-hi) * .4)) 50%,rgb(0 0 0/0) 50%,rgb(0 0 0/0) 100%),
+    linear-gradient(rgb(0 0 0/var(--gl-tint-now)),rgb(0 0 0/var(--gl-tint-now)));
+  box-shadow:inset 0 -12px 16px 0 #ffffff0f,inset 0 4px 16px 0 #ffffff29,inset 0 .75px .25px 0 #ffffff1f,inset 0 .25px .25px 0 #ffffff52,0 0 0 .75px var(--gl-ring);
+  -webkit-backdrop-filter:blur(var(--glass-blur));backdrop-filter:blur(var(--glass-blur));
+  transition-property:scale,color,opacity;
+  transition-duration:calc(var(--dur-glass-release) * var(--slow));
+  transition-timing-function:var(--ease-out);
+}
+.glass.sm{--glass-h:var(--control-sm);padding:0 10px;font-size:12px}
+.glass.lg{--glass-h:var(--control-lg);padding:0 14px}
+.glass.green{--glass-base:var(--glass-green-base);--glass-text:var(--glass-green-text);--glass-ring:var(--glass-green-ring)}
+.glass.coral{--glass-base:var(--glass-coral-base);--glass-text:var(--glass-coral-text);--glass-ring:var(--glass-coral-ring)}
+/* rim: a 1px ring of metal, white at the top and the lower shoulder */
+.glass::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;padding:var(--line-width);border-radius:inherit;
+  background-image:linear-gradient(#fff 0%,#999 55%,#fff 80%,#999 95%);opacity:var(--gl-rim);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+/* gloss: the highlight pill in the top 44%, inset by .28 of the height each side */
+.glass::after{content:"";position:absolute;z-index:-1;pointer-events:none;inset-inline:calc(var(--glass-h,var(--control)) * var(--gloss-inset));top:var(--gloss-top);height:var(--gloss-height);border-radius:var(--radius-pill);
+  background-image:linear-gradient(rgb(255 255 255/var(--gl-gloss)),transparent);
+  transition-property:opacity;transition-duration:calc(var(--dur-glass-release) * var(--slow));transition-timing-function:var(--ease-out)}
+@media (hover:hover){.glass:hover:not(:disabled){--gl-sheen-now:var(--glass-sheen-hover)}}
+.glass:is(:active,[data-active]):not(:disabled){--gl-sheen-now:0;--gl-core-now:var(--glass-core-held);--gl-glint-now:0;scale:var(--scale-press-glass);transition-duration:calc(var(--dur-glass-press) * var(--slow))}
+.glass:is(:active,[data-active]):not(:disabled)::after{opacity:.6;transition-duration:calc(var(--dur-glass-press) * var(--slow))}
+.glass:focus-visible,.flat:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* Direction 1: readout */
+.readout{display:grid;grid-template-columns:repeat(4,auto);gap:4px 24px;padding:12px 16px;border-radius:8px;background:var(--paper);box-shadow:0 0 0 1px var(--line-faint);font-size:12px;color:var(--text-2)}
+.readout b{display:block;font-weight:500;color:var(--text-1);font-size:14px}
+.timeline{position:relative;height:28px;width:420px;max-width:100%;margin-top:16px;border-radius:6px;background:var(--paper);box-shadow:0 0 0 1px var(--line-faint);overflow:hidden}
+.timeline i{position:absolute;top:0;bottom:0;background:var(--field)}
+.timeline i.p{left:0;width:20%;background:var(--ink);opacity:.9}
+.timeline i.r{left:20%;width:80%;background:var(--line)}
+.timeline em{position:absolute;top:0;bottom:0;display:flex;align-items:center;padding:0 8px;font-style:normal;font-size:11px;color:var(--text-2);mix-blend-mode:difference;color:#fff}
+.timeline em.b{left:20%}
+
+/* Direction 2: register the alphas so they ease with the scale */
+@property --gl-sheen-now{syntax:"<number>";inherits:false;initial-value:0}
+@property --gl-core-now{syntax:"<number>";inherits:false;initial-value:0}
+@property --gl-glint-now{syntax:"<number>";inherits:false;initial-value:0}
+.d2 .glass{transition-property:scale,color,opacity,--gl-sheen-now,--gl-core-now}
+
+/* Direction 3: a glint crosses on release */
+.d3 .glass{background-size:200% 100%,auto,auto,auto,auto;background-position:200% 0,0 0,0 0,0 0,0 0;background-repeat:no-repeat}
+.d3 .glass.glint{animation:glaze-glint calc(420ms * var(--slow)) var(--ease-out)}
+@keyframes glaze-glint{0%{--gl-glint-now:.28;background-position:200% 0,0 0,0 0,0 0,0 0}100%{--gl-glint-now:.28;background-position:-100% 0,0 0,0 0,0 0,0 0}}
+
+/* Direction 4: the glass hands off to the next action */
+.d4 .glass,.d4 .flat.handoff{transition-property:scale,color,opacity,background-color,box-shadow,-webkit-backdrop-filter,backdrop-filter;transition-duration:calc(var(--dur-glass-release) * var(--slow)),var(--dur-state),var(--dur-state),var(--dur-state),var(--dur-state),var(--dur-state),var(--dur-state)}
+.d4 .glass::before,.d4 .glass::after{transition-property:opacity;transition-duration:var(--dur-state)}
+.d4 .glass.off{--gl-base:var(--paper);--gl-text:var(--text-1);--gl-ring:var(--line-control);--gl-sheen-now:0;--gl-core-now:0;--gl-glaze-hi:0;--gl-rim:0;--gl-gloss:0;
+  box-shadow:inset 0 -12px 16px 0 #ffffff00,inset 0 4px 16px 0 #ffffff00,inset 0 .75px .25px 0 #ffffff00,inset 0 .25px .25px 0 #ffffff00,0 0 0 1px var(--gl-ring);
+  -webkit-backdrop-filter:blur(0);backdrop-filter:blur(0);cursor:default}
+.d4 .glass.off::before,.d4 .glass.off::after{opacity:0}
+.d4 .stack{display:grid;gap:12px}
+.d4 .card .list{display:grid;gap:8px;margin-bottom:14px}
+.d4 .card .list label{display:flex;gap:8px;align-items:center;color:var(--text-1)}
+.d4 .card .list input{appearance:none;width:14px;height:14px;margin:0;border-radius:50%;box-shadow:0 0 0 1px var(--line-control) inset;background:var(--paper)}
+.d4 .card .list input:checked{background:var(--ink);box-shadow:none}
+.d4 .card .list input:checked+span{color:var(--text-3);text-decoration:line-through}
+.d4 .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid var(--line-faint);color:var(--text-3);font-size:12px}
+.d4 .foot .glass,.d4 .foot .flat{flex:0 0 auto}
+.d4 .swap{display:grid;grid-template-areas:"s"}
+.d4 .swap>*{grid-area:s;transition:opacity var(--dur-state) var(--ease-out),filter var(--dur-state) var(--ease-out)}
+.d4 .swap>[hidden]{display:inline-flex;opacity:0;filter:blur(2px);pointer-events:none}
+.d4 .reset{margin-top:12px;background:none;border:0;color:var(--text-3);font:inherit;font-size:12px;cursor:pointer;padding:0}
+
+/* Direction 5: depth, the surface moves and springs back */
+.d5 .glass{transition-property:scale,translate,color,opacity,box-shadow;transition-duration:calc(320ms * var(--slow));transition-timing-function:var(--ease-spring)}
+.d5 .glass::after{transition-property:opacity,top;transition-duration:calc(320ms * var(--slow));transition-timing-function:var(--ease-spring)}
+.d5 .glass:is(:active,[data-active]):not(:disabled){translate:0 .5px;transition-duration:calc(var(--dur-glass-press) * var(--slow));transition-timing-function:var(--ease-out);
+  box-shadow:inset 0 -12px 16px 0 #ffffff1a,inset 0 4px 16px 0 #ffffff14,inset 0 .75px .25px 0 #ffffff0a,inset 0 .25px .25px 0 #ffffff29,0 0 0 .75px var(--gl-ring)}
+.d5 .glass:is(:active,[data-active]):not(:disabled)::after{top:2.5px;transition-duration:calc(var(--dur-glass-press) * var(--slow));transition-timing-function:var(--ease-out)}
+.d5 .sizes{display:flex;align-items:center;gap:12px}
+
+/* small pill switches in the top bar */
+.sw{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:6px;border:0;background:none;box-shadow:0 0 0 1px var(--line-control);color:var(--text-2);font:inherit;font-size:12px;cursor:pointer}
+.sw[aria-pressed="true"]{background:var(--ink);color:var(--page);box-shadow:none}
+
+@media (max-width:720px){
+  .wrap{padding:32px 16px 64px}
+  section.d header{grid-template-columns:1fr}
+  .stage{padding:24px 16px;flex-direction:column}
+  .top{padding:0 16px}.top nav{display:none}
+}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>Glaze press</h1>
+  <nav>
+    <a href="#d1"><kbd>1</kbd>Exact</a>
+    <a href="#d2"><kbd>2</kbd>Eased</a>
+    <a href="#d3"><kbd>3</kbd>Glint</a>
+    <a href="#d4"><kbd>4</kbd>Handoff</a>
+    <a href="#d5"><kbd>5</kbd>Depth</a>
+  </nav>
+  <div class="right">
+    <button class="sw" id="slow" aria-pressed="false">Slow 8×</button>
+    <button class="sw" id="theme" aria-pressed="false">Dark</button>
+  </div>
+</div>
+
+<main class="wrap">
+  <p class="lede">The one glass action from design.how/systems/glaze, recorded frame by frame and rebuilt. Press takes <b>50 ms</b>: scale to .99, the top sheen goes to 0, the dark core deepens from .32 to .44, the gloss pill drops to 60%. Release takes <b>200 ms</b> on ease-out (.2, .8, .2, 1). Only scale and the gloss opacity ease; the gradient alphas snap. Hover only lifts the sheen from .12 to .16, and snaps too. The five below keep that timing and change one thing each.</p>
+
+  <!-- 1 -->
+  <section class="d d1" id="d1">
+    <header>
+      <h2><small>1</small>Exact</h2>
+      <p class="why">A one to one port of the production CSS: the five gradient layers, the four inset shadows, the masked rim, the gloss pill, the 6px backdrop blur. The readout shows the live values while you hold. Use Slow 8× to see the press and release asymmetry.</p>
+    </header>
+    <div class="stage">
+      <div class="card">
+        <div class="meta"><span class="spin"><svg class="spinner" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-opacity=".3"/><path d="M10.5 6a4.5 4.5 0 0 0-4.5-4.5" stroke="currentColor" stroke-linecap="round"/></svg>Listening</span><span class="num">0:14</span></div>
+        <p class="line">Remind me to call about the kitchen leak on Monday, and find a plumber <span>who can come this week</span></p>
+        <div class="row"><button class="flat">Cancel</button><button class="glass" id="probe">Send it</button></div>
+      </div>
+      <div>
+        <div class="readout" id="readout">
+          <div>scale<b class="num" data-k="scale">1.00</b></div>
+          <div>sheen<b class="num" data-k="sheen">.12</b></div>
+          <div>core<b class="num" data-k="core">.32</b></div>
+          <div>gloss<b class="num" data-k="gloss">1.0</b></div>
+        </div>
+        <div class="timeline"><i class="p"></i><i class="r"></i><em>press 50</em><em class="b">release 200, ease-out</em></div>
+      </div>
+    </div>
+    <div class="spec"><span><b>base</b> #000 at 66%</span><span><b>ring</b> .75px #000 at 56%</span><span><b>rim</b> 1px, white, #999 55%, white 80%, at .24</span><span><b>gloss</b> top 1.5px, 44% tall, inset .28h</span><span><b>press</b> scale .99, sheen 0, core .44, gloss .6</span></div>
+  </section>
+
+  <!-- 2 -->
+  <section class="d d2" id="d2">
+    <header>
+      <h2><small>2</small>Eased</h2>
+      <p class="why">Same geometry, but the sheen and core alphas are registered with @property so they ease on the same 50 ms in and 200 ms out as the scale, instead of snapping. The glass reads as one material moving rather than a light switching off.</p>
+    </header>
+    <div class="stage">
+      <button class="glass">Send it</button>
+      <button class="glass green">Book table</button>
+      <button class="glass coral">Delete</button>
+    </div>
+    <div class="spec"><span><b>changed</b> transition-property adds --gl-sheen-now and --gl-core-now</span><span><b>kept</b> 50 / 200, ease-out, scale .99</span></div>
+  </section>
+
+  <!-- 3 -->
+  <section class="d d3" id="d3">
+    <header>
+      <h2><small>3</small>Glint</h2>
+      <p class="why">The production stylesheet carries a glint layer at 99° that is never turned on. Here it fires once on release, crossing left to right in 420 ms, as the acknowledgement that the action went. Press and release stay exact underneath it.</p>
+    </header>
+    <div class="stage">
+      <div class="card">
+        <div class="meta"><span>Draft</span><span class="num">2 of 2</span></div>
+        <p class="line">Table for four on Friday at Linden, <span>deposit $40, held till 6 pm</span></p>
+        <div class="row"><button class="flat">Not now</button><button class="glass green glinty">Book table</button></div>
+      </div>
+    </div>
+    <div class="spec"><span><b>added</b> one 420 ms sweep of the 99° glint at .28 on release</span><span><b>kept</b> everything else</span></div>
+  </section>
+
+  <!-- 4 -->
+  <section class="d d4" id="d4">
+    <header>
+      <h2><small>4</small>Handoff</h2>
+      <p class="why">Glaze's rule is glass only on the one action you press next. So when you press it, the glass should leave. Send it goes flat and reads Sent, and in 160 ms the glass appears on the next action in the stack. The material is the cursor of intent.</p>
+    </header>
+    <div class="stage">
+      <div class="stack">
+        <div class="card" id="c1">
+          <div class="meta"><span class="spin"><svg class="spinner" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-opacity=".3"/><path d="M10.5 6a4.5 4.5 0 0 0-4.5-4.5" stroke="currentColor" stroke-linecap="round"/></svg>Listening</span><span class="num">0:14</span></div>
+          <p class="line">Remind me to call about the kitchen leak on Monday</p>
+          <div class="row"><button class="flat">Cancel</button><button class="glass" data-step="1"><span class="swap"><span>Send it</span><span hidden>Sent</span></span></button></div>
+        </div>
+        <div class="card" id="c2">
+          <div class="meta"><span>Kitchen leak</span><span>From a voice note</span></div>
+          <div class="list">
+            <label><input type="checkbox" checked><span>Clear the cupboard under the sink</span></label>
+            <label><input type="checkbox"><span>Send two photos of the leak</span></label>
+            <label><input type="checkbox"><span>Be home Tuesday morning</span></label>
+          </div>
+          <div class="foot"><span>9:12 am</span><button class="glass sm off" data-step="2"><span class="swap"><span>Share note</span><span hidden>Shared</span></span></button></div>
+        </div>
+        <button class="reset" id="reset4">Reset</button>
+      </div>
+    </div>
+    <div class="spec"><span><b>added</b> glass to flat crossfade in 160 ms, label swap with opacity and 2px blur</span><span><b>kept</b> the press itself</span></div>
+  </section>
+
+  <!-- 5 -->
+  <section class="d d5" id="d5">
+    <header>
+      <h2><small>5</small>Depth</h2>
+      <p class="why">A physical reading. On press the surface also sinks half a pixel, the gloss slides down 1 px and the inset light flips, bright at the bottom edge. Release comes back on the site's own spring curve over 320 ms, with a 9% overshoot you feel more than see. Three sizes, 26, 32 and 36.</p>
+    </header>
+    <div class="stage">
+      <div class="sizes">
+        <button class="glass sm">Ask by voice</button>
+        <button class="glass">Send it</button>
+        <button class="glass lg green">Ship v15</button>
+      </div>
+    </div>
+    <div class="spec"><span><b>added</b> translate .5px, gloss top 1.5 to 2.5px, inset shadow flip</span><span><b>release</b> 320 ms on linear() spring from the site's shell</span><span><b>press</b> still 50 ms ease-out</span></div>
+  </section>
+</main>
+
+<script>
+// theme and slow motion
+const root=document.documentElement;
+const theme=document.getElementById('theme'),slow=document.getElementById('slow');
+theme.onclick=()=>{const on=root.classList.toggle('dark');theme.setAttribute('aria-pressed',on)};
+slow.onclick=()=>{const on=slow.getAttribute('aria-pressed')!=='true';slow.setAttribute('aria-pressed',on);root.style.setProperty('--slow',on?8:1)};
+addEventListener('keydown',e=>{if(e.target.matches('input,button'))return;if(/^[1-5]$/.test(e.key))document.getElementById('d'+e.key).scrollIntoView({behavior:'smooth',block:'start'})});
+
+// 1: live readout while held and for 400ms after
+const probe=document.getElementById('probe'),ro=document.getElementById('readout');
+let raf,until=0;
+function tick(){
+  const c=getComputedStyle(probe),a=getComputedStyle(probe,'::after');
+  const s=c.scale==='none'?1:parseFloat(c.scale);
+  ro.querySelector('[data-k=scale]').textContent=s.toFixed(3);
+  ro.querySelector('[data-k=sheen]').textContent=(c.getPropertyValue('--gl-sheen-now').trim()||'0').replace(/^0\./,'.');
+  ro.querySelector('[data-k=core]').textContent=(c.getPropertyValue('--gl-core-now').trim()||'0').replace(/^0\./,'.');
+  ro.querySelector('[data-k=gloss]').textContent=parseFloat(a.opacity).toFixed(2).replace(/^0\./,'.').replace('1.00','1.0');
+  if(performance.now()<until)raf=requestAnimationFrame(tick);
+}
+const arm=()=>{until=performance.now()+(parseFloat(getComputedStyle(root).getPropertyValue('--slow'))||1)*600;cancelAnimationFrame(raf);tick()};
+probe.addEventListener('pointerdown',()=>{until=Infinity;cancelAnimationFrame(raf);tick()});
+addEventListener('pointerup',arm);probe.addEventListener('pointerleave',arm);
+
+// 3: glint on release
+document.querySelectorAll('.d3 .glinty').forEach(b=>b.addEventListener('click',()=>{b.classList.remove('glint');void b.offsetWidth;b.classList.add('glint')}));
+
+// 4: handoff
+const s1=document.querySelector('[data-step="1"]'),s2=document.querySelector('[data-step="2"]');
+function swap(btn,done){const [a,b]=btn.querySelectorAll('.swap>span');a.hidden=done;b.hidden=!done}
+s1.addEventListener('click',()=>{if(s1.classList.contains('off'))return;s1.classList.add('off');swap(s1,true);setTimeout(()=>s2.classList.remove('off'),160)});
+s2.addEventListener('click',()=>{if(s2.classList.contains('off'))return;s2.classList.add('off');swap(s2,true)});
+document.getElementById('reset4').onclick=()=>{s1.classList.remove('off');swap(s1,false);s2.classList.add('off');swap(s2,false)};
+</script>
+</body>
+</html>

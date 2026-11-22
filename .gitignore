@@ -14,3 +14,13 @@ intro-lab/aster/pics/slide3.jpg
 intro-lab/aster/pics/c[0-9].jpg
 intro-lab/aster/pics/portrait.jpg
 intro-lab/aster/about/
+crowd-lab/ref/
+cpt-deck/img/
+
+# video stays out of this repo from 2026-11-21: reference recordings and renders
+*.mp4
+*.mov
+*.MOV
+*.MP4
+*.webm
+manus-compare/old/*.pdf

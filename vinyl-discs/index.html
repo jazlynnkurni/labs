@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pressings</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#FAF9F7;--ink:#14171B;--ink2:rgba(20,23,27,.66);--ink3:rgba(20,23,27,.42);--hair:rgba(20,23,27,.16);--jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+html[data-theme="dark"]{--paper:#1C1A17;--ink:#FAF9F7;--ink2:rgba(250,249,247,.66);--ink3:rgba(250,249,247,.42);--hair:rgba(250,249,247,.16)}
+html,body{margin:0;background:var(--paper);color:var(--ink);font:300 15.5px/1.62 var(--hel);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:56px 30px 96px}
+.label{font:600 10.5px/1.5 var(--jak);letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+h1{font:500 clamp(28px,4vw,44px)/1.12 var(--jak);letter-spacing:-.012em;margin:12px 0 0;max-width:22ch}
+p.lede{font-size:17px;line-height:1.62;color:var(--ink2);margin:16px 0 0;max-width:60ch}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:96px 120px;margin-top:48px;padding-right:110px}
+.rec{position:relative;aspect-ratio:1;cursor:pointer}
+.rec canvas.disc{position:absolute;top:2%;left:8%;width:96%;height:96%;display:block;transform:translateX(0) rotate(0deg);transition:transform .7s cubic-bezier(.22,1,.36,1);will-change:transform}
+.rec:hover canvas.disc,html.out canvas.disc{transform:translateX(38%)}
+/* the sleeve, the locked vellum window */
+.sl{position:absolute;inset:0;border-radius:4px;overflow:hidden;background:#FAF9F7;box-shadow:0 0 0 .5px rgba(20,23,27,.10),0 1px 2px rgba(20,23,27,.06),0 10px 24px -8px rgba(20,23,27,.18),0 26px 50px -20px rgba(20,23,27,.26);color:#14171B;transition:transform .45s cubic-bezier(.22,1,.36,1)}
+.rec:hover .sl{transform:translateY(-4px)}
+.sl::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");mix-blend-mode:multiply;opacity:.55}
+.sl .cap{position:absolute;left:0;right:0;bottom:0;padding:0 9% 7%;font:500 12px var(--jak);display:flex;justify-content:space-between;align-items:baseline}
+.sl .cap small{font:500 9px var(--jak);letter-spacing:.12em;color:rgba(20,23,27,.42)}
+.win{position:absolute;left:15%;top:48%;width:70%;aspect-ratio:1;transform:translateY(-50%);border-radius:50%;overflow:hidden;background:rgba(255,255,255,.55);transition:background .45s ease;box-shadow:inset 0 0 0 1px rgba(20,23,27,.10),inset 14px 4px 26px -8px rgba(20,23,27,.22),inset -6px -8px 18px -10px rgba(255,255,255,.9),inset 0 10px 30px rgba(255,255,255,.5)}
+.win .tint{position:absolute;inset:0;background:var(--lab);opacity:.22;mix-blend-mode:multiply;z-index:1;pointer-events:none;transition:opacity .45s ease}
+.win img{position:absolute;left:50%;top:50%;width:70%;height:70%;object-fit:contain;transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(var(--s));filter:blur(2.6px) saturate(.7) contrast(.9);opacity:.78;transition:filter .5s ease,opacity .5s ease}
+.win::after{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");mix-blend-mode:screen;opacity:.98;pointer-events:none;transition:opacity .5s ease;z-index:2}
+.rec:hover .win{background:#fff}.rec:hover .win .tint{opacity:0}.rec:hover .win img{filter:none;opacity:1}.rec:hover .win::after{opacity:0}
+.rec .cap2{position:absolute;left:0;right:0;top:100%;margin-top:14px}
+.rec .cap2 b{display:block;font:500 13px var(--jak)}.rec .cap2 span{display:block;font:300 12.5px/1.5 var(--hel);color:var(--ink2);margin-top:2px}
+.tools{display:flex;gap:16px;align-items:center;margin-top:110px;flex-wrap:wrap}
+label.chk{display:flex;gap:10px;align-items:center;font:500 12.5px var(--jak)}
+</style></head><body>
+<div class="wrap">
+  <div class="label">Pressings · seven discs, glass</div>
+  <h1>Every record its own pressing.</h1>
+  <p class="lede">Real grooves, drawn as rings with a spiral lead-in and the gaps between tracks, on a disc that is glass rather than vinyl: light refracts across the grooves as it turns, with a soft caustic along the rim. Hover a sleeve and the record slides out and spins up. Seven pressing styles, one per project, the way a label would press a special edition.</p>
+  <div class="row" id="row"></div>
+  <div class="tools"><label class="chk"><input id="out" type="checkbox"> hold every record out</label><label class="chk"><input id="spin" type="checkbox"> keep them spinning</label><label class="chk"><input id="dark" type="checkbox"> dark mode</label></div>
+</div>
+<script>
+const P=[
+  {n:'01',t:'Fostr',img:'marks/fostr.png',lab:'#9ba69c',press:'clear',name:'Clear glass',why:'A transparent pressing: the grooves are all there is, the sleeve shows through the disc.'},
+  {n:'02',t:'Halodoc',img:'marks/halodoc-mark.png',lab:'#A99939',press:'smoke',name:'Smoke',why:'Tinted dark glass, nearly black, the classic record in glass.'},
+  {n:'03',t:'Conduit Commerce',img:'marks/conduit-mark.png',lab:'#340414',press:'splatter',name:'Splatter',why:'Oxblood splatter frozen in clear glass, the way a coloured pressing takes its second colour.'},
+  {n:'04',t:'Second Self',img:'marks/second-self.svg',lab:'#827a85',press:'half',name:'Half and half',why:'Mauve on one side, sage on the other, the seam running through the spindle.'},
+  {n:'05',t:'Manus AI',img:'marks/manus-mark.svg',lab:'#1C1A17',press:'picture',name:'Picture disc',why:'The mark printed across the whole disc under the glass, grooves running over it.'},
+  {n:'06',t:'Olive',img:'marks/olive.png',lab:'#9ba69c',press:'marble',name:'Marble',why:'Sage and cream swirled through the glass, no two alike.'},
+  {n:'07',t:'SomiaCX',img:'marks/somiacx-mark.png',lab:'#A99939',press:'gold',name:'Gold glass',why:'Amber glass with a deeper gold label, the special edition.'},
+];
+const MARKS=JSON.parse(`{"win":{"wr":35,"wy":48,"frost":0.98,"blur":2.6,"tint":0.22},"marks":{"Fostr":{"x":1.1417282430213465,"y":6.055008210180624,"s":0.96},"Halodoc":{"x":-1.1987977756892234,"y":7.936018431495406,"s":0.84},"Conduit Commerce":{"x":4.200116175856309,"y":1.5476516812865497,"s":0.93},"Second Self":{"x":1.092412019632414,"y":48.66397765246451,"s":2},"Manus AI":{"x":0.6637687969924817,"y":-0.3527699456975781,"s":1.11},"Olive":{"x":21.35139280492899,"y":1.1960239139515494,"s":1.04},"SomiaCX":{"x":6.520696271929828,"y":-5.412130586883876,"s":1.24}}}`).marks;
+const TAU=Math.PI*2, hash=(x,y,s)=>{const n=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return n-Math.floor(n);};
+const sage=[155,166,156], mauve=[130,122,133], ox=[52,4,20], gold=[169,153,57], cream=[223,221,200], char=[28,26,23];
+const rgba=(c,a)=>`rgba(${c[0]},${c[1]},${c[2]},${a})`;
+function mix(a,b,t){ return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]; }
+/* THE PRESSING: the body of the disc, drawn once at rest */
+function body(c,R,p,img){
+  const g=c.createRadialGradient(0,0,0,0,0,R);
+  switch(p.press){
+    case 'clear': c.fillStyle='rgba(255,255,255,.22)'; c.beginPath(); c.arc(0,0,R,0,TAU); c.fill(); break;
+    case 'smoke': g.addColorStop(0,'rgba(40,36,44,.86)'); g.addColorStop(1,'rgba(22,20,26,.92)'); c.fillStyle=g; c.beginPath(); c.arc(0,0,R,0,TAU); c.fill(); break;
+    case 'splatter': c.fillStyle='rgba(255,255,255,.26)'; c.beginPath(); c.arc(0,0,R,0,TAU); c.fill(); c.save(); c.beginPath(); c.arc(0,0,R,0,TAU); c.clip();
+      for(let i=0;i<140;i++){ const a=hash(i,1,3)*TAU, r=Math.sqrt(hash(i,2,3))*R*1.05, s=1+hash(i,3,3)*hash(i,3,3)*R*.09; c.fillStyle=rgba(ox,.55+hash(i,4,3)*.4); c.beginPath(); c.ellipse(Math.cos(a)*r,Math.sin(a)*r,s,s*(.6+hash(i,5,3)*.8),a,0,TAU); c.fill(); } c.restore(); break;
+    case 'half': c.save(); c.beginPath(); c.arc(0,0,R,0,TAU); c.clip(); c.fillStyle=rgba(mauve,.82); c.fillRect(-R,-R,R,2*R); c.fillStyle=rgba(sage,.82); c.fillRect(0,-R,R,2*R);
+      const sg=c.createLinearGradient(-R*.06,0,R*.06,0); sg.addColorStop(0,rgba(mauve,.82)); sg.addColorStop(1,rgba(sage,.82)); c.fillStyle=sg; c.fillRect(-R*.06,-R,R*.12,2*R); c.restore(); break;
+    case 'picture': c.fillStyle='rgba(250,249,247,.92)'; c.beginPath(); c.arc(0,0,R,0,TAU); c.fill(); if(img&&img.naturalWidth){ c.save(); c.beginPath(); c.arc(0,0,R,0,TAU); c.clip(); const k=Math.min(R*1.2/img.naturalWidth,R*1.2/img.naturalHeight); c.globalAlpha=.9; c.drawImage(img,-img.naturalWidth*k/2,-img.naturalHeight*k/2,img.naturalWidth*k,img.naturalHeight*k); c.restore(); } break;
+    case 'marble': c.save(); c.beginPath(); c.arc(0,0,R,0,TAU); c.clip(); c.fillStyle=rgba(cream,.85); c.fillRect(-R,-R,2*R,2*R);
+      for(let i=0;i<26;i++){ const a0=hash(i,1,7)*TAU, r0=hash(i,2,7)*R; c.strokeStyle=rgba(i%2?sage:mix(sage,char,.35),.5+hash(i,3,7)*.4); c.lineWidth=R*(.02+hash(i,4,7)*.08); c.lineCap='round'; c.beginPath(); let x=Math.cos(a0)*r0,y=Math.sin(a0)*r0; c.moveTo(x,y); for(let k=1;k<12;k++){ const a=a0+k*.35+Math.sin(k+i)*.4, r=r0+Math.sin(k*.9+i)*R*.25; x=Math.cos(a)*r; y=Math.sin(a)*r; c.lineTo(x,y);} c.stroke(); } c.restore(); break;
+    case 'gold': g.addColorStop(0,'rgba(190,160,70,.80)'); g.addColorStop(1,'rgba(150,120,40,.88)'); c.fillStyle=g; c.beginPath(); c.arc(0,0,R,0,TAU); c.fill(); break;
+  }
+}
+/* THE GROOVES: a lead-in spiral, then rings with four gaps where the tracks change, then the run-out */
+function grooves(c,R,dark){
+  const r0=R*.38, r1=R*.965; const gaps=[.56,.70,.82,.90].map(v=>r0+(r1-r0)*v);
+  c.lineWidth=.6; c.strokeStyle=dark?'rgba(255,255,255,.16)':'rgba(0,0,0,.30)';
+  for(let r=r0;r<r1;r+=1.35){ const near=gaps.some(g=>Math.abs(r-g)<2.2); c.globalAlpha=near?.08:1; c.beginPath(); c.arc(0,0,r,0,TAU); c.stroke(); }
+  c.globalAlpha=1;
+  /* lead-in spiral, a touch wider */
+  c.lineWidth=.9; c.strokeStyle=dark?'rgba(255,255,255,.22)':'rgba(0,0,0,.36)'; c.beginPath(); for(let t=0;t<TAU*3;t+=.05){ const r=r1+1-t/(TAU*3)*5; c.lineTo(Math.cos(t)*r,Math.sin(t)*r); } c.stroke();
+}
+function label(c,R,p,dark){
+  const r=R*.36; c.fillStyle=p.lab; c.beginPath(); c.arc(0,0,r,0,TAU); c.fill();
+  c.strokeStyle='rgba(255,255,255,.35)'; c.lineWidth=1; c.beginPath(); c.arc(0,0,r-3,0,TAU); c.stroke();
+  c.fillStyle='#FAF9F7'; c.font=`500 ${Math.round(R*.065)}px "Plus Jakarta Sans"`; c.textAlign='center'; c.textBaseline='middle'; c.fillText(p.t.toUpperCase(),0,-r*.42);
+  c.font=`500 ${Math.round(R*.05)}px "Plus Jakarta Sans"`; c.fillStyle='rgba(250,249,247,.7)'; c.fillText(p.n+'  ·  33 ⅓',0,r*.45);
+  c.fillStyle='#FAF9F7'; c.beginPath(); c.arc(0,0,R*.028,0,TAU); c.fill(); c.fillStyle='rgba(0,0,0,.25)'; c.beginPath(); c.arc(0,0,R*.014,0,TAU); c.fill();
+}
+/* THE GLASS: a highlight that stays fixed to the lamp while the grooves turn under it, a rim caustic, and
+   a bright refraction sweep that runs across the grooves as the disc spins */
+function glass(c,R,ang,dark){
+  c.save(); c.beginPath(); c.arc(0,0,R,0,TAU); c.clip();
+  /* anisotropic highlight: the grooves catch light as two soft lobes opposite each other, fixed to the lamp */
+  for(const [a,w] of [[-Math.PI*.78,.9],[Math.PI*.22,.55]]){ const g=c.createConicGradient(a,0,0); g.addColorStop(0,'rgba(255,255,255,0)'); g.addColorStop(.10,`rgba(255,255,255,${.22*w})`); g.addColorStop(.17,`rgba(255,255,255,${.5*w})`); g.addColorStop(.24,`rgba(255,255,255,${.22*w})`); g.addColorStop(.34,'rgba(255,255,255,0)'); g.addColorStop(1,'rgba(255,255,255,0)'); c.fillStyle=g; c.fillRect(-R,-R,2*R,2*R); }
+  /* a thin refraction sweep that turns with the disc, where the groove pitch lines up with the lamp */
+  const g2=c.createConicGradient(ang*1.0,0,0); g2.addColorStop(0,'rgba(255,255,255,0)'); g2.addColorStop(.02,'rgba(255,255,255,.55)'); g2.addColorStop(.04,'rgba(255,255,255,0)'); g2.addColorStop(.5,'rgba(255,255,255,0)'); g2.addColorStop(.52,'rgba(255,255,255,.35)'); g2.addColorStop(.54,'rgba(255,255,255,0)'); g2.addColorStop(1,'rgba(255,255,255,0)'); c.fillStyle=g2; c.globalAlpha=.9; c.fillRect(-R,-R,2*R,2*R); c.globalAlpha=1;
+  /* body refraction: the far edge darkens, the near edge brightens, like a thick lens */
+  const rg=c.createRadialGradient(-R*.3,-R*.3,R*.2,0,0,R); rg.addColorStop(0,'rgba(255,255,255,.10)'); rg.addColorStop(.75,'rgba(255,255,255,0)'); rg.addColorStop(1,dark?'rgba(0,0,0,.35)':'rgba(0,0,0,.18)'); c.fillStyle=rg; c.fillRect(-R,-R,2*R,2*R);
+  c.restore();
+  /* rim: a bright edge and a caustic ring just inside it */
+  c.lineWidth=1.2; c.strokeStyle='rgba(255,255,255,.75)'; c.beginPath(); c.arc(0,0,R-.8,0,TAU); c.stroke();
+  c.lineWidth=2.5; c.strokeStyle='rgba(255,255,255,.18)'; c.beginPath(); c.arc(0,0,R-3,0,TAU); c.stroke();
+  c.lineWidth=1; c.strokeStyle='rgba(0,0,0,.28)'; c.beginPath(); c.arc(0,0,R,0,TAU); c.stroke();
+}
+const recs=[];
+function make(p){
+  const m=MARKS[p.t]||{x:0,y:0,s:1};
+  const el=document.createElement('div'); el.className='rec'; el.style.setProperty('--lab',p.lab);
+  el.innerHTML=`<canvas class="disc"></canvas><div class="sl"><div class="win"><div class="tint"></div><img src="${p.img}" alt="" style="--x:${m.x}%;--y:${m.y}%;--s:${m.s}"></div><div class="cap"><span>${p.t}</span><small>${p.n}</small></div></div><div class="cap2"><b>${p.name}</b><span>${p.why}</span></div>`;
+  document.getElementById('row').appendChild(el);
+  const cv=el.querySelector('canvas'), c=cv.getContext('2d'); const img=new Image(); img.src=p.img;
+  const R={el,cv,c,p,img,ang:0,vel:0,raf:0,hot:false,body:null};
+  img.onload=()=>{ R.body=null; wake(R); };
+  el.addEventListener('pointerenter',()=>{ R.hot=true; wake(R); }); el.addEventListener('pointerleave',()=>{ R.hot=false; wake(R); });
+  recs.push(R);
+}
+function wake(R){ if(!R.raf) R.raf=requestAnimationFrame(t=>frame(R,t)); }
+function frame(R,t){
+  R.raf=0; const cv=R.cv, dpr=Math.min(2,devicePixelRatio||1), r=cv.getBoundingClientRect(); const W=Math.round(r.width*dpr); if(!W) return;
+  if(cv.width!==W){ cv.width=cv.height=W; R.body=null; }
+  const Rr=W/2*.98, c=R.c, dark=document.documentElement.getAttribute('data-theme')==='dark';
+  const spin=R.hot||document.getElementById('spin').checked;
+  R.vel+=((spin?.055:0)-R.vel)*.05; R.ang+=R.vel;
+  if(!R.body){ const b=document.createElement('canvas'); b.width=b.height=W; const bc=b.getContext('2d'); bc.translate(W/2,W/2); body(bc,Rr,R.p,R.img); grooves(bc,Rr,R.p.press==='smoke'||R.p.press==='half'||R.p.press==='gold'); label(bc,Rr,R.p,dark); R.body=b; }
+  c.setTransform(1,0,0,1,0,0); c.clearRect(0,0,W,W);
+  c.save(); c.translate(W/2,W/2);
+  /* drop shadow under the disc */
+  c.shadowColor=dark?'rgba(0,0,0,.6)':'rgba(20,23,27,.35)'; c.shadowBlur=18*dpr; c.shadowOffsetY=8*dpr; c.fillStyle='rgba(0,0,0,.001)'; c.beginPath(); c.arc(0,0,Rr,0,TAU); c.fill(); c.shadowColor='transparent';
+  c.save(); c.rotate(R.ang); c.drawImage(R.body,-W/2,-W/2); c.restore();
+  glass(c,Rr,R.ang,dark);
+  c.restore();
+  if(Math.abs(R.vel)>.0005||spin) R.raf=requestAnimationFrame(t=>frame(R,t));
+}
+P.forEach(make);
+document.getElementById('spin').addEventListener('change',()=>recs.forEach(wake));
+document.getElementById('out').addEventListener('change',e=>document.documentElement.classList.toggle('out',e.target.checked));
+document.getElementById('dark').addEventListener('change',e=>{ document.documentElement.setAttribute('data-theme',e.target.checked?'dark':'light'); recs.forEach(R=>{ R.body=null; wake(R); }); });
+new ResizeObserver(()=>recs.forEach(wake)).observe(document.getElementById('row'));
+</script>
+</body></html>

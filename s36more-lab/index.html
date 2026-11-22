@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Slide 36 lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap">
+<style>
+/* Six more directions for slide 36, the conclusion. Deck components only: white glass capsules and orbs, big plum
+   numbers, the slide-26 iPhone, rounded media cards, gold stabilo, grey italic footnote. No boxes, no connector lines. */
+:root{--ink:#14171B;--plum:#340414;--mute:#8a8780;--hair:rgba(20,23,27,.12);--jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1240px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:#6f6b64;margin:0 0 28px;max-width:92ch}
+.opt{margin-bottom:56px}
+.bar{display:flex;align-items:center;gap:14px;margin:0 0 12px}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0}
+.lab small{font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:#6f6b64;margin-left:8px}
+button{font:600 12px var(--jak);padding:7px 12px;border-radius:999px;border:0;background:#fff;box-shadow:0 0 0 1px rgba(52,4,20,.15);cursor:pointer;color:var(--plum);flex:none}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 14px 30px -20px rgba(0,0,0,.3);overflow:hidden;position:relative}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:52px 72px 0;position:absolute;left:0;top:0}
+.hd{font:500 40px/1.12 var(--jak);letter-spacing:-.02em;margin:0;max-width:30ch}
+.hd em{font-style:normal;color:var(--plum)}
+.body{position:absolute;left:72px;right:72px;top:176px;height:440px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.fn{position:absolute;left:72px;right:72px;bottom:86px;margin:0;font:italic 300 13px/1.45 var(--hel);color:var(--mute)}
+.ft{position:absolute;left:72px;right:72px;bottom:40px;border-top:1px solid var(--hair);padding-top:12px;display:flex;justify-content:space-between;font:400 13px var(--hel)}
+.ft span:first-child{color:var(--plum)}
+/* shared components */
+.cap{display:inline-flex;align-items:center;white-space:nowrap;font:600 17px/1 var(--jak);padding:14px 22px;border-radius:999px;color:var(--plum);
+  background:radial-gradient(circle at 30% 0,#fff,rgba(214,222,215,.7));box-shadow:inset 1px 1px 1px #fff,0 0 0 1px rgba(52,4,20,.12),0 12px 22px -12px rgba(52,4,20,.35)}
+.cap.s{font-size:14px;padding:10px 16px}.cap.m{background:radial-gradient(circle at 30% 0,#fff,rgba(222,216,224,.75))}
+.cap.w{background:linear-gradient(180deg,#fff,rgba(250,250,252,.96) 60%,rgba(238,238,242,.92))}
+.orb{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:600 14px var(--jak);color:var(--plum);
+  box-shadow:inset 2px 2px 2px rgba(255,255,255,.95),inset 0 -10px 16px -10px rgba(52,4,20,.22),0 0 0 1px rgba(20,23,27,.06),0 10px 18px -12px rgba(52,4,20,.4)}
+.og{background:radial-gradient(circle at 30% 22%,#fff,rgba(214,222,215,.95) 55%,rgba(155,166,156,.75))}
+.om{background:radial-gradient(circle at 30% 22%,#fff,rgba(222,216,224,.95) 55%,rgba(130,122,133,.7))}
+.ob{background:radial-gradient(circle at 30% 22%,#fff,rgba(220,220,218,.9) 50%,transparent 80%),linear-gradient(135deg,rgba(155,166,156,.85),rgba(130,122,133,.85))}
+.ow{background:linear-gradient(180deg,#fff,rgba(250,250,252,.96) 60%,rgba(238,238,242,.92))}
+.bead{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;color:#fff;font:600 19px var(--jak);
+  background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.6),rgba(255,255,255,0) 70%),radial-gradient(circle at 50% 65%,#6a2a3f,#340414 70%);box-shadow:0 6px 12px -5px rgba(52,4,20,.55)}
+mark{color:inherit;background:linear-gradient(transparent 58%,rgba(169,153,57,.38) 58%) no-repeat;background-size:0% 100%;padding:0 2px}
+.val{display:flex;align-items:center;gap:14px}
+.val b{font:600 36px/1 var(--jak);letter-spacing:-.02em;color:var(--plum);font-variant-numeric:tabular-nums;white-space:nowrap}
+.val span:last-child{font:500 14px/1.3 var(--jak);color:var(--mute);max-width:170px}
+.vals{display:flex;justify-content:center;gap:64px}
+.ip{position:relative;display:inline-block;flex:none;padding:8px;border-radius:44px;background:#0b0c0d;
+  box-shadow:inset 0 0 0 1.5px #2a2c2e,inset 0 0 0 3px #0b0c0d,0 30px 50px -26px rgba(20,23,27,.6),0 8px 16px -10px rgba(20,23,27,.35)}
+.ip .scr{position:relative;height:100%;aspect-ratio:720/1568;border-radius:36px;overflow:hidden;background:#000}
+.ip video{position:absolute;inset:0;width:100%;height:100%;display:block}
+.ip i{position:absolute;width:3px;border-radius:2px;background:linear-gradient(90deg,#2a2b2e,#4a4c50)}
+.ip i.a1{left:-3px;top:19%;height:5%}.ip i.a2{left:-3px;top:28%;height:10%}.ip i.a3{left:-3px;top:40%;height:10%}
+.ip i.pw{right:-3px;top:31%;height:15%;background:linear-gradient(270deg,#2a2b2e,#4a4c50)}
+.card{flex:none;border-radius:26px;overflow:hidden;background:#000;aspect-ratio:900/700;
+  box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 0 0 .5px rgba(20,23,27,.1),0 3px 6px rgba(20,23,27,.1),0 22px 40px -14px rgba(52,4,20,.3)}
+.card video{display:block;width:100%;height:100%}
+/* entrance: anything marked .a rises in, in the order given by --d; stabilo draws after */
+.a{opacity:0}
+.go .a{animation:rise .65s cubic-bezier(.22,1,.36,1) var(--d,0s) both}
+.go mark{animation:draw .7s cubic-bezier(.45,.05,.3,1) var(--m,1s) both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes draw{to{background-size:100% 100%}}
+
+/* 1 the rules */
+.d1 .rules{width:100%;max-width:900px}
+.d1 .rule{display:flex;align-items:center;gap:20px;padding:15px 0;border-top:1px solid var(--hair)}
+.d1 .rule:last-child{border-bottom:1px solid var(--hair)}
+.d1 .rule p{margin:0;font:500 25px/1.25 var(--jak);letter-spacing:-.01em}
+.d1 .rule .orb{width:38px;height:38px;font-size:15px}
+.d1 .res{display:flex;gap:12px;margin-top:28px}
+/* 2 results as hero */
+.d2 .big{display:flex;justify-content:center;gap:84px;margin-top:40px}
+.d2 .st{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.d2 .st b{font:600 112px/.9 var(--jak);letter-spacing:-.04em;color:var(--plum);font-variant-numeric:tabular-nums}
+.d2 .st span{font:500 16px/1.35 var(--jak);color:var(--mute);max-width:220px}
+/* 3 before, after */
+.d3 .ba{display:flex;align-items:center;gap:40px}
+.d3 .ba b{font:600 190px/.85 var(--jak);letter-spacing:-.05em}
+.d3 .ba .was{color:rgba(20,23,27,.22)}.d3 .ba .now{color:var(--plum)}
+.d3 .ba i{display:block;width:120px;height:2px;background:var(--plum);position:relative;opacity:.5}
+.d3 .ba i::after{content:"";position:absolute;right:0;top:-6px;width:12px;height:12px;border-top:2px solid var(--plum);border-right:2px solid var(--plum);transform:rotate(45deg)}
+.d3 .sub{margin:22px 0 0;font:500 18px/1.4 var(--jak);color:var(--ink);text-align:center}
+.d3 .vals{margin-top:34px}
+/* 4 two screens, one agent */
+.d4 .media{display:flex;align-items:center;gap:40px;margin:16px 0 16px}
+.d4 .card{height:262px}.d4 .ip{height:282px}
+.d4 .res{display:flex;gap:12px}
+/* 5 the five things I made */
+.d5 .five{display:flex;justify-content:center;gap:34px;margin:34px 0 0}
+.d5 .it{display:flex;flex-direction:column;align-items:center;gap:14px;width:150px;text-align:center}
+.d5 .it .bead{width:58px;height:58px;font-size:24px}
+.d5 .it span{font:600 17px/1.3 var(--jak);color:var(--ink)}
+.d5 .vals{margin-top:46px;padding-top:30px;border-top:1px solid var(--hair);width:100%}
+/* 6 the phone and the payoff */
+.d6{flex-direction:row!important;gap:72px}
+.d6 .ip{height:396px}
+.d6 .rt{display:flex;flex-direction:column;align-items:flex-start;gap:22px}
+.d6 .st{display:flex;align-items:baseline;gap:18px;padding:10px 0;border-top:1px solid var(--hair);min-width:440px}
+.d6 .st:last-child{border-bottom:1px solid var(--hair);padding-bottom:14px}
+.d6 .st b{font:600 64px/1 var(--jak);letter-spacing:-.03em;color:var(--plum);min-width:150px;font-variant-numeric:tabular-nums}
+.d6 .st span{font:500 17px/1.35 var(--jak);color:var(--ink);max-width:250px}
+</style></head><body>
+<div class="wrap">
+<h1>Slide 36, six more directions</h1>
+<p class="lede">The conclusion, six different ways. Every frame keeps the facts, uses only the deck's own pieces (glass capsules and orbs, big plum numbers, the iPhone, rounded media cards, gold stabilo), and has no boxes or connector lines. Each has a Replay button for its entrance. Tell me the number.</p>
+<div id="opts"></div>
+</div>
+<script>
+const HD=`<p class="hd">In conclusion, I set the rules <em>for when Clover showed a screen.</em></p>`;
+const FN=`Interactions: user actions from a request to its answer. Per request, 6 fell to 2: (6 &minus; 2) &divide; 6 &times; 100 = 66.7%. No public launch yet.`;
+const AGENT=(d)=>`<span class="cap a" style="--d:${d}s">An intent-led HUD and an iPhone app, sharing one agent</span>`;
+const PH=(h)=>`<div class="ip" style="height:${h}px"><i class="a1"></i><i class="a2"></i><i class="a3"></i><i class="pw"></i><div class="scr"><video src="media/gardens.mp4" poster="media/gardens.jpg" muted loop autoplay playsinline></video></div></div>`;
+const HUD=`<div class="card"><video src="media/hudwindow.mp4" poster="media/hudwindow.jpg" muted loop autoplay playsinline></video></div>`;
+const V=(o,n,l,d,cnt='')=>`<div class="val a" style="--d:${d}s"><span class="orb ${o}"></span><b ${cnt}>${n}</b><span>${l}</span></div>`;
+const VALS=d=>`<div class="vals">${V('og','52','internal testers wearing it',d,'data-n="52"')}${V('om','&minus;67%','unnecessary HUD interactions',d+.2,'data-n="-67" data-s="%"')}${V('ow','&#10003;','shipped, now on the HUD with our manufacturer',d+.4)}</div>`;
+const D=[
+ ['01','The rules','The title, answered literally: four rules for when Clover shows a screen, as large lines on white glass orbs. The results follow as small capsules.',
+  `<div class="body d1"><div class="rules">
+   ${[['Glance on the glasses. <mark style="--m:1.35s">Go deeper on the phone.</mark>',.4],['Show progress while it works.',.6],['<mark style="--m:1.75s">Confirm</mark> before it sends anything.',.8],['Say what it understood, and what it finished.',1]].map(([t,d],k)=>`<div class="rule a" style="--d:${d}s"><span class="orb ow">${k+1}</span><p>${t}</p></div>`).join('')}
+   </div><div class="res"><span class="cap s a" style="--d:1.9s">52 testers wearing it</span><span class="cap s m a" style="--d:2.05s">&minus;67% interactions</span><span class="cap s w a" style="--d:2.2s">&#10003; Pushed and shipped</span></div></div>`, FN],
+ ['02','Results as the hero','A closing stat moment: 52, &minus;67% and the tick, huge across the middle, under the agent capsule. The build list moves to the footnote and the talk.',
+  `<div class="body d2">${AGENT(.3)}<div class="big">
+   <div class="st a" style="--d:.7s"><b data-n="52">52</b><span>internal testers wearing it</span></div>
+   <div class="st a" style="--d:.9s"><b data-n="-67" data-s="%">&minus;67%</b><span>unnecessary HUD interactions</span></div>
+   <div class="st a" style="--d:1.1s"><b>&#10003;</b><span>pushed and shipped, now on the HUD with our manufacturer</span></div></div></div>`,
+  `Built: three levels of support, six primitives and failure models on the glasses; the SwiftUI app, Modes and search on the phone; the Eden and Clover brand. ${FN}`],
+ ['03','Before, then after','The 6 &rarr; 2 interactions as the hero, in the big numbers of slide 21, with one line on what changed and the three results beneath.',
+  `<div class="body d3"><div class="ba a" style="--d:.3s"><b class="was">6</b><i></i><b class="now">2</b></div>
+   <p class="sub a" style="--d:.7s">interactions per request, from <mark style="--m:1.2s">navigation&#8209;first</mark> to intent&#8209;led</p>${VALS(1.4)}</div>`, FN],
+ ['04','Two screens, one agent','The HUD and the garden iPhone large side by side under the agent capsule, the results as capsules beneath. Almost no text.',
+  `<div class="body d4">${AGENT(.3)}<div class="media"><div class="a" style="--d:.55s">${HUD}</div><div class="a" style="--d:.75s">${PH(282)}</div></div>
+   <div class="res"><span class="cap s a" style="--d:1.1s">52 testers wearing it</span><span class="cap s m a" style="--d:1.25s">&minus;67% interactions</span><span class="cap s w a" style="--d:1.4s">&#10003; Pushed and shipped</span></div></div>`, FN],
+ ['05','The five things I made','A recap of the case: the five numbered Designs impacts as plum beads with a few words each, then the three results.',
+  `<div class="body d5">${AGENT(.3)}<div class="five">
+   ${['Failure states','Handover to the phone','Search on the phone','The Dynamic Island','Card to Island'].map((t,k)=>`<div class="it a" style="--d:${.6+k*.15}s"><span class="bead">${k+1}</span><span>${t}</span></div>`).join('')}
+   </div>${VALS(1.5)}</div>`, FN],
+ ['06','The phone and the payoff','The garden iPhone large on the left; on the right, the agent capsule and the three results stacked big, each with one line.',
+  `<div class="body d6"><div class="a" style="--d:.3s">${PH(396)}</div><div class="rt">${AGENT(.55)}
+   <div style="display:flex;flex-direction:column;width:100%">
+   <div class="st a" style="--d:.8s"><b data-n="52">52</b><span>internal testers wearing it</span></div>
+   <div class="st a" style="--d:1s"><b data-n="-67" data-s="%">&minus;67%</b><span>unnecessary HUD interactions</span></div>
+   <div class="st a" style="--d:1.2s"><b>&#10003;</b><span><mark style="--m:1.7s">Pushed and shipped</mark>, now on the HUD with our manufacturer</span></div></div></div></div>`, FN]];
+document.getElementById('opts').innerHTML=D.map(([n,t,d,b,fn],k)=>`<div class="opt"><div class="bar"><p class="lab">${n} &nbsp;${t}<small>${d}</small></p><button data-k="${k}">Replay</button></div><div class="frame"><div class="sl">${HD}${b}<p class="fn">${fn}</p><div class="ft"><span>36 &nbsp; Findings</span><span>Eden Case Study</span></div></div></div></div>`).join('');
+const sls=[...document.querySelectorAll('.sl')];
+const fit=()=>sls.forEach(s=>s.style.transform=`scale(${s.parentElement.clientWidth/1280})`);addEventListener('resize',fit);fit();
+function count(sl){ sl.querySelectorAll('[data-n]').forEach(b=>{ const n=+b.dataset.n,s=b.dataset.s||'',host=b.closest('.a'),d=parseFloat(getComputedStyle(host).getPropertyValue('--d'))||0,t0=performance.now()+d*1000+150,D=900;
+  const f=now=>{ const p=Math.max(0,Math.min(1,(now-t0)/D)),e=1-Math.pow(1-p,3),v=Math.round(n*e); b.textContent=(v<0?'−':'')+Math.abs(v)+s; if(p<1) requestAnimationFrame(f); };
+  b.textContent='0'+s; requestAnimationFrame(f); }); }
+function play(sl){ sl.classList.remove('go'); void sl.offsetWidth; sl.classList.add('go'); count(sl); }
+document.querySelectorAll('button[data-k]').forEach(b=>b.onclick=()=>play(sls[+b.dataset.k]));
+sls.forEach(play);
+</script>
+</body></html>

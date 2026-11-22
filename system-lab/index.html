@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Paper, the system</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600&display=swap">
+<link rel="stylesheet" href="tokens.css">
+<script>(function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('sys-theme');if(t!=='light'&&t!=='dark')t='dark';document.documentElement.dataset.theme=t;}catch(e){}})();</script>
+<style>
+*{box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--hel);font-size:var(--t-body);line-height:var(--lh-body);text-wrap:pretty;transition:background-color var(--d-page) var(--ease),color var(--d-page) var(--ease)}
+a{color:inherit}
+h1,h2,h3{font-family:var(--jak);font-weight:600;text-wrap:balance;margin:0}
+h1{font-size:var(--t-display);line-height:var(--lh-display);letter-spacing:var(--ls-display);max-width:22ch}
+h2{font-size:var(--t-title);line-height:var(--lh-title);letter-spacing:var(--ls-title)}
+h3{font-size:var(--t-heading);line-height:var(--lh-heading);letter-spacing:var(--ls-heading)}
+p{margin:0;max-width:52ch}
+.lede{font-size:var(--t-lede);line-height:var(--lh-lede);color:var(--ink2);max-width:56ch}
+.wrap{max-width:var(--container);margin:0 auto;padding:0 var(--gutter)}
+@media(min-width:900px){.wrap{padding:0 64px}}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em;color:var(--ink2)}
+
+/* page */
+nav{position:sticky;top:0;z-index:5;background:color-mix(in oklab,var(--paper) 88%,transparent);backdrop-filter:blur(12px);border-bottom:var(--line) solid var(--hair)}
+nav .wrap{display:flex;align-items:center;gap:var(--s-3);height:56px;font-family:var(--jak);font-size:var(--t-small);font-weight:500}
+nav .name{font-weight:600;margin-right:auto}
+nav .links{display:none;gap:var(--s-2)}
+@media(min-width:900px){nav .links{display:flex}}
+nav a{text-decoration:none;color:var(--ink2)}
+nav a:hover{color:var(--ink)}
+#theme{all:unset;cursor:pointer;width:40px;height:40px;display:grid;place-items:center;border-radius:var(--r-pill);color:var(--ink2);transition:color var(--d-state) var(--ease)}
+#theme:hover{color:var(--ink)}
+#theme svg{width:16px;height:16px}
+
+header.top{padding:var(--s-12) 0 var(--s-8)}
+header.top .grid{display:grid;gap:var(--s-3)}
+header.top .from{font-family:var(--jak);font-size:var(--t-small);color:var(--ink3)}
+
+section{padding:var(--s-12) 0 0}
+section>.wrap>.head{display:grid;gap:var(--s-2);padding-bottom:var(--s-6);border-bottom:var(--line) solid var(--hair);margin-bottom:var(--within)}
+.head .one{font-size:var(--t-lede);line-height:var(--lh-lede);color:var(--ink2);max-width:60ch}
+.block{display:grid;gap:var(--s-3);margin-bottom:var(--within)}
+.block>h3{max-width:30ch}
+.block .why{color:var(--ink2)}
+
+/* tables: lines, not boxes */
+table{border-collapse:collapse;width:100%;font-size:var(--t-small);line-height:var(--lh-small)}
+th,td{text-align:left;vertical-align:top;padding:10px 16px 10px 0;border-bottom:var(--line) solid var(--hair)}
+th{font-family:var(--jak);font-weight:500;color:var(--ink3);font-size:var(--t-caption)}
+td:first-child{font-family:var(--jak);font-weight:500;white-space:nowrap}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+td.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--ink2)}
+tr.cut td{color:var(--ink3);text-decoration:line-through}
+.two{display:grid;gap:var(--s-6)}
+@media(min-width:900px){.two{grid-template-columns:5fr 7fr;align-items:start}}
+
+/* rules list */
+ol.rules{margin:0;padding:0;list-style:none;counter-reset:r;display:grid;gap:12px;max-width:64ch}
+ol.rules li{counter-increment:r;display:grid;grid-template-columns:28px 1fr;gap:8px;line-height:1.55}
+ol.rules li::before{content:counter(r);font-family:var(--jak);font-weight:500;color:var(--ink3);font-variant-numeric:tabular-nums}
+ol.rules b{font-family:var(--jak);font-weight:600}
+
+/* specimens */
+.spec{display:grid;gap:var(--s-2)}
+.swatches{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.sw{display:grid;gap:6px;font-size:var(--t-caption);color:var(--ink2);width:112px}
+.sw i{display:block;height:64px;border-radius:var(--r-tile);box-shadow:inset 0 0 0 1px var(--outline)}
+.sw.disc i{border-radius:50%;width:64px}
+.typo{display:grid;gap:var(--s-3)}
+.typo .row{display:grid;grid-template-columns:120px 1fr;gap:var(--s-2);align-items:baseline;padding-bottom:var(--s-2);border-bottom:var(--line) solid var(--hair)}
+.typo .row small{font-family:var(--jak);font-size:var(--t-caption);color:var(--ink3);font-variant-numeric:tabular-nums}
+.t-display{font-family:var(--jak);font-weight:600;font-size:var(--t-display);line-height:var(--lh-display);letter-spacing:var(--ls-display)}
+.t-title{font-family:var(--jak);font-weight:600;font-size:var(--t-title);line-height:var(--lh-title);letter-spacing:var(--ls-title)}
+.t-heading{font-family:var(--jak);font-weight:600;font-size:var(--t-heading);line-height:var(--lh-heading);letter-spacing:var(--ls-heading)}
+.t-lede{font-size:var(--t-lede);line-height:var(--lh-lede);color:var(--ink2)}
+.t-body{font-size:var(--t-body);line-height:var(--lh-body)}
+.t-small{font-size:var(--t-small);line-height:var(--lh-small)}
+.t-caption{font-size:var(--t-caption);line-height:var(--lh-caption);color:var(--ink3)}
+.t-label{font-family:var(--jak);font-weight:500;font-size:var(--t-label);line-height:var(--lh-label);color:var(--ink2)}
+.t-eyebrow{font-family:var(--jak);font-weight:600;font-size:var(--t-eyebrow);letter-spacing:var(--ls-eyebrow);text-transform:uppercase;color:var(--ink3)}
+
+/* radius specimens */
+.radii{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--s-3)}
+.rad{display:grid;gap:8px;font-size:var(--t-caption);color:var(--ink2)}
+.rad .shape{height:96px;background:var(--plate);box-shadow:inset 0 0 0 1px var(--outline)}
+.rad .shape.pill{height:40px;border-radius:var(--r-pill);display:flex;align-items:center;padding:0 16px;font-family:var(--jak);font-weight:500;font-size:13px;color:var(--ink)}
+.rad .shape.plate{border-radius:var(--r-plate)}
+.rad .shape.inset{border-radius:var(--r-plate);padding:8px}
+.rad .shape.inset i{display:block;height:100%;border-radius:var(--r-inset);background:var(--hair)}
+.rad .shape.tile{border-radius:var(--r-tile);width:96px}
+.rad .shape.none{border-radius:0;background:transparent;box-shadow:none;border-top:var(--line) solid var(--hair);border-bottom:var(--line) solid var(--hair)}
+.rad b{font-family:var(--jak);font-weight:600;color:var(--ink)}
+.concentric{display:grid;gap:var(--s-2);justify-items:start}
+.concentric .outer{background:var(--plate);box-shadow:inset 0 0 0 1px var(--outline);border-radius:20px;padding:8px;width:min(100%,360px)}
+.concentric .inner{height:160px;border-radius:12px;background:var(--hair)}
+.concentric .wrong .inner{border-radius:20px}
+.concentric figcaption{font-size:var(--t-caption);color:var(--ink3)}
+.pair{display:grid;gap:var(--s-3)}
+@media(min-width:700px){.pair{grid-template-columns:1fr 1fr}}
+
+/* elevation specimens */
+.elev{display:flex;flex-wrap:wrap;gap:var(--s-4);align-items:flex-start}
+.elev .pillnav{display:flex;gap:4px;padding:4px;border-radius:var(--r-pill);background:var(--pill);box-shadow:var(--lift);font-family:var(--jak);font-size:13px;font-weight:500}
+.elev .pillnav span{padding:8px 14px;border-radius:var(--r-pill);color:var(--ink2)}
+.elev .pillnav span.on{background:var(--gold);color:#FAF9F7}
+.elev .flat{width:200px;height:120px;border-radius:var(--r-plate);background:var(--plate);box-shadow:inset 0 0 0 1px var(--outline)}
+.elev .cap{font-size:var(--t-caption);color:var(--ink3);margin-top:8px}
+
+
+/* controls specimen */
+.controls{display:grid;gap:var(--s-4)}
+.ctl-row{display:flex;flex-wrap:wrap;gap:var(--s-2);align-items:center}
+.ctl-row .cap{flex-basis:100%;font-size:var(--t-caption);color:var(--ink3)}
+.btn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:var(--r-pill);font-family:var(--jak);font-weight:500;font-size:13px;line-height:1;white-space:nowrap;transition:background var(--d-state) var(--ease),color var(--d-state) var(--ease),box-shadow var(--d-state) var(--ease),transform var(--d-press) var(--ease)}
+.btn:active{transform:scale(.96)}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.secondary{box-shadow:inset 0 0 0 1px var(--hair);color:var(--ink)}
+.btn.secondary:hover{box-shadow:inset 0 0 0 1px var(--ink3)}
+.btn.ghost{color:var(--ink2)}
+.btn.ghost:hover{color:var(--ink);background:color-mix(in oklab,var(--ink) 6%,transparent)}
+.btn.touch{background:var(--gold);color:#FAF9F7}
+.btn.small{height:32px;padding:0 14px;font-size:12.5px}
+.btn.icon{width:40px;padding:0;justify-content:center}
+.btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.tag{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:var(--r-pill);box-shadow:inset 0 0 0 1px var(--hair);font-size:13px;color:var(--ink2);white-space:nowrap}
+.tag.on{box-shadow:inset 0 0 0 1px var(--ink);color:var(--ink)}
+.seg{display:inline-flex;padding:4px;gap:4px;border-radius:var(--r-pill);background:var(--pill);box-shadow:var(--lift);font-family:var(--jak);font-size:13px;font-weight:500}
+.seg span{padding:8px 14px;border-radius:var(--r-pill);color:var(--ink2)}
+.seg span.on{background:var(--ink);color:var(--paper)}
+.field{display:inline-flex;align-items:center;height:40px;padding:0 16px;border-radius:var(--r-pill);box-shadow:inset 0 0 0 1px var(--hair);font-size:14px;color:var(--ink3);min-width:240px}
+.ctl-wrong{display:flex;gap:var(--s-2);align-items:center;flex-wrap:wrap}
+.ctl-wrong .btn{border-radius:8px}
+.ctl-wrong .circle{width:40px;height:40px;border-radius:50%;background:var(--ink)}
+
+/* anti-slop table */
+table.vs td:first-child{color:var(--ink3);font-weight:400;font-family:var(--hel);white-space:normal;width:44%}
+table.vs td+td{font-family:var(--jak);font-weight:500}
+
+/* before after */
+table.ba td.num{font-family:var(--jak);font-weight:500}
+
+footer{padding:var(--s-12) 0 var(--s-8);color:var(--ink3);font-size:var(--t-small)}
+footer .wrap{border-top:var(--line) solid var(--hair);padding-top:var(--s-4)}
+
+@media(hover:none){#theme:hover{color:var(--ink2)}}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <span class="name">Paper</span>
+  <div class="links">
+    <a href="#colour">Colour</a><a href="#type">Type</a><a href="#space">Space</a><a href="#radius">Radius</a><a href="#lines">Lines</a><a href="#elevation">Elevation</a><a href="#motion">Motion</a><a href="#parts">Parts</a><a href="#generated">Generated</a><a href="#diff">What changes</a>
+  </div>
+  <button id="theme" aria-label="Toggle theme"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 2v12A6 6 0 0 0 8 2z" fill="currentColor" stroke="none"/></svg></button>
+</div></nav>
+
+<header class="top"><div class="wrap grid">
+  <span class="from">jazlynnwashere.com · the system · read off the live site, 5 November 2026</span>
+  <h1>Paper and ink in two faces. A radius only on what you press or what holds a picture. One shadow for what floats. Motion under 300 that answers the hand.</h1>
+  <p class="lede">Every value here already exists on the site. The system does not add a look, it removes the eleven extra ones. The friend's reading, caps heads, rounded everything, shadows, and motion that makes pages feel slow, maps to four sections below: Type, Radius, Elevation, Motion.</p>
+</div></header>
+
+<!-- COLOUR -->
+<section id="colour"><div class="wrap">
+  <div class="head"><h2>Colour</h2><p class="one">Paper and ink, ink at three alphas for text, gold for the one thing that is active, oxblood for the toggle. Colour never sits on a block of text.</p></div>
+  <div class="two">
+    <div class="block">
+      <h3>Tokens</h3>
+      <table>
+        <tr><th>Token</th><th>Light</th><th>Dark</th><th>Used by</th></tr>
+        <tr><td>paper</td><td class="mono">#FAF9F7</td><td class="mono">#1C1A17</td><td>the page</td></tr>
+        <tr><td>plate</td><td class="mono">#FAF9F7</td><td class="mono">#262320</td><td>media plates, the card, the deck</td></tr>
+        <tr><td>pill</td><td class="mono">#fff</td><td class="mono">#262320</td><td>the nav pill</td></tr>
+        <tr><td>ink</td><td class="mono">#14171B</td><td class="mono">#FAF9F7</td><td>heads, body</td></tr>
+        <tr><td>ink2</td><td class="mono">ink / .66</td><td class="mono">ink / .66</td><td>ledes, captions under media, labels</td></tr>
+        <tr><td>ink3</td><td class="mono">ink / .42</td><td class="mono">ink / .42</td><td>eyebrow, table heads, footer</td></tr>
+        <tr><td>hair</td><td class="mono">ink / .16</td><td class="mono">ink / .16</td><td>every rule and border</td></tr>
+        <tr><td>outline</td><td class="mono">black / .10</td><td class="mono">white / .10</td><td>the 1px edge on every image and plate</td></tr>
+        <tr><td>gold</td><td class="mono">#A99939</td><td class="mono">#A99939</td><td>active tab, pressed state, the signature flick</td></tr>
+        <tr><td>oxblood</td><td class="mono">#340414</td><td class="mono">#340414</td><td>the theme toggle, the Clover cover</td></tr>
+        <tr><td>sage</td><td class="mono">#9BA69C</td><td class="mono">#9BA69C</td><td>the signature</td></tr>
+      </table>
+    </div>
+    <div class="block">
+      <h3>Swatches</h3>
+      <div class="swatches">
+        <div class="sw"><i style="background:#FAF9F7"></i>paper, light</div>
+        <div class="sw"><i style="background:#1C1A17"></i>paper, dark</div>
+        <div class="sw"><i style="background:#262320"></i>plate, dark</div>
+        <div class="sw"><i style="background:#14171B"></i>ink</div>
+        <div class="sw"><i style="background:#A99939"></i>gold</div>
+        <div class="sw"><i style="background:#340414"></i>oxblood</div>
+        <div class="sw"><i style="background:#9BA69C"></i>sage</div>
+      </div>
+      <p class="why">The disc swatch (seven warm greys, sage and mauve) belongs to the hero discs and to nothing else. It is not a palette for cards or tags.</p>
+      <div class="swatches">
+        <div class="sw disc"><i style="background:#dfddc8"></i></div><div class="sw disc"><i style="background:#c7c7c7"></i></div><div class="sw disc"><i style="background:#827a85"></i></div><div class="sw disc"><i style="background:#9ba69c"></i></div><div class="sw disc"><i style="background:#c4c1c8"></i></div><div class="sw disc"><i style="background:#c2beb3"></i></div><div class="sw disc"><i style="background:#dfdac8"></i></div>
+      </div>
+      <ol class="rules">
+        <li><b>Gold is the only accent,</b> and it marks one thing per screen: the tab you are on, the control you are pressing, the signature's flick. Two gold things on one screen is a bug.</li>
+        <li><b>Text is ink at three alphas.</b> No fourth grey, no tinted grey, no coloured text.</li>
+        <li><b>Desktop lands dark, phones land light.</b> The toggle remembers after that. Both themes are designed, not inverted: plate and pill move with the paper.</li>
+        <li><b>The site has 30 hex values today.</b> Eleven are listed above. The rest are the phone mock on About and the disc swatch, and stay where they are.</li>
+      </ol>
+    </div>
+  </div>
+</div></section>
+
+<!-- TYPE -->
+<section id="type"><div class="wrap">
+  <div class="head"><h2>Typography</h2><p class="one">Plus Jakarta Sans at 600 for every head and 500 for every label, Helvetica Neue at 400 for every sentence. Nine roles. Capitals once per page, in the page head, and nowhere else.</p></div>
+  <div class="block">
+    <h3>Roles</h3>
+    <div class="typo">
+      <div class="row"><small>display · clamp 28 to 44 · 1.12 · −.02em · 600</small><span class="t-display">Design engineer</span></div>
+      <div class="row"><small>title · clamp 22 to 30 · 1.2 · −.015em · 600</small><span class="t-title">The community platform nobody stayed on</span></div>
+      <div class="row"><small>heading · 22 · 1.3 · −.012em · 600</small><span class="t-heading">What the first round told us</span></div>
+      <div class="row"><small>lede · 17 · 1.62 · 400 · ink2</small><span class="t-lede">Getting the model to produce an answer was easy; getting it to produce one people would trust was the work.</span></div>
+      <div class="row"><small>body · 15.5 · 1.55 · 400</small><span class="t-body">Seven of ten testers disengaged within minutes. They lingered only on the parts that moved.</span></div>
+      <div class="row"><small>small · 13 · 1.5 · 400</small><span class="t-small">Figure 4. The second prototype, static and clean, tested in week six.</span></div>
+      <div class="row"><small>caption · 12.5 · 1.5 · 400 · ink3</small><span class="t-caption">Manus AI, 2025. Shown with permission.</span></div>
+      <div class="row"><small>label · 13 · 1.35 · 500 · ink2</small><span class="t-label">Final thoughts</span></div>
+      <div class="row"><small>eyebrow · 10.5 · .15em · caps · 600 · ink3</small><span class="t-eyebrow">Case study · Manus AI</span></div>
+    </div>
+  </div>
+  <div class="two">
+    <div class="block">
+      <h3>The caps question</h3>
+      <p class="why">Your friend's first tell. Today a case study carries 23 to 26 caps labels at 10.5px with .15em tracking, one above nearly every heading. Set in a row they read as a template, because that is exactly what generated pages do: a small spaced label above a title, every time.</p>
+    </div>
+    <ol class="rules">
+      <li><b>The eyebrow lives in the page head only.</b> One per page, the same spec on every page, as your head rule already says. It names the page type and the subject.</li>
+      <li><b>Section labels become sentence case.</b> 13px, 500, ink2, no tracking. "Final thoughts", not "FINAL THOUGHTS". Where the label only restates the heading, drop it and let the heading stand.</li>
+      <li><b>Two weights per face.</b> Jakarta 500 and 600. Helvetica 400. The font link drops 700 (loaded, never used) and the five 300s go to 400.</li>
+      <li><b>Nine sizes, not fifteen.</b> 10.5, 12.5, 13, 15.5, 17, 22 and the two clamps. 10, 12, 14, 14.5, 15, 26 and 32 each snap to the nearest role.</li>
+      <li><b>Measure.</b> Body 52ch, lede 56ch, h1 22ch. Heads balance, body is pretty, changing digits are tabular.</li>
+    </ol>
+  </div>
+</div></section>
+
+<!-- SPACE -->
+<section id="space"><div class="wrap">
+  <div class="head"><h2>Space</h2><p class="one">An 8 grid, 1280 wide, 96 between sections on desktop and 64 on a phone, 48 within a section, 24 between things that belong together. The gap between groups is at least twice the gap within.</p></div>
+  <div class="two">
+    <table>
+      <tr><th>Token</th><th>Value</th><th>Used by</th></tr>
+      <tr><td>container</td><td class="num">1280</td><td>the wrap (today 1180 on the hero and 1180 on .wrap; both move to 1280)</td></tr>
+      <tr><td>gutter</td><td class="num">24 · 64</td><td>phone · desktop (today 30 and 20)</td></tr>
+      <tr><td>section</td><td class="num">96 · 64</td><td>desktop · phone (today 96 on section.cs, 136 above the page head)</td></tr>
+      <tr><td>within</td><td class="num">48</td><td>head to body, block to block</td></tr>
+      <tr><td>related</td><td class="num">24</td><td>caption to image, label to head, items in a row</td></tr>
+      <tr><td>sub-grid</td><td class="num">4</td><td>inside a control only: 4 pad in the nav pill, 8 pad in a plate</td></tr>
+    </table>
+    <ol class="rules">
+      <li><b>Spacing does the grouping.</b> Where two things are 24 apart they read as one; where they are 48 apart they read as two. That is what replaces the card around every block.</li>
+      <li><b>Page head: 136 above today, 96 after.</b> The first fold should show the lede.</li>
+      <li><b>Controls:</b> 40 tall on desktop, 44 on touch. The nav pill is 4 pad, 8 by 14 inside.</li>
+    </ol>
+  </div>
+</div></section>
+
+<!-- RADIUS -->
+<section id="radius"><div class="wrap">
+  <div class="head"><h2>Radius</h2><p class="one">Pills for every one-line control, 20 for the plate, 12 for what sits inside it, 8 for a tile, square for everything that is not an object. Five values, never animated.</p></div>
+
+  <div class="block">
+    <h3>The golden rule, and the one under it</h3>
+    <p class="why">Every source that is worth reading agrees on two things. One: nested corners are concentric, so the outer radius equals the inner radius plus the padding between them, and a corner gets smaller as you go in, never bigger. Two: radius scales with the element, so a one-line control is a pill and a large plate carries a larger radius than a small tile. Your own code already states the first in a comment: "outer = inner + padding. 14 + 18 = 32." The system makes it the law.</p>
+    <div class="pair">
+      <figure class="concentric"><div class="outer"><div class="inner"></div></div><figcaption>Right. Plate 20, padding 8, image 12. The curves share a centre.</figcaption></figure>
+      <figure class="concentric wrong"><div class="outer"><div class="inner"></div></div><figcaption>Wrong. Plate 20, padding 8, image 20. The inner corner bulges and the padding looks thicker at the corner than on the edge.</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3>Scale</h3>
+    <div class="radii">
+      <div class="rad"><div class="shape pill">Case studies</div><b>pill · 999</b>buttons, tags, the nav, the theme toggle, chips, any control one line tall</div>
+      <div class="rad"><div class="shape plate"></div><b>plate · 20</b>the media plate, the deck card, the track-record plate, the hover card</div>
+      <div class="rad"><div class="shape inset"><i></i></div><b>inset · 12</b>what sits inside a plate at 8 of padding: the stage, a video, a phone screen</div>
+      <div class="rad"><div class="shape tile"></div><b>tile · 8</b>a swatch, a small card in a row, an image inside a padded plate</div>
+      <div class="rad"><div class="shape none"></div><b>none · 0</b>text, stat cells, tables, rules, full-bleed media, the sheet's joined edge, the page</div>
+    </div>
+  </div>
+
+  <div class="two">
+    <div class="block">
+      <h3>Why not all rounded</h3>
+      <p class="why">A radius says "this is an object you could pick up". Give it to the things that are: a button, a photo on a plate, a card in a deck. Text is not an object, a number is not an object, a section is not an object. Round them and the page becomes a tray of pebbles, which is the second tell your friend named. Today the site has 17 distinct radii; the case studies site has 18 and 26 with !important. Five is enough.</p>
+    </div>
+    <ol class="rules">
+      <li><b>Square unless it is pressed or it holds a picture.</b> Headings, paragraphs, stat cells, tables, code, figure captions and section rules have no box and so no radius.</li>
+      <li><b>Concentric or nothing.</b> Inner = outer − padding, floored at 8. If the maths lands under 8, the inner element goes square and the outer carries the corner alone.</li>
+      <li><b>Proportion.</b> Pill for anything one line tall. 20 for plates wider than about 200. 8 for tiles under about 120. Nothing in between gets a value of its own.</li>
+      <li><b>Three radii per screen at most,</b> and the same role always gets the same value. The pill on the nav and the pill on a tag are the same pill.</li>
+      <li><b>All four corners the same.</b> Mixed corners belong to physical objects only: the phone shell on About (18 and 30) and the sheet whose bottom edge is joined to the screen.</li>
+      <li><b>Never animate a radius.</b> The cursor's border-radius transition and the nav drop's go. A shape that changes shape reads as goo.</li>
+      <li><b>Plain corners on the web.</b> No corner smoothing, no squircle libraries. Continuous corners are iOS's, and the Clover app gets them from the system, never hand-faked.</li>
+      <li><b>Outline rides the radius.</b> The 1px 10% edge is drawn on the same shape (inset shadow or border-radius: inherit), never on a wrapper with a different radius.</li>
+    </ol>
+  </div>
+</div></section>
+
+<!-- LINES -->
+<section id="lines"><div class="wrap">
+  <div class="head"><h2>Lines and outlines</h2><p class="one">One hairline weight at ink 16%, one image edge at 10%, a 2px ring for focus. Lines divide, they do not box.</p></div>
+  <div class="two">
+    <table>
+      <tr><th>Token</th><th>Value</th><th>Used by</th></tr>
+      <tr><td>hair</td><td class="mono">1px · ink / .16</td><td>section rules, table rows, the nav's bottom edge, the row divider</td></tr>
+      <tr><td>outline</td><td class="mono">1px · black or white / .10</td><td>every image, every plate, the deck card. Pure black or white, never tinted.</td></tr>
+      <tr><td>focus</td><td class="mono">2px · ink</td><td>keyboard focus, on the control's own radius</td></tr>
+    </table>
+    <ol class="rules">
+      <li><b>A rule above a block, not a box around it.</b> Where today a card groups a text block, tomorrow a hairline and 48 of space do.</li>
+      <li><b>Borders are for structure and state,</b> never for depth. Depth is the plate colour stepping off the paper.</li>
+      <li><b>The outline is the only edge a picture gets.</b> No shadow under a resting image.</li>
+    </ol>
+  </div>
+</div></section>
+
+<!-- ELEVATION -->
+<section id="elevation"><div class="wrap">
+  <div class="head"><h2>Elevation</h2><p class="one">Two shadows on the whole site: lift for the nav pill and the hover card, float for the sheet. Everything resting on the page is flat, with the plate colour and the outline doing the depth.</p></div>
+  <div class="block">
+    <div class="elev">
+      <div><div class="pillnav"><span class="on">Work</span><span>About</span><span>Art</span></div><div class="cap">lift · the nav pill, the only thing floating over content</div></div>
+      <div><div class="flat"></div><div class="cap">a plate at rest · plate colour plus the 10% outline, no shadow</div></div>
+    </div>
+  </div>
+  <div class="two">
+    <div class="block">
+      <h3>Where the shadows are today</h3>
+      <p class="why">Twenty distinct box-shadows. Nine of them are on the custom cursor in its states and themes, three are card hovers, one is the sheet, one the nav, the rest the phone mock. The shadows your friend saw are mostly the cursor and the hover lift following the pointer around. Remove those and the site reads as paper again.</p>
+    </div>
+    <ol class="rules">
+      <li><b>Shadow means floating.</b> Only something that sits above other content earns one: the nav pill, the sheet, a menu. Plates, cards in the list, stat cells and images rest flat.</li>
+      <li><b>Two recipes.</b> lift: <code>0 1px 2px .04, 0 6px 20px .07</code> (the pill shadow already in the code). float: <code>0 20px 70px .22</code>. In dark, lift deepens to <code>.3 / .35</code> because dark paper swallows a light shadow.</li>
+      <li><b>Hover never adds a shadow.</b> A hover answers with the outline darkening to 16%, or a 2px lift in transform, not a glow spreading under the card. The 18px 40px hover on the Marks cards goes.</li>
+      <li><b>The cursor casts no shadow.</b> See Motion for whether it exists at all.</li>
+      <li><b>Glass only in iOS.</b> No backdrop blur on web plates. The nav's blur over scrolling content is the one exception because the pill genuinely floats.</li>
+    </ol>
+  </div>
+</div></section>
+
+<!-- MOTION -->
+<section id="motion"><div class="wrap">
+  <div class="head"><h2>Motion</h2><p class="one">Press in 120, change state in 160, enter in 200, leave in 160, never longer than 300. One ease-out. Nothing moves unless the hand or the page asked for it, and content is there when you scroll to it.</p></div>
+  <div class="two">
+    <table>
+      <tr><th>Token</th><th>Value</th><th>Used by</th></tr>
+      <tr><td>press</td><td class="num">120ms</td><td>scale .96 on a pressed control</td></tr>
+      <tr><td>state</td><td class="num">160ms</td><td>hover colour, tab change, toggle, outline darkening</td></tr>
+      <tr><td>enter</td><td class="num">200ms</td><td>a hover card, the sheet, a menu. opacity plus 8px of travel</td></tr>
+      <tr><td>exit</td><td class="num">160ms</td><td>the same, out. opacity and a little blur, no travel</td></tr>
+      <tr><td>page</td><td class="num">300ms</td><td>theme change, the longest anything on a page may take</td></tr>
+      <tr><td>ease</td><td class="mono">cubic-bezier(.2,.7,.2,1)</td><td>everything above</td></tr>
+      <tr><td>ease-object</td><td class="mono">cubic-bezier(.33,1.18,.37,1)</td><td>the hero discs and the phone crate only. Things with mass may overshoot; UI may not.</td></tr>
+    </table>
+    <div class="block">
+      <h3>Where the time goes today</h3>
+      <p class="why">Thirty transition recipes across the three main pages, with durations from 160ms to 800ms and two spring curves. The pointer is followed by a custom cursor that resizes, recolours, grows a label and casts a shadow, every page hides the system pointer with cursor: none !important, the hero discs are draggable, and copy fades in on scroll. Each is fine alone. Together they are what "slow and overwhelming" means: the page keeps answering before the reader asked.</p>
+    </div>
+  </div>
+  <div class="block">
+    <h3>Rules</h3>
+    <ol class="rules">
+      <li><b>One ambient motion per page.</b> On the home page that is the discs. On a case study it is nothing, the media is the motion.</li>
+      <li><b>Content that is there.</b> No fade-in on scroll for text, headings, stats or figures. The reveal observers come out of the case studies and About. A video may start when it enters view; that is playback, not a reveal.</li>
+      <li><b>The system pointer comes back.</b> cursor: none goes. The labelled cursor survives in one place if at all: over media plates that carry data-cur, as a plain label with no shadow, no resize and no spring. Everywhere else the browser's arrow and hand.</li>
+      <li><b>Hover answers once, in 160.</b> Colour, outline or a 2px lift. Not shadow, not scale, not a label sliding in. Gated behind (hover: hover) so phones never see it.</li>
+      <li><b>Drag is for the discs.</b> No other object on the site is draggable. The deck pages by click or key.</li>
+      <li><b>Springs are for things with mass.</b> The overshoot curve stays on the discs and the phone crate. The nav drop, the cursor, the Marks cards and the About cells move on the plain ease.</li>
+      <li><b>Keyboard actions do not animate.</b> Tab, escape and enter land instantly.</li>
+      <li><b>Nothing animates from scale(0),</b> and nothing reveals text by growing width. Opacity and a small slide.</li>
+      <li><b>Reduced motion zeroes every duration.</b> The tokens file already does this; the pages inherit it.</li>
+      <li><b>Budget check before shipping a page:</b> count the things that move without a click. If the number is above one, cut until it is one.</li>
+    </ol>
+  </div>
+</div></section>
+
+<!-- PARTS -->
+<section id="parts"><div class="wrap">
+  <div class="head"><h2>Parts by job</h2><p class="one">What each thing on the site is made of, in the tokens above. Nothing new is introduced; this is the existing site named.</p></div>
+
+  <div class="block" id="controls">
+    <h3>Controls, rendered</h3>
+    <p class="why">The pill is a capsule, not a circle: a full-height radius on a shape wider than it is tall. A circle is only ever an icon-only control, and the site has two of those, the theme toggle and the deck's page dot.</p>
+    <div class="controls">
+      <div class="ctl-row"><span class="cap">Buttons, 40 tall, 0 18 inside. Primary ink, secondary hairline, ghost text only, gold only when it is the active or pressed thing.</span>
+        <button class="btn primary">See the case study</button>
+        <button class="btn secondary">Copy email</button>
+        <button class="btn ghost">Back to work <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
+        <button class="btn touch">Work</button>
+        <button class="btn icon" aria-label="Theme"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5v11A5.5 5.5 0 0 0 8 2.5z" fill="currentColor" stroke="none"/></svg></button>
+      </div>
+      <div class="ctl-row"><span class="cap">Small, 32 tall, for inside a plate or a row.</span>
+        <button class="btn primary small">Open</button>
+        <button class="btn secondary small">Prev</button>
+        <button class="btn secondary small">Next</button>
+      </div>
+      <div class="ctl-row"><span class="cap">Tags and chips, 28 tall, hairline only. The chosen one darkens its line, nothing fills.</span>
+        <span class="tag on">Product design</span><span class="tag">Design engineering</span><span class="tag">SwiftUI</span><span class="tag">Research</span><span class="tag">2025</span>
+      </div>
+      <div class="ctl-row"><span class="cap">The nav pill and a segmented control are the same object: a pill of pills, 4 pad, lift shadow.</span>
+        <div class="seg"><span class="on">Work</span><span>About</span><span>Art</span></div>
+        <div class="seg"><span class="on">Light</span><span>Dark</span></div>
+      </div>
+      <div class="ctl-row"><span class="cap">A field is a pill too, hairline that darkens on focus.</span>
+        <div class="field">Password</div>
+        <button class="btn primary">Enter</button>
+      </div>
+      <div class="ctl-row"><span class="cap">Not this. An 8 radius on a one-line control, and a circle where a word belongs. Rounded rectangles are for plates, circles are for icons.</span>
+        <div class="ctl-wrong"><button class="btn primary">See the case study</button><span class="circle"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Part</th><th>Shape</th><th>Surface</th><th>Type</th><th>Motion</th></tr>
+    <tr><td>Nav pill</td><td>pill, 4 pad</td><td>pill colour, lift</td><td>label 13 · 500, gold on the active tab</td><td>state 160; the drop on ease, not the spring</td></tr>
+    <tr><td>Button</td><td>pill, 40 tall, 0 16 pad</td><td>ink on paper, or hair border for secondary</td><td>label 13 · 500</td><td>press 120 to .96, state 160</td></tr>
+    <tr><td>Tag, chip</td><td>pill, 28 tall</td><td>hair border, no fill</td><td>small 13</td><td>state 160</td></tr>
+    <tr><td>Media plate</td><td>plate 20, 8 pad; media inside at 12</td><td>plate colour, outline; no shadow</td><td>caption 12.5 · ink3 under it, 36ch</td><td>none at rest; hover darkens the outline</td></tr>
+    <tr><td>Card in the deck</td><td>plate 20, equal pad on four sides, object-fit cover</td><td>plate colour, outline</td><td>small 13 name line</td><td>enter 200 on page; no drag</td></tr>
+    <tr><td>Stat cell</td><td>none</td><td>none; a hairline above</td><td>display number · tabular, small 13 line under</td><td>none. Numbers do not count up.</td></tr>
+    <tr><td>Section</td><td>none</td><td>paper; a hairline between sections</td><td>heading 22; label 13 · 500 sentence case when needed</td><td>none</td></tr>
+    <tr><td>Page head</td><td>none</td><td>paper</td><td>eyebrow 10.5 caps · title or display · lede 17. The one identical spec</td><td>enter 200 once, on load</td></tr>
+    <tr><td>Sheet</td><td>24 on the top corners, 0 on the joined edge</td><td>paper, float</td><td>inherits</td><td>enter 200 from the control that opened it, exit 160</td></tr>
+    <tr><td>Theme toggle</td><td>pill, 40</td><td>oxblood disc</td><td>none</td><td>state 160; icon swap by opacity and scale .25 to 1</td></tr>
+    <tr><td>Hero discs</td><td>circle</td><td>disc swatch</td><td>none</td><td>ease-object, draggable; the one ambient motion</td></tr>
+    <tr><td>Signature</td><td>none</td><td>sage stroke, gold flick</td><td>none</td><td>draws once on load</td></tr>
+    <tr><td>Image</td><td>inherits its plate, else none</td><td>outline 10%</td><td>caption 12.5</td><td>none</td></tr>
+  </table>
+</div></section>
+
+<!-- GENERATED -->
+<section id="generated"><div class="wrap">
+  <div class="head"><h2>Reads as generated</h2><p class="one">The habits that made two people say "vibe-codey", and what the system does instead.</p></div>
+  <div class="two">
+    <table class="vs">
+      <tr><th>Avoid</th><th>Instead</th></tr>
+      <tr><td>A small spaced caps label above every heading</td><td>One eyebrow in the page head. Sentence case labels below, or the heading alone</td></tr>
+      <tr><td>A radius on everything, cards around text and stats</td><td>Square text, square stats, a rule and 48 of space. Radius on what is pressed or holds a picture</td></tr>
+      <tr><td>A shadow to lift a card, a glow on hover</td><td>Plate colour and the 10% outline. Shadow only on what floats</td></tr>
+      <tr><td>A cursor that resizes, recolours and follows with a shadow</td><td>The system pointer. A plain label over media at most</td></tr>
+      <tr><td>Content that fades in on scroll</td><td>Content that is there</td></tr>
+      <tr><td>Springs on UI</td><td>One ease-out; springs only on the discs and the crate</td></tr>
+      <tr><td>Fifteen font sizes, four weights</td><td>Nine roles, two weights per face</td></tr>
+    </table>
+    <table class="vs">
+      <tr><th>Avoid</th><th>Instead</th></tr>
+      <tr><td>A row of equal stat cards</td><td>Three numbers on a hairline, or a sentence</td></tr>
+      <tr><td>A card in a card</td><td>A plate with its media inside, nothing else nests</td></tr>
+      <tr><td>Glass or blur on web surfaces</td><td>Paper. Glass is native iOS only</td></tr>
+      <tr><td>Tinted greys, a fourth text colour</td><td>Ink at .66 and .42</td></tr>
+      <tr><td>Two accents on one screen</td><td>Gold once</td></tr>
+      <tr><td>Width that grows to reveal text</td><td>Opacity and a small slide</td></tr>
+      <tr><td>Durations past 300, or a hover past 160</td><td>The five durations</td></tr>
+    </table>
+  </div>
+</div></section>
+
+<!-- DIFF -->
+<section id="diff"><div class="wrap">
+  <div class="head"><h2>What changes on the live site</h2><p class="one">Counted off public/index.html, about.html and work/*.html. These are the edits the system asks for; none of them ship until you say so, and the project list and case studies are compared page by page before any push.</p></div>
+  <div class="two">
+    <table class="ba">
+      <tr><th>Measure</th><th>Today</th><th>System</th></tr>
+      <tr><td>Distinct radii</td><td class="num">17</td><td class="num">5</td></tr>
+      <tr><td>Distinct box-shadows</td><td class="num">20</td><td class="num">2</td></tr>
+      <tr><td>Transition recipes</td><td class="num">30</td><td class="num">5 durations · 2 eases</td></tr>
+      <tr><td>Longest UI duration</td><td class="num">800ms</td><td class="num">300ms</td></tr>
+      <tr><td>Font sizes</td><td class="num">15</td><td class="num">9</td></tr>
+      <tr><td>Font weights</td><td class="num">4</td><td class="num">3</td></tr>
+      <tr><td>Caps labels per case study</td><td class="num">23 to 26</td><td class="num">1</td></tr>
+      <tr><td>Scroll-reveal observers</td><td class="num">1 to 2 per page</td><td class="num">0 on copy</td></tr>
+      <tr><td>Custom cursor</td><td>every page, cursor: none</td><td>off, or a label over media only</td></tr>
+      <tr><td>Draggable objects</td><td class="num">discs + deck</td><td class="num">discs</td></tr>
+    </table>
+    <ol class="rules">
+      <li><b>Type.</b> .label becomes sentence case 13 · 500 · ink2 except inside .cs-hero and .head, where the eyebrow spec stays. Drop 700 from the font link, 300s to 400.</li>
+      <li><b>Radius.</b> 6, 7, 9, 10, 14, 16, 18, 24 and 32 snap to the five. .card 32 becomes a plate at 20 with its image at 12.</li>
+      <li><b>Elevation.</b> Remove the hover shadow on .marks .card, all nine cursor shadows, and any shadow on a resting plate. Keep --pill-shadow and the sheet.</li>
+      <li><b>Motion.</b> Replace the 30 recipes with the five tokens; spring only on the discs and the crate; remove cursor: none and the reveal observers on copy. The theme crossfade stays at 300.</li>
+      <li><b>Case studies site.</b> The same tokens. 26px !important and the 18s collapse to 20, the pills stay pills.</li>
+      <li><b>Open decisions,</b> yours: the cursor (off entirely, or a label over media), and whether the discs stay draggable on the home page.</li>
+    </ol>
+  </div>
+</div></section>
+
+<footer><div class="wrap">Paper · jazlynnwashere.com · tokens in tokens.css beside this page · localhost only</div></footer>
+
+<script>
+(function(){
+  var b=document.getElementById('theme');
+  b.addEventListener('click',function(){
+    var d=document.documentElement,t=d.dataset.theme==='dark'?'light':'dark';
+    d.dataset.theme=t;try{localStorage.setItem('sys-theme',t)}catch(e){}
+  });
+})();
+</script>
+</body>
+</html>

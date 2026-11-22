@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Embossed sleeves</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#FAF9F7;--ink:#14171B;--ink2:rgba(20,23,27,.66);--ink3:rgba(20,23,27,.42);--hair:rgba(20,23,27,.16);--jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+html[data-theme="dark"]{--paper:#1C1A17;--ink:#FAF9F7;--ink2:rgba(250,249,247,.66);--ink3:rgba(250,249,247,.42);--hair:rgba(250,249,247,.16)}
+html,body{margin:0;background:var(--paper);color:var(--ink);font:300 15.5px/1.62 var(--hel);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:56px 30px 80px;display:grid;grid-template-columns:1fr 280px;gap:48px;align-items:start}
+.label{font:600 10.5px/1.5 var(--jak);letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+h1{font:500 clamp(28px,4vw,44px)/1.12 var(--jak);letter-spacing:-.012em;margin:12px 0 0;max-width:22ch}
+p.lede{font-size:17px;line-height:1.62;color:var(--ink2);margin:16px 0 0;max-width:52ch}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:64px 28px;margin-top:40px;padding-bottom:40px}
+.rec{position:relative;aspect-ratio:1;cursor:pointer}
+.rec .disc{position:absolute;top:3%;left:11%;width:94%;height:94%;border-radius:50%;background:radial-gradient(circle at 50% 50%,var(--lab) 0 22%,#15131a 22.5% 23.5%,#2a2730 24% 25%,#15131a 25.5%),repeating-radial-gradient(circle at 50% 50%,#1a181e 0 1.5px,#242128 1.5px 3px);box-shadow:0 2px 4px rgba(0,0,0,.2),0 18px 40px -16px rgba(0,0,0,.5);transition:transform .5s cubic-bezier(.22,1,.36,1)}
+.rec .disc::after{content:"";position:absolute;left:50%;top:50%;width:3.4%;height:3.4%;border-radius:50%;background:var(--paper);transform:translate(-50%,-50%)}
+.rec:hover .disc{transform:translateX(30%) rotate(30deg)}
+.rec canvas{position:absolute;inset:0;width:100%;height:100%;display:block;border-radius:6px}
+.rec .cap{position:absolute;left:0;right:0;top:100%;margin-top:14px;display:flex;justify-content:space-between;font:500 13px var(--jak);color:var(--ink2)}
+.rec .cap small{font:500 10.5px var(--jak);letter-spacing:.12em;color:var(--ink3)}
+.panel{position:sticky;top:56px;border:1px solid var(--hair);padding:20px;display:grid;gap:14px;min-width:0}
+.r label{display:block;min-width:0}
+input[type=range]{max-width:100%;box-sizing:border-box}
+.r{display:grid;grid-template-columns:1fr 54px;gap:10px;align-items:center;font:500 12.5px var(--jak)}.r span{color:var(--ink3);text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--ink);margin:6px 0 0}
+.seg{display:flex;gap:6px;flex-wrap:wrap}.seg button{font:500 12px var(--jak);color:var(--ink);background:transparent;border:1px solid var(--hair);border-radius:999px;padding:6px 11px;cursor:pointer}.seg button[aria-pressed=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+label.chk{display:flex;gap:10px;align-items:center;font:500 12.5px var(--jak)}
+button.copy{font:500 12.5px var(--jak);color:var(--ink);background:transparent;border:1px solid var(--hair);border-radius:999px;padding:8px 14px;cursor:pointer}
+pre{word-break:break-all;font:11.5px/1.5 ui-monospace,Menlo,monospace;color:var(--ink2);background:color-mix(in srgb,var(--ink) 4%,transparent);padding:12px;border-radius:8px;margin:0;white-space:pre-wrap}
+</style></head><body>
+<div class="wrap">
+  <div>
+    <div class="label">Embossed sleeves · the stamp's die, on a record</div>
+    <h1>The mark pressed into the paper, no ink.</h1>
+    <p class="lede">The same strike as the Columbia crown on the stamp card: the mark is a height field with soft shoulders, the sleeve carries a paper tooth and a faint swell, and one lamp rakes it from the upper left. Hover lifts and tilts the sleeve toward the hand and the disc slides out. Tune it on the right.</p>
+    <div class="row" id="row"></div>
+  </div>
+  <aside class="panel">
+    <div class="label">Tune</div>
+    <div class="r"><label>Relief <input id="relief" type="range" min="10" max="90" step="1" value="36"></label><span></span></div>
+    <div class="r"><label>Die depth <input id="depth" type="range" min=".5" max="5" step=".1" value="2.3"></label><span></span></div>
+    <div class="r"><label>Soften <input id="soft" type="range" min="0" max="12" step="1" value="2"></label><span></span></div>
+    <div class="r"><label>Mark size <input id="size" type="range" min=".3" max=".8" step=".01" value=".56"></label><span></span></div>
+    <div class="r"><label>Tooth <input id="tooth" type="range" min="0" max="2" step=".05" value=".45"></label><span></span></div>
+    <div class="r"><label>Lamp angle <input id="ang" type="range" min="0" max="360" step="1" value="229"></label><span></span></div>
+    <div class="r"><label>Lamp height <input id="hgt" type="range" min=".2" max="1.2" step=".02" value=".48"></label><span></span></div>
+    <div><div class="label" style="margin-bottom:8px">Stock</div><div class="seg" id="stock"><button data-s="white" aria-pressed="true">white</button><button data-s="cream">cream</button><button data-s="card">postcard</button><button data-s="kraft">kraft</button></div></div>
+    <label class="chk"><input id="deboss" type="checkbox"> pressed in, not raised</label>
+    <label class="chk"><input id="title" type="checkbox" checked> emboss the title too</label>
+    <label class="chk"><input id="dark" type="checkbox"> dark mode</label>
+    <button class="copy" id="copy">copy settings</button>
+    <pre id="out"></pre>
+  </aside>
+</div>
+<script>
+const P=[
+  {n:'01',t:'Fostr',img:'marks/fostr.png',lab:'#9ba69c'},{n:'02',t:'Halodoc',img:'marks/halodoc.png',lab:'#A99939'},{n:'03',t:'Conduit Commerce',img:'marks/conduit.png',lab:'#340414'},
+  {n:'04',t:'Second Self',img:'marks/second-self.svg',lab:'#827a85'},{n:'05',t:'Manus AI',img:'marks/manus.svg',lab:'#1C1A17'},{n:'06',t:'Olive',img:'marks/olive.png',lab:'#9ba69c'},{n:'07',t:'SomiaCX',img:'marks/somiacx.png',lab:'#A99939'},
+];
+const STOCK={white:[246,245,242],cream:[240,234,220],card:[228,220,202],kraft:[205,180,142]};
+const S={relief:36,depth:2.3,soft:2,size:.56,tooth:.45,ang:229,hgt:.48,stock:'white',deboss:false,title:true};
+const norm3=(x,y,z)=>{const m=Math.hypot(x,y,z)||1;return [x/m,y/m,z/m];};
+const hash=(x,y,s)=>{const n=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return n-Math.floor(n);};
+const swell=(x,y,W,H,f,ph)=>Math.sin((x/W)*Math.PI*2*f+ph)*Math.sin((y/H)*Math.PI*2*f+ph*1.7);
+function blur(src,W,H,r){ if(r<1) return src; const tmp=new Float32Array(W*H), out=new Float32Array(W*H);
+  for(let pass=0;pass<2;pass++){ const from=pass===0?src:out;
+    for(let y=0;y<H;y++){ let acc=0; for(let x=-r;x<=r;x++) acc+=from[y*W+Math.min(W-1,Math.max(0,x))];
+      for(let x=0;x<W;x++){ tmp[y*W+x]=acc/(2*r+1); acc+=from[y*W+Math.min(W-1,x+r+1)]-from[y*W+Math.max(0,x-r)]; } }
+    for(let x=0;x<W;x++){ let acc=0; for(let y=-r;y<=r;y++) acc+=tmp[Math.min(H-1,Math.max(0,y))*W+x];
+      for(let y=0;y<H;y++){ out[y*W+x]=acc/(2*r+1); acc+=tmp[Math.min(H-1,y+r+1)*W+x]-tmp[Math.max(0,y-r)*W+x]; } } }
+  return out; }
+/* THE STRIKE. The mark is drawn as a mask (its ink, whatever colour, becomes the raised face), softened so the
+   relief has shoulders, then added to a height field of paper tooth and swell, and shaded by the lamp. */
+function strike(W,H,img,p,dark){
+  const mc=document.createElement('canvas'); mc.width=W; mc.height=H; const m=mc.getContext('2d');
+  const cw=W*S.size, k=Math.min(cw/img.naturalWidth,(H*.5)/img.naturalHeight), iw=img.naturalWidth*k, ih=img.naturalHeight*k;
+  m.drawImage(img,(W-iw)/2,H*.42-ih/2,iw,ih);
+  if(S.title){ m.fillStyle='#fff'; m.font=`500 ${Math.round(W*.052)}px "Plus Jakarta Sans"`; m.textBaseline='alphabetic'; m.fillText(p.t,W*.075,H*.915); m.font=`500 ${Math.round(W*.04)}px "Plus Jakarta Sans"`; m.textAlign='right'; m.fillText(p.n,W*.925,H*.915); m.textAlign='left'; }
+  /* the mark's own pixels, whatever their colour, are the die: the mask is its alpha */
+  const md=m.getImageData(0,0,W,H).data; let mask=new Float32Array(W*H);
+  for(let i=0;i<W*H;i++) mask[i]=md[i*4+3]/255;
+  mask=blur(mask,W,H,Math.max(0,Math.round(S.soft*W/300)));
+  const h=new Float32Array(W*H), sign=S.deboss?-1:1;
+  for(let y=0;y<H;y++) for(let x=0;x<W;x++){ const i=y*W+x;
+    h[i]=((hash(x,y,6)-.5)*.07+(hash(x>>1,y>>1,12)-.5)*.12+(hash(x>>2,y>>2,18)-.5)*.16)*S.tooth+swell(x,y,W,H,3,.2)*.08+mask[i]*S.depth*sign; }
+  const a=S.ang*Math.PI/180, LAMP=norm3(Math.cos(a),Math.sin(a),S.hgt), HALF=norm3(LAMP[0],LAMP[1],LAMP[2]+1);
+  const card=STOCK[S.stock].map(v=>dark?v*.86:v);
+  const relief=S.relief, amb=.76, diff=.3, spec=.06, shine=6;
+  const out=new ImageData(W,H), d=out.data;
+  const at=(x,y)=>h[Math.min(H-1,Math.max(0,y))*W+Math.min(W-1,Math.max(0,x))];
+  for(let y=0;y<H;y++) for(let x=0;x<W;x++){ const i=y*W+x;
+    const dx=(at(x+1,y)-at(x-1,y))*relief, dy=(at(x,y+1)-at(x,y-1))*relief; const n=norm3(-dx,-dy,1);
+    const df=Math.max(0,n[0]*LAMP[0]+n[1]*LAMP[1]+n[2]*LAMP[2]); const sp=Math.pow(Math.max(0,n[0]*HALF[0]+n[1]*HALF[1]+n[2]*HALF[2]),shine)*spec;
+    const kk=amb+diff*df+mask[i]*.05*sign+sp; const o=i*4; d[o]=Math.min(255,card[0]*kk); d[o+1]=Math.min(255,card[1]*kk); d[o+2]=Math.min(255,card[2]*kk); d[o+3]=255; }
+  return out;
+}
+const recs=[];
+function make(p){ const el=document.createElement('div'); el.className='rec'; el.style.setProperty('--lab',p.lab); el.innerHTML=`<div class="disc"></div><canvas></canvas><div class="cap"><span>${p.t}</span><small>${p.n}</small></div>`; document.getElementById('row').appendChild(el);
+  const cv=el.querySelector('canvas'), c=cv.getContext('2d'); const img=new Image(); img.src=p.img; const R={el,cv,c,img,p,plate:null,tilt:{x:0,y:0,tx:0,ty:0,l:0,tl:0},raf:0};
+  img.onload=()=>R.dirty=true;
+  const wake=()=>{ if(!R.raf) R.raf=requestAnimationFrame(()=>draw(R)); };
+  el.addEventListener('pointermove',e=>{ const r=el.getBoundingClientRect(); R.tilt.tx=((e.clientX-r.left)/r.width-.5)*2; R.tilt.ty=((e.clientY-r.top)/r.height-.5)*2; R.tilt.tl=1; wake(); });
+  el.addEventListener('pointerleave',()=>{ R.tilt.tx=R.tilt.ty=0; R.tilt.tl=0; wake(); });
+  R.wake=wake; recs.push(R); return R; }
+function draw(R){ R.raf=0; const cv=R.cv, dpr=Math.min(2,devicePixelRatio||1), r=cv.getBoundingClientRect(); const W=Math.round(r.width*dpr), H=Math.round(r.height*dpr); if(!W||!R.img.naturalWidth) return;
+  const dark=document.documentElement.getAttribute('data-theme')==='dark';
+  if(R.dirty||!R.plate||R.plate.width!==Math.round(W*.86)){ const pw=Math.round(W*.86), ph=pw; const cvp=document.createElement('canvas'); cvp.width=pw; cvp.height=ph; cvp.getContext('2d').putImageData(strike(pw,ph,R.img,R.p,dark),0,0); R.plate=cvp; R.dirty=false; }
+  if(cv.width!==W){ cv.width=W; cv.height=H; }
+  const t=R.tilt; t.x+=(t.tx-t.x)*.1; t.y+=(t.ty-t.y)*.1; t.l+=(t.tl-t.l)*.1; const c=R.c, pw=R.plate.width;
+  c.setTransform(1,0,0,1,0,0); c.clearRect(0,0,W,H); c.save(); c.translate(W/2,H/2-t.l*5*dpr); c.rotate(-0.012+t.x*.012); const g=1+t.l*.02; c.scale(g,g); c.translate(-pw/2,-pw/2);
+  c.beginPath(); c.roundRect(0,0,pw,pw,6*dpr); c.shadowColor=dark?`rgba(0,0,0,${.45+t.l*.2})`:`rgba(20,23,27,${.16+t.l*.1})`; c.shadowBlur=(18+t.l*26)*dpr; c.shadowOffsetY=(8+t.l*16)*dpr; c.shadowOffsetX=(2+t.x*4)*dpr; c.fillStyle='#000'; c.fill(); c.shadowColor='transparent';
+  c.save(); c.clip(); c.drawImage(R.plate,0,0); c.restore(); c.restore();
+  if(Math.abs(t.tx-t.x)+Math.abs(t.ty-t.y)+Math.abs(t.tl-t.l)>.002) R.raf=requestAnimationFrame(()=>draw(R)); }
+P.forEach(make);
+const restrike=()=>{ recs.forEach(R=>{ R.dirty=true; R.wake(); }); show(); };
+document.fonts.ready.then(restrike); setTimeout(restrike,600);
+new ResizeObserver(()=>recs.forEach(R=>R.wake())).observe(document.getElementById('row'));
+const out=document.getElementById('out'); const show=()=>out.textContent=JSON.stringify(S);
+for(const k of ['relief','depth','soft','size','tooth','ang','hgt']){ const el=document.getElementById(k), span=el.closest('.r').querySelector('span'); const upd=()=>{ S[k]=+el.value; span.textContent=el.value; }; el.addEventListener('input',()=>{ upd(); restrike(); }); upd(); }
+document.getElementById('stock').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.stock=b.dataset.s; for(const x of document.querySelectorAll('#stock button')) x.setAttribute('aria-pressed',x===b); restrike(); });
+for(const k of ['deboss','title']){ document.getElementById(k).addEventListener('change',e=>{ S[k]=e.target.checked; restrike(); }); }
+document.getElementById('dark').addEventListener('change',e=>{ document.documentElement.setAttribute('data-theme',e.target.checked?'dark':'light'); restrike(); });
+document.getElementById('copy').addEventListener('click',()=>navigator.clipboard.writeText(out.textContent));
+show();
+</script>
+</body></html>

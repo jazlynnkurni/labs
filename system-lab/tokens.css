@@ -1,0 +1,78 @@
+/* jazlynnwashere.com · tokens
+   Derived from the live site on 2026-11-05. Values that already exist in public/*.html keep their numbers;
+   the only change is that there are fewer of them. Drop this file in and point the pages at it. */
+
+:root{
+  /* faces */
+  --jak:"Plus Jakarta Sans",sans-serif;          /* heads, labels, controls. 500 and 600 only */
+  --hel:"Helvetica Neue",Helvetica,Arial,sans-serif; /* body. 400 only */
+
+  /* paper and ink (light) */
+  --paper:#FAF9F7;
+  --ink:#14171B;
+  --ink2:rgba(20,23,27,.66);
+  --ink3:rgba(20,23,27,.42);
+  --hair:rgba(20,23,27,.16);
+  --outline:oklch(0 0 0 / .1);
+  --plate:#FAF9F7;
+  --pill:#fff;
+
+  /* the two colours */
+  --gold:#A99939;     /* touch: the active tab, the pressed state, the signature flick */
+  --oxblood:#340414;  /* the dark toggle, the Clover cover, nothing else */
+
+  /* the disc swatch. only the hero discs may use these */
+  --disc-1:#dfddc8; --disc-2:#c7c7c7; --disc-3:#827a85; --disc-4:#9ba69c;
+  --disc-5:#c4c1c8; --disc-6:#c2beb3; --disc-7:#dfdac8;
+  --sage:#9ba69c;     /* the signature */
+
+  /* type roles: size / line / weight / tracking */
+  --t-display:clamp(28px,4vw,44px);  --lh-display:1.12; --ls-display:-.02em;
+  --t-title:clamp(22px,2.6vw,30px);  --lh-title:1.2;    --ls-title:-.015em;
+  --t-heading:22px;                  --lh-heading:1.3;  --ls-heading:-.012em;
+  --t-lede:17px;                     --lh-lede:1.62;
+  --t-body:15.5px;                   --lh-body:1.55;
+  --t-small:13px;                    --lh-small:1.5;
+  --t-caption:12.5px;                --lh-caption:1.5;
+  --t-label:13px;                    --lh-label:1.35;   /* sentence case, 500 */
+  --t-eyebrow:10.5px;                --ls-eyebrow:.15em; /* caps. page head only */
+
+  /* space: the golden standard */
+  --s-1:8px; --s-2:16px; --s-3:24px; --s-4:32px; --s-5:40px; --s-6:48px; --s-8:64px; --s-10:80px; --s-12:96px;
+  --container:1280px; --gutter:24px; --section:64px; --within:48px; --related:24px;
+
+  /* radius: five values, and never animated */
+  --r-pill:999px;  /* every one-line control */
+  --r-plate:20px;  /* the media plate, the card, the deck */
+  --r-inset:12px;  /* what sits inside a plate at 8 of padding (20 - 8) */
+  --r-tile:8px;    /* a small tile, a swatch, an image inside a padded plate */
+  --r-none:0;      /* text, stats, tables, rules, full-bleed media, the page */
+
+  /* lines */
+  --line:1px; --focus:2px;
+
+  /* elevation: two shadows on the whole site */
+  --lift:0 1px 2px rgba(20,23,27,.04),0 6px 20px rgba(20,23,27,.07);   /* the nav pill, the hover card */
+  --float:0 20px 70px rgba(0,0,0,.22);                                 /* the sheet */
+
+  /* motion */
+  --d-press:120ms; --d-state:160ms; --d-enter:200ms; --d-exit:160ms; --d-page:300ms;
+  --ease:cubic-bezier(.2,.7,.2,1);          /* the one easing for UI */
+  --ease-object:cubic-bezier(.33,1.18,.37,1); /* discs and the phone crate only: things with mass */
+}
+
+[data-theme="dark"]{
+  --paper:#1C1A17;
+  --ink:#FAF9F7;
+  --ink2:rgba(250,249,247,.66);
+  --ink3:rgba(250,249,247,.42);
+  --hair:rgba(250,249,247,.16);
+  --outline:oklch(1 0 0 / .1);
+  --plate:#262320;
+  --pill:#262320;
+  --lift:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+}
+
+@media (prefers-reduced-motion:reduce){
+  :root{--d-press:0ms;--d-state:0ms;--d-enter:0ms;--d-exit:0ms;--d-page:0ms}
+}

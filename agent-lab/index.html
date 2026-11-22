@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Five ways to show Clover slide 16, "one agent with different jobs", in the deck's current language: sage glass for
+   the glasses, mauve glass for the phone, mixed where they share; plum beads and pills; few words; on the 180 line. */
+:root{--ink:#14171B;--plum:#340414;--gold:#A99939;--hair:rgba(20,23,27,.12);--mute:#6f6b64;
+  --sage:#9ba69c;--sage-lt:rgba(214,222,215,.9);--mauve:#827a85;--mauve-lt:rgba(222,216,224,.9);
+  --jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1340px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:#6f6b64;margin:0 0 26px;max-width:90ch}
+.opt{margin-bottom:40px}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0 0 10px}
+.lab small{font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:#6f6b64;margin-left:8px}
+.lab button{margin-left:10px;font:600 11.5px var(--jak);padding:6px 11px;border-radius:999px;border:1.5px solid var(--plum);background:#fff;color:var(--plum);cursor:pointer;text-transform:none;letter-spacing:0}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 18px 40px -24px rgba(0,0,0,.3);overflow:hidden;position:relative}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:52px 72px 0;position:absolute;left:0;top:0}
+.hd{font:500 42px/1.12 var(--jak);letter-spacing:-.02em;margin:0;max-width:30ch;height:96px}
+.hd em{font-style:normal;color:var(--plum)}
+.body{position:absolute;left:72px;right:72px;top:180px;height:440px}
+.ft{position:absolute;left:72px;right:72px;bottom:40px;border-top:1px solid var(--hair);padding-top:12px;display:flex;justify-content:space-between;font:400 13px var(--hel)}
+.ft span:first-child{color:var(--plum)}
+.tag{font:600 13px/1.4 var(--jak);letter-spacing:.06em;text-transform:uppercase;color:#8a8780}
+.tag.p{color:var(--plum)}
+.h{font:600 22px/1.2 var(--jak);margin:0;color:var(--ink)}
+.sub{font:300 15px/1.45 var(--hel);margin:0;color:var(--mute)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{font:600 12.5px/1 var(--jak);padding:8px 11px;border-radius:999px;background:rgba(255,255,255,.85);box-shadow:0 0 0 1px rgba(52,4,20,.14);color:var(--ink);white-space:nowrap}
+.chips.f span{background:var(--plum);color:#fff;box-shadow:none}
+/* glass */
+.gs{background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.98),var(--sage-lt) 60%,rgba(155,166,156,.55))}
+.gm{background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.98),var(--mauve-lt) 60%,rgba(130,122,133,.45))}
+.gx{background:linear-gradient(160deg,rgba(255,255,255,.98),var(--sage-lt) 52%,var(--mauve-lt))}
+.glass{box-shadow:inset 2px 2px 2px rgba(255,255,255,.95),inset 0 -20px 34px -24px rgba(52,4,20,.2),0 0 0 1px rgba(20,23,27,.06),0 22px 40px -24px rgba(52,4,20,.32)}
+.gi{position:relative;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;isolation:isolate;color:var(--plum);flex:none;
+  background:rgba(255,255,255,.4);box-shadow:inset 1.5px 1.5px 1px #fff,0 0 0 1px rgba(255,255,255,.6),0 8px 18px -8px rgba(52,4,20,.35)}
+.gi svg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gi.lg{width:72px;height:72px}.gi.lg svg{width:34px;height:34px}
+.media{border-radius:16px;overflow:hidden;background:#111;box-shadow:0 14px 28px -18px rgba(20,23,27,.5)}
+.media video,.media img{display:block;width:100%;height:100%;object-fit:cover}
+.media.lt{background:#F3F1EC}.media.lt img{object-fit:contain}
+.ph{width:64px;border-radius:14px;background:none;box-shadow:none}.ph video{object-fit:contain}
+.bead{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none;background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.85),rgba(255,255,255,0) 70%),radial-gradient(circle at 50% 65%,#6a2a3f,#340414 70%);box-shadow:0 3px 6px -2px rgba(52,4,20,.5)}
+ul.sh{list-style:none;margin:0;padding:0;display:grid;gap:8px}ul.sh li{display:flex;align-items:center;gap:10px;font:500 15px/1.3 var(--jak)}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes inL{from{opacity:0;transform:translateX(-80px)}to{opacity:1;transform:none}}
+@keyframes inR{from{opacity:0;transform:translateX(80px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
+.play .an{animation:up .55s ease both}.play .aL{animation:inL .8s cubic-bezier(.3,.7,.2,1) both}.play .aR{animation:inR .8s cubic-bezier(.3,.7,.2,1) both}.play .pp{animation:pop .6s cubic-bezier(.33,1.18,.37,1) both}
+
+/* 01 One agent, two devices: an agent orb in the middle, a sage card left and a mauve card right, joined by beads */
+.o1{display:grid;grid-template-columns:1fr 210px 1fr;align-items:center;height:100%}
+.o1 .dv{border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:10px;height:400px}
+.o1 .dv .media{height:130px}.o1 .mm{display:flex;gap:8px;height:130px}.o1 .mm .ph{height:130px}.o1 .mm .media.lt{flex:1}
+.o1 .orb{justify-self:center;width:190px;height:190px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;position:relative}
+.o1 .orb b{font:600 18px/1.2 var(--jak);color:var(--plum)}
+.o1 .orb ul{list-style:none;margin:0;padding:0;font:500 11.5px/1.5 var(--jak);color:var(--ink)}
+.o1 .link{position:absolute;top:50%;width:26px;height:2px;background:rgba(52,4,20,.35)}.o1 .link.l{right:100%}.o1 .link.r{left:100%}
+
+/* 02 The venn of jobs: sage and mauve circles, each device's jobs inside, the shared agent where they overlap */
+.o2{position:relative;height:100%}
+.o2 .c .chips{max-width:168px}.o2 .c.l .chips{max-width:170px}.o2 .c{position:absolute;top:10px;width:400px;height:400px;border-radius:50%;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.o2 .c.l{left:calc(50% - 400px + 80px);padding:0 196px 0 40px;align-items:flex-start}
+.o2 .c.r{left:calc(50% - 80px);padding:0 24px 0 204px;align-items:flex-start;mix-blend-mode:multiply}
+.o2 .mid{position:absolute;left:calc(50% - 62px);top:140px;width:124px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;z-index:2}
+.o2 .mid b{font:600 15px/1.25 var(--jak);color:var(--plum)}
+.o2 .mid ul{list-style:none;margin:0;padding:0;font:500 11.5px/1.5 var(--jak)}
+
+/* 03 Two lanes and a shared spine: the glasses lane above, the phone lane below, one agent strip down the middle */
+.o3{display:grid;grid-template-rows:1fr 54px 1fr;gap:10px;height:100%}
+.o3 .ln{border-radius:22px;padding:16px 20px;display:grid;grid-template-columns:200px 1fr;gap:20px;align-items:center}
+.o3 .ln .media{height:140px}.o3 .mm{display:flex;gap:8px;height:140px}.o3 .mm .ph{height:140px}.o3 .mm .media.lt{flex:1}
+.o3 .sp{border-radius:999px;display:flex;align-items:center;justify-content:center;gap:16px;padding:0 20px}
+.o3 .sp b{font:600 15px var(--jak);color:var(--plum);margin-right:6px}
+.o3 .sp span{display:inline-flex;align-items:center;gap:7px;font:500 13px var(--jak)}
+
+/* 04 A split screen: sage half and mauve half, the media big, a plum agent bead sitting on the seam */
+.o4{display:grid;grid-template-columns:1fr 1fr;height:100%;border-radius:26px;overflow:hidden;position:relative}
+.o4 .hf{padding:22px 26px;justify-content:flex-end;padding-top:118px;display:flex;flex-direction:column;gap:12px}
+.o4 .hf .media{height:170px}.o4 .mm{display:flex;gap:8px;height:170px}.o4 .mm .ph{height:170px;width:82px}.o4 .mm .media.lt{flex:1}
+.o4 .seam{position:absolute;left:calc(50% - 150px);top:16px;width:300px;height:88px;border-radius:999px!important;flex-direction:row!important;gap:12px!important;padding:0 20px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;
+  box-shadow:inset 2px 2px 2px #fff,0 0 0 6px rgba(255,255,255,.6),0 18px 36px -16px rgba(52,4,20,.4)}
+.o4 .seam b{font:600 15px/1.2 var(--jak);color:var(--plum);white-space:nowrap}.o4 .seam small{font:500 11px/1.4 var(--jak);color:var(--mute);text-align:left}
+
+/* 05 One brain, two hands: the agent card on top, two device cards hanging from it on green lines */
+.o5{display:flex;flex-direction:column;align-items:center;height:100%}
+.o5 .top{border-radius:22px;padding:14px 24px;display:flex;align-items:center;gap:18px}
+.o5 .top b{font:600 18px var(--jak);color:var(--plum)}
+.o5 .top .chips span{background:rgba(255,255,255,.7)}
+.o5 svg.br{display:block;width:760px;height:46px}
+.o5 .row{display:grid;grid-template-columns:1fr 1fr;gap:28px;width:100%}
+.o5 .dv{border-radius:22px;padding:16px 18px;display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:start}
+.o5 .dv .media{height:210px}.o5 .mm{display:flex;gap:6px;height:210px}.o5 .mm .ph{height:210px;width:80px}.o5 .dv{grid-template-columns:210px 1fr!important}.o5 .mm .media.lt{flex:1}
+</style></head><body>
+<div class="wrap">
+<h1>Agent lab</h1>
+<p class="lede">Five ways to show slide 16, "So I gave the glasses and the iPhone app one agent with different jobs", in the deck's current language: sage glass for the glasses, mauve glass for the phone, mixed where they share. Same words and media as the slide. Press Play to see each arrive. Tell me the number.</p>
+<div id="opts"></div>
+</div>
+<script>
+const I={g:'<svg viewBox="0 0 48 48"><rect x="4" y="17" width="17" height="13" rx="5.5"/><rect x="27" y="17" width="17" height="13" rx="5.5"/><path d="M21 22q3-3 6 0M4 21 1 19M44 21l3-2"/></svg>',
+ p:'<svg viewBox="0 0 48 48"><rect x="14" y="4" width="20" height="40" rx="5"/><path d="M21 9h6"/></svg>',
+ a:'<svg viewBox="0 0 48 48"><path d="M24 6l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/><path d="M36 30l1.6 4.4L42 36l-4.4 1.6L36 42l-1.6-4.4L30 36l4.4-1.6z"/></svg>'};
+const gi=(k,c='')=>`<span class="gi ${c}">${I[k]}</span>`;
+const vG='<div class="media"><video src="media/hudbg.mp4" poster="media/hudbg.jpg" muted loop autoplay playsinline></video></div>';
+const vP='<div class="mm"><div class="media ph"><video src="media/appfirst.mp4" poster="media/appfirst.jpg" muted loop autoplay playsinline></video></div><div class="media lt"><img src="media/app-lofi.png" alt=""></div></div>';
+const JG=['Spoken requests','Glanceable answers','Context while busy'], JP=['Onboarding','Modes','Summaries','Search','Error recovery','Device settings'];
+const SH=['One identity','One memory','Same preferences','Same visual principles'];
+const ch=(a,f)=>`<div class="chips${f?' f':''}">${a.map(x=>`<span>${x}</span>`).join('')}</div>`;
+const head='<p class="hd">So I gave the glasses and the iPhone app <em>one agent with different jobs.</em></p>';
+const frame=b=>`<div class="frame"><div class="sl">${head}<div class="body">${b}</div><div class="ft"><span>16 &nbsp; Discovery</span><span>Eden Case Study</span></div></div></div>`;
+const d=(s)=>`style="animation-delay:${s}s"`;
+const O=[
+ ['01','One agent, two devices','A mixed-glass agent orb in the middle holds what is shared; the sage glasses card and the mauve phone card hang off it.',
+  `<div class="o1">
+   <div class="dv gs glass aL" ${d(.2)}>${vG}<div style="display:flex;align-items:center;gap:10px">${gi('g')}<p class="h">The glasses</p></div><span class="tag">Its jobs</span>${ch(JG)}</div>
+   <div class="orb gx glass pp" ${d(.7)}><i class="link l"></i><i class="link r"></i>${gi('a')}<b>One agent</b><ul>${SH.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+   <div class="dv gm glass aR" ${d(.2)}>${vP}<div style="display:flex;align-items:center;gap:10px">${gi('p')}<p class="h">The iPhone app</p></div><span class="tag">Its jobs</span>${ch(JP)}</div></div>`],
+ ['02','The venn of jobs','The same sage and mauve circles as the venn: each device’s jobs inside its circle, the shared agent in the overlap.',
+  `<div class="o2"><div class="c l gs glass aL" ${d(.2)}>${gi('g')}<p class="h">The glasses</p>${ch(JG)}</div>
+   <div class="c r gm glass aR" ${d(.2)}>${gi('p')}<p class="h">The iPhone app</p>${ch(JP)}</div>
+   <div class="mid pp" ${d(1)}>${gi('a')}<b>One agent</b><ul>${SH.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>`],
+ ['03','Two lanes, one spine','A sage glasses lane and a mauve phone lane, with the shared agent as one mixed-glass strip running between them.',
+  `<div class="o3"><div class="ln gs glass aL" ${d(.2)}>${vG}<div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;gap:10px">${gi('g')}<p class="h">The glasses</p></div>${ch(JG)}</div></div>
+   <div class="sp gx glass pp" ${d(.6)}><b>One agent</b>${SH.map(x=>`<span><i class="bead"></i>${x}</span>`).join('')}</div>
+   <div class="ln gm glass aR" ${d(.35)}>${vP}<div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;gap:10px">${gi('p')}<p class="h">The iPhone app</p></div>${ch(JP)}</div></div></div>`],
+ ['04','A split screen','The slide split down the middle, sage and mauve; the media big; one white agent disc sitting on the seam.',
+  `<div class="o4 glass"><div class="hf gs aL" ${d(.2)}>${vG}<div style="display:flex;align-items:center;gap:10px">${gi('g')}<p class="h">The glasses</p></div>${ch(JG)}</div>
+   <div class="hf gm aR" ${d(.2)}>${vP}<div style="display:flex;align-items:center;gap:10px;justify-content:flex-end">${gi('p')}<p class="h">The iPhone app</p></div><div style="align-self:flex-end">${ch(JP)}</div></div>
+   <div class="seam pp" ${d(.8)}>${gi('a')}<b>One agent</b><small>${SH.join(' · ')}</small></div></div>`],
+ ['05','One brain, two hands','The agent and what it shares on top; two branches drop to the sage glasses card and the mauve phone card.',
+  `<div class="o5"><div class="top gx glass pp" ${d(.2)}>${gi('a')}<b>One agent</b>${ch(SH)}</div>
+   <svg class="br an" ${d(.55)} viewBox="0 0 760 46"><path d="M380 0 C380 26, 190 18, 190 46 M380 0 C380 26, 570 18, 570 46" fill="none" stroke="#6F7C70" stroke-width="2" stroke-linecap="round"/></svg>
+   <div class="row"><div class="dv gs glass aL" ${d(.7)}>${vG}<div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;gap:10px">${gi('g')}<p class="h">The glasses</p></div>${ch(JG,1)}</div></div>
+   <div class="dv gm glass aR" ${d(.7)}>${vP}<div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;gap:10px">${gi('p')}<p class="h">The iPhone app</p></div>${ch(JP,1)}</div></div></div></div>`]];
+document.getElementById('opts').innerHTML=O.map(([n,t,ds,h],k)=>`<section class="opt" id="o${k}"><p class="lab">${n} ${t}<small>${ds}</small><button data-k="${k}">Play</button></p>${frame(h)}</section>`).join('');
+const fit=()=>document.querySelectorAll('.frame').forEach(f=>{f.firstElementChild.style.transform=`scale(${f.clientWidth/1280})`});
+addEventListener('resize',fit);fit();
+document.querySelectorAll('.lab button').forEach(b=>b.onclick=()=>{const s=document.getElementById('o'+b.dataset.k);s.classList.remove('play');void s.offsetWidth;s.classList.add('play');});
+document.querySelectorAll('.opt').forEach(s=>s.classList.add('play'));
+</script>
+</body></html>

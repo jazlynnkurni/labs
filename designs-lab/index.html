@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Designs lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Five directions for the Designs run, slides 24-29 (the five design impacts), each shown across all six slides so the
+   run reads as one system. Deck language: plum beads, sage/mauve glass, the green line, open layouts, media whole. */
+:root{--ink:#14171B;--plum:#340414;--gold:#A99939;--hair:rgba(20,23,27,.12);--mute:#6f6b64;--green:#6F7C70;
+  --sage-lt:rgba(214,222,215,.9);--mauve-lt:rgba(222,216,224,.9);
+  --jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1500px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:#6f6b64;margin:0 0 26px;max-width:100ch}
+.opt{margin-bottom:46px}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0 0 12px}
+.lab small{font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:#6f6b64;margin-left:8px}
+.strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 14px 30px -20px rgba(0,0,0,.3);overflow:hidden;position:relative}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:52px 72px 0;position:absolute;left:0;top:0}
+.hd{font:500 40px/1.12 var(--jak);letter-spacing:-.02em;margin:0;max-width:30ch;display:flex;gap:16px;align-items:flex-start}
+.hd em{font-style:normal;color:var(--plum)}
+.body{position:absolute;left:72px;right:72px;top:180px;height:440px}
+.ft{position:absolute;left:72px;right:72px;bottom:40px;border-top:1px solid var(--hair);padding-top:12px;display:flex;justify-content:space-between;font:400 13px var(--hel)}
+.ft span:first-child{color:var(--plum)}
+.tag{font:600 13px/1.4 var(--jak);letter-spacing:.06em;text-transform:uppercase;color:#8a8780}.tag.p{color:var(--plum)}
+.h{font:600 19px/1.3 var(--jak);margin:0}.sub{font:300 16px/1.45 var(--hel);margin:0;color:var(--ink)}
+.bead{display:inline-grid;place-items:center;flex:none;width:44px;height:44px;border-radius:50%;color:#fff;font:600 19px var(--jak);
+  background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.6),rgba(255,255,255,0) 70%),radial-gradient(circle at 50% 65%,#6a2a3f,#340414 70%);box-shadow:0 6px 12px -5px rgba(52,4,20,.55)}
+.media{border-radius:14px;overflow:hidden;box-shadow:0 14px 28px -18px rgba(20,23,27,.5);background:#000}
+.media img,.media video{display:block;width:100%;height:100%;object-fit:contain}
+.media.w{background:#fff}
+.ph{border-radius:26px;box-shadow:0 18px 34px -18px rgba(20,23,27,.5)}
+.glass{box-shadow:inset 2px 2px 2px rgba(255,255,255,.95),inset 0 -20px 34px -24px rgba(52,4,20,.2),0 0 0 1px rgba(20,23,27,.06),0 22px 40px -24px rgba(52,4,20,.32)}
+.gs{background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.98),var(--sage-lt) 60%,rgba(155,166,156,.55))}
+.gm{background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.98),var(--mauve-lt) 60%,rgba(130,122,133,.45))}
+.pill{display:inline-flex;font:600 14px/1 var(--jak);padding:10px 14px;border-radius:999px;background:#fff;box-shadow:0 0 0 1px rgba(52,4,20,.14)}
+.pill.f{background:var(--plum);color:#fff;box-shadow:none}.pill.x{box-shadow:0 0 0 2px var(--gold);color:#6f6b64}
+
+/* 01 rail: a numbered plum rail down the left of every slide, the active impact lit, the content to its right */
+.d1 .rail{position:absolute;left:0;top:0;bottom:0;width:60px;display:flex;flex-direction:column;align-items:center;justify-content:space-between}
+.d1 .rail::before{content:"";position:absolute;left:29px;top:22px;bottom:22px;width:2px;background:var(--green);z-index:0}
+.d1 .rail i{position:relative;z-index:1;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px rgba(52,4,20,.25);font:600 11px/22px var(--jak);font-style:normal;text-align:center;color:#8a8780}
+.d1 .rail i.on{width:40px;height:40px;line-height:40px;font-size:17px;color:#fff;background:radial-gradient(circle at 50% 65%,#6a2a3f,#340414 70%);box-shadow:0 6px 12px -5px rgba(52,4,20,.55)}
+.d1 .ct{position:absolute;left:96px;right:0;top:0;bottom:0;display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start}
+/* 02 problem to fix */
+.d2 .pf{display:grid;grid-template-columns:1fr 70px 1fr;align-items:start;height:100%}
+.d2 .ar{height:220px;display:flex;align-items:center}.d2 .ar i{display:block;width:100%;height:2px;background:var(--green);position:relative}
+.d2 .ar i::after{content:"";position:absolute;right:0;top:-5px;width:10px;height:10px;border-top:2px solid var(--green);border-right:2px solid var(--green);transform:rotate(45deg)}
+.d2 .col{display:flex;flex-direction:column;gap:12px}
+/* 03 device stage */
+.d3 .stage{position:relative;height:100%;display:flex;justify-content:center}
+.d3 .note{position:absolute;width:260px;display:flex;gap:10px}
+.d3 .note::before{content:"";flex:none;width:12px;height:12px;margin-top:5px;border-radius:50%;background:var(--plum);box-shadow:0 0 0 4px rgba(52,4,20,.12)}
+/* 04 progress line along the top */
+.d4 .prog{position:absolute;left:0;right:0;top:-30px;display:flex;align-items:center;gap:0}
+.d4 .prog i{flex:1;height:2px;background:rgba(111,124,112,.3)}.d4 .prog i.on{background:var(--green)}
+.d4 .prog b{width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px rgba(52,4,20,.25)}.d4 .prog b.on{background:var(--plum);box-shadow:none}
+.d4 .prog b.cur{width:22px;height:22px;box-shadow:0 0 0 5px rgba(52,4,20,.14)}
+.d4 .ct{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;padding-top:20px}
+/* 05 spotlight */
+.d5 .sp{display:flex;flex-direction:column;align-items:center;gap:18px;height:100%}
+.d5 .sp .sub{text-align:center;max-width:60ch;font-size:18px}
+</style></head><body>
+<div class="wrap">
+<h1>Designs lab, slides 24&ndash;29</h1>
+<p class="lede">Five directions for the Designs run: the five numbered impacts (failure states, the HUD that broke, search on the phone, the Island ruler and moments, the card into the Island). Each direction is shown across all six slides, in reading order left to right, top to bottom, so you can judge the run as one system. Real media, shown whole. Tell me the number.</p>
+<div id="opts"></div>
+</div>
+<script>
+const M=f=>`media/${f}`;
+const img=(f,c='',st='')=>`<div class="media ${c}" style="${st}"><img src="${M(f)}" alt=""></div>`;
+const vid=(f,c='',st='')=>`<div class="media ${c}" style="${st}"><video src="${M(f)}.mp4" poster="${M(f)}.jpg" muted loop autoplay playsinline></video></div>`;
+/* the six slides' content, cut to their essentials */
+const S=[
+ {n:1,t:'If a step failed, the HUD said',e:'what Clover understood and finished.',vis:img('levels-white.png','w','height:300px;max-width:100%;aspect-ratio:1728/986'),pts:['Level 1: ask only for the missing detail','Level 2: offer two clear options','Level 3: keep what worked, retry what failed']},
+ {n:2,t:'Under navigation‑first, the HUD broke',e:'when one answer needed two jobs.',vis:img('j-clash.png','','height:330px;aspect-ratio:864/762'),pts:['More light, less battery','Two jobs on one screen','Too much to read']},
+ {n:3,t:'I made the phone’s AI a search tool',e:'so it would not compete with the glasses.',vis:`<div style="display:flex;gap:20px">${vid('appv2f','ph','height:300px;aspect-ratio:392/824')}${vid('gardenf','ph','height:300px;aspect-ratio:392/816')}</div>`,pts:['Rejected: the same chat on both','Chosen: search on the phone','Friction on purpose']},
+ {n:4,t:'To carry tasks to the phone,',e:'I measured the Dynamic Island.',vis:`<div style="display:flex;gap:20px;align-items:flex-end">${img('ruler-pills.png','w','height:240px;aspect-ratio:560/460')}${vid('islandfull','ph','height:300px;aspect-ratio:480/992')}</div>`,pts:['A ruler at true point size','About eleven characters a side','A summary with no app open']},
+ {n:4,t:'So the Island showed the same moments',e:'the HUD showed on the glasses.',vis:`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:center;width:600px">${img('if-disp2.png','','aspect-ratio:442/294')}${img('isl-doing.png','w','aspect-ratio:420/106')}${img('if-disp3.png','','aspect-ratio:443/294')}${img('isl-ready.png','w','aspect-ratio:420/118')}</div>`,pts:['Show progress','Confirm before sending','62 points a side']},
+ {n:5,t:'Then I prototyped the card',e:'folding into the Dynamic Island.',vis:img('card-to-island.png','w','height:330px;aspect-ratio:1'),pts:['Drag up, pinch or tap','The card tilts back and shrinks','Anchored at the top']}];
+const head=s=>`<p class="hd"><span class="bead">${s.n}</span><span>${s.t} <em>${s.e}</em></span></p>`;
+const frame=(s,k,body,h=head(s))=>`<div class="frame"><div class="sl">${h}<div class="body">${body}</div><div class="ft"><span>${24+k} &nbsp; Designs</span><span>Eden Case Study</span></div></div></div>`;
+const D=[
+ ['01','A numbered rail','A green rail down the left with all five impacts; the current one is a large plum bead. The audience always knows where they are.',
+  (s,k)=>`<div class="d1"><div class="rail">${[1,2,3,4,5].map(x=>`<i class="${x===s.n?'on':''}">${x}</i>`).join('')}</div><div class="ct"><div>${s.vis}</div><div style="display:flex;flex-direction:column;gap:14px;padding-top:6px">${s.pts.map((p,j)=>`<div style="display:flex;gap:12px;align-items:baseline;border-top:1px solid rgba(20,23,27,.1);padding-top:12px"><span class="tag p">0${j+1}</span><p class="h">${p}</p></div>`).join('')}</div></div></div>`],
+ ['02','Problem, then fix','Each impact split into what went wrong (gold) and what I did (plum), joined by the green arrow.',
+  (s,k)=>`<div class="d2"><div class="pf"><div class="col"><span class="tag">The problem</span>${s.vis}</div><div class="ar"><i></i></div><div class="col"><span class="tag p">What I did</span>${s.pts.map((p,j)=>`<span class="pill ${j==0?'x':j==2?'f':''}" style="align-self:flex-start">${p}</span>`).join('')}</div></div></div>`],
+ ['03','The device on stage','The device or screen large and centred, with the points pinned around it as plum-dot notes.',
+  (s,k)=>`<div class="d3"><div class="stage">${s.vis}<div class="note" style="left:0;top:30px"><p class="h">${s.pts[0]}</p></div><div class="note" style="right:0;top:120px"><p class="h">${s.pts[1]}</p></div><div class="note" style="left:0;top:260px"><p class="h">${s.pts[2]}</p></div></div></div>`],
+ ['04','A progress line','The green line runs across the top of every slide with five beads; it fills to the current impact, so the run reads as one journey.',
+  (s,k)=>`<div class="d4"><div class="prog">${[1,2,3,4,5].map((x,j)=>`${j?`<i class="${x<=s.n?'on':''}"></i>`:''}<b class="${x<=s.n?'on':''} ${x===s.n?'cur':''}"></b>`).join('')}</div><div class="ct"><div>${s.vis}</div><div style="display:flex;flex-direction:column;gap:12px">${s.pts.map(p=>`<div class="gs glass" style="border-radius:16px;padding:12px 16px"><p class="h">${p}</p></div>`).join('')}</div></div></div>`],
+ ['05','Spotlight','One visual, centred and large, with a single line beneath. The points move to your talk track.',
+  (s,k)=>`<div class="d5"><div class="sp">${s.vis}<p class="sub">${s.pts.join(' &middot; ')}</p></div></div>`]];
+document.getElementById('opts').innerHTML=D.map(([n,t,d,f])=>`<section class="opt"><p class="lab">${n} ${t}<small>${d}</small></p><div class="strip">${S.map((s,k)=>frame(s,k,f(s,k))).join('')}</div></section>`).join('');
+const fit=()=>document.querySelectorAll('.frame').forEach(f=>{f.firstElementChild.style.transform=`scale(${f.clientWidth/1280})`});
+addEventListener('resize',fit);fit();
+</script>
+</body></html>

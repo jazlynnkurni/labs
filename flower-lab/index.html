@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>flower-lab · callas, frosted</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; -webkit-font-smoothing: antialiased;
+    background: radial-gradient(120% 90% at 50% 40%, #f3f2f0 0%, #e9e8e6 70%, #dcdbd9 100%); }
+  canvas { display: block; width: 100vw; height: 100dvh; cursor: grab; }
+  canvas:active { cursor: grabbing; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<script id="vs" type="x-shader/x-vertex">#version 300 es
+precision highp float;
+in vec3 aP; in vec3 aN; in vec2 aUV; in float aM;
+uniform mat4 uProj, uView, uModel;
+out vec3 vP; out vec3 vN; out vec2 vUV; out float vM;
+void main() {
+  vec4 wp = uModel * vec4(aP, 1.0);
+  vP = wp.xyz; vN = mat3(uModel) * aN; vUV = aUV; vM = aM;
+  gl_Position = uProj * uView * wp;
+}
+</script>
+
+<script id="fs" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+in vec3 vP; in vec3 vN; in vec2 vUV; in float vM;
+uniform vec3 uCam; uniform float uT;
+out vec4 o;
+
+float hash(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+float vnoise(vec2 p) {
+  vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y);
+}
+float fbm(vec2 p) { float v = 0.0, a = 0.5; for (int i = 0; i < 5; i++) { v += a * vnoise(p); p = mat2(1.6, 1.2, -1.2, 1.6) * p; a *= 0.5; } return v; }
+
+/* the spathe: yellow-green in the throat, pink through the bell, deep magenta on the edges and the tip,
+   with fine veins running the length of it and a little speckle */
+vec3 spathe(vec2 uv, bool inside, out float rough) {
+  float s = uv.x, w = uv.y;
+  vec3 throat = vec3(0.74, 0.76, 0.34);
+  vec3 pink   = vec3(0.78, 0.20, 0.46);
+  vec3 edge   = vec3(0.50, 0.04, 0.26);
+  float base = smoothstep(0.06, 0.40, s + (inside ? -0.04 : 0.08));
+  vec3 c = mix(throat, pink, base);
+  float e = smoothstep(0.55, 1.0, abs(w)) * 0.75 + smoothstep(0.78, 1.0, s) * 0.7;
+  c = mix(c, edge, clamp(e, 0.0, 1.0));
+  /* veins: long striations that converge toward the base */
+  float vein = fbm(vec2(w * 38.0 * (0.6 + 0.4 * s), s * 5.0));
+  float ridge = smoothstep(0.42, 0.58, vein);
+  c *= 1.0 - 0.11 * ridge;
+  c *= 1.0 + 0.05 * (fbm(uv * vec2(9.0, 70.0)) - 0.5);          /* soft blotching */
+  c *= 1.0 + 0.035 * (hash(floor(uv * vec2(900.0, 1400.0))) - 0.5);   /* speckle */
+  if (inside) c *= vec3(0.86, 0.80, 0.84);                        /* the inside is a shade cooler and darker */
+  rough = mix(0.28, 0.40, ridge);                                 /* the veins break the wax */
+  return c;
+}
+vec3 stem(vec2 uv) {
+  vec3 c = mix(vec3(0.46, 0.60, 0.26), vec3(0.62, 0.72, 0.36), smoothstep(0.0, 1.0, uv.x));
+  c *= 1.0 - 0.12 * smoothstep(0.45, 0.6, fbm(vec2(uv.y * 30.0, uv.x * 12.0)));   /* lengthwise ribs */
+  return c;
+}
+vec3 spadix(vec2 uv) {
+  vec3 c = mix(vec3(0.92, 0.68, 0.10), vec3(0.98, 0.84, 0.30), uv.x);
+  c *= 1.0 - 0.25 * smoothstep(0.5, 0.75, vnoise(uv * vec2(40.0, 120.0)));    /* the knobbly florets */
+  return c;
+}
+
+float D_ggx(float NH, float a) { float a2 = a * a; float d = NH * NH * (a2 - 1.0) + 1.0; return a2 / (3.14159 * d * d); }
+float G_sch(float NV, float NL, float a) { float k = (a + 1.0) * (a + 1.0) / 8.0; return (NV / (NV * (1.0 - k) + k)) * (NL / (NL * (1.0 - k) + k)); }
+
+vec3 light(vec3 N, vec3 V, vec3 L, vec3 lc, vec3 alb, float rough, float f0, float thin) {
+  float NL = dot(N, L);
+  float wrapd = clamp((NL + 0.3) / 1.3, 0.0, 1.0);                 /* soft, wrapped diffuse: a fleshy surface */
+  vec3 H = normalize(L + V);
+  float NH = max(dot(N, H), 0.0), NV = max(dot(N, V), 0.001), VH = max(dot(V, H), 0.0);
+  float F = f0 + (1.0 - f0) * pow(1.0 - VH, 5.0);
+  float spec = D_ggx(NH, rough) * G_sch(NV, max(NL, 0.001), rough) * F / max(4.0 * NV * max(NL, 0.001), 0.001) * max(NL, 0.0);
+  /* light coming through the thin petal from behind: tinted by the petal, strongest when the light is behind it */
+  float tr = pow(clamp(dot(-N, L), 0.0, 1.0), 1.4) * thin;
+  return lc * (alb * wrapd + vec3(spec) * 0.9 + alb * alb * tr * 1.6);
+}
+
+void main() {
+  vec3 N = normalize(vN);
+  bool front = gl_FrontFacing;
+  if (!front) N = -N;
+  vec3 V = normalize(uCam - vP);
+  int m = int(vM + 0.5);
+  vec3 alb; float rough, f0 = 0.04, thin = 0.0, ao = 1.0;
+  if (m == 0) { alb = spathe(vUV, !front, rough); thin = 0.55; ao = front ? 1.0 : mix(0.30, 1.0, smoothstep(0.05, 0.6, vUV.x)); }
+  else if (m == 1) { alb = stem(vUV); rough = 0.5; }
+  else { alb = spadix(vUV); rough = 0.55; ao = mix(0.35, 1.0, smoothstep(0.0, 0.5, vUV.x)); }
+
+  vec3 col = vec3(0.0);
+  col += light(N, V, normalize(vec3(-0.55, 0.85, 0.55)), vec3(1.0, 0.97, 0.92) * 1.25, alb, rough, f0, thin);   /* key: high, left, front */
+  col += light(N, V, normalize(vec3(0.85, 0.15, 0.35)), vec3(0.62, 0.66, 0.76) * 0.40, alb, rough, f0, thin);   /* fill: cool, right */
+  col += light(N, V, normalize(vec3(0.25, 0.55, -0.85)), vec3(1.0, 0.92, 0.95) * 0.85, alb, rough, f0, thin * 1.3); /* back: lights the edges through */
+  /* sky and ground ambient, a studio with a pale floor */
+  vec3 amb = mix(vec3(0.42, 0.40, 0.40), vec3(0.66, 0.67, 0.70), N.y * 0.5 + 0.5) * 0.42;
+  col += amb * alb;
+  col *= ao;
+  /* a touch of fresnel rim on the wax */
+  float rim = pow(1.0 - max(dot(N, V), 0.0), 4.0);
+  col += rim * 0.10 * vec3(1.0, 0.95, 0.95);
+  /* tone map */
+  col = (col * (2.51 * col + 0.03)) / (col * (2.43 * col + 0.59) + 0.14);
+  col = pow(col, vec3(1.0 / 2.2));
+  o = vec4(col, 1.0);
+}
+</script>
+
+<script id="pvs" type="x-shader/x-vertex">#version 300 es
+void main() { vec2 p = vec2((gl_VertexID & 1) * 4 - 1, (gl_VertexID & 2) * 2 - 1); gl_Position = vec4(p, 0.0, 1.0); }
+</script>
+<script id="pfs" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+uniform sampler2D uScene; uniform vec2 uRes; uniform float uSplit; uniform float uT;
+out vec4 o;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+/* the right half is a pane of frosted glass: the scene behind it smears sideways,
+   and breaks into a spray of coarse dots that thins out toward the edge. the scene
+   texture is premultiplied, so averaging it is right and alpha says "flower here". */
+void main() {
+  vec2 uv = gl_FragCoord.xy / uRes;
+  vec4 sharp = texture(uScene, uv);
+  if (uv.x < uSplit) { o = sharp; return; }
+  float d = (uv.x - uSplit) / (1.0 - uSplit);                 /* 0 at the pane edge, 1 at the right edge */
+  /* the smear: a wide, mostly horizontal blur that opens up to the right */
+  vec4 blur = vec4(0.0);
+  float sx = 0.010 + 0.05 * d, sy = 0.004 + 0.02 * d;
+  for (int i = 0; i < 4; i++) for (int j = 0; j < 4; j++) {
+    vec2 jit = vec2(hash(gl_FragCoord.xy + float(i * 4 + j)), hash(gl_FragCoord.yx + float(i * 4 + j) + 3.3)) - 0.5;
+    vec2 off = vec2((float(i) - 1.5) / 1.5 + jit.x * 0.5, (float(j) - 1.5) / 1.5 + jit.y * 0.5) * vec2(sx, sy);
+    blur += texture(uScene, uv + off - vec2(sx * 0.6, 0.0));
+  }
+  blur /= 16.0;
+  /* the spray: one sample per coarse cell, pulled from somewhere to the left, so the
+     flower's colour is thrown rightward in dots; fewer dots the further out you go */
+  vec2 cell = floor(gl_FragCoord.xy / 2.5);                 /* a constant cell: one that grows with x stalls into streaks */
+  float h1 = hash(cell), h2 = hash(cell + 11.3), h3 = hash(cell + 27.7);
+  vec2 src = vec2(uv.x - h1 * h1 * (0.02 + 0.16 * d), uv.y + (h2 - 0.5) * (0.02 + 0.08 * d));
+  vec4 spray = texture(uScene, src);
+  float cov = step(h3, pow(1.0 - d, 1.3) * 0.95);
+  spray *= cov;
+  vec4 f = blur * 0.70 + spray * 0.80;
+  f = min(f, vec4(1.0));
+  f.rgb = mix(f.rgb, vec3(f.a), 0.10);                       /* the glass whitens it a touch */
+  f.rgb += (hash(gl_FragCoord.xy * 0.7 + uT) - 0.5) * 0.04 * f.a;   /* grain */
+  o = f;
+}
+</script>
+
+<script>
+/* flower-lab: three pink calla lilies, close up, from IMG_4600,
+   and the right half of the screen a pane of frosted glass.
+   the spathe is one leaf rolled into a funnel: a parametric sheet
+   (s along the leaf, w across it) wrapped more than a turn at the
+   base, flaring at the lip, drawn up to a tip that leans back.
+   a spadix stands in the throat, a stem below. all shaded in the
+   fragment shader: waxy sheen, light through the petal, veins.     */
+(() => {
+const canvas = document.getElementById('c');
+const gl = canvas.getContext('webgl2', { antialias: true, alpha: true, premultipliedAlpha: true });
+if (!gl) { document.body.innerHTML = '<p style="font: 14px system-ui; padding: 24px">This page needs WebGL2.</p>'; return; }
+
+/* ---- geometry ------------------------------------------------- */
+const sm = (a, b, x) => { x = Math.max(0, Math.min(1, (x - a) / (b - a))); return x * x * (3 - 2 * x); };
+const bump = (a, b, x) => sm(a, (a + b) / 2, x) * (1 - sm((a + b) / 2, b, x));
+
+/* the spathe sheet. s: 0 at the stem, 1 at the tip. w: -1..1 across the leaf. */
+function spathe(s, w) {
+  // how far round the sheet reaches, in half-turns: past a full turn low down (rolled, overlapped),
+  // parting above mid-height into the open lip, narrowing to nothing at the tip
+  const span = (1.15 - 0.55 * sm(0.36, 0.76, s)) * Math.pow(1 - sm(0.80, 1.0, s), 0.6);
+  const th = Math.PI + w * span * Math.PI;                                           // the tip sits at the back, the edges meet at the front
+  let r = 0.085 + 0.50 * sm(0.08, 0.72, s);                                          // the bell
+  const edge = sm(0.45, 1.0, Math.abs(w)) * bump(0.30, 0.95, s);                     // the lip: the leaf's edges, flared out and curled under
+  r += 0.42 * edge;
+  let y = 1.55 * s - 0.22 * edge * edge;
+  const tip = sm(0.70, 1.0, s);                                                      // the tip rises and leans back
+  r += 0.26 * tip * tip;
+  y += 0.18 * tip * (1 - Math.abs(w));
+  y += 0.10 * (1 - Math.abs(w)) * sm(0.45, 0.9, s);                                 // the back wall stands taller than the lip
+  r *= 1 + 0.07 * Math.cos(th);                                                      // slightly oval, deeper front to back
+  return [r * Math.cos(th), y, r * Math.sin(th)];
+}
+function stem(s, w) {       // s down the stem (0 at the flower), w around
+  const th = w * Math.PI, y = 0.12 - 3.4 * s;
+  const r = 0.072 + 0.02 * s;
+  const bend = 0.06 * Math.sin(s * 2.4) * s;
+  return [r * Math.cos(th) + bend, y, r * Math.sin(th)];
+}
+function spadix(s, w) {     // s up the spadix, w around
+  const th = w * Math.PI, y = 0.10 + 0.72 * s;
+  const r = (0.052 - 0.028 * s) * (1 + 0.06 * Math.sin(th * 7 + s * 60));
+  return [r * Math.cos(th), y, r * Math.sin(th)];
+}
+
+const P = [], Nn = [], UV = [], M = [], I = [];
+function sheet(fn, mat, NS, NW, wmin, wmax) {
+  const base = P.length / 3, es = 1e-3, ew = 1e-3;
+  for (let i = 0; i <= NS; i++) for (let j = 0; j <= NW; j++) {
+    const s = i / NS, w = wmin + (wmax - wmin) * j / NW;
+    const p = fn(s, w);
+    const ps = fn(Math.min(1, s + es), w), pw = fn(s, Math.min(wmax, w + ew));
+    const ds = [ps[0] - p[0], ps[1] - p[1], ps[2] - p[2]], dw = [pw[0] - p[0], pw[1] - p[1], pw[2] - p[2]];
+    let n = [ds[1] * dw[2] - ds[2] * dw[1], ds[2] * dw[0] - ds[0] * dw[2], ds[0] * dw[1] - ds[1] * dw[0]];
+    const l = Math.hypot(...n) || 1; n = n.map(v => v / l);
+    P.push(...p); Nn.push(...n); UV.push(s, w); M.push(mat);
+  }
+  for (let i = 0; i < NS; i++) for (let j = 0; j < NW; j++) {
+    const a = base + i * (NW + 1) + j, b = a + NW + 1;
+    I.push(a, b, a + 1, a + 1, b, b + 1);
+  }
+}
+sheet(spathe, 0, 220, 160, -1, 1);
+sheet(stem, 1, 60, 32, -1, 1);
+sheet(spadix, 2, 60, 32, -1, 1);
+
+/* ---- GL ------------------------------------------------------- */
+function shader(type, src) { const sh = gl.createShader(type); gl.shaderSource(sh, src.trim()); gl.compileShader(sh); if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(sh)); return sh; }
+const prog = gl.createProgram();
+gl.attachShader(prog, shader(gl.VERTEX_SHADER, document.getElementById('vs').textContent));
+gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, document.getElementById('fs').textContent));
+gl.linkProgram(prog); if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) console.error(gl.getProgramInfoLog(prog));
+gl.useProgram(prog);
+function attr(name, data, size) {
+  const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, name); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, size, gl.FLOAT, false, 0, 0);
+}
+const U = n => gl.getUniformLocation(prog, n);
+const post = gl.createProgram();
+gl.attachShader(post, shader(gl.VERTEX_SHADER, document.getElementById('pvs').textContent));
+gl.attachShader(post, shader(gl.FRAGMENT_SHADER, document.getElementById('pfs').textContent));
+gl.linkProgram(post); if (!gl.getProgramParameter(post, gl.LINK_STATUS)) console.error(gl.getProgramInfoLog(post));
+const PU = n => gl.getUniformLocation(post, n);
+const vao = gl.createVertexArray(); gl.bindVertexArray(vao);   // the scene's attributes live here; the post pass draws with none bound
+attr('aP', P, 3); attr('aN', Nn, 3); attr('aUV', UV, 2); attr('aM', M, 1);
+const ib = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(I), gl.STATIC_DRAW);
+gl.bindVertexArray(null);
+/* the scene renders into a multisampled framebuffer, resolves to a texture, and the post pass draws that */
+let msFB = null, texFB = null, sceneTex = null;
+function makeTargets() {
+  for (const fb of [msFB, texFB]) if (fb) gl.deleteFramebuffer(fb);
+  if (sceneTex) gl.deleteTexture(sceneTex);
+  const w = canvas.width, h = canvas.height, samples = Math.min(4, gl.getParameter(gl.MAX_SAMPLES));
+  msFB = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, msFB);
+  const cb = gl.createRenderbuffer(); gl.bindRenderbuffer(gl.RENDERBUFFER, cb); gl.renderbufferStorageMultisample(gl.RENDERBUFFER, samples, gl.RGBA8, w, h);
+  gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, cb);
+  const db = gl.createRenderbuffer(); gl.bindRenderbuffer(gl.RENDERBUFFER, db); gl.renderbufferStorageMultisample(gl.RENDERBUFFER, samples, gl.DEPTH_COMPONENT24, w, h);
+  gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, db);
+  sceneTex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, sceneTex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  texFB = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, texFB);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, sceneTex, 0);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+}
+
+/* ---- matrices ------------------------------------------------- */
+const persp = (fov, asp, n, f) => { const t = 1 / Math.tan(fov / 2); return [t / asp, 0, 0, 0, 0, t, 0, 0, 0, 0, (f + n) / (n - f), -1, 0, 0, 2 * f * n / (n - f), 0]; };
+function lookAt(e, c, up) {
+  let z = [e[0] - c[0], e[1] - c[1], e[2] - c[2]]; let l = Math.hypot(...z); z = z.map(v => v / l);
+  let x = [up[1] * z[2] - up[2] * z[1], up[2] * z[0] - up[0] * z[2], up[0] * z[1] - up[1] * z[0]]; l = Math.hypot(...x); x = x.map(v => v / l);
+  const y = [z[1] * x[2] - z[2] * x[1], z[2] * x[0] - z[0] * x[2], z[0] * x[1] - z[1] * x[0]];
+  return [x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2], z[2], 0, -(x[0] * e[0] + x[1] * e[1] + x[2] * e[2]), -(y[0] * e[0] + y[1] * e[1] + y[2] * e[2]), -(z[0] * e[0] + z[1] * e[1] + z[2] * e[2]), 1];
+}
+const rotY = a => [Math.cos(a), 0, -Math.sin(a), 0, 0, 1, 0, 0, Math.sin(a), 0, Math.cos(a), 0, 0, 0, 0, 1];
+const rotZ = a => [Math.cos(a), Math.sin(a), 0, 0, -Math.sin(a), Math.cos(a), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+const trs = (t, k) => [k, 0, 0, 0, 0, k, 0, 0, 0, 0, k, 0, t[0], t[1], t[2], 1];
+const rotX = a => [1, 0, 0, 0, 0, Math.cos(a), Math.sin(a), 0, 0, -Math.sin(a), Math.cos(a), 0, 0, 0, 0, 1];
+function mul(a, b) { const r = new Array(16).fill(0); for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) for (let k = 0; k < 4; k++) r[j * 4 + i] += a[k * 4 + i] * b[j * 4 + k]; return r; }
+
+/* ---- view: drag to turn it, otherwise a slow turn ------------- */
+let yaw = 0.0, pitch = 0.0, drag = null, spin = true;
+/* three flowers, placed like the poster: the main one left of centre looking into its throat,
+   a lower one leaning out to the left, and a tall one behind on the right, in the frost */
+const FLOWERS = [
+  { at: [-0.25, 0.0, 0.0], yaw: -1.15, tilt: 0.0, k: 1.0 },
+  { at: [-1.25, 0.45, 0.35], yaw: -1.7, tilt: 0.32, k: 0.82 },
+  { at: [0.95, 0.95, -0.7], yaw: -0.55, tilt: -0.12, k: 0.92 },
+];
+canvas.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY, yaw, pitch }; spin = false; canvas.setPointerCapture(e.pointerId); });
+canvas.addEventListener('pointermove', e => { if (!drag) return; yaw = drag.yaw + (e.clientX - drag.x) * 0.008; pitch = Math.max(-0.6, Math.min(0.6, drag.pitch + (e.clientY - drag.y) * 0.006)); });
+canvas.addEventListener('pointerup', () => { drag = null; });
+
+let W = 0, H = 0;
+function size() {
+  const dpr = Math.min(2, devicePixelRatio || 1);
+  W = innerWidth; H = innerHeight;
+  canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  makeTargets();
+}
+const t0 = performance.now();
+function frame(now) {
+  if (innerWidth !== W || innerHeight !== H) size();
+  if (!canvas.width) { requestAnimationFrame(frame); return; }
+  const t = (now - t0) / 1000;
+  if (spin) yaw += 0.0008;
+  /* the scene, into the multisampled target */
+  gl.bindFramebuffer(gl.FRAMEBUFFER, msFB);
+  gl.useProgram(prog); gl.bindVertexArray(vao); gl.enable(gl.DEPTH_TEST);
+  gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  const cam = [0.0, 2.0, 6.4];                                   // a little above, looking down into the bells
+  const view = lookAt(cam, [0, 0.7, 0], [0, 1, 0]);
+  const proj = persp(0.50, W / H, 0.1, 30);
+  const group = mul(rotX(pitch), rotY(yaw));                     // the drag turns the whole bunch
+  gl.uniformMatrix4fv(U('uProj'), false, proj); gl.uniformMatrix4fv(U('uView'), false, view);
+  gl.uniform3fv(U('uCam'), cam); gl.uniform1f(U('uT'), t);
+  for (const f of FLOWERS) {
+    const model = mul(group, mul(trs(f.at, 1), mul(rotZ(f.tilt), mul(rotY(f.yaw), trs([0, 0, 0], f.k)))));
+    gl.uniformMatrix4fv(U('uModel'), false, model);
+    gl.drawElements(gl.TRIANGLES, I.length, gl.UNSIGNED_INT, 0);
+  }
+  /* resolve, then the frost pass to the screen */
+  gl.bindFramebuffer(gl.READ_FRAMEBUFFER, msFB); gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, texFB);
+  gl.blitFramebuffer(0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height, gl.COLOR_BUFFER_BIT, gl.NEAREST);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.useProgram(post); gl.bindVertexArray(null); gl.disable(gl.DEPTH_TEST);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, sceneTex);
+  gl.uniform1i(PU('uScene'), 0); gl.uniform2f(PU('uRes'), canvas.width, canvas.height); gl.uniform1f(PU('uSplit'), 0.5); gl.uniform1f(PU('uT'), t);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

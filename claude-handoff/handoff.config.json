@@ -1,0 +1,31 @@
+{
+  "_about": "What counts as company material. Edit freely; the handoff script reads this every run. Paths may start with ~.",
+  "company": {
+    "claude_org_ids": ["f930ec94-fb99-4253-9f2b-48b7c6c9e18f"],
+    "claude_org_names": ["Autumn AI"],
+    "github_orgs": ["AutumnHQ", "spark-glasses"],
+    "path_prefixes": [
+      "~/spark",
+      "~/autumn-",
+      "~/Desktop/autumn-launch-videos"
+    ],
+    "skills": ["autumngotmotion", "creation-rules", "react-book-sync"],
+    "skills_mentioning_company": ["enforce-design-system", "ux-writing-humanize"],
+    "taste_files": ["memory-spark.md", "spark-chat.md", "autumn-portfolio.md"]
+  },
+  "personal": {
+    "projects": [
+      { "name": "Agent Arena", "path": "~/Desktop/labs/agent-arena", "start": "pnpm dev  (http://localhost:6700)" },
+      { "name": "Labs", "path": "~/Desktop/labs" },
+      { "name": "Portfolio (jazlynnwashere.com)", "path": "~/Desktop/portfolio", "start": "dev on :3001" },
+      { "name": "Portfolio experiments", "path": "~/Desktop/portfolio-experiments", "start": "dev on :3000" },
+      { "name": "Revamp and phone build", "path": "~/Desktop/revamp-proto", "start": "python3 serve.py 5330" },
+      { "name": "Fostr", "path": "~/Desktop/Fostr_Jaz" },
+      { "name": "SocialBricks", "path": "~/Desktop/SocialBricks-abraham" },
+      { "name": "Humor class", "path": "~/humor-hello-world" },
+      { "name": "Humor admin", "path": "~/humor-admin" }
+    ]
+  },
+  "required_tools": ["git", "node", "pnpm", "python3", "claude"],
+  "optional_tools": ["codex", "agent", "ffmpeg", "docker", "gh"]
+}

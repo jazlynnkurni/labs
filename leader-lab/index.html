@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>leader lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#1C1A17;--ink:#FAF9F7;--ink3:rgba(250,249,247,.42);--outline:oklch(1 0 0 / .1)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Plus Jakarta Sans",sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:1280px;margin:0 auto;padding:96px 64px}
+h1{font-weight:300;font-size:44px;margin:0 0 16px;text-wrap:balance}
+p.lede{color:var(--ink3);font-size:15px;line-height:1.5;margin:0 0 48px;max-width:60ch;text-wrap:pretty}
+ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+a{display:flex;gap:24px;align-items:baseline;padding:16px 0;border-top:1px solid var(--outline);color:inherit;text-decoration:none}
+a span{font:500 13px "Plus Jakarta Sans";color:var(--ink3);font-variant-numeric:tabular-nums;width:24px}
+a b{font-weight:300;font-size:28px}
+a i{font-style:normal;color:var(--ink3);font-size:14px;margin-left:auto;max-width:44ch;text-align:right}
+@media(hover:hover){a:hover b{opacity:.7}}
+</style>
+<main>
+  <h1>Five leaders, no dots</h1>
+  <p class="lede">The line from a hovered project title to its card, ending on the year. Hover a title on each page. Keys 1 to 5 switch, t switches light and dark.</p>
+  <ol>
+    <li><a href="leader.html?v=1"><span>1</span><b>Vellum pipe</b><i>The discs&apos; own shader as a pipe</i></a></li>
+    <li><a href="leader.html?v=2"><span>2</span><b>Vellum pipeline, flowing</b><i>A second sheet slides through it, brightening where it stacks</i></a></li>
+    <li><a href="leader.html?v=3"><span>3</span><b>White glow hairline</b><i>1px white with a soft glow</i></a></li>
+    <li><a href="leader.html?v=4"><span>4</span><b>Fibre pulse</b><i>A faint line carrying a glowing pulse to the card</i></a></li>
+    <li><a href="leader.html?v=5"><span>5</span><b>Glass tube</b><i>A hollow pipe in plain SVG, no WebGL</i></a></li>
+  </ol>
+</main>
+</html>

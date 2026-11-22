@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Island lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap">
+<style>
+/* Five directions for slide 27, the Dynamic Island measurement. Deck rules: content on the line under the title, open
+   layouts (no bento), the 3px green connector line, white glass end beads, plum accents, gold stabilo for the caveat,
+   the iPhone silhouette from slide 26, media whole. */
+:root{--ink:#14171B;--plum:#340414;--gold:#A99939;--hair:rgba(20,23,27,.12);--mute:#6f6b64;--green:#6F7C70;
+  --jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1240px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:var(--mute);margin:0 0 30px;max-width:95ch}
+.opt{margin-bottom:54px}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0 0 12px}
+.lab small{font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:var(--mute);margin-left:8px}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 14px 30px -20px rgba(0,0,0,.3);overflow:hidden;position:relative}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:52px 72px 0;position:absolute;left:0;top:0}
+.hd{font:500 40px/1.12 var(--jak);letter-spacing:-.02em;margin:0;white-space:nowrap}
+.hd em{font-style:normal;color:var(--plum)}
+.bead{display:inline-grid;place-items:center;vertical-align:6px;width:44px;height:44px;margin-right:14px;border-radius:50%;color:#fff;font:600 19px var(--jak);letter-spacing:0;
+  background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.6),rgba(255,255,255,0) 70%),radial-gradient(circle at 50% 65%,#6a2a3f,#340414 70%);box-shadow:0 6px 12px -5px rgba(52,4,20,.55)}
+.tin{position:absolute;left:0;height:3px;background:var(--green)}
+.body{position:absolute;left:72px;top:184px;width:1136px;height:420px}
+.fn{position:absolute;left:72px;bottom:90px;margin:0;font:italic 300 13px var(--hel);color:#8a8780}
+.ft{position:absolute;left:72px;right:72px;bottom:40px;border-top:1px solid var(--hair);padding-top:12px;display:flex;justify-content:space-between;font:400 13px var(--hel)}
+.ft span:first-child{color:var(--plum)}
+.abs{position:absolute}
+svg.cn{position:absolute;left:0;top:0;width:1136px;height:420px;overflow:visible;pointer-events:none}
+svg.cn path{fill:none;stroke:var(--green);stroke-width:3;stroke-linejoin:round}
+.eb{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;z-index:2;
+  background:linear-gradient(180deg,#fff,rgba(250,250,252,.96) 60%,rgba(236,236,240,.92));
+  box-shadow:inset 1.5px 1.5px 1px #fff,inset 0 -5px 7px -5px rgba(20,23,27,.2),0 0 0 1px rgba(20,23,27,.12),0 5px 9px -4px rgba(52,4,20,.35)}
+.eb.lg{width:22px;height:22px;margin:-11px 0 0 -11px}
+.tag{font:600 12px/1.4 var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0}
+.ln{position:relative;margin:0;padding-left:17px;font:400 16px/1.45 var(--hel);color:var(--ink)}
+.ln::before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:50%;background:var(--plum)}
+.ln.cv::before{background:var(--gold)}
+.mk{background:linear-gradient(transparent 58%,rgba(169,153,57,.38) 58%);padding:0 2px}
+.tx{display:flex;flex-direction:column;gap:8px}
+.tx.c{align-items:center;text-align:left}
+/* the ruler: shown whole on its own dark ground */
+.ru{position:absolute;border-radius:14px;overflow:hidden;box-shadow:0 22px 40px -22px rgba(20,23,27,.55),0 0 0 .5px rgba(20,23,27,.1)}
+.ru img{display:block;width:100%;height:100%}
+/* the iPhone silhouette, as on slide 26 */
+.ip{position:absolute;padding:8px;background:#0b0c0d;box-shadow:inset 0 0 0 1.5px #2a2c2e,inset 0 0 0 3px #0b0c0d,0 30px 50px -26px rgba(20,23,27,.6),0 8px 16px -10px rgba(20,23,27,.35)}
+.ip .scr{position:relative;height:100%;width:100%;overflow:hidden;background:#000}
+.ip video{position:absolute;inset:0;width:100%;height:100%;display:block}
+.ip i{position:absolute;width:3px;border-radius:2px;background:linear-gradient(90deg,#2a2b2e,#4a4c50)}
+.ip i.a1{left:-3px;top:19%;height:5%}.ip i.a2{left:-3px;top:28%;height:10%}.ip i.a3{left:-3px;top:40%;height:10%}
+.ip i.pw{right:-3px;top:31%;height:15%;background:linear-gradient(270deg,#2a2b2e,#4a4c50)}
+.rl{position:absolute;background:#fff;padding:0 10px}
+</style></head><body>
+<div class="wrap">
+<h1>Island lab, slide 27</h1>
+<p class="lede">Five directions for slide 27, the Dynamic Island measurement. Every frame keeps the incoming title line from slide 26 and joins the parts with the deck's 3px green connector, with white glass beads at the ends. The ruler and the recording are shown whole; the phone uses the slide 26 silhouette. Tell me the number.</p>
+<div id="opts"></div>
+</div>
+<script>
+const r1=v=>Math.round(v*10)/10;
+/* ruler: 560 x 460 source; the compact pill's right edge sits at (395, 46) */
+const RU=(h,x,y)=>{const w=h*560/460;return {w,h,x,y,px:x+395/560*w,py:y+46/460*h,html:`<div class="ru" style="left:${r1(x)}px;top:${r1(y)}px;width:${r1(w)}px;height:${r1(h)}px"><img src="media/ruler-pills.png" alt="A ruler for the Island at true point size"></div>`}};
+/* phone: recording 480 x 992; the Island pill spans x 100-380, centre y 31 */
+const PH=(h,x,y)=>{const sh=h-16,sw=sh*480/992,w=sw+16,rad=h*.118,srad=h*.097;
+  return {w,h,x,y,iy:y+8+31/992*sh,il:x+8+100/480*sw,ir:x+8+380/480*sw,cx:x+w/2,
+  html:`<div class="ip" style="left:${r1(x)}px;top:${r1(y)}px;width:${r1(w)}px;height:${h}px;border-radius:${r1(rad)}px"><i class="a1"></i><i class="a2"></i><i class="a3"></i><i class="pw"></i><div class="scr" style="border-radius:${r1(srad)}px"><video src="media/islandfull.mp4" poster="media/islandfull.jpg" muted loop autoplay playsinline aria-label="Clover in the Dynamic Island: the card folds into the notch"></video></div></div>`}};
+const eb=(x,y,c='')=>`<span class="eb ${c}" style="left:${r1(x)}px;top:${r1(y)}px"></span>`;
+const cn=d=>`<svg class="cn" viewBox="0 0 1136 420">${d.map(p=>`<path d="${p}"/>`).join('')}</svg>`;
+const RT=`<p class="tag">The ruler</p>`, PT=`<p class="tag">The prototype</p>`;
+const L1=`<p class="ln">I built it at true point size with real text</p>`, L2=`<p class="ln">I found room for about eleven characters a side</p>`;
+const L3=`<p class="ln">I prototyped a summary that appears with no app open</p>`, L4=`<p class="ln cv"><span class="mk">Whether Live Activities shipped is to be confirmed</span></p>`;
+const D=[];
+
+/* 01 the bridge: one straight line from the ruler's compact pill to the Island on the phone */
+{const r=RU(300,57.4,0),p=PH(300,0,0);p.x=896-p.w/2;const q=PH(300,p.x,0);const dy=r.py-(q.iy-q.y);const P=PH(300,q.x,dy);
+ D.push(['01','The bridge','One straight green line runs from the ruler’s compact pill to the Island on the real phone, beads at both ends. What I measured sits under the ruler; what I built sits under the phone.',
+ r.html+P.html+cn([`M${r1(r.px+6)} ${r1(r.py)} H${r1(P.il-4)}`])+eb(r.px+6,r.py)+eb(P.il-4,P.iy)+
+ `<div class="abs tx" style="left:50px;top:334px;width:380px">${RT}${L1}${L2}</div><div class="abs tx" style="left:${r1(896-210)}px;top:334px;width:420px">${PT}${L3}${L4}</div>`]);}
+
+/* 02 the rail: the two stages hang from one green line, the media dropping from a bead at each stop */
+{const r=RU(256,0,52);r.x=240-r.w/2;const R=RU(256,r.x,52);const P=PH(256,0,52);const Q=PH(256,896-P.w/2,52);
+ D.push(['02','The rail','A green rail across the top with a large glass bead at each stage; the ruler and the phone drop from them on short connectors, and the points read beneath. Measure, then build, as one line.',
+ R.html+Q.html+cn([`M0 12 H1136`,`M240 12 V50`,`M896 12 V50`])+eb(240,12,'lg')+eb(896,12,'lg')+
+ `<span class="rl tag" style="left:262px;top:3px">The ruler</span><span class="rl tag" style="left:918px;top:3px">The prototype</span>`+
+ `<div class="abs tx" style="left:50px;top:330px;width:380px">${L1}${L2}</div><div class="abs tx" style="left:686px;top:330px;width:420px">${L3}${L4}</div>`]);}
+
+/* 03 the zoom: the phone's Island opens out into the ruler, then the ruler's pill runs on to the points */
+{const P=PH(400,0,10),R=RU(340,330,30);
+ D.push(['03','The zoom','The phone on the left; two green lines open out from its Island to the ruler, like a magnifier. The compact pill then runs on to the points, so the eye goes phone, measurement, finding.',
+ P.html+R.html+cn([`M${r1(P.ir)} ${r1(P.iy)} L330 30`,`M${r1(P.ir)} ${r1(P.iy)} L330 370`,`M${r1(R.px+6)} ${r1(R.py)} H760 Q772 ${r1(R.py)} 772 ${r1(R.py+12)} V${r1(R.py+24)}`])+
+ eb(P.ir,P.iy)+eb(R.px+6,R.py)+
+ `<div class="abs tx" style="left:790px;top:${r1(R.py+14)}px;width:346px">${RT}${L1}${L2}<div style="height:18px;border-bottom:1px solid var(--hair);margin-bottom:10px"></div>${PT}${L3}${L4}</div>`]);}
+
+/* 04 the tree: one line from the pill to the Island, a bead at its middle, and the four points branching off a trunk */
+{const R=RU(380,0,0);const P0=PH(380,1136-0,0);const w=P0.w;const P=PH(380,1136-w,R.py-(P0.iy-0));const tx=490;
+ const ys=[96,164,262,330];
+ D.push(['04','The tree','The ruler’s pill runs straight to the Island on the phone. From a bead at its middle a trunk drops, and each point branches off it, measurement first, then the prototype.',
+ R.html+P.html+cn([`M${r1(R.px+6)} ${r1(R.py)} H${r1(P.il-4)}`,`M${tx} ${r1(R.py)} V${ys[3]-12} Q${tx} ${ys[3]} ${tx+12} ${ys[3]} H${tx+24}`,...ys.slice(0,3).map(y=>`M${tx} ${y-12} Q${tx} ${y} ${tx+12} ${y} H${tx+24}`)])+
+ eb(R.px+6,R.py)+eb(P.il-4,P.iy)+eb(tx,R.py,'lg')+
+ `<p class="abs tag" style="left:${tx+34}px;top:${ys[0]-44}px">The ruler</p><p class="abs tag" style="left:${tx+34}px;top:${ys[2]-44}px">The prototype</p>`+
+ [L1,L2,L3,L4].map((l,k)=>`<div class="abs" style="left:${tx+34}px;top:${ys[k]-12}px;width:${r1(P.x-tx-60)}px">${l}</div>`).join('')]);}
+
+/* 05 the spine: the title line from slide 26 turns down the left margin and branches into each stage */
+{const R=RU(190,30,0),P=PH(210,0,0);const Px=30+R.w/2-P.w/2;const Q=PH(210,Px,206);const y1=R.y+R.h/2,y2=Q.y+Q.h/2;
+ D.push(['05','The spine','The green line coming in from slide 26 turns down the left margin and branches into the ruler, then the phone; each stage reads across from its picture, with the pill linked straight to the Island.',
+ R.html+Q.html+cn([`M-36 -66 V${r1(y2-12)} Q-36 ${r1(y2)} -24 ${r1(y2)} H${r1(Q.x)}`,`M-36 ${r1(y1-12)} Q-36 ${r1(y1)} -24 ${r1(y1)} H30`,`M${r1(R.px+6)} ${r1(R.py)} H${r1(R.x+R.w+40)} Q${r1(R.x+R.w+52)} ${r1(R.py)} ${r1(R.x+R.w+52)} ${r1(R.py+12)} V${r1(Q.iy-12)} Q${r1(R.x+R.w+52)} ${r1(Q.iy)} ${r1(R.x+R.w+40)} ${r1(Q.iy)} H${r1(Q.ir+4)}`])+
+ eb(R.px+6,R.py)+eb(Q.ir+4,Q.iy)+
+ `<div class="abs tx" style="left:430px;top:${r1(y1-46)}px;width:600px">${RT}${L1}${L2}</div><div class="abs tx" style="left:430px;top:${r1(y2-46)}px;width:600px">${PT}${L3}${L4}</div>`,true]);}
+
+document.getElementById('opts').innerHTML=D.map(([n,t,d,b,spine])=>`<div class="opt"><p class="lab">${n} &nbsp;${t}<small>${d}</small></p><div class="frame"><div class="sl"><span class="tin${spine?' sp':''}"></span><p class="hd"><span class="bead">4</span>To carry tasks to the phone, I measured<br><em>how much of the Dynamic Island was usable.</em></p><div class="body">${b}</div><p class="fn">I explored the concept at true size in my notch and iPhone prototypes.</p><div class="ft"><span>27 &nbsp; Designs</span><span>Eden Case Study</span></div></div></div></div>`).join('');
+/* the incoming title connector: from the slide's left edge at the middle of the title's second line, stopping 14px short of it.
+   On the spine frame it is the start of the spine, so it stops at the turn instead. */
+const place=()=>document.querySelectorAll('.sl').forEach(sl=>{const k=sl.getBoundingClientRect().width/1280,S=sl.getBoundingClientRect(),em=sl.querySelector('.hd em').getBoundingClientRect(),t=sl.querySelector('.tin');
+  const y=(em.top+em.height/2-S.top)/k,x=(em.left-S.left)/k;t.style.top=(y-1.5)+'px';
+  if(t.classList.contains('sp')){t.style.width='38px';const s=sl.querySelector('svg.cn path');const by=184;s.setAttribute('d',s.getAttribute('d').replace('M-36 -66',`M-36 ${Math.round(y-by)}`));sl.querySelector('svg.cn').insertAdjacentHTML('beforeend',`<path d="M-72 ${Math.round(y-by)} H-48 Q-36 ${Math.round(y-by)} -36 ${Math.round(y-by)+12}"/>`);t.style.display='none';}
+  else t.style.width=(x-14)+'px';});
+const fit=()=>document.querySelectorAll('.frame').forEach(f=>f.querySelector('.sl').style.transform=`scale(${f.clientWidth/1280})`);
+addEventListener('resize',fit);fit();document.fonts.ready.then(place);
+</script>
+</body></html>

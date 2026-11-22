@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overview lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#FAF9F7;--ink:#14171B;--touch:#340414;--plate:#fff;--sage:#6f8a63;--ink-06:rgba(20,23,27,.06);--ink-12:rgba(20,23,27,.12);--ink-40:rgba(20,23,27,.4);--ink-60:rgba(20,23,27,.6);--shadow:0 1px 2px rgba(20,23,27,.05),0 12px 32px -16px rgba(20,23,27,.22)}
+[data-theme=dark]{--paper:#1C1A17;--ink:#FAF9F7;--touch:#A99939;--plate:#262320;--sage:#8fa985;--ink-06:rgba(250,249,247,.06);--ink-12:rgba(250,249,247,.12);--ink-40:rgba(250,249,247,.4);--ink-60:rgba(250,249,247,.6);--shadow:0 0 0 1px rgba(255,255,255,.08),0 12px 32px -16px rgba(0,0,0,.6)}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:300 16px/1.5 Helvetica,Arial,sans-serif}
+.jak{font-family:"Plus Jakarta Sans",sans-serif;letter-spacing:-.01em}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px}
+.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--paper) 86%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--ink-06)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.mark{font-family:"Plus Jakarta Sans";font-weight:600;font-size:13px;display:flex;gap:10px;align-items:center}
+.mark b{background:var(--touch);color:var(--paper);font-size:11px;padding:2px 8px;border-radius:999px;font-weight:500}
+.pill{display:flex;gap:2px;padding:4px;border-radius:999px;background:var(--plate);box-shadow:var(--shadow)}
+.pill a,.pill button{font:500 13px "Plus Jakarta Sans";padding:9px 14px;border-radius:999px;color:var(--ink-60);text-decoration:none;border:0;background:none;cursor:pointer}
+.pill a.on{color:var(--touch)}.pill button:hover,.pill a:hover{color:var(--touch)}
+section.dir{padding:72px 0 24px;border-top:1px solid var(--ink-06)}section.dir:first-of-type{border-top:0;padding-top:40px}
+.label{display:flex;gap:14px;align-items:baseline;margin-bottom:20px}.label .n{font:600 12px "Plus Jakarta Sans";color:var(--paper);background:var(--ink);border-radius:999px;padding:3px 9px}
+.label h2{font:600 20px "Plus Jakarta Sans";margin:0}.label p{margin:0;color:var(--ink-60);font-size:14px;max-width:720px}
+.eyebrow{font:500 12px "Plus Jakarta Sans";color:var(--ink-60);text-transform:none;letter-spacing:.02em}
+h1.t{font:600 39px/1.1 "Plus Jakarta Sans";margin:8px 0 6px;letter-spacing:-.02em}
+.lede{color:var(--ink-60);font-size:14px;max-width:640px;margin:0 0 28px}
+.card{background:var(--plate);border-radius:24px;box-shadow:var(--shadow);padding:24px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.num{font:600 39px/1 "Plus Jakarta Sans";letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.sm{font-size:14px;color:var(--ink-60)}.xs{font-size:12px;color:var(--ink-60)}
+.up{color:var(--sage)}.down{color:var(--touch)}.flat{color:var(--ink-40)}
+.h3{font:600 16px "Plus Jakarta Sans";margin:0 0 12px}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:10px 0;border-bottom:1px solid var(--ink-06);vertical-align:top}th{font:500 12px "Plus Jakarta Sans";color:var(--ink-60)}tr:last-child td{border:0}
+.tag{display:inline-block;font:500 11px "Plus Jakarta Sans";padding:2px 8px;border-radius:999px;background:var(--ink-06);color:var(--ink-60)}
+.tag.touch{background:var(--touch);color:var(--paper)}.tag.sage{background:var(--sage);color:var(--paper)}
+.row{display:flex;gap:12px;align-items:center}.ava{width:28px;height:28px;border-radius:50%;background:var(--sage);color:var(--paper);display:grid;place-items:center;font:600 12px "Plus Jakarta Sans";flex:none}
+/* 2 feed */
+.feed{position:relative;padding-left:22px}.feed:before{content:"";position:absolute;left:6px;top:8px;bottom:8px;width:1px;background:var(--ink-12)}
+.feed .ev{position:relative;padding:10px 0 10px 14px}.feed .ev:before{content:"";position:absolute;left:-19px;top:17px;width:9px;height:9px;border-radius:50%;background:var(--plate);border:2px solid var(--ink-40)}
+.feed .ev.gen:before{border-color:var(--ink)}.feed .ev.lol:before{border-color:var(--touch);background:var(--touch)}.feed .ev.join:before{border-color:var(--sage);background:var(--sage)}
+.feed .day{font:600 13px "Plus Jakarta Sans";margin:18px 0 4px 14px;color:var(--ink)}.feed .day:first-child{margin-top:0}
+.strip{display:flex;gap:28px;padding:16px 24px;border-radius:999px;background:var(--plate);box-shadow:var(--shadow);margin-bottom:24px;font-size:14px}.strip b{font:600 16px "Plus Jakarta Sans"}
+/* 3 calendar */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}.cal .d{background:var(--plate);border-radius:16px;box-shadow:var(--shadow);min-height:132px;padding:12px}.cal .d.today{outline:2px solid var(--touch);outline-offset:-2px}.cal .d.past{opacity:1}.cal .d.future{opacity:.45;box-shadow:none;border:1px dashed var(--ink-12)}
+.cal .wd{font:600 12px "Plus Jakarta Sans";color:var(--ink-60);display:flex;justify-content:space-between}.cal .wd b{color:var(--ink)}
+.cal .setup{font-size:11px;color:var(--ink-40);margin:6px 0 8px;line-height:1.3;height:28px;overflow:hidden}
+.cal .k{display:flex;justify-content:space-between;font-size:12px;padding:3px 0}.cal .k i{font-style:normal;color:var(--ink-60)}.cal .k b{font:600 12px "Plus Jakarta Sans"}
+.cal .k.z{color:var(--ink-40)}.cal .k.z b{color:var(--ink-40);font-weight:500}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--ink-60);margin:12px 0 0}
+/* 4 flow */
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:0;align-items:stretch}
+.flow .st{background:var(--plate);border-radius:24px;box-shadow:var(--shadow);padding:22px}.flow .st .num{font-size:44px}.flow .st .what{font:600 13px "Plus Jakarta Sans";margin-top:6px}.flow .st .how{font-size:12px;color:var(--ink-60);margin-top:4px;line-height:1.4}
+.flow .arr{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 10px;color:var(--ink-60);font-size:12px;min-width:92px;text-align:center}.flow .arr b{font:600 14px "Plus Jakarta Sans";color:var(--ink)}.flow .arr svg{width:40px;height:16px;stroke:var(--ink-40);fill:none;stroke-width:1.5}
+.bar{height:6px;border-radius:999px;background:var(--ink-06);overflow:hidden;margin-top:14px}.bar i{display:block;height:100%;background:var(--ink);border-radius:999px}
+/* 5 health */
+.status{display:inline-flex;gap:8px;align-items:center;font:600 13px "Plus Jakarta Sans"}.status:before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.q{color:var(--ink-40)}.p{color:var(--sage)}.b{color:var(--touch)}
+.todo li{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--ink-06)}.todo li:last-child{border:0}.todo{list-style:none;margin:0;padding:0}.todo .dot{width:8px;height:8px;border-radius:50%;margin-top:8px;flex:none;background:var(--touch)}
+.todo a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--ink-12);text-underline-offset:3px}
+.spark{display:flex;align-items:flex-end;gap:2px;height:28px}.spark i{flex:1;background:var(--ink-12);border-radius:2px 2px 0 0;min-height:2px}.spark i:last-child{background:var(--touch)}
+@media(max-width:900px){.grid4,.grid2,.flow{grid-template-columns:1fr}.flow .arr{min-height:40px;flex-direction:row;gap:8px}.cal{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <div class="mark">Columbia Laughs <b>admin</b> <span class="xs" style="margin-left:8px">overview lab · five directions</span></div>
+  <div class="pill"><button id="theme">◐ mode</button><a href="#d1">1</a><a href="#d2">2</a><a href="#d3">3</a><a href="#d4">4</a><a href="#d5">5</a></div>
+</div></div>
+<main class="wrap" id="main"></main>
+<script src="data.js"></script>
+<script>
+const D = window.DATA; const DAY = 864e5; const now = Date.now();
+const NY = d => new Date(d).toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+const todayKey = NY(now);
+const week = (arr, off = 0) => arr.filter(x => { const t = +new Date(x.created_at); return t > now - (7 + off) * DAY && t <= now - off * DAY; }).length;
+const name = id => (D.profiles.find(p => p.id === id) || {}).name || 'someone';
+const ini = n => (n || '?').trim()[0].toUpperCase();
+const fmt = s => new Date(s).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+const dayWord = k => { const diff = Math.round((+new Date(todayKey) - +new Date(k)) / DAY); return diff === 0 ? 'Today' : diff === 1 ? 'Yesterday' : new Date(k + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }); };
+const plural = (n, w, ws) => `${n} ${n === 1 ? w : (ws || w + 's')}`;
+const lols = [...D.votes, ...D.laughs];
+const genLols = new Map(); { const cg = new Map(D.candidates.map(c => [c.id, c.generation_id])); for (const v of D.votes) { const g = cg.get(v.candidate_id); if (g) genLols.set(g, (genLols.get(g) || 0) + 1); } }
+const candLols = new Map(); for (const v of D.votes) candLols.set(v.candidate_id, (candLols.get(v.candidate_id) || 0) + 1);
+const METRICS = [
+  { key: 'members', title: 'Members', what: 'signed in with Google', rows: D.profiles, one: 'member' },
+  { key: 'punch', title: 'AI punchlines', what: 'written by the model for members', rows: D.candidates, one: 'punchline' },
+  { key: 'lols', title: 'Lols', what: 'taps of lol? on anything', rows: lols, one: 'lol' },
+  { key: 'jokes', title: 'Member jokes', what: 'written by members themselves', rows: D.jokes, one: 'joke' },
+];
+const deltaWords = (a, b) => a === b ? (a ? 'same as last week' : 'none last week either') : a > b ? `${a - b} more than last week` : `${b - a} fewer than last week`;
+const deltaCls = (a, b) => a === b ? 'flat' : a > b ? 'up' : 'down';
+const top5 = D.candidates.map(c => ({ ...c, lols: candLols.get(c.id) || 0, setup: (D.generations.find(g => g.id === c.generation_id) || {}).setup })).sort((a, b) => b.lols - a.lols || b.id - a.id).slice(0, 5);
+const active = D.profiles.map(p => ({ p, gens: D.generations.filter(g => g.user_id === p.id).length, lols: lols.filter(v => v.user_id === p.id).length, jokes: D.jokes.filter(j => j.author_id === p.id).length })).sort((a, b) => (b.gens + b.lols + b.jokes) - (a.gens + a.lols + a.jokes));
+const main = document.getElementById('main');
+const dir = (n, id, title, why, body) => main.insertAdjacentHTML('beforeend', `<section class="dir" id="${id}"><div class="label"><span class="n">${n}</span><div><h2>${title}</h2><p>${why}</p></div></div>${body}</section>`);
+const page = (title, lede, body) => `<p class="eyebrow">Overview</p><h1 class="t">${title}</h1><p class="lede">${lede}</p>${body}`;
+
+/* 1 ---------------------------------------------------------- words, not marks */
+dir(1, 'd1', 'Plain numbers, plain words', 'No chart at all. At this size a sentence is more honest than a sparkline: "2 members, both joined this week" says more than seven dashes. Charts come back only once a metric has enough history to draw one.',
+page('This week', `What happened in the last seven days, in words.`, `
+<div class="grid4">${METRICS.map(m => { const a = week(m.rows), b = week(m.rows, 7); return `<div class="card"><p class="eyebrow">${m.title}</p><p class="num" style="margin:10px 0 6px">${m.rows.length}</p><p class="sm" style="margin:0">${m.what}.</p><p style="margin:14px 0 0;font-size:14px"><b class="${deltaCls(a, b)}">${plural(a, m.one)} this week</b><span class="sm">, ${deltaWords(a, b)}.</span></p></div>`; }).join('')}</div>
+<div class="card" style="margin-top:16px"><p class="h3">In one paragraph</p><p style="margin:0;font-size:16px;max-width:720px">${(() => { const g = week(D.generations), c = week(D.candidates), l = week(lols), j = week(D.jokes), m = week(D.profiles); const who = [...new Set(D.generations.filter(x => +new Date(x.created_at) > now - 7 * DAY).map(x => x.user_id))].map(name); return `${m ? plural(m, 'new member') + ' signed in' : 'Nobody new signed in'} this week. ${g ? `${who.join(' and ')} asked the model ${plural(g, 'time')} and got ${plural(c, 'punchline')}` : 'Nobody asked the model for punchlines'}; ${l ? `those and the member jokes earned ${plural(l, 'lol')}` : 'nothing earned a lol yet'}. ${j ? plural(j, 'joke was', 'jokes were') + ' written by hand.' : 'No jokes were written by hand.'}`; })()}</p></div>
+<div class="grid2" style="margin-top:16px">
+  <div class="card"><p class="h3">What's landing</p><table>${top5.map(c => `<tr><td><div>${c.punchline}</div><div class="xs">${c.setup || ''}</div></td><td style="text-align:right;white-space:nowrap">${c.lols ? plural(c.lols, 'lol') : '<span class="xs">no lols yet</span>'}</td></tr>`).join('')}</table></div>
+  <div class="card"><p class="h3">Most active members</p><table>${active.map(a => `<tr><td><div class="row"><span class="ava">${ini(a.p.name)}</span>${a.p.name}</div></td><td class="sm" style="text-align:right">${[a.gens && plural(a.gens, 'generation'), a.lols && plural(a.lols, 'lol'), a.jokes && plural(a.jokes, 'joke')].filter(Boolean).join(' · ') || 'nothing yet'}</td></tr>`).join('')}</table></div>
+</div>`));
+
+/* 2 ---------------------------------------------------------- the feed */
+{ const ev = [
+  ...D.profiles.map(p => ({ t: p.created_at, k: 'join', h: `<b>${p.name}</b> joined` })),
+  ...D.generations.map(g => { const n = D.candidates.filter(c => c.generation_id === g.id).length; return { t: g.created_at, k: 'gen', h: `<b>${name(g.user_id)}</b> asked for punchlines on “${g.setup}” <span class="xs">· ${n} came back${genLols.get(g.id) ? `, ${plural(genLols.get(g.id), 'lol')} so far` : ''} · ${(g.model || '').replace('google/', '')}</span>` }; }),
+  ...D.jokes.map(j => ({ t: j.created_at, k: 'joke', h: `<b>${name(j.author_id)}</b> wrote a joke: “${j.setup} ${j.punchline}”` })),
+  ...D.votes.map(v => { const c = D.candidates.find(c => c.id === v.candidate_id); return { t: v.created_at, k: 'lol', h: `<b>${name(v.user_id)}</b> lol’d “${c ? c.punchline : 'a punchline'}”` }; }),
+  ...D.laughs.map(v => { const j = D.jokes.find(j => j.id === v.joke_id); return { t: v.created_at, k: 'lol', h: `<b>${name(v.user_id)}</b> lol’d ${j ? `“${j.setup}”` : 'a joke'}` }; }),
+].sort((a, b) => +new Date(b.t) - +new Date(a.t));
+let lastDay = '', html = '';
+for (const e of ev.slice(0, 40)) { const k = NY(e.t); if (k !== lastDay) { html += `<p class="day">${dayWord(k)}</p>`; lastDay = k; } html += `<div class="ev ${e.k}"><div style="font-size:14px">${e.h}</div><div class="xs">${fmt(e.t)}</div></div>`; }
+dir(2, 'd2', 'The feed', 'The overview is a log of what people actually did, newest first, with the totals demoted to one strip at the top. For a community this size, "Esha lol’d the Butler punchline" is the metric. Counts become a by-product of reading.',
+page('What happened', 'Every sign-in, generation, lol and joke, as it happened.', `
+<div class="strip">${METRICS.map(m => `<span><b>${m.rows.length}</b> <span class="sm">${m.title.toLowerCase()}</span></span>`).join('')}<span style="margin-left:auto" class="sm">${plural(ev.filter(e => +new Date(e.t) > now - 7 * DAY).length, 'event')} this week</span></div>
+<div class="card"><div class="feed">${html || '<p class="sm">Nothing yet.</p>'}</div></div>`)); }
+
+/* 3 ---------------------------------------------------------- week calendar */
+{ const days = []; const base = new Date(todayKey + 'T12:00:00'); const dow = (base.getDay() + 6) % 7; /* monday first */
+for (let i = 0; i < 7; i++) { const d = new Date(+base - (dow - i) * DAY); const k = NY(d); days.push({ k, d, state: k === todayKey ? 'today' : k < todayKey ? 'past' : 'future' }); }
+const count = (rows, k) => rows.filter(r => NY(r.created_at) === k).length;
+const setups = Object.fromEntries(D.generations.map(g => [NY(g.created_at), g.setup]));
+dir(3, 'd3', 'The week as a calendar', 'Replaces the seven dashes with the seven days they stood for. Each day lists its counts by name, today is outlined, days ahead are dashed. The brain already knows how to read a week; nobody has to decode a bar.',
+page('This week', 'Monday to Sunday, what each day brought.', `
+<div class="cal">${days.map(x => { const ks = [['members', D.profiles], ['generations', D.generations], ['punchlines', D.candidates], ['lols', lols], ['jokes', D.jokes]].map(([l, r]) => [l, count(r, x.k)]); const tot = ks.reduce((s, [, n]) => s + n, 0); return `<div class="d ${x.state}"><div class="wd"><span>${x.d.toLocaleDateString('en-US', { weekday: 'short' })}</span><b>${x.d.getDate()}</b></div><div class="setup">${x.state === 'future' ? '' : (setups[x.k] ? '“' + setups[x.k] + '”' : tot ? '' : 'quiet')}</div>${x.state === 'future' ? '' : ks.map(([l, n]) => `<div class="k ${n ? '' : 'z'}"><i>${l}</i><b>${n}</b></div>`).join('')}</div>`; }).join('')}</div>
+<div class="legend"><span>Outlined = today</span><span>Dashed = not yet</span><span>Quoted line = the setup people generated on</span></div>
+<div class="grid2" style="margin-top:24px">
+  <div class="card"><p class="h3">Last week, for comparison</p><p class="sm" style="margin:0">${METRICS.map(m => `${plural(week(m.rows, 7), m.one)}`).join(' · ')}</p></div>
+  <div class="card"><p class="h3">All time</p><p class="sm" style="margin:0">${METRICS.map(m => `${plural(m.rows.length, m.one)}`).join(' · ')}</p></div>
+</div>`)); }
+
+/* 4 ---------------------------------------------------------- the flow */
+{ const members = D.profiles.length, generators = new Set(D.generations.map(g => g.user_id)).size, gens = D.generations.length, cands = D.candidates.length, votes = D.votes.length, votedCands = new Set(D.votes.map(v => v.candidate_id)).size, jokes = D.jokes.length, writers = new Set(D.jokes.map(j => j.author_id).filter(Boolean)).size;
+const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+const arrow = (txt, sub) => `<div class="arr"><svg viewBox="0 0 40 16"><path d="M0 8h36M30 2l6 6-6 6"/></svg><b>${txt}</b><span>${sub}</span></div>`;
+const st = (n, what, how, fill) => `<div class="st"><p class="num">${n}</p><p class="what">${what}</p><p class="how">${how}</p><div class="bar"><i style="width:${fill}%"></i></div></div>`;
+dir(4, 'd4', 'The product as a flow', 'The four numbers are not four separate things; they are one path people walk. Sign in, ask the model, get punchlines, tap lol. Showing them as stages with the hand-off between each tells the admin where people stop, which is the one thing a dashboard should say.',
+page('How people move through it', 'Each stage is a thing the app does; the arrows are how many make it to the next.', `
+<div class="flow">
+  ${st(members, 'sign in', 'members with a profile', 100)}
+  ${arrow(pct(generators, members) + '%', `${generators} of ${members} ask the model`)}
+  ${st(gens, 'ask the model', `${plural(gens, 'generation')} on the daily setup or their own`, pct(generators, members))}
+  ${arrow(cands ? (cands / Math.max(1, gens)).toFixed(1) + '×' : '—', 'punchlines per ask')}
+  ${st(cands, 'get punchlines', 'cards written by the model', pct(generators, members))}
+  ${arrow(pct(votedCands, cands) + '%', `${votedCands} of ${cands} got a lol`)}
+  ${st(votes, 'tap lol', `on ${plural(votedCands, 'punchline')}`, pct(votedCands, cands))}
+</div>
+<div class="grid2" style="margin-top:16px">
+  <div class="card"><p class="h3">The side path: writing by hand</p><p class="sm" style="margin:0">${writers} of ${members} members wrote their own jokes, ${jokes} in all, which earned ${plural(D.laughs.length, 'lol')}. ${jokes > cands / 2 ? 'Members write more than they ask the model, which is worth knowing.' : ''}</p></div>
+  <div class="card"><p class="h3">Where it stops</p><p class="sm" style="margin:0">${pct(votedCands, cands) < 30 ? `Most punchlines never get a lol (${100 - pct(votedCands, cands)}% have none). Either people read and leave, or the lol button is not findable. That is the next thing to look at.` : 'Lols keep up with punchlines; the loop closes.'}</p></div>
+</div>`)); }
+
+/* 5 ---------------------------------------------------------- health + to-do */
+{ const level = (n) => n === 0 ? ['Quiet', 'q'] : n < 5 ? ['Picking up', 'p'] : ['Busy', 'b'];
+const days14 = rows => Array.from({ length: 14 }, (_, i) => { const k = NY(new Date(now - (13 - i) * DAY)); return rows.filter(r => NY(r.created_at) === k).length; });
+const noName = D.profiles.filter(p => p.name === 'member').length, noLol = D.generations.filter(g => !genLols.get(g.id)).length, failed = D.responses.filter(r => r.status === 'error').length, zeroMix = D.chains.filter(c => !c.mix_weight).length;
+dir(5, 'd5', 'Health, then what to do', 'Each metric gets a state in words (quiet, picking up, busy) instead of a chart; the chart only appears once there are at least ten points to draw. Under it, a short list of things that need a hand. The page answers "is it fine?" and then "what should I do?".',
+page('Is it fine?', 'A state per metric, and the short list of things to fix.', `
+<div class="grid4">${METRICS.map(m => { const a = week(m.rows); const [w, c] = level(a); const s = days14(m.rows); const enough = m.rows.length >= 10; return `<div class="card"><p class="eyebrow">${m.title}</p><p class="status ${c}" style="margin:8px 0 10px">${w}</p><p class="sm" style="margin:0">${plural(a, m.one)} this week · ${m.rows.length} all time</p>${enough ? `<div class="spark" style="margin-top:14px" title="${s.join(', ')}">${s.map(v => `<i style="height:${Math.max(7, v / Math.max(1, ...s) * 100)}%"></i>`).join('')}</div><p class="xs" style="margin:6px 0 0">last 14 days</p>` : `<p class="xs" style="margin:14px 0 0">Too few to chart yet; a trend line appears at 10.</p>`}</div>`; }).join('')}</div>
+<div class="card" style="margin-top:16px"><p class="h3">Needs a hand</p><ul class="todo">
+  ${noLol ? `<li><span class="dot"></span><div><b>${plural(noLol, 'generation has', 'generations have')} no lols</b> <span class="sm">out of ${D.generations.length}. Open <a href="#">Media</a> and read them: dull punchlines are a prompt problem, good ones with no lols are a layout problem.</span></div></li>` : ''}
+  ${noName ? `<li><span class="dot"></span><div><b>${plural(noName, 'member')} without a name</b> <span class="sm">skipped onboarding. Nothing to do, but their jokes show as “member”.</span></div></li>` : ''}
+  ${zeroMix ? `<li><span class="dot" style="background:var(--ink-40)"></span><div><b>${plural(zeroMix, 'chain')} resting at 0%</b> <span class="sm">of the mix. Fine if intended; <a href="#">Prompts</a> to change it.</span></div></li>` : ''}
+  ${failed ? `<li><span class="dot"></span><div><b>${plural(failed, 'model call')} failed</b> <span class="sm">and fell through to the next model. See <a href="#">Requests</a>.</span></div></li>` : `<li><span class="dot" style="background:var(--sage)"></span><div><b>No failed model calls</b> <span class="sm">in the log.</span></div></li>`}
+</ul></div>`)); }
+
+document.getElementById('theme').onclick = () => document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+</script>
+</body>
+</html>

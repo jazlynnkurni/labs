@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chalk-lab · folder</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  body { display: grid; place-items: center; }
+  .folder { position: relative; }
+  .folder canvas { position: absolute; display: block; }
+</style>
+</head>
+<body>
+<div class="folder" id="folder"><canvas id="back"></canvas><canvas id="front"></canvas></div>
+<script type="module">
+/* chalk-lab: the folder from ref.png, a sidewalk cut into a folder icon, with the chalk horses
+   galloping across the front panel from left to right.
+   How the photo is made, and so how this is: two separate pieces of concrete. The back panel and
+   tab are a darker, smoother, cooler slab; the front is lighter and coarser, lit from the top and
+   scored by a broom near the bottom. The horses are white chalk with a strong blue cast, a firm
+   outline with a dusty halo, a rubbed half-transparent fill, the far legs pressed lighter, and the
+   chalk breaking up wherever the concrete has a pit, because chalk only takes on the high points. */
+import { makeConcrete } from './concrete.js';
+import { pose, SPEED, STRIDE } from './gallop.js';
+
+/* the folder, in ref.png pixels with the origin at the tab's top left (the photo's 53, 90) */
+const REF_W = 630, REF_H = 572, FRONT_Y = 110, FRONT_H = 462, R_FRONT = 40;
+const GROUND = 195, HEIGHT = 88;                    // the horses' ground line and withers height inside the front panel
+const HORSES = [{ phase: 0.00, y: 0 }, { phase: 0.37, y: -3 }, { phase: 0.71, y: 2 }, { phase: 0.15, y: -1 }];
+const OUTLINE = 'rgb(228,239,255)', STROKE = 'rgba(232,242,255,1)';
+const TAU = Math.PI * 2;
+
+function backPath(c) {
+  c.beginPath();
+  c.moveTo(0, 140); c.lineTo(0, 52); c.arcTo(0, 0, 52, 0, 52);
+  c.lineTo(170, 0); c.bezierCurveTo(215, 0, 236, 2, 246, 10);            // the tab's soft top right
+  c.lineTo(276, 44); c.bezierCurveTo(283, 52, 292, 56, 305, 56);         // its slanted side and the fillet into the strip
+  c.lineTo(585, 56); c.arcTo(630, 56, 630, 101, 45); c.lineTo(630, 140); c.closePath();
+}
+const frontPath = (c, s = 1) => { c.beginPath(); c.roundRect(0, 0, REF_W * s, FRONT_H * s, R_FRONT * s); };
+const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+
+const folder = document.getElementById('folder'), back = document.getElementById('back'), front = document.getElementById('front');
+const fx = front.getContext('2d');
+let k, dpr, Wd, Hd, pad, L = {}, concrete, rubPat, ready = false;
+
+function setup() {
+  dpr = Math.min(2, devicePixelRatio || 1);
+  const fw = Math.max(240, Math.min(innerWidth - 48, 720, (innerHeight - 48) * REF_W / REF_H));
+  k = fw / REF_W;
+  folder.style.width = fw + 'px'; folder.style.height = REF_H * k + 'px';
+
+  // back: the shadow of the whole icon, then the back slab
+  const m = 48 * k, bw = fw + 2 * m, bh = REF_H * k + 2 * m, bx = back.getContext('2d');
+  Object.assign(back.style, { left: -m + 'px', top: -m + 'px', width: bw + 'px', height: bh + 'px' });
+  back.width = Math.round(bw * dpr); back.height = Math.round(bh * dpr);
+  const s = k * dpr;
+  for (const [col, blur, oy] of [['rgba(0,0,0,.20)', 22, 8], ['rgba(0,0,0,.10)', 3, 1]]) {
+    bx.save(); bx.setTransform(s, 0, 0, s, m * dpr, m * dpr);
+    bx.shadowColor = col; bx.shadowBlur = blur * s; bx.shadowOffsetY = oy * s; bx.fillStyle = '#878786';
+    backPath(bx); bx.fill(); bx.translate(0, FRONT_Y); frontPath(bx); bx.fill(); bx.restore();
+  }
+  const slab = makeConcrete({ w: REF_W, h: 140, s, seed: 7,
+    tone: (tx, ty, o) => { o[0] = 143 - 14 * tx - 3 * ty; o[1] = 147 - 15 * tx - 3 * ty; o[2] = 150 - 16 * tx - 3 * ty; },
+    amp: { macro: 3, mottle: 3, grain: 6, fine: 5, chroma: 1.5 }, pits: 0.6, debris: 1.2 });
+  bx.save(); bx.setTransform(s, 0, 0, s, m * dpr, m * dpr); backPath(bx); bx.clip();
+  bx.setTransform(1, 0, 0, 1, m * dpr, m * dpr); bx.drawImage(slab.canvas, 0, 0); bx.restore();
+
+  // front: its own slab, lit from the top, warmer and coarser further down, scored near the bottom
+  Object.assign(front.style, { left: '0px', top: FRONT_Y * k + 'px', width: fw + 'px', height: FRONT_H * k + 'px' });
+  Wd = front.width = Math.round(REF_W * s); Hd = front.height = Math.round(FRONT_H * s);
+  const STOPS = [[0, 176, 180, 183], [0.15, 165, 169, 172], [0.38, 146, 149, 151], [0.46, 129, 131, 130], [0.80, 130, 129, 125], [0.88, 128, 125, 120], [1, 132, 128, 122]];
+  concrete = makeConcrete({ w: REF_W, h: FRONT_H, s, seed: 23,
+    tone: (tx, ty, o) => {
+      let i = 0; while (i < STOPS.length - 2 && ty > STOPS[i + 1][0]) i++;
+      const a = STOPS[i], b = STOPS[i + 1], u = (ty - a[0]) / (b[0] - a[0]), side = (tx - 0.5) * 9 * (1 - ty);
+      o[0] = a[1] + (b[1] - a[1]) * u + side; o[1] = a[2] + (b[2] - a[2]) * u + side; o[2] = a[3] + (b[3] - a[3]) * u + side;
+    },
+    amp: { macro: 4, mottle: 4.5, grain: 15, fine: 11, chroma: 2.5, rise: 0.3 }, pits: 1, debris: 1, lines: [398, 406, 414] });
+
+  // the chalk layers: wider than the panel, so a horse half off the edge is cut by the panel, not outlined by the buffer
+  pad = Math.ceil(1.5 * HEIGHT * s);
+  const lw = Wd + 2 * pad;
+  for (const n of ['near', 'far', 'ero', 'edge', 'fill', 'rub', 'marks']) L[n] = mk(lw, Hd);
+  L.halo = mk(Math.ceil(lw / 4), Math.ceil(Hd / 4));
+  L.chalk = mk(Wd, Hd);
+  for (const n in L) L[n].x = L[n].getContext('2d');
+  rubPat = L.rub.x.createPattern(rubTile(s), 'repeat');
+  ready = true;
+}
+
+/* the rubbed fill: chalk dragged on its side and smudged with a finger. a tile that moves with each horse */
+function rubTile(s) {
+  const n = Math.round(240 * s), c = mk(n, n), x = c.getContext('2d');
+  let a = 99; const r = () => { a = (a * 16807) % 2147483647; return a / 2147483647; };
+  x.fillStyle = 'rgba(212,228,252,.34)'; x.fillRect(0, 0, n, n);
+  const wrap = f => { for (const ox of [-n, 0, n]) for (const oy of [-n, 0, n]) f(ox, oy); };
+  for (let i = 0; i < 22; i++) {
+    const cx = r() * n, cy = r() * n, R = (16 + r() * 40) * s, lighter = r() < 0.6, al = 0.04 + r() * 0.07;
+    x.globalCompositeOperation = lighter ? 'source-over' : 'destination-out';
+    wrap((ox, oy) => {
+      const g = x.createRadialGradient(cx + ox, cy + oy, 0, cx + ox, cy + oy, R);
+      g.addColorStop(0, lighter ? `rgba(236,244,255,${al})` : `rgba(0,0,0,${al * 2.2})`); g.addColorStop(1, 'rgba(0,0,0,0)');
+      x.fillStyle = g; x.fillRect(cx + ox - R, cy + oy - R, 2 * R, 2 * R);
+    });
+  }
+  x.globalCompositeOperation = 'source-over'; x.lineCap = 'round';
+  for (let i = 0; i < 650; i++) {
+    const cx = r() * n, cy = r() * n, len = (4 + r() * 12) * s, t = -0.45 + (r() - 0.5) * 0.5;
+    x.strokeStyle = `rgba(236,244,255,${0.05 + r() * 0.12})`; x.lineWidth = (0.6 + r() * 1.4) * s;
+    wrap((ox, oy) => { x.beginPath(); x.moveTo(cx + ox, cy + oy); x.lineTo(cx + ox + Math.cos(t) * len, cy + oy + Math.sin(t) * len); x.stroke(); });
+  }
+  return c;
+}
+
+/* drawing a pose into a silhouette layer */
+function spline(c, P, closed = true) {
+  const n = P.length, g = i => closed ? P[(i + n) % n] : P[Math.max(0, Math.min(n - 1, i))];
+  c.moveTo(P[0][0], P[0][1]);
+  for (let i = 0; i < (closed ? n : n - 1); i++) {
+    const p0 = g(i - 1), p1 = g(i), p2 = g(i + 1), p3 = g(i + 2);
+    c.bezierCurveTo(p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6, p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6, p2[0], p2[1]);
+  }
+  if (closed) c.closePath();
+}
+function quad(c, a, b, wa, wb) {
+  const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l;
+  c.beginPath(); c.moveTo(a[0] + nx * wa / 2, a[1] + ny * wa / 2); c.lineTo(b[0] + nx * wb / 2, b[1] + ny * wb / 2);
+  c.lineTo(b[0] - nx * wb / 2, b[1] - ny * wb / 2); c.lineTo(a[0] - nx * wa / 2, a[1] - ny * wa / 2); c.closePath(); c.fill();
+}
+const disc = (c, p, w) => { c.beginPath(); c.arc(p[0], p[1], w / 2, 0, TAU); c.fill(); };
+function shapes(c, list, X, Y, S) {
+  const D = q => [X + q[0] * S, Y - q[1] * S];
+  c.fillStyle = '#fff';
+  for (const sh of list) {
+    if (sh.chain) {
+      const [A, J, F, T] = sh.chain.map(D), w = sh.w.map(v => v * S);
+      quad(c, A, J, w[0], w[1]); quad(c, J, F, w[2], w[3]); quad(c, F, T, w[3], w[4]);
+      disc(c, A, w[0]); disc(c, J, w[1]); disc(c, F, w[3]); disc(c, T, w[4]);
+    } else {
+      c.beginPath(); const P = sh.pts.map(D);
+      if (sh.smooth) spline(c, P); else { P.forEach((q, i) => i ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1])); c.closePath(); }
+      c.fill();
+    }
+  }
+}
+
+/* a silhouette into chalk: eroded to find its outline, the rub inside, a dust halo round the line */
+function edgeOf(S, r) {
+  const E = L.ero.x, G = L.edge.x, w = L.near.width, h = L.near.height;
+  E.clearRect(0, 0, w, h); E.drawImage(S, 0, 0); E.globalCompositeOperation = 'destination-in';
+  for (let i = 0; i < 8; i++) E.drawImage(S, Math.cos(i / 8 * TAU) * r, Math.sin(i / 8 * TAU) * r);
+  E.globalCompositeOperation = 'source-over';
+  G.clearRect(0, 0, w, h); G.drawImage(S, 0, 0);
+  G.globalCompositeOperation = 'destination-out'; G.drawImage(L.ero, 0, 0);
+  G.globalCompositeOperation = 'source-in'; G.fillStyle = OUTLINE; G.fillRect(0, 0, w, h);
+  G.globalCompositeOperation = 'source-over';
+  const H = L.halo.x; H.clearRect(0, 0, L.halo.width, L.halo.height); H.drawImage(L.edge, 0, 0, L.halo.width, L.halo.height);
+}
+function layer(S, line, rub) {
+  const F = L.fill.x, w = L.near.width, h = L.near.height, C = L.chalk.x;
+  edgeOf(S, 2.4 * k * dpr);
+  F.clearRect(0, 0, w, h); F.drawImage(L.rub, 0, 0);
+  F.globalCompositeOperation = 'destination-in'; F.drawImage(S, 0, 0); F.globalCompositeOperation = 'source-over';
+  C.globalAlpha = 0.3 * line; C.drawImage(L.halo, -pad, 0, w, h);
+  C.globalAlpha = rub; C.drawImage(L.fill, -pad, 0);
+  C.globalAlpha = line; C.drawImage(L.edge, -pad, 0);
+  C.globalAlpha = 1;
+}
+
+function render(t) {
+  if (!ready) return;
+  const S = HEIGHT * k * dpr, loop = Wd + 2.4 * S, w = L.near.width, h = L.near.height;
+  const N = L.near.x, Fa = L.far.x, R = L.rub.x, M = L.marks.x;
+  for (const c of [N, Fa, R, M]) c.clearRect(0, 0, w, h);
+  M.lineCap = M.lineJoin = 'round'; M.strokeStyle = STROKE;
+  HORSES.forEach((hs, i) => {
+    const X = pad + ((t * SPEED * S + i * loop / HORSES.length) % loop) - 1.0 * S, Y = (GROUND + hs.y) * k * dpr;
+    const P = pose(((t / STRIDE + hs.phase) % 1 + 1) % 1);
+    shapes(Fa, P.far, X, Y, S); shapes(N, P.near, X, Y, S);
+    rubPat.setTransform(new DOMMatrix([1, 0, 0, 1, X, Y])); R.fillStyle = rubPat; R.fillRect(X - 1.4 * S, Y - 1.7 * S, 2.6 * S, 1.9 * S);
+    for (const st of P.strokes) {
+      M.globalAlpha = st.a; M.lineWidth = st.w * k * dpr; M.beginPath(); spline(M, st.pts.map(q => [X + q[0] * S, Y - q[1] * S]), false); M.stroke();
+    }
+  });
+  M.globalAlpha = 1;
+  Fa.globalCompositeOperation = 'destination-out'; Fa.drawImage(L.near, 0, 0); Fa.globalCompositeOperation = 'source-over';
+
+  const C = L.chalk.x; C.clearRect(0, 0, Wd, Hd);
+  layer(L.far, 0.7, 0.8);                           // the far legs, pressed lighter
+  layer(L.near, 0.95, 1);
+  C.drawImage(L.marks, -pad, 0);
+  C.globalCompositeOperation = 'destination-in'; C.drawImage(concrete.grain, 0, 0); C.globalCompositeOperation = 'source-over';
+
+  fx.setTransform(1, 0, 0, 1, 0, 0); fx.clearRect(0, 0, Wd, Hd);
+  fx.save(); frontPath(fx, k * dpr); fx.clip(); fx.drawImage(concrete.canvas, 0, 0); fx.drawImage(L.chalk, 0, 0); fx.restore();
+}
+
+const still = new URLSearchParams(location.search).get('t');   // ?t=1.2 holds one moment, for checks
+let rt;
+addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { setup(); render(still ? +still : performance.now() / 1000); }, 120); });
+setup();
+window.chalk = { render };
+if (still !== null) render(+still);
+else { const loopF = now => { render(now / 1000); requestAnimationFrame(loopF); }; requestAnimationFrame(loopF); }
+</script>
+</body>
+</html>

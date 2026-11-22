@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The shelf, big</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#FAF9F7;--ink:#14171B;--ink2:rgba(20,23,27,.66);--ink3:rgba(20,23,27,.42);--hair:rgba(20,23,27,.16);--plate:#FAF9F7;--gold:#A99939;--ox:#340414;--jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+html[data-theme="dark"]{--paper:#1C1A17;--ink:#FAF9F7;--ink2:rgba(250,249,247,.66);--ink3:rgba(250,249,247,.42);--hair:rgba(250,249,247,.16);--plate:#262320}
+html,body{margin:0;background:var(--paper);color:var(--ink);font:300 15.5px/1.62 var(--hel);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 30px}
+header.top{padding:56px 0 0}
+.label{font:600 10.5px/1.5 var(--jak);letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+h1{font:500 clamp(28px,4vw,44px)/1.12 var(--jak);letter-spacing:-.012em;margin:12px 0 0;max-width:24ch}
+p.lede{font-size:17px;line-height:1.62;color:var(--ink2);margin:16px 0 0;max-width:60ch}
+section{padding:96px 0 0}
+section .head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+section h2{font:500 clamp(22px,2.6vw,30px)/1.2 var(--jak);letter-spacing:-.012em;margin:12px 0 0;max-width:26ch}
+section .why{margin:0;max-width:52ch;color:var(--ink2);font-size:15.5px}
+.stage{position:relative;margin-top:40px;height:600px;border:1px solid var(--hair);overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none}
+.stage .hint{position:absolute;left:24px;bottom:18px;font:300 12.5px var(--hel);color:var(--ink3);pointer-events:none}
+.stage .pick{position:absolute;right:24px;bottom:18px;display:flex;gap:16px;align-items:center;opacity:0;transform:translateY(6px);transition:opacity .3s ease,transform .4s cubic-bezier(.22,1,.36,1);pointer-events:none}
+.stage .pick.on{opacity:1;transform:none}
+.stage .pick b{font:500 17px var(--jak)}.stage .pick i{display:block;font:300 13px var(--hel);font-style:normal;color:var(--ink2)}
+.stage .pick span{font:500 13px var(--jak);background:var(--ink);color:var(--paper);border-radius:999px;padding:10px 16px}
+/* the record: a 240 sleeve, the disc behind peeking right */
+.rec{position:absolute;width:240px;height:240px;will-change:transform;transform-style:preserve-3d;cursor:pointer;--shift:0px}
+.rec.hot{transition:transform .42s cubic-bezier(.22,1,.36,1)}
+.rec .disc{position:absolute;top:8px;left:26px;width:224px;height:224px;border-radius:50%;transition:transform .5s cubic-bezier(.22,1,.36,1)}
+.rec .disc canvas{position:absolute;inset:-6%;width:112%;height:112%;display:block}
+.rec .sleeve{position:absolute;inset:0;border-radius:6px;overflow:hidden;background:#fff;box-shadow:0 0 0 .5px rgba(20,23,27,.10),0 1px 2px rgba(20,23,27,.06),0 10px 24px -8px rgba(20,23,27,.18),0 30px 60px -20px rgba(20,23,27,.28)}
+
+.rec .sleeve .t{position:absolute;left:0;right:0;bottom:0;padding:12px 18px 14px;background:#fff;font:500 13px var(--jak);color:#14171B;display:flex;justify-content:space-between;align-items:baseline}
+.rec .sleeve .t small{font:500 10.5px var(--jak);letter-spacing:.12em;color:rgba(20,23,27,.42)}
+.rec .sleeve::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(165deg,rgba(255,255,255,.5),rgba(255,255,255,0) 38%);box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}
+/* THE VELLUM WINDOW, locked 2026-10-20 from the sleeve lab: a true circle dead centre, recessed (shaded left
+   wall, light on the upper right), tinted with the label colour, the mark behind frost that clears on hover. */
+.rec .sleeve .win{position:absolute;left:calc(50% - 35%);top:48%;width:70%;aspect-ratio:1;transform:translateY(-50%);border-radius:50%;overflow:hidden;background:rgba(255,255,255,.55);
+  box-shadow:inset 0 0 0 1px rgba(20,23,27,.10),inset 14px 4px 26px -8px rgba(20,23,27,.22),inset -6px -8px 18px -10px rgba(255,255,255,.9),inset 0 10px 30px rgba(255,255,255,.5)}
+.rec .sleeve .win .tint{position:absolute;inset:0;background:var(--lab);opacity:0.22;mix-blend-mode:multiply;z-index:1;pointer-events:none}
+.rec .sleeve .win img{position:absolute;left:50%;top:50%;width:70%;height:70%;object-fit:contain;transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(var(--s));filter:blur(2.6px) saturate(.7) contrast(.9);opacity:.78;transition:filter .5s ease,opacity .5s ease}
+.rec .sleeve .win::after{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");mix-blend-mode:screen;opacity:0.98;pointer-events:none;transition:opacity .5s ease;z-index:2}
+/* on hover the window is clear: white glass, no tint, no frost, the mark in its own colours */
+.rec .sleeve .win{transition:background .45s ease}
+.rec .sleeve .win .tint{transition:opacity .45s ease}
+.rec.hot .sleeve .win img,.rec:hover .sleeve .win img{filter:none;opacity:1}
+.rec.hot .sleeve .win::after,.rec:hover .sleeve .win::after{opacity:0}
+.rec.hot .sleeve .win .tint,.rec:hover .sleeve .win .tint{opacity:0}
+.rec.hot .sleeve .win,.rec:hover .sleeve .win{background:#fff}
+.rec .sleeve::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");mix-blend-mode:multiply;opacity:.55}
+.rec .sleeve{background:#FAF9F7}
+.rec .sleeve .t{background:transparent}
+/* spines for the shelf */
+.spine{position:absolute;width:34px;height:300px;border-radius:3px;background:#fff;box-shadow:0 0 0 .5px rgba(20,23,27,.12),0 8px 20px -10px rgba(20,23,27,.3);cursor:pointer;will-change:transform;display:grid;place-items:center}
+.spine b{writing-mode:vertical-rl;transform:rotate(180deg);font:500 12.5px var(--jak);letter-spacing:.04em;color:#14171B;white-space:nowrap}
+.spine i{position:absolute;left:0;right:0;bottom:0;height:10px;background:var(--lab)}
+/* the platter */
+.platter{position:absolute;width:380px;height:380px;border-radius:50%;background:#2a2730;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),0 30px 60px -30px rgba(0,0,0,.6)}
+.platter .mat{position:absolute;inset:14px;border-radius:50%;background:#1a181e}
+.titles{position:absolute;left:0;top:0;bottom:0;width:46%;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:0 40px;box-sizing:border-box}
+.titles a{font:300 34px/1.2 var(--hel);letter-spacing:-.015em;color:var(--ink3);text-decoration:none;transition:color .18s ease;cursor:pointer;display:flex;justify-content:space-between;align-items:baseline}
+.titles a small{font:500 11px var(--jak);letter-spacing:.1em;color:var(--ink3)}
+.titles a.on,.titles a:hover{color:var(--ink)}
+/* THE PREVIEW CARD, as on the live home: a 20px plate with a hair outline, the recording inset 12px on
+   all four sides, the caption beneath. On a hover it fades in from the middle of the stage, scaling up
+   from a touch smaller, and goes the same way back. */
+.pv{position:absolute;left:0;top:0;width:440px;transform:translate(0,-50%) scale(.92);opacity:0;pointer-events:none;z-index:200;transform-origin:50% 50%;
+  border-radius:20px;padding:12px;background:var(--plate);outline:1px solid var(--hair);outline-offset:-1px;box-shadow:0 30px 80px -30px rgba(0,0,0,.35);
+  transition:opacity .28s ease,transform .42s cubic-bezier(.22,1,.36,1),left .42s cubic-bezier(.22,1,.36,1),top .42s cubic-bezier(.22,1,.36,1)}
+.pv.on{opacity:1;transform:translate(0,-50%) scale(1)}
+.pv .m{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:var(--plate)}
+.pv .m video,.pv .m img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.pv .m video.on,.pv .m img.on{display:block}
+.pv .c{padding:16px 10px 8px}
+.pv .c b{display:block;font:500 20px/1.25 var(--jak);color:var(--ink)}
+.pv .c i{display:block;font:500 14px/1.4 var(--jak);font-style:normal;color:var(--ink3);margin:4px 0 8px}
+.pv .c span{display:block;font:300 15px/1.5 var(--hel);color:var(--ink2);max-width:40ch}
+.stage.hovering .rec:not(.hot),.stage.hovering .spine:not(.hot){filter:brightness(.92) saturate(.9)}
+.tools{display:flex;gap:12px;align-items:center;margin:48px 0 96px}
+label.chk{display:flex;gap:10px;align-items:center;font:500 12.5px var(--jak)}
+</style><style>
+/* BIG: one stage, the whole window. The shelf keeps its own geometry and is zoomed as a block. */
+header.top,section .head{display:none}
+.wrap{max-width:none;padding:0}
+section{padding:0}
+.stage{height:calc(100vh / var(--K,1.6));margin:0;border:0;zoom:var(--K,1.6);background:var(--paper)}
+.stage .hint{left:calc(24px / var(--K,1.6));bottom:calc(18px / var(--K,1.6));zoom:calc(1 / var(--K,1.6))}
+.stage .pick{right:calc(24px / var(--K,1.6));bottom:calc(18px / var(--K,1.6));zoom:calc(1 / var(--K,1.6))}
+</style>
+</head><body>
+<div class="wrap">
+  <header class="top">
+    <div class="label">Vinyl on the web · five ways to dig</div>
+    <h1>The projects as a crate of records, on a desk this time.</h1>
+    <p class="lede">The same seven sleeves as the phone crate, laid out for a pointer and a wide screen. Scroll inside a stage or drag to dig; hover pulls a disc; click picks. Each stage is one way the Projects section of the home could behave. Nothing here touches the live site.</p>
+  </header>
+  <div id="stages"></div>
+  <div class="tools"><label class="chk"><input id="card" type="checkbox"> show the preview card on hover</label><label class="chk"><input id="dark" type="checkbox"> dark mode</label></div>
+</div>
+<script>
+const K=Math.max(1.25,Math.min(1.9,innerWidth/820)); document.documentElement.style.setProperty("--K",K);   /* the shelf scaled for a laptop: sleeves about 400px wide */
+const M='http://localhost:5330';
+const P=[
+  {n:'01',t:'Fostr',img:'marks/fostr.png',role:'Founding design engineer',lab:'#9ba69c',st:'Live',s:'Building the brand, landing site and internal platform from 0 to 1',v:M+'/videos/work-fostr.mp4',pic:M+'/videos/work-fostr.jpg'},
+  {n:'02',t:'Halodoc',img:'marks/halodoc-mark.png',role:'Product designer',lab:'#A99939',st:'Shipped to 20M+ users',s:'Designing the onboarding journey for AI Prescription on mobile',v:M+'/videos/trim/work-halodoc.mp4',pic:M+'/videos/trim/work-halodoc.jpg'},
+  {n:'03',t:'Conduit Commerce',img:'marks/conduit-mark.png',role:'Product design lead',lab:'#340414',st:'Shipped',s:'Designing and shipping a B2B SaaS website for an AI-feature launch',v:M+'/videos/trim/work-conduit.mp4',pic:M+'/videos/trim/work-conduit.jpg'},
+  {n:'04',t:'Second Self',img:'marks/second-self.svg',role:'Design engineer',lab:'#827a85',st:'YHacks \u201926, 1st place',s:'Building an AI agent that lives on your own Mac',v:M+'/videos/second-self.mp4',pic:M+'/videos/second-self.jpg'},
+  {n:'05',t:'Manus AI',img:'marks/manus-mark.svg',role:'Product designer',lab:'#1C1A17',st:'Approved, in development',s:'Designing an AI community platform to drive adoption',v:M+'/videos/work-manus.mp4',pic:M+'/videos/work-manus.jpg'},
+  {n:'06',t:'Olive',img:'marks/olive.png',role:'Product designer',lab:'#9ba69c',st:'NYU UX Design-a-thon \u201925, 2nd place',s:'Designing an AI-powered carbon tracking app',v:M+'/videos/trim/work-olive.mp4',pic:M+'/videos/trim/work-olive.jpg'},
+  {n:'07',t:'SomiaCX',img:'marks/somiacx-mark.png',role:'Product designer',lab:'#A99939',st:'0 to 1',s:'Architecting a unified UVP system for three financial subsidiaries',pic:M+'/images/trim/work-somiacx.png'},
+];
+let TITLE_='',NUM_='';
+const TAU=Math.PI*2;
+const hash=(x,y,s)=>{const n=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return n-Math.floor(n);};
+/* ---- shared pieces ---- */
+function label(c,R,opts={}){ const r=R*.355; c.save(); c.rotate(opts.ang||0); c.translate(R*.004,R*.003);   /* labels are never dead centre: the wobble you see on a turntable */
+  c.fillStyle=opts.col||LAB; c.beginPath(); c.arc(0,0,r,0,TAU); c.fill();
+  /* paper label: a faint tooth and a bright pressed rim where the vinyl meets it */
+  c.save(); c.beginPath(); c.arc(0,0,r,0,TAU); c.clip(); c.globalAlpha=.12; for(let i=0;i<400;i++){ c.fillStyle=hash(i,1,5)>.5?'#fff':'#000'; c.fillRect((hash(i,2,5)-.5)*2*r,(hash(i,3,5)-.5)*2*r,1,1); } c.restore();
+  c.lineWidth=R*.012; c.strokeStyle='rgba(255,255,255,.55)'; c.beginPath(); c.arc(0,0,r-R*.006,0,TAU); c.stroke();
+  c.lineWidth=R*.006; c.strokeStyle='rgba(0,0,0,.35)'; c.beginPath(); c.arc(0,0,r+R*.004,0,TAU); c.stroke();
+  c.fillStyle='rgba(250,249,247,.95)'; c.textAlign='center'; c.textBaseline='middle';
+  c.font=`600 ${Math.round(R*.055)}px "Plus Jakarta Sans"`; c.fillText((TITLE_||'').toUpperCase(),0,-r*.40);
+  c.font=`500 ${Math.round(R*.040)}px "Plus Jakarta Sans"`; c.fillStyle='rgba(250,249,247,.75)'; c.fillText('SIDE A',0,r*.36); c.fillText((NUM_||'')+' · 33⅓',0,r*.56);
+  c.restore();
+  /* the spindle hole is the true centre; it does not move */
+  c.fillStyle='rgba(20,18,22,1)'; c.beginPath(); c.arc(0,0,R*.026,0,TAU); c.fill();
+  c.lineWidth=1; c.strokeStyle='rgba(255,255,255,.5)'; c.beginPath(); c.arc(0,R*.003,R*.026,0.2,Math.PI-.2); c.stroke();
+}
+function edge(c,R){ c.lineWidth=R*.012; c.strokeStyle='rgba(0,0,0,.55)'; c.beginPath(); c.arc(0,0,R-R*.004,0,TAU); c.stroke(); c.lineWidth=1; c.strokeStyle='rgba(255,255,255,.22)'; c.beginPath(); c.arc(0,0,R-R*.013,0,TAU); c.stroke(); }
+function shadow(c,R,dpr,dark){ c.shadowColor=dark?'rgba(0,0,0,.7)':'rgba(20,23,27,.42)'; c.shadowBlur=22*dpr; c.shadowOffsetY=10*dpr; c.fillStyle='#111'; c.beginPath(); c.arc(0,0,R,0,TAU); c.fill(); c.shadowColor='transparent'; }
+/* two light fans opposite each other, the way grooves catch a lamp; they stay fixed to the lamp while the disc turns */
+function fans(c,R,strength,width,lampA){
+  for(const [a,w] of [[lampA,1],[lampA+Math.PI,.72]]){ const g=c.createConicGradient(a-width/2,0,0); const s=strength*w;
+    g.addColorStop(0,'rgba(255,255,255,0)'); g.addColorStop(width/TAU*.35,`rgba(255,255,255,${s*.45})`); g.addColorStop(width/TAU*.5,`rgba(255,255,255,${s})`); g.addColorStop(width/TAU*.65,`rgba(255,255,255,${s*.45})`); g.addColorStop(width/TAU,'rgba(255,255,255,0)'); g.addColorStop(1,'rgba(255,255,255,0)');
+    c.fillStyle=g; c.fillRect(-R,-R,2*R,2*R); }
+}
+function grooveMask(c,R,inner,outer,gaps){
+  /* restricts to the grooved area, with the dead-wax and the gaps left alone */
+  c.beginPath(); c.arc(0,0,outer,0,TAU); c.arc(0,0,inner,0,TAU,true); c.clip('evenodd');
+}
+/* the things on a real disc that are not symmetric, so the turn can be seen: the lead-in and run-out
+   spirals, a few faint radial pressing streaks, a scatter of dust; drawn in the disc's own frame */
+function marks(c,R,ang,light){
+  c.save(); c.rotate(ang);
+  c.strokeStyle=light?'rgba(0,0,0,.14)':'rgba(255,255,255,.16)'; c.lineWidth=.9;
+  c.beginPath(); for(let t=0;t<TAU*2.5;t+=.04){ const r=R*.965-t/(TAU*2.5)*R*.02; c.lineTo(Math.cos(t)*r,Math.sin(t)*r); } c.stroke();            /* lead-in */
+  c.beginPath(); for(let t=0;t<TAU*3;t+=.04){ const r=R*.42-t/(TAU*3)*R*.025; c.lineTo(Math.cos(t)*r,Math.sin(t)*r); } c.stroke();                 /* run-out */
+  c.strokeStyle=light?'rgba(0,0,0,.05)':'rgba(255,255,255,.03)'; c.lineWidth=R*.02;
+  for(const a of [.4,1.9,3.3,4.6,5.7]){ c.beginPath(); c.moveTo(Math.cos(a)*R*.42,Math.sin(a)*R*.42); c.lineTo(Math.cos(a+.05)*R*.95,Math.sin(a+.05)*R*.95); c.stroke(); }   /* pressing streaks */
+  c.fillStyle=light?'rgba(0,0,0,.35)':'rgba(255,255,255,.4)'; for(let i=0;i<34;i++){ const a=hash(i,1,9)*TAU, r=R*(.43+hash(i,2,9)*.5); c.fillRect(Math.cos(a)*r,Math.sin(a)*r,1,1); }
+  c.restore();
+}
+/* ---- a general pressed disc: every groove a V in a height field, shaded by one lamp. opts: body, lab, lamp
+   (angle), pitch (px), spec, trans (0 opaque vinyl .. 1 translucent coloured), streak */
+function pressedDraw(opts){
+  const cache=new Map();
+  return function(c,R,ang,dark){
+    const W=Math.round(R*2);
+    if(!cache.has(W)){ const b=document.createElement('canvas'); b.width=b.height=W; const d=b.getContext('2d').createImageData(W,W), px=d.data;
+      const la=opts.lamp??-2.2, LX=Math.cos(la)*.9, LY=Math.sin(la)*.9, LZ=opts.lz??.36, m=Math.hypot(LX,LY,LZ), lx=LX/m,ly=LY/m,lz=LZ/m;
+      const pitch=opts.pitch??1.25, body=opts.body, lab=opts.lab, trans=opts.trans??0, spec=opts.spec??.9;
+      for(let y=0;y<W;y++) for(let x=0;x<W;x++){ const dx=x-W/2+.5, dy=y-W/2+.5, r=Math.hypot(dx,dy), o=(y*W+x)*4; if(r>R){ px[o+3]=0; continue; }
+        const u=r/R; let dh=0;
+        if(u>.395&&u<.965){ const p=r/pitch; const f=p-Math.floor(p); dh=(f<.5?-1:1)*(opts.depth??1.6); }
+        if(u<=.355&&u>.345) dh=-6; if(u>.965) dh=(u-.965)*-40;
+        const nx=dx/r*dh, ny=dy/r*dh, nl=Math.hypot(nx,ny,1), nnx=-nx/nl, nny=-ny/nl, nnz=1/nl;
+        const diff=Math.max(0,nnx*lx+nny*ly+nnz*lz); const hx=lx,hy=ly,hz=lz+1,hm=Math.hypot(hx,hy,hz); const sp=Math.pow(Math.max(0,nnx*hx/hm+nny*hy/hm+nnz*hz/hm),28);
+        let col=u<=.355?lab:body; let k=.55+.45*diff;
+        if(trans>0&&u>.355){ /* translucent: thinner toward the rim reads lighter, the grooves scatter the light so the fans are softer */ const th=1-(u-.355)/.61; k=.80+.22*diff; col=[col[0]+(255-col[0])*(1-th)*trans*.35,col[1]+(255-col[1])*(1-th)*trans*.35,col[2]+(255-col[2])*(1-th)*trans*.35]; }
+        const s=sp*(u<=.355?.25:spec*(1-trans*.55))*255;
+        px[o]=Math.min(255,col[0]*k+s); px[o+1]=Math.min(255,col[1]*k+s); px[o+2]=Math.min(255,col[2]*k+s); px[o+3]=255; }
+      b.getContext('2d').putImageData(d,0,0); cache.set(W,b); }
+    c.save(); c.rotate(ang); c.drawImage(cache.get(W),-R,-R,2*R,2*R); c.restore();
+    marks(c,R,ang,!!opts.light);
+    c.save(); c.rotate(ang); c.translate(R*.004,R*.003); c.fillStyle=opts.text||'rgba(250,249,247,.95)'; c.textAlign='center'; c.textBaseline='middle'; const r=R*.355; c.font=`600 ${Math.round(R*.055)}px "Plus Jakarta Sans"`; c.fillText((TITLE_||'').toUpperCase(),0,-r*.40); c.font=`500 ${Math.round(R*.040)}px "Plus Jakarta Sans"`; c.globalAlpha=.75; c.fillText('SIDE A',0,r*.36); c.fillText((NUM_||'')+' · 33⅓',0,r*.56); c.globalAlpha=1;
+    c.lineWidth=R*.012; c.strokeStyle='rgba(255,255,255,.5)'; c.beginPath(); c.arc(0,0,r-R*.006,0,TAU); c.stroke(); c.restore();
+    c.fillStyle='#141216'; c.beginPath(); c.arc(0,0,R*.026,0,TAU); c.fill(); edge(c,R);
+  };
+}
+
+const hexRGB=h=>{const n=parseInt(h.slice(1),16);return [(n>>16)&255,(n>>8)&255,n&255];};
+/* THE PRESSINGS TAKE TURNS: black vinyl under three lights, and the three translucent colours, the label in each project's colour */
+/* the lamp sits upper RIGHT here: the disc peeks out of the sleeve's right side, so that is the crescent
+   that must carry the lit fan, not the half hidden behind the cover */
+const PRESS=[
+  {kind:'P1',opt:{body:[16,15,18],lamp:-.7,lz:.3,spec:1.1,depth:1.8}},
+  {kind:'C1',opt:{body:[158,172,160],lamp:-.7,lz:.55,spec:.7,trans:.8,light:true}},
+  {kind:'P2',opt:{body:[22,21,25],lamp:-1.2,lz:.9,spec:.35,depth:1.2}},
+  {kind:'C2',opt:{body:[136,126,140],lamp:-.7,lz:.55,spec:.75,trans:.6,light:true}},
+  {kind:'P3',opt:{body:[14,13,16],lamp:-.4,lz:.28,spec:.9,pitch:2.2,depth:2.2}},
+  {kind:'C3',opt:{body:[186,164,84],lamp:-.7,lz:.55,spec:.8,trans:.7,light:true}},
+  {kind:'P1',opt:{body:[16,15,18],lamp:-.7,lz:.3,spec:1.1,depth:1.8}},
+];
+const DISCS=[];
+function mountDisc(el,p,i){ const cv=el.querySelector('.disc canvas'), c=cv.getContext('2d'); const pr=PRESS[i%PRESS.length];
+  const lab=hexRGB(p.lab); const darkLab=lab[0]+lab[1]+lab[2]<300;
+  const draw=pressedDraw(Object.assign({lab,text:darkLab?'rgba(250,249,247,.95)':'rgba(20,23,27,.85)'},pr.opt));
+  const S={el,cv,c,draw,ang:0,vel:0,raf:0,title:p.t,num:p.n}; DISCS.push(S); wakeDisc(S); return S; }
+function wakeDisc(S){ if(!S.raf) S.raf=requestAnimationFrame(()=>frameDisc(S)); }
+function frameDisc(S){ S.raf=0; const dpr=Math.min(2,devicePixelRatio||1), r=S.cv.getBoundingClientRect(), W=Math.round(r.width*dpr); if(!W) return; if(S.cv.width!==W){ S.cv.width=S.cv.height=W; }
+  const hot=S.el.classList.contains('hot')||S.el.matches(':hover'); S.vel+=((hot?.06:0)-S.vel)*.05; S.ang+=S.vel;
+  const c=S.c, R=W/2/1.12, dark=document.documentElement.getAttribute('data-theme')==='dark';
+  c.setTransform(1,0,0,1,0,0); c.clearRect(0,0,W,W); c.save(); c.translate(W/2,W/2);
+  TITLE_=S.title; NUM_=S.num; shadow(c,R,dpr,dark); S.draw(c,R,S.ang,dark); c.restore();
+  if(Math.abs(S.vel)>.0004||hot) S.raf=requestAnimationFrame(()=>frameDisc(S)); }
+const MARKS={"Fostr": {"x": 1.1417282430213465, "y": 6.055008210180624, "s": 0.96}, "Halodoc": {"x": -1.1987977756892234, "y": 7.936018431495406, "s": 0.84}, "Conduit Commerce": {"x": 4.200116175856309, "y": 1.5476516812865497, "s": 0.93}, "Second Self": {"x": 1.092412019632414, "y": 48.66397765246451, "s": 2}, "Manus AI": {"x": 0.6637687969924817, "y": -0.3527699456975781, "s": 1.11}, "Olive": {"x": 21.35139280492899, "y": 1.1960239139515494, "s": 1.04}, "SomiaCX": {"x": 6.520696271929828, "y": -5.412130586883876, "s": 1.24}};
+const N=P.length, clamp=(v,a,b)=>Math.max(a,Math.min(b,v)), sm=x=>x*x*(3-2*x);
+function record(p,i){ const el=document.createElement('div'); el.className='rec'; el.dataset.i=i; el.style.setProperty('--lab',p.lab);
+  const m=MARKS[p.t]||{x:0,y:0,s:1};
+  el.innerHTML=`<div class="disc"><canvas></canvas></div><div class="sleeve"><div class="win"><div class="tint"></div><img src="${p.img}" alt="" style="--x:${m.x}%;--y:${m.y}%;--s:${m.s}"></div><div class="t"><span>${p.t}</span><small>${p.n}</small></div></div>`; mountDisc(el,p,i); return el; }
+/* pointer + wheel drive a continuous pos; a short press is a tap; glides settle on a whole record */
+function wire(st, o){ let down=null, moved=false, v=0, raf=0;
+  const glide=(target,ms=420)=>{ const from=o.pos(); let t0=0; cancelAnimationFrame(raf); (function g(t){ if(!t0) t0=t; const k=sm(clamp((t-t0)/ms,0,1)); o.set(from+(target-from)*k); if(k<1) raf=requestAnimationFrame(g); })(performance.now()); };
+  st.addEventListener('pointerdown',e=>{ down={x:e.clientX,y:e.clientY,pos:o.pos(),t:e.target}; moved=false; v=0; st.setPointerCapture(e.pointerId); cancelAnimationFrame(raf); });
+  st.addEventListener('pointermove',e=>{ if(!down) return; const d=o.axis==='x'?e.clientX-down.x:e.clientY-down.y; if(Math.abs(d)>5) moved=true; const np=down.pos-d/o.px; v=np-o.pos(); o.set(np); });
+  const up=e=>{ if(!down) return; const t=down.t; down=null; if(!moved){ o.tap&&o.tap(t); return; } glide(clamp(Math.round(o.pos()+v*6),0,N-1)); };
+  st.addEventListener('pointerup',up); st.addEventListener('pointercancel',up);
+  st.addEventListener('wheel',e=>{ e.preventDefault(); const d=o.axis==='x'?(Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY):e.deltaY; o.set(clamp(o.pos()+d/o.px,0,N-1)); clearTimeout(o._w); o._w=setTimeout(()=>glide(Math.round(o.pos()),300),100); },{passive:false});
+  o.glide=glide;
+}
+function stage(v){
+  const sec=document.createElement('section');
+  sec.innerHTML=`<div class="head"><div><div class="label">${v.name}</div><h2>${v.head}</h2></div><p class="why">${v.why}</p></div><div class="stage"><div class="pick"><div><b></b><i></i></div><span>open case study</span></div><div class="hint">${v.hint}</div></div>`;
+  document.getElementById('stages').appendChild(sec);
+  const st=sec.querySelector('.stage'), pick=sec.querySelector('.pick'), hint=sec.querySelector('.hint');
+  let pos=0, picked=-1, hover=-1;
+  const showPick=i=>{ picked=i; if(i<0){ pick.classList.remove('on'); return; } pick.querySelector('b').textContent=P[i].t; pick.querySelector('i').textContent=P[i].role; pick.classList.add('on'); };
+  const pv=document.createElement('div'); pv.className='pv'; pv.innerHTML='<div class="m"></div><div class="c"><b></b><i></i><span></span></div>'; st.appendChild(pv);
+  const media=new Map(), pm=pv.querySelector('.m');
+  const card=i=>{ if(!window.SHOW_CARD) i=-1; pv.classList.toggle('on',i>=0); st.classList.toggle('hovering',i>=0); st.querySelectorAll('.rec,.spine').forEach(e=>e.classList.toggle('hot',+e.dataset.i===i)); if(i<0){ media.forEach(m=>{ m.classList.remove('on'); m.pause&&m.pause(); }); return; }
+    const p=P[i]; pv.querySelector('b').textContent=p.t; pv.querySelector('i').textContent=p.role+' \u00b7 '+p.st; pv.querySelector('span').textContent=p.s;
+    if(!media.has(i)){ let m; if(p.v){ m=document.createElement('video'); m.muted=true; m.loop=true; m.playsInline=true; m.preload='auto'; m.poster=p.pic; m.src=p.v; } else { m=document.createElement('img'); m.src=p.pic; } pm.appendChild(m); media.set(i,m); }
+    media.forEach((m,k)=>{ const on=k===i; m.classList.toggle('on',on); if(m.play){ if(on) m.play().catch(()=>{}); else m.pause(); } }); };
+  const S={st,pos:()=>pos,picked:()=>picked,hover:()=>hover,showPick,P,card};
+  const els=v.build(S); st.insertBefore(hint,null);
+  const set=p=>{ pos=clamp(p,0,N-1); v.update(els,S); };
+  st.addEventListener('pointerover',e=>{ const r=e.target.closest('.rec,.spine,.titles a'); hover=r?+r.dataset.i:-1; card(hover); v.update(els,S); DISCS.forEach(wakeDisc); });
+  st.addEventListener('pointerleave',()=>{ hover=-1; card(-1); v.update(els,S); DISCS.forEach(wakeDisc); });
+  if(v.axis) wire(st,{axis:v.axis,px:v.px,pos:()=>pos,set,tap:t=>{ const r=t.closest('.rec,.spine,.titles a'); if(!r) return; const i=+r.dataset.i; if(v.tap) v.tap(i,S,set); else { showPick(picked===i?-1:i); } v.update(els,S); }});
+  else st.addEventListener('click',e=>{ const r=e.target.closest('.rec,.spine,.titles a'); if(!r) return; const i=+r.dataset.i; if(v.tap) v.tap(i,S,p=>{pos=p;}); else showPick(picked===i?-1:i); v.update(els,S); });
+  /* THE RECORD MAKES ROOM. On hover the sleeve and its disc move left together, and the card lands in
+     the space to their right; near the right edge the record goes right and the card lands on its left. */
+  const CARD=440, GAP=28, SHIFT=130;
+  const place=()=>{ const el=st.querySelector('.rec.hot,.spine.hot'); if(!window.SHOW_CARD){ if(el) el.style.setProperty('--shift','0px'); return; } if(!el||v.centreCard){ if(v.centreCard&&hover>=0){ pv.style.left=(st.clientWidth/2-CARD/2)+'px'; pv.style.top=(st.clientHeight/2)+'px'; } return; }
+    const sr=st.getBoundingClientRect(), r=el.getBoundingClientRect(); const right=r.right-sr.left, left=r.left-sr.left, cy=r.top-sr.top+r.height/2;
+    const fits=right-SHIFT+GAP+CARD<=st.clientWidth-16;        /* measured where the record will be once it has moved left */
+    el.style.setProperty('--shift',(fits?-SHIFT:SHIFT)+'px');
+    const x=fits?right-SHIFT+GAP:left+SHIFT-GAP-CARD; pv.style.left=Math.max(16,Math.min(st.clientWidth-CARD-16,x))+'px'; pv.style.top=Math.max(170,Math.min(st.clientHeight-170,cy))+'px'; };
+  const update0=v.update.bind(v); v.update=(E,S2)=>{ update0(E,S2); st.querySelectorAll('.rec').forEach(e=>{ if(!e.classList.contains('hot')) e.style.setProperty('--shift','0px'); e.style.transform='translateX(var(--shift)) '+e.style.transform; }); requestAnimationFrame(place); };
+  S.set=set; v.update(els,S);
+}
+const V=[
+  { name:'01 · Shelf', head:'Slide along the shelf', hint:'scroll or drag sideways · hover pulls the disc · click picks', axis:'x', px:230*K,
+    why:'The phone direction, widened. Seven sleeves on one shelf, the one in front square-on and lifted, the rest turned away. Hover pulls the disc out of any sleeve; click picks it.',
+    build(S){ return P.map((p,i)=>{ const r=record(p,i); S.st.appendChild(r); return r; }); },
+    update(R,S){ const W=S.st.clientWidth, pos=S.pos(); R.forEach((r,i)=>{ const d=i-pos, a=Math.abs(d); r.style.zIndex=100-Math.round(a*10);
+      const x=W/2-120+d*300, rot=clamp(d*45,-50,50), s=1-Math.min(a,1)*.12, up=S.picked()===i&&a<.5;
+      r.style.transform=`translate(${x}px,${up?150:180}px) perspective(1200px) rotateY(${-rot}deg) scale(${s})`; r.style.opacity=a>2.4?0:1; r.style.filter=`brightness(${1-Math.min(a,1)*.1})`;
+      r.querySelector('.disc').style.transform=`translateX(${(S.hover()===i||up)?92:(1-sm(clamp(a,0,1)))*44}px) rotate(${S.hover()===i?40:0}deg)`; }); } },
+  { name:'02 · Crate', head:'Dig through the crate', hint:'scroll or drag · hover tips a sleeve back · click picks', axis:'x', px:120,
+    why:'A crate seen from above at an angle, records filed front to back. Scrolling walks through the crate; the sleeve you are on tips back toward you so the whole cover shows. The way a hand moves through a bin.',
+    build(S){ return P.map((p,i)=>{ const r=record(p,i); S.st.appendChild(r); return r; }); },
+    update(R,S){ const W=S.st.clientWidth, pos=S.pos(); R.forEach((r,i)=>{ const d=i-pos, a=Math.abs(d), on=S.hover()===i||(S.picked()===i);
+      r.style.zIndex=50-i; r.style.transformOrigin='50% 100%';
+      const x=W/2-120+d*72, y=300+d*8, tilt=on?-4:(d<0?-62:-38), lift=on?-40:0;
+      r.style.transform=`translate(${x}px,${y+lift}px) perspective(1400px) rotateX(${tilt}deg) rotateY(${d*-2}deg)`; r.style.opacity=d<-1.5?0:1; r.style.filter=`brightness(${1-clamp(d,0,6)*.05})`;
+      r.querySelector('.disc').style.transform='none'; }); } },
+  { name:'03 · Spines', head:'A shelf of spines', hint:'hover a spine to pull it out · click picks', axis:null,
+    why:'Records shelved edge-on, only the spines showing, the title running up each one. Hovering slides that record out of the shelf and turns it to face you; clicking picks it. The quietest of the five on the page.',
+    build(S){ const W=S.st.clientWidth; return P.map((p,i)=>{ const sp=document.createElement('div'); sp.className='spine'; sp.dataset.i=i; sp.style.setProperty('--lab',p.lab); sp.innerHTML=`<b>${p.t}</b><i></i>`; S.st.appendChild(sp);
+      const r=record(p,i); r.style.pointerEvents='none'; S.st.appendChild(r); return {sp,r}; }); },
+    update(E,S){ const W=S.st.clientWidth, x0=W/2-(N*44)/2; E.forEach((e,i)=>{ const on=S.hover()===i||S.picked()===i;
+      e.sp.style.transform=`translate(${x0+i*44}px,${on?120:150}px)`; e.sp.style.zIndex=10+i;
+      e.r.style.transformOrigin='50% 50%'; e.r.style.transition='transform .5s cubic-bezier(.22,1,.36,1),opacity .3s ease'; e.r.style.zIndex=60;
+      e.r.style.transform=on?`translate(${clamp(x0+i*44-103,24,W-264)}px,340px) rotateY(0deg)`:`translate(${x0+i*44-103}px,420px) rotateY(80deg) scale(.6)`; e.r.style.opacity=on?1:0; }); } },
+  { name:'04 · Platter', head:'Titles left, platter right', hint:'hover a title to drop its record on · click opens', axis:null, centreCard:true,
+    why:'The home list as it is today, titles on the left, but the preview on the right is a turntable: hovering a title lifts the record out of its sleeve and drops it on the platter, spinning; the sleeve leans against the plinth.',
+    build(S){ const W=S.st.clientWidth; const list=document.createElement('div'); list.className='titles'; list.innerHTML=P.map((p,i)=>`<a data-i="${i}"><span>${p.t}</span><small>${p.n}</small></a>`).join(''); S.st.appendChild(list);
+      const pl=document.createElement('div'); pl.className='platter'; pl.innerHTML='<div class="mat"></div>'; S.st.appendChild(pl);
+      const R=P.map((p,i)=>{ const r=record(p,i); r.style.pointerEvents='none'; S.st.appendChild(r); return r; }); return {list,pl,R}; },
+    update(E,S){ const W=S.st.clientWidth, cur=S.hover()>=0?S.hover():(S.picked()>=0?S.picked():0); E.list.querySelectorAll('a').forEach((a,i)=>a.classList.toggle('on',i===cur));
+      E.pl.style.transform=`translate(${W*.62}px,110px)`; E.R.forEach((r,i)=>{ const on=i===cur; r.style.zIndex=on?30:20; r.style.transition='transform .55s cubic-bezier(.22,1,.36,1),opacity .3s ease';
+        r.style.transform=on?`translate(${W*.62-150}px,330px) rotate(-6deg)`:`translate(${W*.62-150}px,360px) rotate(-6deg) scale(.96)`; r.style.opacity=on?1:0;
+        /* the disc lands on the platter's centre: sleeve at (W*.62-150, 330), the disc's own centre 138px in and 120 down, the platter's centre at (W*.62+190, 300) */
+        const d=r.querySelector('.disc'); d.style.setProperty('--dx',on?'202px':'0px'); d.style.setProperty('--dy',on?'-150px':'0px'); d.style.transition='transform .6s cubic-bezier(.22,1,.36,1)';
+        d.style.transform=on?'translate(202px,-150px)':'none'; d.style.animation=on?'spin 2.8s linear infinite .6s':'none'; }); } },
+  { name:'05 · Wall', head:'A wall of sleeves', hint:'hover any sleeve · click picks', axis:null,
+    why:'All seven face out on a wall, four and three, every card the same size with the same gap. Hover slides the disc out and spins it, the sleeve lifts a little. Scannable at a glance, which recruiters like, and the records still feel like records.',
+    build(S){ return P.map((p,i)=>{ const r=record(p,i); S.st.appendChild(r); return r; }); },
+    update(R,S){ const W=S.st.clientWidth, gap=24, cw=220, cols=4, rowW=cols*cw+(cols-1)*gap, x0=(W-rowW)/2; R.forEach((r,i)=>{ const row=i<4?0:1, col=i<4?i:i-4, rw=row?3:4, xx=(W-(rw*cw+(rw-1)*gap))/2+col*(cw+gap), y=40+row*290, on=S.hover()===i||S.picked()===i;
+      r.style.width=r.style.height='220px'; r.style.zIndex=on?30:10; r.style.transition='transform .45s cubic-bezier(.22,1,.36,1)';
+      r.style.transform=`translate(${xx}px,${y+(on?-8:0)}px) scale(${on?1.03:1})`; r.querySelector('.disc').style.transform=on?'translateX(70px) rotate(90deg)':'none'; }); } },
+];
+const st=document.createElement('style'); st.textContent='@keyframes spin{from{transform:translate(var(--dx,0),var(--dy,0)) rotate(0deg)}to{transform:translate(var(--dx,0),var(--dy,0)) rotate(360deg)}}'; document.head.appendChild(st);
+stage(V[0]);   /* big: the shelf alone, full screen */
+window.SHOW_CARD=false; document.getElementById('card').addEventListener('change',e=>{ window.SHOW_CARD=e.target.checked; });
+document.getElementById('dark').addEventListener('change',e=>document.documentElement.setAttribute('data-theme',e.target.checked?'dark':'light'));
+</script>
+</body></html>

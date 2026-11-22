@@ -1,0 +1,529 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Variant 4</title>
+<link rel="stylesheet" href="deck.css?v=20261026q">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<filter id="lens" filterUnits="objectBoundingBox" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+  <feImage id="lensmap" href="" x="0" y="0" width="42" height="42" preserveAspectRatio="none" result="map"/>
+  <feDisplacementMap in="SourceGraphic" in2="map" scale="22" xChannelSelector="R" yChannelSelector="G"/>
+</filter>
+<filter id="lens96" filterUnits="objectBoundingBox" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+  <feImage id="lensmap96" href="" x="0" y="0" width="96" height="96" preserveAspectRatio="none" result="map"/>
+  <feDisplacementMap in="SourceGraphic" in2="map" scale="30" xChannelSelector="R" yChannelSelector="G"/>
+</filter></defs></svg>
+<script>
+/* THE MAP. For every pixel of the disc: its direction from the centre, and a shift that is zero
+   in the flat middle and grows toward the rim, the way a lens bends more at its edge. Red is x,
+   green is y, 128 is no shift. */
+(function(){ const N=112, cv=document.createElement('canvas'); cv.width=cv.height=N; const x=cv.getContext('2d'); const img=x.createImageData(N,N), d=img.data;
+  for(let j=0;j<N;j++) for(let i=0;i<N;i++){ const u=(i+.5)/N*2-1, v=(j+.5)/N*2-1; const r=Math.hypot(u,v); const o=(j*N+i)*4;
+    let k=0; if(r<1){ const t=Math.max(0,(r-.5)/.5); k=t*t; }               /* flat to 50%, then a rising bend */
+    const nx=r>0?u/r:0, ny=r>0?v/r:0;
+    d[o]=Math.round(128+nx*127*k); d[o+1]=Math.round(128+ny*127*k); d[o+2]=128; d[o+3]=255; }
+  x.putImageData(img,0,0); document.getElementById('lensmap').setAttribute('href',cv.toDataURL()); document.getElementById('lensmap96').setAttribute('href',cv.toDataURL()); })();
+</script>
+<div id="stage"><div id="slide">
+<section class="s" data-steps="1"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="cover">
+  <p class="c-brand"><img class="logo" src="assets/manus/logo.svg" alt="Manus AI"></p>
+  <div class="cv-l">
+    <h1>Redesigning the Manus AI community <em class="hl">so new users stay.</em></h1>
+    <p class="cv-by">I proposed, researched, designed and shipped the new community as its sole designer.</p></div>
+  <div class="cv-r"><div class="frame"><video src="assets/manus/solution-2-paths.mp4" poster="assets/manus/solution-2-paths.png" muted loop autoplay playsinline aria-label="The shipped community page"></video></div></div>
+<div class="cv-meta"><div><p class="ml">My role</p><p class="mv">Product Design Intern, sole designer on the community platform</p></div><div><p class="ml">Timeline</p><p class="mv">November 2025 to January 2026</p></div><div><p class="ml">Team</p><p class="mv tm1"><span class="tn1"><mark class="nm1">Michelle Liu</mark>, Product Manager</span><span class="tn1"><mark class="nm1">Richard Liu</mark>, GTM</span><span class="tn1"><mark class="nm1">Peng Ying</mark>, Community Lead</span><span class="tn1"><mark class="nm1">Henry Yang</mark>, Co&#8209;Founder</span><span class="tn1"><mark class="nm1">Jazlynn Kurniandra</mark>, Product Designer (me)</span></p></div><div><p class="ml">Tools</p><p class="mv">Claude Code, Figma<br>Lovable, Manus AI</p></div></div>
+</div></div><div class="foot"><span class="n">01</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="sh60"><span class="no">01</span><h1>Context</h1></div></div><div class="foot"><span class="n">02</span><span class="ch"><a class="on" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>What Manus <em class="hl">asked.</em></h2></div></div><div class="ea3">
+<div class="ea3i"><div class="appic"><span class="sq"><img class="s43m" src="assets/manus/manus-mark.svg" alt=""></span><span class="nm">Manus</span></div></div>
+<ul class="ea3t"><li>Manus launched in March 2025 as <b>one of the most capable general AI agents</b>.</li>
+<li>On the GAIA benchmark it reported <b>86.5% at Level 1</b> against 74.3% for OpenAI Deep Research.</li>
+<li>It passed <b>$100m in annual recurring revenue</b> about eight months after launch.</li></ul>
+<i class="gl3 out"></i>
+</div></div><div class="foot"><span class="n">03</span><span class="ch"><a class="on" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>What I <em class="hl">found.</em></h2></div></div><div class="ea3 ed4 ed4c">
+<div class="ea3i ed4i"><!-- <p class="cap4 c1"></p><p class="cap4 c2"></p> --><div class="shot4 s1 ph4"><span>Image placeholder</span></div><div class="shot4 s2 ph4"><span>Image placeholder</span></div></div>
+<ul class="ea3t"><li>The community page had two jobs. It had to <b>draw new users in</b> to learn the product and <b>grow a power-user community</b> that shares tips and advice.</li>
+<li>New users landed on <b>an archive of past events</b> and left within seconds.</li>
+<li>Before the redesign <b>new-user retention was 30%</b> among internal testers.</li></ul>
+<i class="gl3 in"></i><i class="gl3 out"></i>
+</div></div><div class="foot"><span class="n">04</span><span class="ch"><a class="on" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>How I <em class="hl">answered.</em></h2></div></div><div class="ea3 ed4 ed5">
+<div class="ea3i ed4i"><!-- <p class="cap5"></p> --><div class="shot4 s1 ph4"><span>Image placeholder</span></div><div class="shot4 s2 ph4"><span>Image placeholder</span></div><div class="shot4 s3 ph4"><span>Image placeholder</span></div></div>
+<ul class="ea3t"><li>As <b>sole designer</b> I ran <b>13 interviews</b>, <b>three rounds of usability testing</b> and two research-led pivots.</li>
+<li>I rebuilt the page&rsquo;s <b>information architecture</b> around an AI-guided path.</li>
+<li><b>The result:</b> each user gets <b>a personal pathway ranked by fit</b> that carries its own explanation. <b>One dashboard</b> holds their role, events and contributions.</li></ul>
+<i class="gl3 in"></i><i class="gl3 run"></i><i class="vl3 down"></i>
+</div></div><div class="foot"><span class="n">05</span><span class="ch"><a class="on" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>Every result was confirmed <em class="hl">by a metric.</em></h2></div></div><div class="mt6"><i class="vl3 in"></i><i class="vl3 down"></i>
+<div class="mt6c"><span class="gl6"><svg viewBox="0 0 48 48"><path class="a" d="M6 9h24a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H17l-7 6v-6H6a3 3 0 0 1-3-3V12a3 3 0 0 1 3-3z"/><path class="b" d="M37 19h5a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2v5l-6-5h-7"/><path d="M10 16h16M10 21h10"/></svg></span><span class="n6">13</span><b>Interviews</b><p>The same three pain points kept surfacing.</p><p class="ins">Measured with: one-to-one interviews</p></div><div class="mt6c"><span class="gl6"><svg viewBox="0 0 48 48"><path class="a" d="M38 24a14 14 0 1 1-4.1-9.9"/><path class="b" d="M38 9v6h-6"/><path d="M18 24l4 4 8-8"/></svg></span><span class="n6">3</span><b>Rounds of usability testing</b><p>Two opposite prototypes, then a guided path.</p><p class="ins">Measured with: usability sessions with testers</p></div><div class="mt6c"><span class="gl6"><svg viewBox="0 0 48 48"><path d="M5 41h38"/><path class="a" d="M9 12l10 10 7-6 13 15"/><path class="b" d="M32 31h7v-7"/></svg></span><span class="n6">30%</span><b>New-user retention before the redesign</b><p>Among internal testers, before the AI-guided path.</p><p class="ins">Measured with: new-user retention in internal testing</p></div>
+</div></div><div class="foot"><span class="n">06</span><span class="ch"><a class="on" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>The work ran in six stages <em class="hl">over three months.</em></h2></div></div><div class="rmB"><i class="vl3 in"></i><i class="gl7"></i><svg class="lp" viewBox="0 0 1136 200"><path class="ln" d="M0 150 H1136" stroke="#14171B" stroke-width="2"/><g class="lp1 piv"><path class="pc" pathLength="1" d="M576.0 124 C576.0 18, 386.7 18, 386.7 116" fill="none" stroke="rgba(20,23,27,.38)" stroke-width="2" stroke-linecap="round"/><path class="ph" pathLength="1" d="M379.7 106 L386.7 122 L393.7 106" fill="none" stroke="rgba(20,23,27,.38)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g></svg><div class="pv lp1" style="left:381px;width:200px">Two pivots<br><span>Both came from testing</span></div><div class="rowB6"><div class="st"><i class="nd"></i><b><a class="nj" data-go="2">Context<i>&rarr;</i></a></b><p>Activation metric</p><p>Funnel on the community page</p></div><div class="st"><i class="nd"></i><b><a class="nj" data-go="8">Discovery<i>&rarr;</i></a></b><p>13 interviews</p><p>Competitive audit</p></div><div class="st"><i class="nd"></i><b><a class="nj" data-go="17">Solution<i>&rarr;</i></a></b><p>Three principles</p><p>A test for each design</p></div><div class="st"><i class="nd"></i><b><a class="nj" data-go="19">Testing<i>&rarr;</i></a></b><p>Two extremes tested</p><p>Three rounds of cards</p></div><div class="st"><i class="nd"></i><b><a class="nj" data-go="27">Final design<i>&rarr;</i></a></b><p>Dashboard, path, recommendations</p><p>Stakeholder map</p></div><div class="st"><i class="nd"></i><b><a class="nj" data-go="34">Measuring<i>&rarr;</i></a></b><p>Success metrics</p><p>Scaling across Manus</p></div></div></div></div><div class="foot"><span class="n">07</span><span class="ch"><a class="on" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="sh60"><span class="no">02</span><h1>Discovery</h1></div></div><div class="foot"><span class="n">08</span><span class="ch"><a class="" data-go="2">Context</a><a class="on" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>The problem statement</h2></div></div><blockquote class="psq"><span class="qm">&ldquo;</span><p>New users meet a highly capable product with <mark>no clear place to start</mark>. This affects <mark>non-technical newcomers</mark> who cannot tell where to begin and <mark>power users</mark> who have no way to be seen. It holds new&#8209;user retention at <mark>30%</mark>. A successful design gives every newcomer <mark>a clear first step</mark> and every power user <span class="nw"><mark>a place to contribute</mark>.<span class="qe">&rdquo;</span></span></p></blockquote></div><div class="foot"><span class="n">09</span><span class="ch"><a class="" data-go="2">Context</a><a class="on" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>The data pinpointed that the failure was in converting acquired users <em class="hl">to active users.</em></h2></div></div>
+<p class="mt act-t">Featured-capability activation rate, measured in November 2025</p>
+<div class="fun3"><div class="fr3"><div class="fbw"><i style="width:100%"></i><span>Watched a UGC video</span></div><div class="fsrc"><b>UGC and social platform data</b><p>Views, watch time and click-throughs, each video tagged by hand for the 1.5 Max capability it featured.</p></div></div><div class="fr3"><div class="fbw"><i style="width:64%"></i><span>Downloaded Manus</span></div><div class="fsrc"><b>Acquisition and attribution data</b><p>UTM links, deep links and referral codes tie each download to its video.</p></div></div><div class="fr3"><div class="fbw"><i style="width:14%"></i><u class=gp><b>The activation gap</b></u><span>Used the capability the video showed</span></div><div class="fsrc"><b>In-app event data</b><p>Feature-level events show whether, how often and how soon.</p></div></div></div>
+<p class="fn fn10">Activation rate = users who used the featured capability &divide; users who downloaded after watching that video.</p></div><div class="foot"><span class="n">10</span><span class="ch"><a class="" data-go="2">Context</a><a class="on" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>The main reason was that Manus shipped capabilities <em class="hl">faster than users could learn them.</em></h2></div></div>
+<div class="conv c11v">
+  <div class="cvl"><p class="mt">Where new users came from</p><div class="cn cn0"><b>UGC videos</b><p>The founder&rsquo;s bet for the 1.5 Max launch.</p></div><div class="cn cn1"><b>A notification badge</b><p>The only teaching channel inside the chat UI.</p></div><div class="cn cn2"><b>LinkedIn messages</b><p>Two or three a week, asking how to get involved.</p></div></div>
+  <svg class="cvs" viewBox="0 0 200 330" preserveAspectRatio="none"><g fill="none" stroke="rgba(20,23,27,.28)" stroke-width="1.5" stroke-linecap="round"><path class="c11 l1" pathLength="1" d="M4 55 L192 165"/><path class="c11 l2" pathLength="1" d="M4 165 L192 165"/><path class="c11 l3" pathLength="1" d="M4 275 L192 165"/></g></svg>
+  <div class="cvr"><p class="mt">Where they landed</p><div class="cvp"><img src="assets/manus/old-community.png" alt="The community page before the redesign"></div><b>The community page</b><p>It converted almost none of them.</p></div>
+</div></div><div class="foot"><span class="n">11</span><span class="ch"><a class="" data-go="2">Context</a><a class="on" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>The community page was key to turning new users into active ones <em class="hl">but failed to convert them.</em></h2></div></div>
+<div class="gap half"></div>
+<div class="fig pins" style="height:470px">
+  <div class="frame" style="left:0;top:20px;width:700px"><img src="assets/manus/old-community.png" alt="The community page before the redesign"></div>
+  <svg class="ov" viewBox="0 0 1136 470">
+    <g class="pin p1"><path d="M330 97 H700" fill="none" stroke="#fff" stroke-width="5" stroke-opacity=".9"/><path d="M330 97 H756" fill="none" stroke="#340414" stroke-width="1.5"/><circle cx="330" cy="97" r="12" fill="#340414" stroke="#fff" stroke-width="2"/><text x="330" y="101.5" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-size="13" font-weight="600" fill="#fff">1</text></g>
+    <g class="pin p2"><path d="M165 186 H700" fill="none" stroke="#fff" stroke-width="5" stroke-opacity=".9"/><path d="M165 186 H756" fill="none" stroke="#340414" stroke-width="1.5"/><circle cx="165" cy="186" r="12" fill="#340414" stroke="#fff" stroke-width="2"/><text x="165" y="190.5" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-size="13" font-weight="600" fill="#fff">2</text></g>
+    <g class="pin p3"><path d="M232 309 H756" fill="none" stroke="#340414" stroke-width="1.5"/><circle cx="232" cy="309" r="12" fill="#340414" stroke="#fff" stroke-width="2"/><text x="232" y="313.5" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-size="13" font-weight="600" fill="#fff">3</text></g>
+  </svg>
+  <div class="co tl pin p1" style="left:770px;top:84px"><b>Click-through was high</b><p>People arrived on a hackathon that had already ended.</p></div>
+  <div class="co tl pin p2" style="left:770px;top:173px"><b>Conversion stayed flat</b><p>The page&rsquo;s main button opened a recap of that past event.</p></div>
+  <div class="co tl pin p3" style="left:770px;top:296px"><b>Retention was low</b><p>Below sat an archive of past events. Most visitors left within seconds.</p></div>
+  <div class="co ink pin p4" style="left:0;top:372px;width:1136px"><b>This was the next surface to fix</b><p>The notification badge was not teaching anyone how to use Manus. The UGC view counts also hid how few viewers went on to try the capability they saw. With the launch and the acquisition news, a wave of curious users was about to arrive. We planned to meet them on this page.</p></div>
+</div></div><div class="foot"><span class="n">12</span><span class="ch"><a class="" data-go="2">Context</a><a class="on" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>New users could not tell <em class="hl">what Manus could do for them.</em></h2></div></div>
+<div class="walk">
+  <div class="wv"><video data-sync="walk" src="assets/manus/pivot-hackathon.mp4" muted loop autoplay playsinline></video><div class="wbar"><i></i></div></div>
+  <div class="wl"><p class="mt">Scrolling the old community page</p><div class="wline"><div class="ws" data-t="0"><span class="wt">0:00</span><div><b>A single past event</b><p>The page opens on a hackathon that has already ended.</p></div></div><div class="ws" data-t="2"><span class="wt">0:02</span><div><b>An archive of past events</b><p>Next come dozens of meetups that have also already happened.</p></div></div><div class="ws" data-t="17"><span class="wt">0:17</span><div><b>One call to action</b><p>The only ask on the page is to host an event.</p></div></div><div class="ws" data-t="19.5"><span class="wt">0:19</span><div><b>What Manus can do</b><p>The products appear only as a list of names in the footer.</p></div></div><div class="ws end" data-t="20.5"><span class="wt">Result</span><div><b>About 30% of visitors stayed</b><p>Most left within seconds of arriving.</p></div></div></div></div>
+</div></div><div class="foot"><span class="n">13</span><span class="ch"><a class="" data-go="2">Context</a><a class="on" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>In 13 interviews, the same three pain points <em class="hl">kept surfacing.</em></h2></div></div>
+<div class="row s7"><div class="s7l"><p class="n13"><b>13</b><span>user interviews and secondary research</span></p><div class="stack" id="stack"><div class="card p0"><div class="qcard"><p>&ldquo;I’ve been using Manus for <u>weeks</u>, but sometimes I can’t keep up with the constant upgrades <u>like its 1.5 Max series</u>. The community doesn’t help with that at all, it’s just <u>a list</u> of past events.&rdquo;</p><div class="who"><svg viewBox="0 0 56 56" aria-hidden="true" style="color:#A99939"><circle cx="28" cy="28" r="28" fill="currentColor"/><circle cx="28" cy="21" r="7.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M14 44c2.2-7.6 7.4-11.5 14-11.5S39.8 36.4 42 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><span>Manus user interviewee</span></div></div></div><div class="card p1"><div class="qcard"><p>&ldquo;I opened the community page and just didn’t know what I was supposed to do. There’s <u>no indication</u> of where to start or what counts as participating.&rdquo;</p><div class="who"><svg viewBox="0 0 56 56" aria-hidden="true" style="color:#340414"><circle cx="28" cy="28" r="28" fill="currentColor"/><circle cx="28" cy="21" r="7.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M14 44c2.2-7.6 7.4-11.5 14-11.5S39.8 36.4 42 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><span>Manus community member</span></div></div></div><div class="card p2"><div class="qcard"><p>&ldquo;I want to <u>contribute and share</u> what I’ve built, but I have no idea if anyone will see it or if it even matters. There’s no feedback, <u>no signal</u> that my work is visible.&rdquo;</p><div class="who"><svg viewBox="0 0 56 56" aria-hidden="true" style="color:#A99939"><circle cx="28" cy="28" r="28" fill="currentColor"/><circle cx="28" cy="21" r="7.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M14 44c2.2-7.6 7.4-11.5 14-11.5S39.8 36.4 42 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><span>Manus community member</span></div></div></div></div><div class="dots" id="dots"><i class="on"></i><i></i><i></i></div></div><div class="finds" id="finds"><p class="lead3">Recurring pain points</p>
+  <div class="f on"><b>Cognitive overload</b><p>Non-technical users couldn&rsquo;t identify what Manus could do for them.</p></div>
+  <div class="f"><b>A static archive</b><p>The community felt like an archive. Users disengaged within minutes.</p></div>
+  <div class="f"><b>No way to contribute</b><p>Users wanted to contribute but had no clear pathway. They stayed passive.</p></div>
+</div></div></div><div class="foot"><span class="n">14</span><span class="ch"><a class="" data-go="2">Context</a><a class="on" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>The problem also extended to power users who had <em class="hl">no structured way to share their work.</em></h2></div></div>
+<div class="dp">
+  <div class="g new"><h3>Community newcomers</h3><p class="meta">5 people · age 22-35</p><div class="br"></div><div class="dots men"><svg class="av" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="28" fill="currentColor"/><circle cx="28" cy="21" r="7.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M14 44c2.2-7.6 7.4-11.5 14-11.5S39.8 36.4 42 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="av" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="28" fill="currentColor"/><circle cx="28" cy="21" r="7.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M14 44c2.2-7.6 7.4-11.5 14-11.5S39.8 36.4 42 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="av" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="28" fill="currentColor"/><circle cx="28" cy="21" r="7.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M14 44c2.2-7.6 7.4-11.5 14-11.5S39.8 36.4 42 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="av" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="28" fill="currentColor"/><circle cx="28" cy="21" r="7.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M14 44c2.2-7.6 7.4-11.5 14-11.5S39.8 36.4 42 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="av" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="28" fill="currentColor"/><circle cx="28" cy="21" r="7.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M14 44c2.2-7.6 7.4-11.5 14-11.5S39.8 36.4 42 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></div><b>Doesn&rsquo;t know where to start</b><p>or what Manus can do for them. Wants to learn fast.</p><p class="ans"><span>Design question</span> How might we make AI capabilities legible to everyday users?</p></div>
+  <div class="g pow"><h3>Power users</h3><p class="meta">8 people · age 25-40+</p><div class="br"></div><div class="dots men"><svg class="av" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="28" fill="currentColor"/><circle cx="28" cy="21" r="7.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M14 44c2.2-7.6 7.4-11.5 14-11.5S39.8 36.4 42 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="av" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="28" fill="currentColor"/><circle cx="28" cy="21" r="7.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M14 44c2.2-7.6 7.4-11.5 14-11.5S39.8 36.4 42 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="av" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="28" fill="currentColor"/><circle cx="28" cy="21" r="7.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M14 44c2.2-7.6 7.4-11.5 14-11.5S39.8 36.4 42 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="av" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="28" fill="currentColor"/><circle cx="28" cy="21" r="7.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M14 44c2.2-7.6 7.4-11.5 14-11.5S39.8 36.4 42 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="av" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="28" fill="currentColor"/><circle cx="28" cy="21" r="7.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M14 44c2.2-7.6 7.4-11.5 14-11.5S39.8 36.4 42 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="av" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="28" fill="currentColor"/><circle cx="28" cy="21" r="7.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M14 44c2.2-7.6 7.4-11.5 14-11.5S39.8 36.4 42 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="av" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="28" fill="currentColor"/><circle cx="28" cy="21" r="7.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M14 44c2.2-7.6 7.4-11.5 14-11.5S39.8 36.4 42 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="av" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="28" fill="currentColor"/><circle cx="28" cy="21" r="7.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M14 44c2.2-7.6 7.4-11.5 14-11.5S39.8 36.4 42 44" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></div><b>Has no structured way to share their work</b><p>Wants visibility and credibility for their work.</p><p class="ans"><span>Design question</span> How might we turn passive members into active contributors?</p></div>
+</div></div><div class="foot"><span class="n">15</span><span class="ch"><a class="" data-go="2">Context</a><a class="on" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>No existing community gave power users fast feedback <em class="hl">and lasting contributions.</em></h2></div></div>
+<div class="fig pins" style="height:480px;margin-top:20px">
+  <svg class="ov" viewBox="0 0 1136 480">
+    <path d="M70 430 H640" stroke="#14171B" stroke-width="1.2"/><path d="M70 430 V20" stroke="#14171B" stroke-width="1.2"/>
+    <path d="M355 20 V430 M70 225 H640" stroke="rgba(20,23,27,.16)" stroke-width="1"/>
+    <g font-family="Plus Jakarta Sans,sans-serif" font-size="14" font-weight="500" fill="#14171B">
+      <text x="70" y="456">Slow feedback loop</text><text x="640" y="456" text-anchor="end">Fast feedback loop</text>
+      <text transform="translate(52 430) rotate(-90)">Short-lived contributions</text><text transform="translate(52 20) rotate(-90)" text-anchor="end">Persistent contributions</text>
+    </g>
+    <circle class="pin p1" cx="160" cy="95" r="13" fill="#14171B"/>
+    <circle class="pin p3" cx="545" cy="345" r="13" fill="#14171B"/>
+    <circle class="pin p2" cx="430" cy="300" r="13" fill="#14171B"/>
+    <circle class="pin p4" cx="545" cy="95" r="40" fill="none" stroke="#340414" stroke-width="2" stroke-dasharray="5 5"/>
+    <circle class="pin p4" cx="545" cy="95" r="13" fill="#340414"/>
+    <g class="pin p5"><path d="M588 95 H704" stroke="#340414" stroke-width="1.5"/><path d="M698 89 L708 95 L698 101" fill="none" stroke="#340414" stroke-width="1.5"/></g>
+  </svg>
+  <div class="mp pin p1" style="left:184px;top:70px;width:160px"><b>Forums and docs</b><p>Searchable but slow and quiet</p></div>
+  <div class="mp pin p3" style="left:360px;top:362px;width:200px;text-align:right"><b>Chat communities</b><p>Fast but scattered</p></div>
+  <div class="mp pin p2" style="left:190px;top:276px;width:224px;text-align:right"><b>Gamified platforms</b><p>Rewards activity over impact</p></div>
+  <div class="mp hl2 pin p4" style="left:390px;top:146px;width:240px;text-align:right"><b>The gap Manus could fill</b></div>
+  <div class="co pin p5" style="left:720px;top:82px;width:416px"><p class="hmw-lead">So we asked two questions</p>
+    <p class="hmw">How might we make AI capabilities legible to everyday users?</p>
+    <p class="hmw">How might we turn passive members into active contributors?</p></div>
+</div></div><div class="foot"><span class="n">16</span><span class="ch"><a class="" data-go="2">Context</a><a class="on" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="sh60"><span class="no">03</span><h1>Solution</h1></div></div><div class="foot"><span class="n">17</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="on" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>To fix conversion, I organised the redesign of the community page around <em class="hl">three principles.</em></h2></div></div><div class="qD"><div class="c"><b>Legibility on arrival</b><p>Each capability is shown doing something on the first screen before the user is asked for anything.</p><div class="tst"><span>Each design had to pass</span>Can a newcomer see what Manus does before signing in?</div></div><div class="c"><b>Progressive disclosure</b><p>Each visit shows one thing worth doing and reveals more as users take part. Nothing new to learn first.</p><div class="tst"><span>Each design had to pass</span>Is the next step visible without learning a new system?</div></div><div class="c"><b>Explainability by default</b><p>Everything shown states why it was shown. Users can check the fit and flag a wrong one.</p><div class="tst"><span>Each design had to pass</span>Can a user tell why something was shown?</div></div></div></div><div class="foot"><span class="n">18</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="on" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="sh60"><span class="no">04</span><h1>Testing</h1></div></div><div class="foot"><span class="n">19</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="on" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>First, I tested whether points and levels <em class="hl">would drive engagement.</em></h2></div></div>
+<div class="hyw">
+  <div class="frame vid hyv"><video src="assets/manus/pivot-walkthrough.mp4" muted loop autoplay playsinline></video></div>
+  <div class="note n1"><span>Hypothesis</span><p>Adding points, levels and quests will get people engaging with the community.</p></div>
+  
+</div></div><div class="foot"><span class="n">20</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="on" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>Second, I moved to a static structure <em class="hl">to make the products legible.</em></h2></div></div>
+<div class="fig" style="height:470px;margin-top:10px">
+  <div class="frame" style="left:210px;top:70px;width:716px"><img src="assets/manus/whiteboard-crop.png" alt="Four low-fidelity prototypes sketched on the whiteboard"></div>
+  <svg class="ov" viewBox="0 0 1136 470">
+    <g fill="none" stroke="#fff" stroke-width="5" stroke-opacity=".85"><path d="M467 177 V375"/><path d="M654 193 V375"/><path d="M863 290 H926"/><path d="M264 201 H210"/></g>
+    <g fill="none" stroke="#340414" stroke-width="1.5"><path d="M264 201 H204"/><path d="M467 177 V384"/><path d="M654 193 V384"/><path d="M863 290 H936"/></g>
+    <circle cx="264" cy="201" r="6" fill="#340414" stroke="#fff" stroke-width="2"/><circle cx="467" cy="177" r="6" fill="#340414" stroke="#fff" stroke-width="2"/><circle cx="654" cy="193" r="6" fill="#340414" stroke="#fff" stroke-width="2"/><circle cx="863" cy="290" r="6" fill="#340414" stroke="#fff" stroke-width="2"/>
+  </svg>
+  <div class="co tl" style="left:0;top:188px;width:196px;text-align:right"><b>An AI search bar</b><p>Promotes the product and AI-human collaboration.</p></div>
+  <div class="co tl" style="left:394px;top:390px;width:220px"><b>Explore and event CTAs</b><p>Scalable buttons added in version 2.</p></div>
+  <div class="co tl" style="left:633px;top:390px;width:230px"><b>Gamification after login</b><p>A status page later dropped in testing.</p></div>
+  <div class="co tl" style="left:944px;top:277px;width:200px"><b>Engineering tradeoff</b><p>Event uploads stayed manual through Luma for reliability and speed to launch.</p></div>
+</div></div><div class="foot"><span class="n">21</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="on" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>So I tested the two opposites <em class="hl">to find a middle.</em></h2></div></div>
+<div class="ext2">
+  <div><div class="ex"><img src="assets/manus/gamified-prototype.png" alt=""></div><b>Gamified</b><p>Rewarded activity with points, levels and quests.</p></div>
+  <div><div class="ex"><img src="assets/manus/static-page-full.png" alt=""></div><b>Static</b><p>Showed every product clearly. Nothing was personalised.</p></div>
+</div>
+<div class="spec"><span class="sl">Motivate</span><i></i><span class="sm2">What we were looking for</span><i></i><span class="sr">Clarify</span></div></div><div class="foot"><span class="n">22</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="on" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s" data-seq="game"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>Testers found the gamified version overwhelming and could not say <em class="hl">what the mechanics were for.</em></h2></div></div>
+<div class="gap half"></div>
+<div class="fig seq" style="height:470px">
+  <div class="frame" style="left:0;top:20px;width:700px"><img src="assets/manus/gamified-prototype.png" alt="The gamified prototype"></div>
+  <svg class="ov" viewBox="0 0 1136 470">
+    <g class="l1"><path d="M290 33 H700" fill="none" stroke="#fff" stroke-width="5" stroke-opacity=".75"/><path d="M290 33 H756" fill="none" stroke="#340414" stroke-width="1.5"/><circle cx="290" cy="33" r="6" fill="#340414" stroke="#fff" stroke-width="2"/></g>
+    <g class="l2"><path d="M633 199 H756" fill="none" stroke="#340414" stroke-width="1.5"/><circle cx="633" cy="199" r="6" fill="#340414" stroke="#fff" stroke-width="2"/></g>
+    <g class="l3"><path d="M90 240 V300 H700" fill="none" stroke="#fff" stroke-width="5" stroke-opacity=".75"/><path d="M90 240 V300 H756" fill="none" stroke="#340414" stroke-width="1.5"/><circle cx="90" cy="240" r="6" fill="#340414" stroke="#fff" stroke-width="2"/></g>
+  </svg>
+  <div class="co tl c1" style="left:770px;top:20px"><b>Navigation</b><p>Testers reported confusion about getting around.</p></div>
+  <div class="co tl c2" style="left:770px;top:186px"><b>What the mechanics were for</b><p>Testers were unclear what the game mechanics were for.</p></div>
+  <div class="co tl c3" style="left:770px;top:287px"><b>Role progression</b><p>Testers reported confusion about role progression.</p></div>
+  <div class="co ink c4" style="left:0;top:418px;width:1136px"><p></p></div>
+</div></div><div class="foot"><span class="n">23</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="on" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s" data-seq="static"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>Testers found the static version clear but lost interest, lingering only on <em class="hl">what moved.</em></h2></div></div>
+<div class="gap half"></div>
+<div class="fig seq" style="height:470px">
+  <div class="frame" style="left:0;top:0;width:391px"><img src="assets/manus/static-page-full.png" alt="The static community page"></div>
+  <svg class="ov" viewBox="0 0 1136 470">
+    <g fill="none" stroke-width="1.5">
+      <path d="M322 106 H456" stroke="#340414"/>
+      <path d="M128 166 H456" stroke="#A99939" stroke-width="2"/>
+      <path d="M194 250 H456" stroke="#A99939" stroke-width="2"/>
+      <path d="M194 384 H456" stroke="#340414"/>
+    </g>
+    <circle cx="322" cy="106" r="6" fill="#340414" stroke="#fff" stroke-width="2"/><circle cx="128" cy="166" r="6" fill="#A99939" stroke="#fff" stroke-width="2"/><circle cx="194" cy="250" r="6" fill="#A99939" stroke="#fff" stroke-width="2"/><circle cx="194" cy="384" r="6" fill="#340414" stroke="#fff" stroke-width="2"/>
+  </svg>
+  <div class="co lg" style="left:466px;top:6px;width:300px"><span><i class="a"></i>Users lingered</span><span><i class="b"></i>Users spent less time</span></div>
+  <div class="co tl" style="left:466px;top:93px;width:300px"><b>Live countdown</b><p>Users lingered here.</p></div>
+  <div class="co tl ink" style="left:466px;top:153px;width:300px"><b>Role selector</b><p>Users spent less time here.</p></div>
+  <div class="co tl ink" style="left:466px;top:247px;width:300px"><b>Three feature cards</b><p>Users spent less time here too.</p></div>
+  <div class="co tl" style="left:466px;top:371px;width:300px"><b>Pulsing map</b><p>Users lingered here.</p></div>
+  <div class="co tk" style="left:812px;top:0;width:324px"><p class="mt">What this told me</p><ul class="tkl"><li><b>The structure had to change.</b> The information architecture needed realignment.</li><li><b>Interactions had to feel alive.</b> Users were drawn to interactivity that felt personally relevant. I began another round of iteration for longer time on page.</li></ul></div>
+</div></div><div class="foot"><span class="n">24</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="on" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>That pointed to a guided approach, <em class="hl">refined over three rounds.</em></h2></div></div><div class="p16">
+<div class="p16c"><div class="p16m"><div class="mk mk-grid"><p class="mk-h">Choose your path with Manus.</p>
+<div class="mk-tbl"><span>Fellow</span><span>Role #4</span><span>Role #7</span><span>Ambassador</span><span>Role #5</span><span>Role #8</span><span>Open Builder</span><span>Role #6</span><span>Role #9</span></div></div></div><p class="vlab">Iteration 1: choose your path</p><p class="vg">Shows every way in at once</p><p class="vl">Nine choices on arrival</p></div>
+<div class="p16k"><i class="arw"></i></div>
+<div class="p16c"><div class="p16m"><div class="mk"><div class="mk-yp"><p class="mk-h">Your Path</p><span class="mk-pm">Powered by Manus</span></div>
+<p class="mk-kv"><b>Role</b> Open Builder</p><p class="mk-kv"><b>Focus area</b> Agent tooling, prototyping</p><p class="mk-kv"><b>Current mode</b> Active contributor</p>
+<span class="mk-btn">Start My AI-Guided Path</span></div></div><p class="vlab">Iteration 2: Your Path card</p><p class="vg">&ldquo;Start My AI-Guided Path&rdquo; won on click-through</p><p class="vl">Shows a role but no next step yet</p></div>
+<div class="p16k"><i class="arw"></i></div>
+<div class="p16c win"><div class="p16m"><div class="mk"><div class="mk-yp"><p class="mk-h">Your Path</p><span class="mk-pm">Powered by Manus</span></div>
+<span class="mk-btn dark">Start My AI-Guided Path</span>
+<p class="mk-h2">Recommended next steps</p>
+<div class="mk-step"><b>Join: NYC Hackathon</b><p>Why this: builds real-time collaboration skills</p></div>
+<div class="mk-step"><b>Contribute: review an agent tooling PR</b><p>Why this: matches your recent activity</p></div>
+<div class="mk-step"><b>Learn: agent memory systems</b><p>Why this: prepares you for upcoming roles</p></div></div></div><p class="vlab">Iteration 3: next steps on the card</p><p class="vg">Each next step says why it was picked</p><p class="vl">Relies on the AI getting the role right</p></div>
+</div></div><div class="foot"><span class="n">25</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="on" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s" data-steps="1"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>I challenged the PM on one design because each new role <em class="hl">would break the card layout.</em></h2></div></div>
+<div class="rl">
+  <div class="rl-row"><p class="mt">Before: a fixed three-card layout with one card per opportunity</p>
+    <div class="rl-b"><img class="pi" src="assets/manus/hackathon-card-before.png" alt="Three fixed cards"><div class="ghost"><b>Campus Leader</b><span>needs a new card</span></div><div class="ghost"><b>Ambassador</b><span>needs a new card</span></div><div class="ghost"><b>Regional Hub</b><span>needs a new card</span></div></div>
+    </div>
+  <div class="rl-row stp"><p class="mt">After: one role-agnostic template filled by the AI for each user</p>
+    <div class="rl-a"><div class="rk"><span class="tag">Open Builder</span><b>Join NYC Hackathon</b><p class="d">Collaborate on agent systems with top builders.</p><p class="why"><svg class="sp" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l1.6 4.4L14 7l-4.4 1.6L8 13l-1.6-4.4L2 7l4.4-1.6z" fill="currentColor"/></svg><span>Why this matters</span><i>&rarr;</i></p><p class="wt">Builds real-time collaboration skills.</p></div><div class="rk nw"><span class="tag nw">Ambassador &middot; new role</span><b>Host a local meetup</b><p class="d">Bring builders in your city together.</p><p class="why"><svg class="sp" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l1.6 4.4L14 7l-4.4 1.6L8 13l-1.6-4.4L2 7l4.4-1.6z" fill="currentColor"/></svg><span>Why this matters</span><i>&rarr;</i></p><p class="wt">Grows your local community.</p></div><div class="rk nw"><span class="tag nw">Campus Leader &middot; new role</span><b>Start a campus club</b><p class="d">Introduce classmates to Manus.</p><p class="why"><svg class="sp" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l1.6 4.4L14 7l-4.4 1.6L8 13l-1.6-4.4L2 7l4.4-1.6z" fill="currentColor"/></svg><span>Why this matters</span><i>&rarr;</i></p><p class="wt">The same card works without a redesign.</p></div><div class="rk nw"><span class="tag nw">Regional Hub &middot; new role</span><b>Run a regional demo day</b><p class="d">Showcase builders across your region.</p><p class="why"><svg class="sp" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l1.6 4.4L14 7l-4.4 1.6L8 13l-1.6-4.4L2 7l4.4-1.6z" fill="currentColor"/></svg><span>Why this matters</span><i>&rarr;</i></p><p class="wt">The same card works without a redesign.</p></div></div></div>
+</div>
+<p class="fn">Illustrative cards. Only the hackathon card is from the shipped design.</p></div><div class="foot"><span class="n">26</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="on" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="sh60"><span class="no">05</span><h1>Final design</h1></div></div><div class="foot"><span class="n">27</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="on" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>So I proposed a dashboard that guides every user <em class="hl">to a first contribution.</em></h2></div></div>
+<div class="flow4"><div class="fs"><div class="ft"><img src="assets/manus/ship-dashboard.png" alt=""></div><b>Community dashboard</b><p>Role, active path, upcoming events and pending contributions in one place.</p></div><i class="farw"></i><div class="fs"><div class="ft"><img src="assets/manus/ship-paths.png" alt=""></div><b>AI-guided path</b><p>Infers each user&rsquo;s role, focus area and mode. Recommends a next step with a reason.</p></div><i class="farw"></i><div class="fs"><div class="ft"><img src="assets/manus/ship-recs.png" alt=""></div><b>Role-agnostic recommendations</b><p>Ranked by fit. Hackathons, ambassador programmes and campus leadership surface at login.</p></div><i class="farw"></i><div class="fs end"><div class="ft fend"><span>First meaningful contribution</span></div><b>Where every path leads</b><p>The dashboard links straight to the events calendar for a first contribution.</p></div></div></div><div class="foot"><span class="n">28</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="on" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>The redesign answers each pain point <em class="hl">with one part of the design.</em></h2></div></div>
+<div class="hbs"><div><p class="mt">For new users</p><div class="hbh"><span>What we heard</span><span></span><span>What the redesign does</span></div><div class="hbr"><p class="hq">&ldquo;There&rsquo;s no indication of where to start.&rdquo;</p><i class="parw">&rarr;</i><div class="ui"><span class="ui-l">Your Path</span><span class="ui-b dark">Start My AI-Guided Path</span></div></div><div class="hbr"><p class="hq">&ldquo;I can&rsquo;t keep up with the constant upgrades.&rdquo;</p><i class="parw">&rarr;</i><div class="ui"><span class="ui-l">Recommended this week</span><span class="ui-r">Learn: agent memory systems</span><span class="ui-w">Why this matters</span></div></div><div class="hbr"><p class="hq">No sense of what counts as participating</p><i class="parw">&rarr;</i><div class="ui"><span class="ui-r">Join NYC Hackathon</span><span class="ui-c">24 hours</span><span class="ui-c hi">High effort</span></div></div></div>
+<div><p class="mt">For power users</p><div class="hbh"><span>What we heard</span><span></span><span>What the redesign does</span></div><div class="hbr"><p class="hq">No structured way to share what they build</p><i class="parw">&rarr;</i><div class="ui"><span class="ui-l">Your contributions</span><span class="ui-st">Agent demo &middot; In review</span><span class="ui-b">Host an Event</span></div></div><div class="hbr"><p class="hq">&ldquo;No signal that my work is visible.&rdquo;</p><i class="parw">&rarr;</i><div class="ui"><span class="ui-l">Ranked by fit</span><span class="ui-r">Review an agent tooling PR</span><span class="ui-w">Matches your recent activity</span></div></div><div class="hbr"><p class="hq">Wanted visibility and credibility</p><i class="parw">&rarr;</i><div class="ui"><span class="ui-c">Open Builder</span><span class="ui-c">Ambassador</span><span class="ui-c">Campus Leader</span></div></div></div></div></div><div class="foot"><span class="n">29</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="on" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s" data-steps="1"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>Before build, stakeholder sessions gave every recommendation <em class="hl">an owner and an API.</em></h2></div></div>
+<div class="jm">
+  <div class="jmap stp-hide"><img src="assets/manus/journey-flow.png" alt="The stakeholder map"></div>
+  <div class="jl stp"><div class="jh"></div><p class="mt c">Wanted</p><p class="mt c">Concerns and questions</p></div>
+  <div class="jl stp"><b class="jt">Engineering</b><p>A maintainable system, accurate data and privacy compliance</p><p>Scraping events from Luma, fragile automation and consent risks</p></div>
+  <div class="jl stp"><b class="jt">Community and GTM</b><p>Active participation, self-onboarding and visible community leaders</p><p>Explicit user input and clear ownership of content</p></div>
+  <div class="jl stp"><b class="jt">Product manager</b><p>A scalable system, less support burden and clear success metrics</p><p>What happens when roles double? How do we measure success?</p></div>
+  <svg class="jbr stp" viewBox="0 0 70 330" preserveAspectRatio="none"><path d="M0 105 H30 M0 195 H30 M0 285 H30 M30 105 V285 M30 195 H62" fill="none" stroke="#14171B" stroke-width="1.5"/><path d="M56 189 L66 195 L56 201" fill="none" stroke="#14171B" stroke-width="1.5"/></svg>
+  <div class="jd stp"><p class="mt">What we decided</p>
+    <div class="r"><b>Event hosting</b><p>An explicit &ldquo;Host an Event&rdquo; button and a manual submission flow. Consent is clear and nothing is scraped from third parties.</p></div>
+    <div class="r"><b>Role architecture</b><p>Modular components let roles be added or removed without a redesign.</p></div>
+  </div>
+</div>
+<p class="fn stp">Redrawn from the stakeholder map I built with engineering, the community team and the PMs.</p></div><div class="foot"><span class="n">30</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="on" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s" data-seq="sol"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>The final design brought role, path and events <em class="hl">into one dashboard.</em></h2></div></div><div class="tabs" style="--from:0px;--to:0px"><span class="tb on">01 Dashboard</span><span class="tb">02 Your Path</span><span class="tb">03 Recommendations</span><i class="ul"></i></div><div class="solB"><div class="frame vid sv"><video src="assets/manus/manus-solution-1-dashboard.mp4" muted loop autoplay playsinline></video></div><div class="txb"><p class="tx">The dashboard acts as a single home where role, active path, upcoming events and pending contributions sit in one place. Reminders only surface when something needs attention.</p></div></div></div><div class="foot"><span class="n">31</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="on" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s" data-seq="sol"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>The AI-guided path reflects each user&rsquo;s role <em class="hl">back to them.</em></h2></div></div><div class="tabs" style="--from:0px;--to:230px"><span class="tb">01 Dashboard</span><span class="tb on">02 Your Path</span><span class="tb">03 Recommendations</span><i class="ul"></i></div><div class="solB"><div class="frame vid sv"><video src="assets/manus/solution-2-paths.mp4" muted loop autoplay playsinline></video></div><div class="txb"><p class="tx">Your Path works out each user&rsquo;s role, focus area and mode from what they already do on Manus. Its &ldquo;Recommended this week&rdquo; list is ranked by fit and gives a reason for every pick.</p></div></div></div><div class="foot"><span class="n">32</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="on" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s" data-seq="sol"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>Recommendations take on new roles <em class="hl">without a layout change.</em></h2></div></div><div class="tabs" style="--from:230px;--to:460px"><span class="tb">01 Dashboard</span><span class="tb">02 Your Path</span><span class="tb on">03 Recommendations</span><i class="ul"></i></div><div class="solB"><div class="frame vid sv"><video src="assets/manus/solution-3-recommendations.mp4" muted loop autoplay playsinline></video></div><div class="txb"><p class="tx">At login the AI surfaces hackathons, ambassador programs and campus leadership. It can include roles that don&rsquo;t exist yet.</p></div></div></div><div class="foot"><span class="n">33</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="on" data-go="27">Final design</a><a class="" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="sh60"><span class="no">06</span><h1>Measuring</h1></div></div><div class="foot"><span class="n">34</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="on" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>Public launch will answer <em class="hl">three open questions.</em></h2></div></div>
+<div class="strat"><div class="frame vid stv"><video src="assets/manus/solution-2-paths.mp4" muted loop autoplay playsinline></video></div>
+<div><p class="mt">Questions for public launch</p><div class="rows">
+<div class="r"><b>Inferring roles</b><p>What does inferring role, focus and mode from behaviour do to retention, compared with asking users to pick?</p></div>
+<div class="r"><b>Reasons on picks</b><p>Does a reason on every recommendation improve clarity on where to start and how to contribute?</p></div>
+<div class="r"><b>Role-agnostic cards</b><p>Does the template hold up as the community adds roles that did not exist at launch?</p></div></div></div></div></div><div class="foot"><span class="n">35</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="on" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>Internal testing already backs the hypothesis <em class="hl">on clarity and retention.</em></h2></div></div><div class="tr3">
+<div class="trr"><span>Hypothesis</span><b>Guidance on arrival raises clarity and retention</b></div>
+<svg class="trb" viewBox="0 0 1136 50" preserveAspectRatio="none"><path d="M568 0 V20 M268 20 H868 M268 20 V50 M868 20 V50" fill="none" stroke="#14171B" stroke-width="1.5"/></svg>
+<div class="trk">
+  <div><p class="mt">Newcomers can find a way in</p>
+    <div class="lf got"><span>Retention</span><b>30% &rarr; 65-70%</b></div><div class="lf got"><span>Clarity on where to start</span><b>80%</b></div>
+    <div class="lf got"><span>Time on site</span><b>2.1&times;</b></div><div class="lf"><span>Paths started in the first session</span><b>At launch</b></div></div>
+  <div><p class="mt">Power users have a place to be seen</p>
+    <div class="lf got"><span>Relevance of picks</span><b>75%</b></div><div class="lf"><span>Contributions submitted</span><b>At launch</b></div>
+    <div class="lf"><span>Events hosted</span><b>At launch</b></div><div class="lf"><span>Return visits</span><b>At launch</b></div></div>
+</div></div>
+<p class="fn">Live data from internal testing users at Manus after the AI-guided architecture was rolled out to them. The redesign is approved and in production. It has not yet launched publicly.</p></div><div class="foot"><span class="n">36</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="on" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>In conclusion, guidance kept people where <em class="hl">game mechanics did not.</em></h2></div></div>
+<div class="t23w">
+<div class="vt-root"><span>What changed</span><b>Retention 30% &rarr; 65-70%</b></div>
+<p class="why3">What testing showed about each principle</p>
+<svg class="br23" viewBox="0 0 1136 56" preserveAspectRatio="none"><path d="M568 0 V24 M189 24 H947 M189 24 V56 M568 24 V56 M947 24 V56" fill="none" stroke="#14171B" stroke-width="1.5"/></svg>
+<div class="l3">
+<div class="vt-k"><b>Legibility on arrival</b><p>The static version showed that newcomers needed to see what Manus does before anything else. Clarity alone still did not keep them on the page.</p></div>
+<div class="vt-k"><b>Progressive disclosure</b><p>Testers lost their way among points and levels. They stayed when the page offered one guided next step at a time.</p></div>
+<div class="vt-k"><b>Explainability by default</b><p>Each recommendation states why it was picked. Users can check that reasoning and flag a pick that does not fit.</p></div>
+</div></div></div><div class="foot"><span class="n">37</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="on" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+<section class="s"><img class="sigtr" src="assets/jaz-signature.svg" alt="Jazlynn"><div class="wrap"><div class="head"><div><h2>How can we scale this work <em class="hl">across Manus?</em></h2></div></div><div class="n24">
+<div class="n24c"><p class="mt">What users see</p><div class="mk mk-rec"><p class="mk-h c">Recommended This Week</p><p class="mk-sub">Prioritized by fit. Not engagement.</p><div class="rcs"><div class="rc"><b>Join NYC Hackathon</b><p>Collaborate on agent systems with top builders.</p><div class="rc-t"><span>24 hours</span><span class="ef hi">High effort</span></div><div class="rc-r addn"><span>Useful pick?</span><svg class="th" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 9l3-6c1.2 0 2 .9 2 2v3h4.2c1 0 1.7.9 1.5 1.9l-1.1 5.5c-.2.9-.9 1.6-1.8 1.6H6zM2.5 9H6v9H2.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><svg class="th dn" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 9l3-6c1.2 0 2 .9 2 2v3h4.2c1 0 1.7.9 1.5 1.9l-1.1 5.5c-.2.9-.9 1.6-1.8 1.6H6zM2.5 9H6v9H2.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div></div><div class="rc"><b>Collaborate on Tools</b><p>Contribute to the open-source tooling repo.</p><div class="rc-t"><span>2-3 hours</span><span class="ef md">Medium effort</span></div><div class="rc-r addn"><span>Useful pick?</span><svg class="th" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 9l3-6c1.2 0 2 .9 2 2v3h4.2c1 0 1.7.9 1.5 1.9l-1.1 5.5c-.2.9-.9 1.6-1.8 1.6H6zM2.5 9H6v9H2.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><svg class="th dn" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 9l3-6c1.2 0 2 .9 2 2v3h4.2c1 0 1.7.9 1.5 1.9l-1.1 5.5c-.2.9-.9 1.6-1.8 1.6H6zM2.5 9H6v9H2.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div></div><div class="rc"><b>Read: Scaling Agent</b><p>Foundational knowledge for your next project.</p><div class="rc-t"><span>20 minutes</span><span class="ef lo">Low effort</span></div><div class="rc-r addn"><span>Useful pick?</span><svg class="th" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 9l3-6c1.2 0 2 .9 2 2v3h4.2c1 0 1.7.9 1.5 1.9l-1.1 5.5c-.2.9-.9 1.6-1.8 1.6H6zM2.5 9H6v9H2.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><svg class="th dn" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 9l3-6c1.2 0 2 .9 2 2v3h4.2c1 0 1.7.9 1.5 1.9l-1.1 5.5c-.2.9-.9 1.6-1.8 1.6H6zM2.5 9H6v9H2.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div></div></div></div><p class="n24p"><b>Add lightweight feedback.</b> A thumbs up or down on every pick makes the AI&rsquo;s decisions more transparent.</p></div>
+<div class="n24c"><p class="mt">What the team tracks</p><div class="mk mk-team"><div class="tm-h"><b>Community analytics</b><span>Internal</span></div><p class="tm-l">Days from joining to first meaningful action</p><div class="hist"><span class="ya">New users</span><div class="hb"><i style="height:24px"></i><span>0-1</span></div><div class="hb"><i style="height:57px"></i><span>2-3</span></div><div class="hb"><i style="height:78px"></i><span>4-7</span></div><div class="hb"><i style="height:45px"></i><span>8-14</span></div><div class="hb"><i style="height:27px"></i><span>15+</span></div></div><p class="xa">Days since joining</p><p class="tm-l">Pick ratings this week</p><div class="pr"><span class="pu" style="width:68%">Useful</span><span class="pn">Not useful</span></div><p class="tm-k">Illustrative figures that show the measures</p></div><p class="n24p"><b>Track time to first meaningful action.</b> A better measure of real contribution than time on site.</p></div>
+</div>
+<p class="fn">Concept mockups. The remaining work would be finishing development and launch.</p>
+</div><div class="foot"><span class="n">38</span><span class="ch"><a class="" data-go="2">Context</a><a class="" data-go="8">Discovery</a><a class="" data-go="17">Solution</a><a class="" data-go="19">Testing</a><a class="" data-go="27">Final design</a><a class="on" data-go="34">Measuring</a></span><span class="t">Manus AI case study</span></div></section>
+</div></div>
+<button class="arrow l" id="prev" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+<button class="arrow r" id="next" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+<div id="bar"><i></i></div>
+<div id="hint">&larr; &rarr;</div>
+<script>
+const S=[...document.querySelectorAll('.s')]; let i=0;
+const slide=document.getElementById('slide');
+function fit(){ const k=Math.min(innerWidth/1280, innerHeight/720); slide.style.transform=`scale(${k})`; }
+/* a slide arriving while it is still leaving (back right after forward) would keep its 'off'
+   and stay invisible until the timer cleared it; the arrival always clears it first */
+const BUILD='.fig svg.ov,.fig svg .pt,.fig .mp,.fig .co,.rows>.r,.ten .d10 i,.dp .g>h3,.dp .g>.meta,.dp .dots i,.dp .g>b,.dp .g>p,.vt-root,.vt-k,.p16k,.p16c+.p16k+.p16c,.rcs .rc,.finds .f,.rowB6 .st,.rmB .pv,.vs2 .side,.vs2 .gapx,.roster>div,.take li,.rl-row,.rk,.sh3,.res-br,.rr-main,.rr,.rb2,.n24c,.hyp .hrow,.cap10,.tl3>div';
+function build(sec){ if(document.body.classList.contains('print')||matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let k=0; sec.querySelectorAll(BUILD).forEach(el=>{ {const q=el.closest('.seq'); if(q&&q.querySelector('.c1')) return;} if(el.closest('.pins')||el.closest('.stp')||el.classList.contains('stp')||el.closest('.rmB')||el.closest('.walk')) return; el.style.animation='none'; void el.offsetWidth;
+    el.style.animation=`pinIn .45s ease ${Math.min(0.25+k*0.16,2.6).toFixed(2)}s both`; k++; }); }
+function advance(){ const c=S[i]; if(c.dataset.steps&&!c.classList.contains('st1')){ c.classList.add('st1'); return; } go(i+1); }
+const offT=new Map();
+function go(n){ const nxt=S[(n+S.length)%S.length]; const seqCut=S[i].dataset.seq&&S[i].dataset.seq===nxt.dataset.seq; [S[i],nxt].forEach(x=>{x.classList.toggle('cut',!!seqCut);}); if(seqCut) setTimeout(()=>{S.forEach(x=>x.classList.remove('cut'));},650);
+  const from=S[i]; from.classList.remove('on'); from.classList.add('off'); clearTimeout(offT.get(from)); offT.set(from,setTimeout(()=>from.classList.remove('off'),600));
+  i=(n+S.length)%S.length; S[i].classList.remove('st1'); clearTimeout(offT.get(S[i])); S[i].classList.remove('off'); S[i].classList.add('on');
+  S[i].querySelectorAll('video').forEach(v=>{v.currentTime=0;v.play().catch(()=>{});}); build(S[i]);
+  document.querySelector('#bar i').style.width=((i+1)/S.length*100)+'%';
+  document.title=`Manus AI \u2014 ${i+1}/${S.length}`; }
+addEventListener('resize',fit);
+addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();advance();}
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();back();}
+  if(e.key==='Home')go(0); if(e.key==='End')go(S.length-1);
+  if(e.key==='f')document.documentElement.requestFullscreen?.();});
+addEventListener('click',e=>{ if(e.target.closest('video')||e.target.closest('.stack')||e.target.closest('a')||e.target.closest('.arrow'))return; advance(); });
+document.addEventListener('click',e=>{const a=e.target.closest('[data-go]'); if(a){e.preventDefault(); go(parseInt(a.dataset.go)-1);}});
+document.querySelectorAll('video[data-sync]').forEach(v=>{ const sec=v.closest('.s');
+  const stops=[...sec.querySelectorAll('.ws')]; const bar=sec.querySelector('.wv');
+  v.addEventListener('timeupdate',()=>{ const t=v.currentTime; bar.style.setProperty('--p',(t/(v.duration||1)).toFixed(3));
+    stops.forEach(st=>st.classList.toggle('hit',t>=parseFloat(st.dataset.t))); }); });
+document.getElementById('prev').addEventListener('click',()=>back()); document.getElementById('next').addEventListener('click',()=>advance());
+/* the arrows lift for the half of the screen the pointer is on, and their rim light faces the pointer */
+(function(){ const L=document.getElementById('prev'), R=document.getElementById('next');
+  function ang(el,e){ const b=el.getBoundingClientRect(); const a=Math.atan2(e.clientY-(b.top+b.height/2), e.clientX-(b.left+b.width/2))*180/Math.PI; el.style.setProperty('--ang',(a+90)+'deg'); }
+  /* an arrow lifts only when the pointer is actually near it: within 160px of its centre. Anywhere
+     else both stay thin. The lift is held for a beat so it does not flicker at the edge. */
+  let tL=0,tR=0;
+  function near(el,e){ const b=el.getBoundingClientRect(); return Math.hypot(e.clientX-(b.left+b.width/2), e.clientY-(b.top+b.height/2))<130; }
+  addEventListener('pointermove',e=>{
+    const nl=near(L,e), nr=near(R,e);
+    if(nl){ clearTimeout(tL); L.classList.add('near'); } else { clearTimeout(tL); tL=setTimeout(()=>L.classList.remove('near'),140); }
+    if(nr){ clearTimeout(tR); R.classList.add('near'); } else { clearTimeout(tR); tR=setTimeout(()=>R.classList.remove('near'),140); }
+    ang(L,e); ang(R,e); },{passive:true});
+  /* leaving the window, the tab, or the arrow itself always drops the lift */
+  const drop=()=>{ clearTimeout(tL); clearTimeout(tR); L.classList.remove('near'); R.classList.remove('near'); };
+  document.documentElement.addEventListener('pointerleave',drop); addEventListener('blur',drop);
+  document.addEventListener('visibilitychange',()=>{ if(document.hidden) drop(); });
+  [L,R].forEach(el=>el.addEventListener('pointerleave',()=>{ setTimeout(()=>{ if(!el.matches(':hover')) el.classList.remove('near'); },150); }));
+  addEventListener('keydown',drop);
+})();
+(function(){
+  const st=document.getElementById('stack'); if(!st) return;
+  const cards=[...st.querySelectorAll('.card')], dots=[...document.querySelectorAll('#dots i')];
+  let order=[0,1,2], busy=false, dx=0, x0=null;
+  function place(){ order.forEach((ci,pos)=>{ cards[ci].className='card p'+pos; }); dots.forEach((d,k)=>d.classList.toggle('on',k===order[0])); document.querySelectorAll('#finds .f').forEach((f,k)=>f.classList.toggle('on',k===order[0])); }
+  function next(){ if(busy) return; busy=true; const top=cards[order[0]]; top.className='card out';
+    setTimeout(()=>{ order.push(order.shift()); place(); busy=false; },380); }
+  st.addEventListener('pointerdown',e=>{ x0=e.clientX; dx=0; st.setPointerCapture(e.pointerId); });
+  st.addEventListener('pointermove',e=>{ if(x0===null) return; dx=e.clientX-x0; const top=cards[order[0]]; top.style.transition='none'; top.style.transform=`translateX(${dx*0.35}px) translateY(${Math.abs(dx)*0.25}px) rotate(${dx/60}deg)`; });
+  const up=()=>{ if(x0===null) return; const top=cards[order[0]]; top.style.transition=''; top.style.transform=''; if(Math.abs(dx)>60||Math.abs(dx)<4) next(); x0=null; dx=0; };
+  st.addEventListener('pointerup',up); st.addEventListener('pointercancel',up);
+  place();
+})();
+/* each plate gets a copy of its own media under the frame; blurred, that copy is the refraction in the rim.
+   A video's copy is a live video too, muted and in step, so the frosted rim moves with the recording. */
+document.querySelectorAll('#slide .plate').forEach(pl=>{ if(pl.closest('.cs-hero')) return; const m=pl.querySelector(':scope>img,:scope>video'); if(!m) return;
+  if(m.tagName==='IMG'){ pl.classList.add('still'); return; }
+  let g; if(m.tagName==='VIDEO'){ g=m.cloneNode(true); g.removeAttribute('poster'); g.muted=true; g.loop=true; g.playsInline=true; g.autoplay=true; }
+  else { g=document.createElement('img'); g.src=m.src; }
+  g.className='glass'; g.setAttribute('aria-hidden','true'); pl.insertBefore(g,pl.firstChild); });
+if(new URLSearchParams(location.search).get('print')==='1'){document.body.classList.add('print');}
+else{ fit(); S.forEach(x=>x.style.transition='none'); go(Math.max(0,(parseInt(new URLSearchParams(location.search).get('s'))||1)-1)); requestAnimationFrame(()=>S.forEach(x=>x.style.transition='')); }
+</script>
+<script src="sheets-gl.js"></script>
+<script>
+/* FROM THE CLOVER DECK, KEPT IN STEP WITH IT.
+   1. THE ROLL. Arriving at a chapter divider, the frosted disc from jazlynnwashere.com rolls in from the right: its
+      leading edge pushes the slide before off to the left and uncovers the divider behind it.
+   2. THE DROP. Leaving a divider, it drops down off the slide and the chapter's first slide settles in from above.
+   3. THE DISCS. The same frosted discs scattered down the right of every divider, never over its number or name.
+      Press E on a divider to edit them (drag, scroll to resize, double-click to remove, Save writes discs.json).
+   4. back() undoes a step (the cover's second beat) before it leaves the slide. */
+/* Jaz is approving these one at a time: true turns on the divider roll, drop and discs below */
+const CLOVER_DIVIDERS=true;
+let rolling=false;
+const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2, out=t=>1-Math.pow(1-t,3);
+function settle(A,B){ A.classList.remove('on','off','st1','viaGap'); A.style.transform=''; A.style.zIndex=''; A.style.clipPath='';
+  B.style.transform=''; B.style.opacity=''; B.style.zIndex=''; B.style.clipPath='';
+  i=S.indexOf(B); B.classList.add('on'); scatterNear();
+  document.querySelector('#bar i').style.width=((i+1)/S.length*100)+'%'; document.title=`Manus AI — ${i+1}/${S.length}`;
+  requestAnimationFrame(()=>{ A.style.transition=B.style.transition=''; rolling=false; }); }
+function wake(B){ B.classList.remove('st1','off'); B.querySelectorAll('video').forEach(v=>{v.currentTime=0;v.play().catch(()=>{});}); build(B); }
+function roll(){ const A=S[i], B=S[i+1]; if(rolling||!B) return false;
+  if(!window.mountSheets||matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+  rolling=true; const D=900, Wd=1280, R=D/2;
+  const cv=document.createElement('canvas'); cv.className='roll';
+  cv.style.cssText=`position:absolute;left:0;top:${(720-D)/2}px;width:${D}px;height:${D}px;z-index:40;pointer-events:none;clip-path:circle(50%);will-change:transform`;
+  slide.appendChild(cv);
+  const HS=window.mountSheets(cv,[{x:.5,y:.5,r:.5}],['#9ba69c'],{paper:'#FFFFFF',ground:'#1C1A17',bleed:0,clear:()=>0});
+  if(!HS){ cv.remove(); rolling=false; return false; }
+  scatter(B); const disc=HS.discs[0], rot0=disc.rot;
+  [A,B].forEach(x=>x.style.transition='none');
+  wake(B); B.classList.add('on'); B.style.clipPath='inset(0 0 0 100%)'; B.style.zIndex='30'; A.style.zIndex='20';
+  const x0=Wd+R+20, x1=-R-20, T=1500, t0=performance.now();
+  function f(now){ const t=Math.min(1,(now-t0)/T), cx=x0+(x1-x0)*ease(t);
+    cv.style.transform=`translateX(${cx-R}px)`; disc.rot=rot0-(cx-x0)/R; HS.draw();
+    A.style.transform=`translateX(${Math.min(0,cx-R-Wd)}px)`;
+    B.style.clipPath=`inset(0 0 0 ${Math.max(0,Math.min(Wd,cx))}px)`;
+    if(t<1) return requestAnimationFrame(f);
+    cv.remove(); settle(A,B); }
+  requestAnimationFrame(f); return true; }
+const BLEED=260;
+function drop(){ const A=S[i], B=S[i+1]; if(rolling||!B||matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+  rolling=true; [A,B].forEach(x=>x.style.transition='none');
+  B.classList.remove('off'); B.classList.add('on'); B.style.opacity='0'; B.style.zIndex='20'; A.style.zIndex='30';
+  const T=900, Dd=700, LAG=480, t0=performance.now(); let woke=false;
+  function f(now){ const ta=Math.min(1,(now-t0)/T), tb=Math.max(0,Math.min(1,(now-t0-LAG)/Dd));
+    A.style.transform=`translateY(${ease(ta)*(720+BLEED+40)}px)`;          /* far enough that the whole top disc shows on the way down */
+    if(tb>0&&!woke){ woke=true; wake(B); }
+    B.style.transform=`translateY(${(1-out(tb))*-90}px)`; B.style.opacity=String(out(tb));
+    if(ta<1||tb<1) return requestAnimationFrame(f);
+    settle(A,B); }
+  requestAnimationFrame(f); return true; }
+
+/* the discs on the dividers: mounted the first time a divider comes up, under its words, letting clicks through */
+const SCATTER=[[790,300,120],[1010,230,110],[1230,360,150],[880,480,115],[1100,520,100],[700,500,80]];
+const SWATCH=['#dfddc8','#c7c7c7','#827a85','#9ba69c','#c4c1c8','#dfddc8','#c2beb3','#dfdac8'];
+let LAYOUT={};
+fetch('discs.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{ if(j){ LAYOUT=j; S.forEach(x=>{ if(x.__discs&&!x.__layout0){ x.__layout=null; scatter(x,true); } }); } }).catch(()=>{});
+const keyOf=sec=>sec.querySelector('.sh60 h1')?.textContent.trim()||'';
+function scatter(sec,force){ if((sec.__discs&&!force)||!window.mountSheets||!sec.querySelector('.sh60')) return;
+  sec.querySelector('canvas.scat')?.remove();
+  const cv=document.createElement('canvas'); cv.className='scat';
+  cv.style.cssText=`position:absolute;left:0;top:${-BLEED}px;width:1280px;height:${720+BLEED}px;z-index:-1;pointer-events:none`;
+  sec.insertBefore(cv,sec.firstChild);
+  const k=sec.querySelector('.sh60 .no')?.textContent.trim()||'0', off=(parseInt(k)||0)%SWATCH.length;
+  const sw=SWATCH.slice(off).concat(SWATCH.slice(0,off));
+  const L=sec.__layout||LAYOUT[keyOf(sec)]||SCATTER.map(([x,y,r],n)=>[x,y,r,n]);
+  sec.__layout=L;
+  const R0=cv.getBoundingClientRect(), b=R0.height*BLEED/(720+BLEED); sec.__geom={w:R0.width,h:R0.height,b};
+  const HS=window.mountSheets(cv,L.map(([x,y,r])=>({x:x/1280,y:y/720,r:r/1280})),sw,{paper:'#FFFFFF',ground:'#1C1A17',bleed:b,clear:()=>0});
+  if(HS) HS.discs.forEach((d,n)=>{ d.ink=(L[n][3]??n)%sw.length; d.ur=L[n][2]/1280; });
+  sec.__discs=HS||1; if(HS) HS.draw(); }
+let editing=null;
+function readLayout(sec){ const H=sec.__discs; if(!H||H===1) return sec.__layout;
+  const {w,h,b}=sec.__geom, hero=h-b;
+  return H.discs.map(d=>[Math.round((d.x*650+w/2)/w*1280), Math.round((h/2-d.y*650-b)/hero*720), Math.round(d.ur*1280), d.ink]); }
+function editBar(sec){ const b=document.createElement('div'); b.className='discbar';
+  b.innerHTML='<b>Editing discs</b><button data-a="add">+ Disc</button><button data-a="shuffle">Shuffle colours</button><button data-a="save">Save</button><button data-a="done">Done</button><span class="msg">Drag to move · scroll to resize · double-click to remove</span>';
+  b.addEventListener('click',e=>{ e.stopPropagation(); const a=e.target.dataset.a; if(!a) return;
+    if(a==='add'){ sec.__layout=readLayout(sec).concat([[1000,360,90,Math.floor(Math.random()*8)]]); scatter(sec,true); arm(sec); }
+    if(a==='shuffle'){ sec.__layout=readLayout(sec).map(d=>[d[0],d[1],d[2],Math.floor(Math.random()*8)]); scatter(sec,true); arm(sec); }
+    if(a==='save'){ S.forEach(x=>{ if(x.__discs&&x.__discs!==1) LAYOUT[keyOf(x)]=readLayout(x); });
+      fetch('save-discs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(LAYOUT)})
+        .then(r=>{ b.querySelector('.msg').textContent=r.ok?'Saved to discs.json':'Could not save: is the deck running on serve.py?'; })
+        .catch(()=>{ b.querySelector('.msg').textContent='Could not save: is the deck running on serve.py?'; }); }
+    if(a==='done') endEdit(); });
+  slide.appendChild(b); return b; }
+function arm(sec){ const cv=sec.querySelector('canvas.scat'); if(!cv) return; cv.style.pointerEvents='auto'; cv.style.cursor='grab';
+  const H=sec.__discs; if(!H||H===1) return;
+  const at=e=>{ const r=cv.getBoundingClientRect(), g=sec.__geom, q=r.width/g.w; return [((e.clientX-r.left)/q-g.w/2)/650, (g.h/2-(e.clientY-r.top)/q)/650]; };
+  const pick=e=>{ const [x,y]=at(e); for(let n=H.discs.length-1;n>=0;n--){ const d=H.discs[n]; if((x-d.x)**2+(y-d.y)**2<=d.r*d.r) return d; } return null; };
+  cv.onwheel=e=>{ const d=pick(e); if(!d) return; e.preventDefault(); const f=Math.exp(-e.deltaY*0.0015); d.r*=f; d.ur*=f; H.draw(); };
+  cv.ondblclick=e=>{ const d=pick(e); if(!d) return; const L=readLayout(sec); L.splice(H.discs.indexOf(d),1); sec.__layout=L; scatter(sec,true); arm(sec); }; }
+function startEdit(){ const sec=S[i]; if(!CLOVER_DIVIDERS||!sec.querySelector('.sh60')) return; scatter(sec,true); editing={sec,bar:editBar(sec)}; sec.classList.add('editing'); arm(sec); }
+function endEdit(){ if(!editing) return; const {sec,bar}=editing; sec.__layout=readLayout(sec); bar.remove(); sec.classList.remove('editing');
+  const cv=sec.querySelector('canvas.scat'); if(cv){ cv.style.pointerEvents='none'; cv.style.cursor=''; } editing=null; }
+addEventListener('keydown',e=>{ if(e.key==='e'||e.key==='E'){ editing?endEdit():startEdit(); } });
+function scatterNear(){ if(!CLOVER_DIVIDERS||!window.mountSheets) return; [i,i+1].forEach(j=>S[j]&&scatter(S[j])); }
+addEventListener('load',()=>{ const t=setInterval(()=>{ if(window.mountSheets){ clearInterval(t); scatterNear(); } },50); });
+
+/* FROM THE CLOVER DECK: WHAT MANUS ASKED -> WHAT I FOUND -> HOW I ANSWERED. The green rule under one slide's points
+   runs off its right edge; the deck pans right along it, and the next slide arrives with the rule already running in
+   from its left edge. From How I answered the rule turns down instead, and the deck pans down through the metrics
+   onto the timeline. */
+function pan(dir){ const A=S[i], B=S[i+1]; if(rolling||!B||matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+  rolling=true; [A,B].forEach(x=>x.style.transition='none'); wake(B); B.classList.add('on');
+  const T=950, t0=performance.now(), ax=dir==='down'?'Y':'X', L=dir==='down'?720:1280;
+  function f(now){ const t=Math.min(1,(now-t0)/T), x=ease(t)*L;
+    A.style.transform=`translate${ax}(${-x}px)`; B.style.transform=`translate${ax}(${L-x}px)`;
+    if(t<1) return requestAnimationFrame(f);
+    settle(A,B); }
+  requestAnimationFrame(f); return true; }
+/* 10 to 11: the usual turn to the left, but the dashed activation-gap box comes along and grows into the community
+   page card, where the screenshot fades in: this page is where the gap happened. */
+function gapToPage(){ const A=S[i], B=S[i+1]; if(rolling||!B||matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+  const gp=A.querySelector('.fun3 u.gp'), cvp=B.querySelector('.c11v .cvp'); if(!gp||!cvp) return false;
+  rolling=true; [A,B].forEach(x=>x.style.transition='none'); wake(B); B.classList.add('on');
+  const r0=gp.getBoundingClientRect(), r1=cvp.getBoundingClientRect(), K=document.getElementById('slide').getBoundingClientRect().width/1280;
+  const ov=document.createElement('div'); ov.style.cssText=`position:fixed;z-index:9999;pointer-events:none;box-sizing:border-box;border:${1.5*K}px dashed #340414;border-radius:${4*K}px;left:${r0.left}px;top:${r0.top}px;width:${r0.width}px;height:${r0.height}px`;
+  document.body.appendChild(ov); gp.style.visibility='hidden'; cvp.style.opacity='0'; B.classList.add('viaGap');
+  const T=950, G=1150, t0=performance.now(), L=1280;
+  function f(now){ const t=now-t0, p=ease(Math.min(1,t/T)), x=p*L;
+    A.style.transform=`translateX(${-x}px)`; B.style.transform=`translateX(${L-x}px)`;
+    const q=ease(Math.min(1,t/G)), M=(a,b)=>a+(b-a)*q;
+    ov.style.left=M(r0.left,r1.left)+'px'; ov.style.top=M(r0.top,r1.top)+'px'; ov.style.width=M(r0.width,r1.width)+'px'; ov.style.height=M(r0.height,r1.height)+'px';
+    ov.style.borderRadius=M(4,26)*K+'px'; ov.style.borderColor=`rgba(52,4,20,${(1-q*.85).toFixed(3)})`;
+    if(t<G) return requestAnimationFrame(f);
+    cvp.style.transition='opacity .45s ease'; cvp.style.opacity='1'; ov.style.transition='opacity .45s ease'; ov.style.opacity='0';
+    setTimeout(()=>{ ov.remove(); cvp.style.transition=''; cvp.style.opacity=''; gp.style.visibility=''; },480);
+    settle(A,B); }
+  requestAnimationFrame(f); return true; }
+/* the wiring: a step on the slide first, then the roll into a divider or the drop out of one, else the usual turn */
+const advance0=advance, go0=go;
+advance=function(){ if(rolling) return; if(editing) endEdit(); const c=S[i], nx=S[i+1];
+  if(c.dataset.steps&&!c.classList.contains('st1')) return advance0();
+  if(c.querySelector('.vl3.down')&&nx&&nx.querySelector('.vl3.in')&&pan('down')) return;
+  if(c.querySelector('.gl3.out')&&nx&&nx.querySelector('.gl3.in')&&pan('right')) return;
+  if(c.querySelector('.fun3 u.gp')&&nx&&nx.querySelector('.c11v .cvp')&&gapToPage()) return;
+  if(CLOVER_DIVIDERS&&nx&&nx.querySelector('.sh60')&&roll()) return;
+  if(CLOVER_DIVIDERS&&c.querySelector('.sh60')&&nx&&!nx.querySelector('.sh60')&&drop()) return;
+  advance0(); };
+go=function(n){ if(rolling) return; if(editing) endEdit(); S.forEach(x=>x.classList.remove('viaGap')); go0(n); scatterNear(); };
+function back(){ if(rolling) return; if(editing) endEdit(); const c=S[i]; if(c.classList.contains('st1')){ c.classList.remove('st1'); return; } go(i-1); }
+</script>
+<script>
+/* THE FIT. The floor rule from deck.css, enforced: for each slide, everything between the head and
+   the foot must end 24px above the foot rule. If it does not, that slide's content is scaled down,
+   uniformly, by just enough. Runs after fonts load and again on resize. */
+(function(){
+  const PAD=24;
+  function fit(sec){
+    const wrap=sec.querySelector('.wrap'), foot=sec.querySelector('.foot'); if(!wrap||!foot) return;
+    const head=wrap.querySelector('.head');
+    const kids=[...wrap.children].filter(e=>e!==head&&e!==foot&&!e.classList.contains('fn')&&!e.classList.contains('sigtr'));
+    if(!kids.length) return;
+    kids.forEach(k=>k.style.zoom='');
+    const scale=(document.getElementById('slide').getBoundingClientRect().width/1280)||1;
+    const limit=foot.getBoundingClientRect().top-PAD*scale;
+    let top=1e9,bottom=-1e9; kids.forEach(k=>{const b=k.getBoundingClientRect(); if(b.height<1) return; top=Math.min(top,b.top); bottom=Math.max(bottom,b.bottom);});
+    if(bottom>limit&&bottom>top){ const z=Math.max(.55,(limit-top)/(bottom-top)); kids.forEach(k=>k.style.zoom=z.toFixed(3)); }
+  }
+  function all(){ document.querySelectorAll('section.s').forEach(fit); }
+  (document.fonts?document.fonts.ready:Promise.resolve()).then(()=>{ all(); setTimeout(all,300); });
+  addEventListener('resize',()=>{ clearTimeout(all._t); all._t=setTimeout(all,120); });
+  addEventListener('load',()=>setTimeout(all,50));
+})();
+</script>
+<script>
+/* FROM THE CLOVER DECK. The problem statement's marker sweeps on: each highlight is run over left to right, one after
+   another, once the slide has landed (Clover runs it at the end of its question merge; here it follows the drop). */
+(function(){ const B=[...document.querySelectorAll('section.s')].find(s=>s.querySelector('.psq')); if(!B) return;
+  const st=document.createElement('style'); st.textContent=`section.s.viaQ .psq mark{background-size:0% 100%!important;background-repeat:no-repeat!important;transition:background-size .7s cubic-bezier(.3,.7,.2,1)}
+section.s.viaQ.qsweep .psq mark{background-size:100% 100%!important}
+section.s.viaQ .psq mark:nth-of-type(2){transition-delay:.35s}section.s.viaQ .psq mark:nth-of-type(3){transition-delay:.7s}section.s.viaQ .psq mark:nth-of-type(4){transition-delay:1.05s}
+section.s.viaQ .psq mark:nth-of-type(5){transition-delay:1.4s}section.s.viaQ .psq .nw mark{transition-delay:1.75s}
+section.s.viaQ.qreset .psq mark{transition:none!important}`; document.head.appendChild(st);
+  let was=false, t=0;
+  new MutationObserver(()=>{ const on=B.classList.contains('on'); if(on===was) return; was=on; clearTimeout(t);
+    if(on){ B.classList.add('viaQ','qreset'); B.classList.remove('qsweep'); void B.offsetWidth; B.classList.remove('qreset');   /* empty at once, then swept */
+      t=setTimeout(()=>B.classList.add('qsweep'),1250); } }).observe(B,{attributes:true,attributeFilter:['class']});   /* leaving, it stays drawn */
+})();
+</script>
+
+<script>window.TV=4;</script><script src="t.js?v=5"></script>

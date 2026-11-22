@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Takeaways lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Five ways to show the Eden deck's last slide, "Key takeaways and next steps": three lessons, each with
+   the step it leads to. Every option sits in a 1280x720 slide frame with the deck's head, type and moss. */
+:root{--ink:#14171B;--moss:#3E4F1A;--olive:#6B7A3A;--sage:#C4D4A4;--tint:#F1F4E8;--hair:rgba(20,23,27,.14);--mute:#4a4740;
+  --jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1340px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:#6f6b64;margin:0 0 26px}
+.opt{margin-bottom:34px}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--moss);margin:0 0 10px}
+.lab small{display:inline;font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:#6f6b64;margin-left:8px}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 18px 40px -24px rgba(0,0,0,.3);overflow:hidden;container-type:inline-size}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:64px 72px 0;position:relative}
+.hd{font:500 52px/1.08 var(--jak);letter-spacing:-.03em;margin:0}
+.hd em{font-style:normal;color:var(--moss)}
+.ft{position:absolute;left:72px;right:72px;bottom:34px;border-top:1px solid var(--hair);padding-top:14px;display:flex;justify-content:space-between;font:400 14px var(--hel);color:var(--ink)}
+.ft span:first-child{color:var(--moss)}
+.tag{font:600 11.5px var(--jak);letter-spacing:.09em;text-transform:uppercase;color:var(--moss)}
+.t{font:600 22px/1.25 var(--jak);letter-spacing:-.015em;color:var(--ink);margin:0}
+.p{font:400 15px/1.5 var(--hel);color:var(--mute);margin:0}
+.nx{font:500 16px/1.4 var(--jak);color:var(--ink);margin:0}
+
+/* 01 Lesson to step: three rows, the lesson on the left and the step it leads to on the right */
+.o1 .rows{margin-top:44px;display:grid;gap:14px}
+.o1 .r{display:grid;grid-template-columns:42px 1fr 64px 1fr;align-items:center;border-top:1px solid var(--hair);padding-top:16px}
+.o1 .r:first-child{border-top:2px solid var(--moss)}
+.o1 .k{font:600 15px var(--jak);color:var(--moss)}
+.o1 .L .t{font-size:21px}.o1 .L .p{margin-top:4px;font-size:14px;max-width:44ch}
+.o1 .ar{height:2px;background:var(--moss);position:relative;margin:0 14px}
+.o1 .ar::after{content:"";position:absolute;right:-1px;top:-5px;width:10px;height:10px;border-top:2px solid var(--moss);border-right:2px solid var(--moss);transform:rotate(45deg)}
+.o1 .N{background:var(--tint);border-radius:14px;padding:14px 18px}
+.o1 .N .tag{display:block;margin-bottom:4px}
+
+/* 02 Two tiers: what I learned above, what I do next below, joined by a line through each pair */
+.o2 .tier{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.o2 .lbl{display:flex;align-items:center;gap:12px;margin:52px 0 16px}
+.o2 .lbl::after{content:"";flex:1;height:1px;background:var(--hair)}
+.o2 .up .c{padding-right:8px}.o2 .up .p{margin-top:6px;font-size:14.5px}
+.o2 .join{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;height:34px}
+.o2 .join i{display:block;width:2px;height:100%;background:var(--moss);margin-left:22px;position:relative}
+.o2 .join i::after{content:"";position:absolute;left:-4px;bottom:0;width:10px;height:10px;border-right:2px solid var(--moss);border-bottom:2px solid var(--moss);transform:translateY(2px) rotate(45deg)}
+.o2 .dn .c{background:var(--moss);color:#fff;border-radius:16px;padding:18px 20px}
+.o2 .dn .nx{color:#fff}.o2 .dn .tag{color:var(--sage);display:block;margin-bottom:6px}
+.o2 .lbl2{margin-top:6px}
+
+/* 03 Editorial numerals: one big light numeral per lesson, the step set in a pill underneath */
+.o3 .cols{margin-top:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
+.o3 .n{font:300 96px/.85 var(--jak);letter-spacing:-.05em;color:var(--sage)}
+.o3 .t{margin-top:18px}.o3 .p{margin-top:8px;font-size:14.5px}
+.o3 .pill{margin-top:20px;display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--moss);border-radius:16px;padding:12px 14px}
+.o3 .pill b{flex:none;width:22px;height:22px;border-radius:50%;background:var(--moss);color:#fff;display:grid;place-items:center;font:600 12px var(--jak);margin-top:1px}
+.o3 .pill .nx{font-size:15px}
+
+/* 04 Split cards: each card is half lesson on white, half next step on moss, so the turn is the fold */
+.o4 .cards{margin-top:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.o4 .cd{border-radius:20px;overflow:hidden;border:1.5px solid var(--moss);display:flex;flex-direction:column;height:410px}
+.o4 .top{padding:22px 22px 18px;flex:1}
+.o4 .top .tag{color:var(--olive)}.o4 .top .t{margin-top:10px}.o4 .top .p{margin-top:8px;font-size:14.5px}
+.o4 .bot{background:var(--moss);padding:18px 22px 22px;position:relative}
+.o4 .bot::before{content:"";position:absolute;left:28px;top:-9px;width:16px;height:16px;background:var(--moss);transform:rotate(45deg)}
+.o4 .bot .tag{color:var(--sage)}.o4 .bot .nx{color:#fff;margin-top:6px}
+
+/* 05 The loop: the three lessons as one cycle, measure then repivot then align, with each step on its arc */
+.o5 .body{margin-top:24px;display:grid;grid-template-columns:470px 1fr;gap:40px;align-items:center}
+.o5 svg{width:470px;height:470px;display:block}
+.o5 .list{display:grid;gap:18px}
+.o5 .it{display:grid;grid-template-columns:34px 1fr;gap:14px;padding-top:14px;border-top:1px solid var(--hair)}
+.o5 .it:first-child{border-top:2px solid var(--moss)}
+.o5 .it b{width:30px;height:30px;border-radius:50%;background:var(--moss);color:#fff;display:grid;place-items:center;font:600 13px var(--jak)}
+.o5 .it .t{font-size:19px}.o5 .it .p{font-size:14px;margin-top:3px}
+.o5 .it .nx{font-size:14.5px;margin-top:8px;color:var(--moss)}
+.o5 .it .nx::before{content:"Next \2192  ";font-weight:600}
+</style></head><body>
+<div class="wrap">
+<h1>Takeaways lab</h1>
+<p class="lede">Five ways to show "Key takeaways and next steps", each at slide size with the deck's type and moss. Tell me the number.</p>
+<div id="opts"></div>
+</div>
+<script>
+const L=[
+ {k:'Measure',t:'Pick a north-star metric',p:'It is easy to get carried away by noise in usability sessions and in trends. A north-star metric keeps the design decisions tied to data.',n:'I will measure time from a request to useful information with the 52 testers.'},
+ {k:'Repivot',t:'Repivots are the best part.',p:'Iterating is how a hypothesis gets tested in practice. The best ideas are not always the first ones, as navigation‑first showed.',n:'I will test the intent-led HUD over a week of real wear.'},
+ {k:'Align',t:'Align early, and keep asking',p:'I wish I had synced with engineering and the founders more. Building in their language from the start would have saved time on merges, and the most important conversations are often the ones nobody says out loud.',n:'I will agree the platform with engineers before I refine an interaction.'}];
+const head='<p class="hd">Key takeaways <em>and next steps.</em></p>';
+const foot='<div class="ft"><span>40 &nbsp; Findings</span><span>Eden Case Study</span></div>';
+const short=p=>p.split('. ')[0]+'.';
+const O=[
+ ['01','Lesson to step','Three rows; each lesson points straight at the step it leads to.',
+  `<div class="o1">${head}<div class="rows">${L.map((l,i)=>`<div class="r"><span class="k">0${i+1}</span><div class="L"><p class="t">${l.t}</p><p class="p">${short(l.p)}</p></div><i class="ar"></i><div class="N"><span class="tag">Next step</span><p class="nx">${l.n}</p></div></div>`).join('')}</div></div>`],
+ ['02','Two tiers','What I learned on top, what I do next underneath, an arrow down through each pair.',
+  `<div class="o2">${head}<div class="lbl"><span class="tag">What I learned</span></div><div class="tier up">${L.map(l=>`<div class="c"><p class="t">${l.t}</p><p class="p">${l.p}</p></div>`).join('')}</div><div class="join"><i></i><i></i><i></i></div><div class="tier dn">${L.map(l=>`<div class="c"><span class="tag">Next step</span><p class="nx">${l.n}</p></div>`).join('')}</div></div>`],
+ ['03','Editorial numerals','A big light numeral per lesson, the full reasoning, and the step in a pill.',
+  `<div class="o3">${head}<div class="cols">${L.map((l,i)=>`<div><div class="n">0${i+1}</div><p class="t">${l.t}</p><p class="p">${l.p}</p><div class="pill"><b>&rarr;</b><p class="nx">${l.n}</p></div></div>`).join('')}</div></div>`],
+ ['04','Split cards','Each card folds from lesson (white) into next step (moss).',
+  `<div class="o4">${head}<div class="cards">${L.map((l,i)=>`<div class="cd"><div class="top"><span class="tag">Takeaway 0${i+1}</span><p class="t">${l.t}</p><p class="p">${l.p}</p></div><div class="bot"><span class="tag">Next step</span><p class="nx">${l.n}</p></div></div>`).join('')}</div></div>`],
+ ['05','The loop','The three lessons as one cycle: measure, repivot, align, and round again.',
+  `<div class="o5">${head}<div class="body"><svg viewBox="0 0 470 470" aria-hidden="true">
+    
+    ${(()=>{const c=235,r=160,A=[-90,30,150],P=a=>[c+r*Math.cos(a*Math.PI/180),c+r*Math.sin(a*Math.PI/180)];let o='';
+      A.forEach((a,i)=>{const s=P(a+17),e=P(A[(i+1)%3]+(i==2?360:0)-17),t=(A[(i+1)%3]+(i==2?360:0)-17)*Math.PI/180,tx=-Math.sin(t),ty=Math.cos(t);
+        o+=`<path d="M${s[0].toFixed(1)} ${s[1].toFixed(1)} A${r} ${r} 0 0 1 ${e[0].toFixed(1)} ${e[1].toFixed(1)}" fill="none" stroke="#3E4F1A" stroke-width="2.5" stroke-linecap="round"/>`;
+        o+=`<path d="M${(e[0]+tx*2).toFixed(1)} ${(e[1]+ty*2).toFixed(1)} l${(-tx*11-ty*6).toFixed(1)} ${(-ty*11+tx*6).toFixed(1)} l${(ty*12).toFixed(1)} ${(-tx*12).toFixed(1)}z" fill="#3E4F1A"/>`;});
+      A.forEach((a,i)=>{const [x,y]=P(a);o+=`<circle cx="${x}" cy="${y}" r="38" fill="#3E4F1A"/><text x="${x}" y="${y+5}" text-anchor="middle" font-family="Plus Jakarta Sans" font-weight="600" font-size="15" fill="#fff">${L[i].k}</text>`;});return o;})()}
+    <text x="235" y="228" text-anchor="middle" font-family="Plus Jakarta Sans" font-weight="600" font-size="20" fill="#14171B">Clover</text>
+    <text x="235" y="252" text-anchor="middle" font-family="Helvetica Neue" font-size="13" fill="#6f6b64">each round starts from data</text>
+  </svg><div class="list">${L.map((l,i)=>`<div class="it"><b>${i+1}</b><div><p class="t">${l.t}</p><p class="p">${short(l.p)}</p><p class="nx">${l.n}</p></div></div>`).join('')}</div></div></div>`]];
+document.getElementById('opts').innerHTML=O.map(([n,t,d,h])=>`<section class="opt"><p class="lab">${n} ${t}<small>${d}</small></p><div class="frame"><div class="sl">${h}${foot}</div></div></section>`).join('');
+const fit=()=>document.querySelectorAll('.frame').forEach(f=>{f.firstElementChild.style.transform=`scale(${f.clientWidth/1280})`});
+addEventListener('resize',fit);fit();document.fonts&&document.fonts.ready.then(fit);
+</script>
+</body></html>

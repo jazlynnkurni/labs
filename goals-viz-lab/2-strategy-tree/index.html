@@ -1,0 +1,45 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2 · Strategy tree</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;600;700&display=swap">
+<link rel="stylesheet" href="../shared.css">
+<style>
+/* an opportunity-solution-style tree: the company at the root, its goals as branches, the flow that carries each goal,
+   and the report's evidence as the leaf. The build draws it from the root down, cause to proof */
+.top{left:0;right:0;top:88px;display:flex;justify-content:center}
+.top .head{max-width:1000px}
+.lines{left:0;top:0;width:1280px;height:720px;pointer-events:none}
+.lines path{fill:none;stroke:rgba(20,23,27,.28);stroke-width:1}
+/* root: the plum outline pill she picked for the two-process slides */
+.root{left:576px;top:232px;width:128px;height:44px;border:1.5px solid var(--plum);border-radius:22px;display:flex;align-items:center;justify-content:center;
+  font:600 15px/1 var(--jak);color:var(--plum);background:var(--paper)}
+.node{width:360px;display:flex;justify-content:center}
+.goal{top:340px}
+.flow{top:404px}
+.flow h3{font-size:22px;line-height:1.25;color:var(--ink);background:#fff;border-radius:12px;padding:16px 24px;box-shadow:var(--depth)}
+.leaf{top:516px}
+.leaf .body{text-align:center;max-width:288px}
+.c1{left:60px}.c2{left:460px}.c3{left:860px}</style></head>
+<body><div id="stage">
+<div class="top"><h2 class="head" data-b="0">According to <span class="hl">ClassPass&rsquo;s 2026 Industry Impact Report</span>, these are the company&rsquo;s <span class="hl">business goals</span>:</h2></div>
+<svg class="lines" viewBox="0 0 1280 720" aria-hidden="true">
+  <path data-b="2" d="M640 276V306"/>
+  <path data-b="2" d="M640 276V292Q640 300 632 300H248Q240 300 240 308V330"/>
+  <path data-b="2" d="M640 276V292Q640 300 648 300H1032Q1040 300 1040 308V330"/>
+  <path data-b="2" d="M640 306V330"/>
+  <path data-b="4" d="M240 360V404"/><path data-b="4" d="M640 360V404"/><path data-b="4" d="M1040 360V404"/>
+  <path data-b="6" d="M240 463V508"/><path data-b="6" d="M640 463V508"/><path data-b="6" d="M1040 463V508"/>
+</svg>
+<div class="root" data-b="1">ClassPass</div>
+<div class="node goal c1" data-b="3"><p class="lab g1">Wellness beyond fitness</p></div>
+<div class="node goal c2" data-b="3"><p class="lab g2">AI integration</p></div>
+<div class="node goal c3" data-b="3"><p class="lab g3">Retention</p></div>
+<div class="node flow c1" data-b="5"><h3>Finding a class</h3></div>
+<div class="node flow c2" data-b="5"><h3>Support chat</h3></div>
+<div class="node flow c3" data-b="5"><h3>Rating a class</h3></div>
+<div class="node leaf c1" data-b="7"><p class="body">Wellness bookings grew 37% in 2025, as fast as fitness</p></div>
+<div class="node leaf c2" data-b="7"><p class="body">AI already sets class spots and credit prices, and now answers members</p></div>
+<div class="node leaf c3" data-b="7"><p class="body">80% of members who join after a trial go back to a studio they tried</p></div>
+</div>
+<p class="tag">2 · Strategy tree · click to play the build · <a href="../">all five</a></p>
+<script src="../shared.js"></script>
+</body></html>

@@ -1,0 +1,33 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Depop 5 · Value chain</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;600;700&display=swap">
+<link rel="stylesheet" href="../../shared.css">
+<style>
+/* a value chain: each process is a chevron that hands on to the next, and the offer is the link between them,
+   drawn as the deck's own dark block arrow (flat #222, 1.5px #999 outline, white label) */
+.top{left:0;right:0;top:88px;display:flex;justify-content:center}
+.chain{left:0;top:0;width:1280px;height:720px}
+.chain .p{fill:#fff;stroke:rgba(20,23,27,.2);stroke-width:1;stroke-linejoin:round}
+.chain .k{fill:#222;stroke:#999;stroke-width:1.5;stroke-linejoin:miter}
+.side{top:300px;display:flex;flex-direction:column;gap:16px}
+.side h3{font-size:28px;line-height:1.25;color:var(--ink)}
+.vb{display:flex;flex-direction:column;gap:12px}
+.vb p{font:400 17px/1.45 var(--hel);color:var(--ink);display:flex;gap:10px}
+.vb p::before{content:"·";color:var(--plum);font-weight:700}
+.l{left:144px;width:352px}.r{left:784px;width:320px}
+.kl{left:568px;top:376px;width:120px;text-align:center;font:600 15px/1.3 var(--jak);color:#fff}
+</style></head>
+<body><div id="stage">
+<div class="top"><h2 class="head" data-b="0">Depop&rsquo;s value comes from 2 main processes:</h2></div>
+<svg class="chain" viewBox="0 0 1280 720" aria-hidden="true">
+  <g data-b="1"><path class="p" d="M96 216H520L576 396L520 576H96Z"/></g>
+  <g data-b="3"><path class="k" d="M528 216H672L728 396L672 576H528L584 396Z"/></g>
+  <g data-b="4"><path class="p" d="M680 216H1128L1184 396L1128 576H680L736 396Z"/></g>
+</svg>
+<div class="side l" data-b="2"><h3>Discovery</h3><div class="vb"><p>One-off pieces from 5 million active sellers</p><p>Filters for brand, size, colour and price</p></div></div>
+<p class="kl" data-b="3">making<br>an offer</p>
+<div class="side r" data-b="5"><h3>Deal</h3><div class="vb"><p>Offers and bags that agree a price</p><p>Checkout with payments and shipping built in</p></div></div>
+</div>
+<p class="tag">Depop 5 · Value chain · click to play the build · <a href="../../">all formats</a></p>
+<script src="../../shared.js"></script>
+</body></html>

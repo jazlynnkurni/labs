@@ -1,215 +1,243 @@
 <!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>App Critique</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&display=swap">
+<title>DoorDash App Crit R2</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;600;700&display=swap">
 <style>
-/* APP CRITIQUE · ClassPass. The intro deck's material: paper slides on a 1280x720 stage that push left and right,
-   Jakarta for heads, Helvetica for body, plum for emphasis, the gold felt tip on one phrase per headline.
-   The grid: eyebrow and headline sit in the band 32-136, content starts on the 168 line (32px under it), centred.
-   Annotations: each finding owns a number. Its region on the screenshot gets a plum hairline outline, its marker sits in
-   the gutter to the left of the screen at the region's top, and its words sit in the column on the right. Every click
-   reveals the next finding in reading order. Sage markers are things that work. */
+/* DOORDASH APP CRIT R2 · ClassPass, Depop, Pinterest. Four slides per app: title, what it is, the two processes it runs on,
+   and its business goals mapped to the flows. Same material as the App Critique decks: paper slides on a 1280x720 stage that
+   push left and right, Jakarta for heads, Helvetica for body, plum for emphasis, hairlines for structure. No entrance motion.
+   Every picture is a placeholder until its file lands in img/r2/ under the name the placeholder shows. */
 :root{--jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif;
-  --gold:#A99939;--plum:#340414;--sage:#9ba69c;--paper:#FAF9F7;--ink:#14171B;--ink2:rgba(20,23,27,.66);--ink3:rgba(20,23,27,.42);
-  --hair:rgba(20,23,27,.14);--ease:cubic-bezier(.45,0,.15,1);--out:cubic-bezier(.2,.7,.2,1)}
+  --gold:#A99939;--plum:#340414;--paper:#FAF9F7;--ink:#14171B;--ink2:rgba(20,23,27,.66);--ink3:rgba(20,23,27,.42);
+  --hair:rgba(20,23,27,.14);--out:cubic-bezier(.2,.7,.2,1)}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;overflow:hidden;background:#0E0D0C;color:var(--ink);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 #stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform:translate(-50%,-50%) scale(var(--k,1));background:var(--paper);overflow:hidden}
 .sl{position:absolute;inset:0;display:none;background:var(--paper)}.sl.on{display:block}
 .sl>*{position:absolute}
-h1,h2{margin:0;font-family:var(--jak);font-weight:500;letter-spacing:-.015em;text-wrap:balance}
+h1,h2,h3{margin:0;font-family:var(--jak);font-weight:500;letter-spacing:-.015em;text-wrap:balance}
 p{margin:0;text-wrap:pretty}
-.lab{font:600 10.5px/1.5 var(--jak);letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+.lab{font:600 10.5px/1.5 var(--jak);letter-spacing:.15em;text-transform:uppercase;color:var(--plum)}
 
-/* the head: eyebrow over headline, bottom-aligned in the band so every slide's content starts on the same line */
-.head{left:0;right:0;top:32px;height:104px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:10px;text-align:center;padding:0 140px}
-.head .lab{color:var(--plum)}
-.head h2{font-size:30px;line-height:1.25;color:var(--ink);max-width:1000px}
-.hl{color:var(--plum);font-weight:600;padding:0 .08em;margin:0 -.08em;box-decoration-break:clone;-webkit-box-decoration-break:clone;mix-blend-mode:multiply;
-  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M6 6 C 60 2, 140 9, 200 5 S 330 3, 394 7 L 397 32 C 340 37, 250 30, 190 35 S 70 38, 4 33 Z' fill='%23A99939' opacity='.42'/><path d='M12 9 C 90 4, 180 12, 260 8 S 360 6, 390 10 L 392 29 C 320 33, 230 27, 150 31 S 60 34, 10 30 Z' fill='%23A99939' opacity='.2'/></svg>") no-repeat 0 55%/0% 1.08em}
-.sl.on .hl{animation:mkdraw .8s cubic-bezier(.3,.7,.2,1) .6s both}
-@keyframes mkdraw{from{background-size:0% 1.08em}to{background-size:100% 1.08em}}
-
-/* enters: ~100ms between chunks, 8px rise, 8px blur, opacity */
-.in{opacity:0}
-.sl.on .in{animation:rise .6s var(--out) both;animation-delay:calc(var(--i,0) * 100ms + 150ms)}
-@keyframes rise{from{opacity:0;transform:translateY(8px);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}
-
-/* ---------- flow slides ---------- */
-.body{left:0;right:0;top:168px;display:flex;justify-content:center;align-items:flex-start;gap:48px}
-.body>*{position:relative}
-.shots{display:flex;gap:32px;align-items:flex-start}
-.fig{display:flex;flex-direction:column;align-items:center;gap:12px}
-.shot{position:relative;height:var(--ph,470px);aspect-ratio:644/1400}
-.shot.wide{height:auto;width:var(--pw,420px);aspect-ratio:1400/997}
-.shot img{display:block;width:100%;height:100%;border-radius:calc(var(--ph,470px) * .068);outline:1px solid rgba(0,0,0,.1);outline-offset:-1px;background:#fff}
-.shot.wide img{border-radius:14px}
-.cap{font:400 11.5px/1.45 var(--hel);color:var(--ink3);text-align:center;max-width:calc(var(--ph,470px) * .46 + 20px)}
-.shot.wide+.cap{max-width:var(--pw,420px)}
-/* a region: plum hairline, hidden until its finding is revealed */
-.rg{position:absolute;border:1.5px solid var(--plum);border-radius:8px;opacity:0;transform:scale(.985);transition:opacity .24s var(--out),transform .24s var(--out);pointer-events:none}
-.rg.ok{border-color:#6f7d70}
-.mk{position:absolute;left:-26px;width:20px;height:20px;margin-top:-1px;border-radius:50%;background:var(--plum);color:#fff;font:600 11px/20px var(--jak);text-align:center;font-variant-numeric:tabular-nums;
-  opacity:0;transform:scale(.5);filter:blur(4px);transition:opacity .24s var(--out),transform .24s var(--out),filter .24s var(--out)}
-.mk.ok,.fn .n.ok{background:var(--sage);color:var(--ink)}
-.shown{opacity:1!important;transform:none!important;filter:blur(0)!important}
-.redact{position:absolute;border-radius:10px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);background:rgba(255,255,255,.25)}
-
-/* the findings column */
-.finds{width:var(--fw,320px);display:flex;flex-direction:column;gap:24px}
-.fn{display:grid;grid-template-columns:20px 1fr;column-gap:12px;row-gap:4px;opacity:0;transform:translateY(8px);filter:blur(8px);transition:opacity .28s var(--out),transform .28s var(--out),filter .28s var(--out)}
-.fn .n{grid-row:span 2;width:20px;height:20px;margin-top:1px;border-radius:50%;background:var(--plum);color:#fff;font:600 11px/20px var(--jak);text-align:center;font-variant-numeric:tabular-nums}
-.fn h3{margin:0;font:600 16px/1.3 var(--jak);color:var(--ink);letter-spacing:-.01em}
-.fn p{font:300 14.5px/1.5 var(--hel);color:var(--ink2)}
-.later{font:italic 300 13px/1.5 var(--hel);color:var(--ink3);padding-top:16px;border-top:1px solid var(--hair);opacity:0;transition:opacity .28s var(--out)}
-.foot{left:0;right:0;top:684px;text-align:center;font:400 12px/1.4 var(--hel);color:var(--ink3)}
-.foot b{font:600 10px var(--jak);letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin-right:8px}
-.foot i{font-style:normal;margin:0 14px;color:var(--hair)}
-
-/* ---------- cover ---------- */
-.cover .mid{left:0;right:0;top:0;height:720px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center}
-.cover h1{font-size:76px;line-height:1;letter-spacing:-.03em}
-.cover .sub{font:300 17px/1.5 var(--hel);color:var(--ink2)}
-
-/* ---------- text slides ---------- */
-.cols{left:0;right:0;top:168px;display:flex;justify-content:center;align-items:center;gap:0}
-/* a text slide as one centred group: head over content, 32px apart, equal space above and below, equal left and right */
+/* a slide as one centred group: head over content, 32px apart, equal space above and below */
 .ctr{left:0;right:0;top:0;height:720px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px}
-.ctr>.head,.ctr>.cols{position:static;height:auto;padding:0}
-.ctr>.cols{gap:64px}
-.col{width:440px;padding:0;display:flex;flex-direction:column;gap:32px}
-.col+.col{border-left:1px solid var(--hair)}
-.col .lab{color:var(--plum)}
-.col p{font:400 17px/1.5 var(--hel);color:var(--ink)}
-.col p.g{color:var(--ink);font-size:15px}
-.big{font:500 44px/1 var(--jak);letter-spacing:-.025em;color:var(--plum);font-variant-numeric:tabular-nums}
-.big small{font:300 15px/1.4 var(--hel);letter-spacing:0;color:var(--ink2);margin-left:10px}
-.blk{display:flex;flex-direction:column;gap:8px}
-.blk h4,.col .ch4{margin:0;font:600 15px/1.35 var(--jak);color:var(--plum);letter-spacing:-.005em}
-.jr{display:flex;flex-direction:column;gap:8px;padding-top:32px;border-top:1px solid var(--hair)}
-.jr .lab{color:var(--plum)}
-.trip{display:flex;align-items:baseline;gap:12px;font:500 20px var(--jak);letter-spacing:-.015em;white-space:nowrap}
-.col .note{font:italic 300 13.5px/1.5 var(--hel);color:var(--ink3);text-align:left}
-.trip span{color:var(--ink3);font:300 17px var(--hel)}
-.trip em{font-style:normal;color:var(--plum)}
-/* ABIGAIL. The Maya card from the Clover deck (slide 41, .mc9), ported as is: one pane of glass running from sage into
-   mauve, the label, her name, her facts as chips, then her situation as dotted rows. The portrait frame shows only when
-   img/abigail.jpg exists; no stand-in picture. */
-:root{--sig-deep:#6F7C70;--sig2:#827a85;--gl-sage:rgba(155,166,156,.62);--gl-sage-lt:rgba(214,222,215,.85);--gl-mauve-lt:rgba(222,216,224,.85)}
-.pcard{position:relative;width:340px;border-radius:24px;padding:18px 18px 12px;
-  background:linear-gradient(160deg,rgba(255,255,255,.98) 0%,var(--gl-sage-lt) 52%,var(--gl-mauve-lt) 100%);
-  box-shadow:inset 2px 2px 2px rgba(255,255,255,.95),inset 0 -22px 36px -26px rgba(130,122,133,.35),0 0 0 1px rgba(20,23,27,.06),0 26px 48px -24px rgba(52,4,20,.32)}
-.pcard .av{display:inline-block;height:126px;border-radius:20px;padding:5px;margin-bottom:10px;background:linear-gradient(145deg,#fff,var(--gl-sage));
-  box-shadow:inset 1.5px 1.5px 1px rgba(255,255,255,.9),0 0 0 1px rgba(255,255,255,.6),0 10px 22px -10px rgba(52,4,20,.4)}
-.pcard .av img{display:block;height:100%;width:auto;border-radius:15px}
-.pcard .who{margin:0;font:600 11.5px/1.4 var(--jak);letter-spacing:.06em;text-transform:uppercase;color:#8a8780}
-.pcard .nm{margin:2px 0 8px;font:500 30px/1.1 var(--jak);letter-spacing:-.02em;color:var(--plum)}
-.pcard .fx{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
-.pcard .fx span{font:600 11.5px/1 var(--jak);padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.8);color:var(--ink);box-shadow:0 0 0 1px rgba(52,4,20,.14)}
-.pcard .tl{margin:0 0 4px;font:600 11.5px/1.4 var(--jak);letter-spacing:.06em;text-transform:uppercase;color:var(--plum)}
-.pcard .tr{display:flex;align-items:flex-start;gap:10px;margin:0;padding:6px 0;border-top:1px solid rgba(52,4,20,.14);font:400 14.5px/1.4 var(--hel);color:var(--ink)}
-.pcard .tr i{flex:none;width:8px;height:8px;margin-top:6px;border-radius:50%;background:var(--plum)}
-.note{left:0;right:0;text-align:center;font:italic 300 13.5px/1.5 var(--hel);color:var(--ink3)}
+.ctr h2{font-size:30px;line-height:1.25;color:var(--ink);max-width:1000px;text-align:center;padding:0 140px;box-sizing:content-box}
 
-/* ---------- opportunities ---------- */
-.ops{left:0;right:0;top:168px;display:flex;justify-content:center}
-.op{width:360px;padding:0 36px;display:flex;flex-direction:column;gap:12px}
-.op+.op{border-left:1px solid var(--hair)}
-.op .p{font:600 12px var(--jak);letter-spacing:.14em;color:var(--plum)}
-.op h3{margin:0;font:500 22px/1.25 var(--jak);letter-spacing:-.015em;color:var(--ink);text-wrap:balance}
-.op p{font:300 15px/1.5 var(--hel);color:var(--ink2)}
-.op .m{margin-top:6px;padding-top:12px;border-top:1px solid var(--hair);font:300 13.5px/1.5 var(--hel);color:var(--ink2)}
-.op .m b{display:block;font:600 10px/1.6 var(--jak);letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
-.keep{left:0;right:0;top:520px;display:flex;justify-content:center}
-.keep>div{width:1080px;padding-top:20px;border-top:1px solid var(--hair);display:flex;gap:16px;align-items:baseline;justify-content:center}
-.keep p{font:300 15px/1.5 var(--hel);color:var(--ink)}
+/* the signature gold felt tip from the App Critique decks, drawn already in place (no entrance motion) */
+.hl{color:var(--plum);font-weight:600;padding:0 .08em;margin:0 -.08em;box-decoration-break:clone;-webkit-box-decoration-break:clone;mix-blend-mode:multiply;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M6 6 C 60 2, 140 9, 200 5 S 330 3, 394 7 L 397 32 C 340 37, 250 30, 190 35 S 70 38, 4 33 Z' fill='%23A99939' opacity='.42'/><path d='M12 9 C 90 4, 180 12, 260 8 S 360 6, 390 10 L 392 29 C 320 33, 230 27, 150 31 S 60 34, 10 30 Z' fill='%23A99939' opacity='.2'/></svg>") no-repeat 0 55%/100% 1.08em}
 
-/* chrome */
-#bar{position:fixed;left:0;right:0;bottom:0;height:2px;background:rgba(255,255,255,.08);z-index:9}#bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .3s var(--out)}
-.hint{position:fixed;right:18px;bottom:12px;font:400 12px var(--hel);color:rgba(255,255,255,.3);z-index:9}
-@media (prefers-reduced-motion:reduce){.sl.on .in,.sl.on .hl{animation-duration:1ms;animation-delay:0ms}.rg,.mk,.fn,.later{transition:none}}
-</style>
-<body><div id="stage"><div id="deck"></div></div><div id="bar"><i></i></div><div class="hint">click, space or → · ← back</div>
+/* placeholders: a grey frame that names the file it waits for; the real picture covers it once that file exists */
+.ph{position:relative;background:rgba(20,23,27,.06);overflow:hidden;display:flex;align-items:center;justify-content:center;
+  /* a soft lift off the paper, the cover tile's family: a contact ring, a near shadow, one long soft drop */
+  box-shadow:0 0 0 1px rgba(0,0,0,.06),0 2px 4px rgba(20,23,27,.06),0 24px 48px -20px rgba(20,23,27,.28)}
+.ph span{font:400 12px/1.4 var(--hel);color:var(--ink3);text-align:center;padding:0 12px}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.ph::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1);pointer-events:none}
+
+/* 0 · the opening slide: the three apps as real app tiles, big, iOS corner, layered depth outside and a soft inner shadow.
+   Hover (pointer devices only) lifts the tile and leans it toward the pointer while the other two ease away; a press
+   goes straight to that app's title slide. */
+.icons{left:0;right:0;top:0;height:720px;display:flex;align-items:center;justify-content:center;gap:64px}
+.tile{position:relative;width:280px;height:280px;padding:0;border:0;background:none;border-radius:22.37%;cursor:pointer;
+  will-change:transform;transition:box-shadow 320ms cubic-bezier(.2,.7,.2,1);
+  box-shadow:0 0 0 1px rgba(0,0,0,.06),0 2px 4px rgba(20,23,27,.08),0 18px 36px -12px rgba(20,23,27,.28),0 40px 70px -30px rgba(20,23,27,.35)}
+.tile img{display:block;width:100%;height:100%;border-radius:inherit}
+.tile::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  box-shadow:inset 0 2px 1px rgba(255,255,255,.28),inset 0 -6px 14px rgba(0,0,0,.18),inset 0 0 0 1px rgba(0,0,0,.08)}
+.tile.lift{box-shadow:0 0 0 1px rgba(0,0,0,.06),0 4px 8px rgba(20,23,27,.08),0 30px 50px -14px rgba(20,23,27,.32),0 60px 90px -30px rgba(20,23,27,.38)}
+.tile:focus-visible{outline:2px solid var(--plum);outline-offset:6px}
+/* touch screens and reduced motion get no hover field, only a press */
+@media (hover:none),(prefers-reduced-motion:reduce){.tile{transition:transform 160ms cubic-bezier(.2,.7,.2,1),box-shadow 320ms cubic-bezier(.2,.7,.2,1)}.tile:active{transform:scale(.96)}}
+
+/* 1 · title: the name over a hairline and the round label, three screens on the right */
+.tt{left:96px;top:0;height:720px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:24px}
+/* the name and its hairline share one box as wide as the name, so the line always stops at the last letter */
+.tt .nm{display:flex;flex-direction:column;gap:24px}
+.tt h1{font:300 76px/1 var(--jak);letter-spacing:-.03em;color:var(--ink)}
+.tt .rule{width:100%;height:1px;background:var(--hair)}
+.tt .lab{font:500 13px/1.6 var(--hel);letter-spacing:.15em}
+.phones{right:96px;top:0;height:720px;display:flex;align-items:center;gap:24px}
+.phones .ph{height:420px;aspect-ratio:644/1400;border-radius:29px}
+
+/* 2 · what it is: three uses, one picture each, same size, same inset */
+.uses{display:flex;gap:32px}
+.use{width:340px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.use .ph{width:340px;height:240px;border-radius:16px}
+/* two pictures for one use, stacked like Angela's: two equal 4:5 cards, tilted apart and overlapping, inside the same
+   340x240 footprint as a single picture so every caption stays on one line */
+.use .pair{position:relative;width:340px;height:240px}
+.use .pair .ph{position:absolute;top:10px;width:176px;height:220px;border-radius:16px}
+.use .pair .ph:first-child{left:14px;transform:rotate(-7deg)}
+.use .pair .ph:last-child{left:150px;transform:rotate(6deg)}
+.use h3{font:400 20px/1.3 var(--hel);color:var(--ink)}
+
+/* 3 · the two processes as a value chain (her pick from goals-viz-lab): each process is a chevron, and the action that
+   carries one into the other is the link between them, filled in her signature plum.
+   Headline and chain sit as one centred group, 32px apart, like the other centred slides */
+/* the value slide's subheadline: who the app is mainly for, 12px under the title so it reads as one head */
+.vhd{display:flex;flex-direction:column;align-items:center;gap:12px}
+.vsub{margin:0;font:400 18px/1.4 var(--hel);color:var(--ink2);text-align:center;text-wrap:balance;max-width:880px}
+.vsub span{color:var(--ink);font-weight:500}
+.vc{position:relative;width:1088px;height:288px}
+.vc svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.vc .p{fill:#fff;stroke:rgba(20,23,27,.2);stroke-width:1;stroke-linejoin:round}
+.vc .k{fill:var(--plum);stroke:var(--plum);stroke-width:1;stroke-linejoin:miter}
+.vs{position:absolute;top:0;height:288px;padding-top:72px;display:flex;flex-direction:column;gap:16px}
+.vs.l{left:48px;width:352px}.vs.r{left:688px;width:320px}
+.vs h3{font-size:28px;line-height:1.25;color:var(--ink)}
+.vb{display:flex;flex-direction:column;gap:12px}
+.vb p{font:400 17px/1.5 var(--hel);color:var(--ink);display:flex;gap:12px}
+.vb p::before{content:"·";color:var(--plum);font-weight:700}
+/* the label wraps to two balanced lines, centred by eye on the plum at the label's height (centre x 549), and both process titles share one line */
+.vk{position:absolute;left:501px;top:0;width:96px;height:288px;display:flex;align-items:center;justify-content:center}
+.vk span{font:600 17px/1.3 var(--jak);color:#fff;text-align:center;text-wrap:balance}
+
+/* 4 · business goals as annotated screens (her pick 3 from goals-viz-lab): each goal is one thread from its dot, past
+   the real screen where the goal shows up (circled, as in the critique slides), to the flow and the evidence, ending on
+   the same dot. Columns are 400 wide from x 40; the thread runs on x + 46, the screen sits at x + 80 */
+.gtop{left:0;right:0;top:64px;display:flex;justify-content:center}
+.gtop h2{font-size:30px;line-height:1.25;color:var(--ink);text-align:center;max-width:1000px}
+.gg{top:186px;display:flex;align-items:center;gap:12px;white-space:nowrap}
+.gg::before,.gdot{content:"";flex:none;width:12px;height:12px;border-radius:50%;background:var(--dot)}
+.gdot{top:562px}
+.g1{--dot:#9ba69c}.g2{--dot:#827a85}.g3{--dot:var(--gold)}
+.gshot{top:228px;width:220px;height:296px;overflow:hidden;border-radius:16px;background:#fff;
+  box-shadow:0 0 0 1px rgba(0,0,0,.06),0 1px 2px -1px rgba(0,0,0,.06),0 2px 4px 0 rgba(0,0,0,.04),0 12px 32px -12px rgba(20,23,27,.18)}
+.gshot img{position:absolute;left:0;width:100%;top:calc(var(--top) * -220px / 644)}
+.gshot::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+.gnote{top:556px;width:300px;display:flex;flex-direction:column;gap:8px}
+.gnote h3{font-size:20px;line-height:25px;color:var(--ink)}
+.gnote p{font:400 15px/1.45 var(--hel);color:var(--ink)}
+.gthread{left:0;top:0;width:1280px;height:720px;pointer-events:none}
+.gthread path{fill:none;stroke:rgba(52,4,20,.4);stroke-width:1}
+.gthread rect{fill:none;stroke:var(--plum);stroke-width:1.5}
+/* a white halo under each plum ring so it still reads on Depop and Pinterest's dark screens */
+.gthread rect.halo{stroke:#fff;stroke-width:4.5}
+.gthread circle{fill:var(--plum)}
+
+#bar{position:fixed;left:0;right:0;bottom:0;height:2px;background:rgba(255,255,255,.08);z-index:9}#bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .3s var(--out)}</style>
+<body><div id="stage"><div id="deck"></div></div><div id="bar"><i></i></div>
 <script>
 (()=>{
 const stage=document.getElementById('stage'),deck=document.getElementById('deck');
 const fit=()=>stage.style.setProperty('--k',Math.min(innerWidth/1280,innerHeight/720));addEventListener('resize',fit);fit();
 
-/* A screen: src, caption, regions [n,x,y,w,h] in % of the screenshot, redactions [x,y,w,h]. ok marks a finding that works. */
-const SH=(id,cap,rg=[],opt={})=>({id,cap,rg,...opt});
-/* ---------- the deck ---------- */
-const S=[
- {type:'cover'},
- {type:'context'},
+/* the content she approved, ClassPass, Depop, then Pinterest (Pinterest copied from her friend's deck) */
+const APPS=[
+ {k:'classpass',name:'ClassPass',
+  is:'ClassPass is a fitness and wellness membership.',
+  uses:['Trying new studios','Building a routine','Treating yourself'],
+  a:['Variety',['Over 88,000 gyms, studios, salons and spas on one membership','One credit system across every kind of class']],
+  z:['Routine',['Book it again and reminders that bring you back','Reviews that help others choose']],
+  bridge:'booking a class',
+  shots:[['r2/goals/classpass-find.jpg',0,[4,150,163,38],'ClassPass Home with the Save on spa and salon row'],['r2/goals/classpass-chat.jpg',0,[8,74,192,126],'ClassPass Support chat opening with its AI notice'],['r2/goals/classpass-rate.jpg',0,[8,94,192,40],'Rate your experience at SLT']],
+  src:'According to <span class="hl">ClassPass&rsquo;s 2026 Industry Impact Report</span>, these are the company&rsquo;s <span class="hl">business goals</span>:',
+  users:'younger members who want variety and are more price sensitive than a studio&rsquo;s own clients',
+  goals:[['Wellness beyond fitness','Finding a class','37% more wellness bookings in 2025, growing as fast as fitness'],
+         ['AI integration','Support chat','62M+ reservations in 2025, so AI now answers members as well as pricing their spots'],
+         ['Retention','Rating a class','72% of members say they would not have found their go-to studio without ClassPass']]},
+ {k:'depop',name:'Depop',
+  is:'Depop is a secondhand fashion marketplace.',
+  uses:['Finding one-off pieces','Dressing for less','Selling your closet'],
+  a:['Discovery',['One-off pieces from 5 million active sellers','Filters for brand, size, colour and price']],
+  z:['Deal',['Offers and bags that agree a price','Checkout with payments and shipping built in']],
+  bridge:'making an offer',
+  shots:[['r2/goals/depop-find.jpg',0,[4,20,152,26],'Depop Home with the search bar'],['r2/goals/depop-filter.jpg',0,[4,18,210,58],'Depop brand filter'],['r2/goals/depop-bag.jpg',0,[144,52,76,32],'Depop bag with shipping per seller']],
+  src:'According to <span class="hl">eBay&rsquo;s Q3 2026 Earnings Call</span>, these are Depop&rsquo;s <span class="hl">business goals</span>:',
+  users:'Gen Z and Millennial shoppers, with nearly 90% of buyers under 34',
+  goals:[['Growth','Finding an item','11M active buyers, up from 9M, and U.S. users and items sold more than doubled in a year'],
+         ['Listing quality','Filtering','5M active sellers, so new AI models push higher-quality listings and filters should surface them'],
+         ['Monetization','Offer and checkout','Nearly a fifth of eBay&rsquo;s 16% sales growth came from Depop, which now ships on eBay&rsquo;s cheaper rates']]},
+ {k:'pinterest',name:'Pinterest',
+  is:'Pinterest is a visual discovery platform.',
+  uses:['Collecting inspiration','Setting goals','Curating a vision'],pair:[0,1,2],
+  a:['Discovery',['A huge library of images and visual references, curated over time','A robust algorithm that knows your taste']],
+  z:['Curation',['A system of pins, boards, and sections','Tools to sort, search, and reorganize your collection']],
+  bridge:'saving a pin',
+  shots:[['r2/goals/pinterest-save.jpg',0,[168,134,50,34],'A Pinterest pin with its Save button'],['r2/goals/pinterest-assistant.jpg',0,[44,249,131,36],'Pinterest Assistant answering on a pin'],['r2/goals/pinterest-shop.jpg',0,[97,143,50,33],'A Pinterest pin with its Visit button']],
+  src:'According to <span class="hl">Pinterest&rsquo;s Q3 2026 Earnings Report</span>, these are the company&rsquo;s <span class="hl">business goals</span>:',
+  users:'Gen Z, now 57% of its 661M monthly users and its most engaged group',
+  goals:[['Visual discovery','Saving a pin','661M monthly users run 80B+ searches a month, and saving is where browsing becomes a collection'],
+         ['AI integration','Pinterest Assistant','About 80% of Pinterest Assistant searches are commercial, now that it is live across the U.S.'],
+         ['Monetization','Shopping a pin','Two-thirds of Gen Z users come to shop, and revenue grew 12% to $1.17B']]}
 ];
 
-/* ---------- builders ---------- */
-const esc=s=>s;
-function flow(d){
-  const fig=sh=>{
-    const seen=new Set();
-    const regs=sh.rg.map(([n,x,y,w,h,ok])=>`<div class="rg ${ok?'ok':''}" data-n="${n}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%"></div>`).join('');
-    const mks=sh.rg.filter(r=>!seen.has(r[0])&&seen.add(r[0])).map(([n,x,y,w,h,ok])=>`<div class="mk ${ok?'ok':''}" data-n="${n}" style="top:${y}%">${n}</div>`).join('');
-    const red=(sh.redact||[]).map(([x,y,w,h])=>`<div class="redact" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%"></div>`).join('');
-    return `<div class="fig in" style="--i:${0}"><div class="shot ${sh.wide?'wide':''}" style="${sh.pw?`--pw:${sh.pw}px`:''}"><img src="img/IMG_${sh.id}.jpg" alt="${sh.cap}">${red}${regs}${mks}</div><div class="cap">${sh.cap}</div></div>`;
-  };
-  const finds=d.finds.map((f,i)=>`<div class="fn" data-n="${i+1}"><span class="n ${f.ok?'ok':''}">${i+1}</span><h3>${f.t}</h3><p>${f.b}</p></div>`).join('');
-  const foot=d.foot.map(([k,v])=>`<b>${k}</b>${v}`).join('<i>/</i>');
-  return {steps:d.finds.length+(d.later?1:0),html:`
-   <div class="head"><div class="lab in" style="--i:0">${d.eb}</div><h2 class="in" style="--i:1">${d.h}</h2></div>
-   <div class="body" style="--ph:${d.ph}px;--fw:${d.fw}px"><div class="shots">${d.shots.map(fig).join('')}</div>
-     <div class="finds">${finds}${d.later?`<p class="later">${d.later}</p>`:''}</div></div>
-   <div class="foot in" style="--i:4">${foot}</div>`};
-}
-const BUILD={
- cover:()=>({steps:0,html:`<div class="mid"><div class="lab in" style="--i:0">App critique</div><h1 class="in" style="--i:1">ClassPass</h1>
-   <p class="sub in" style="--i:2">Booking a class, from Home to Profile.</p></div>`}),
- context:()=>({steps:0,html:`
-   <div class="ctr"><div class="head"><div class="lab in" style="--i:0">01 · Context</div><h2 class="in" style="--i:1">Business Context, Problem Space, &amp; Use Case</h2></div>
-   <div class="cols">
-    <div class="col in" style="--i:2;align-self:center"><div class="blk"><h4 class="ch4">ClassPass</h4>
-      <p class="g">A credit-based fitness marketplace connecting members with studios looking to fill unused capacity.</p></div>
-      <div class="blk"><h4>The business model</h4><p class="g">ClassPass earns subscription revenue while paying studios per booking, using dynamic pricing to balance demand and availability.</p></div>
-      <div class="blk"><h4>The business challenge</h4><p class="g">Historically, ClassPass’s unlimited plans made frequent users expensive to serve, prompting its shift toward credits. Today, it must retain variety-seeking members while competing with studios’ direct memberships and discounts.</p></div>
-      <div class="jr"><h4 class="ch4">User Journey</h4><div class="trip"><em>Discover</em><span>→</span><em>Book</em><span>→</span><em>Attend or cancel</em></div></div></div>
-    <div class="pcard in" style="--i:3"><span class="av"><img src="img/abigail.jpg" alt="Abigail" onerror="this.parentElement.remove()"></span>
-      <p class="who">Our user</p><p class="nm">Abigail</p>
-      <div class="fx"><span>Early 20s</span><span>Product marketer</span><span>New York</span></div>
-      <p class="tl">Her Saturday</p>
-      <p class="tr"><i></i>Wants to be fit and social</p>
-      <p class="tr"><i></i>New to ClassPass, on a friend’s recommendation</p>
-      <p class="tr"><i></i>Books a class for Saturday</p>
-      <p class="tr"><i></i>Then finds it clashes with a restaurant reservation, and needs to cancel</p></div>
-   </div></div>`}),
- flow
-};
+const ph=(file,label)=>`<div class="ph"><span>${label}<br>img/r2/${file}</span><img src="img/r2/${file}" alt="" onerror="this.remove()"></div>`;
+const S=[];
+APPS.forEach(a=>{
+  S.push(`<div class="tt"><div class="nm"><h1>${a.name}</h1><div class="rule"></div></div><p class="lab">DoorDash App Crit<br>Summer 2027</p></div>
+    <div class="phones">${[1,2,3].map(i=>ph(`${a.k}-screen-${i}.jpg`,`${a.name} screen ${i}`)).join('')}</div>`);
+  S.push(`<div class="ctr"><h2>${a.is}</h2><div class="uses">${a.uses.map((u,i)=>`<div class="use">${(a.pair||[]).includes(i)?`<div class="pair">${ph(`${a.k}-use-${i+1}a.jpg`,u)}${ph(`${a.k}-use-${i+1}b.jpg`,u)}</div>`:ph(`${a.k}-use-${i+1}.jpg`,u)}<h3>${u}</h3></div>`).join('')}</div></div>`);
+  S.push(`<div class="gtop"><h2>${a.src}</h2></div>
+    ${a.goals.map(([g,f,l],i)=>{const [img,top,,alt]=a.shots[i],x=40+400*i;
+      return `<p class="lab gg g${i+1}" style="left:${x+40}px">${g}</p>
+      <div class="gshot" style="left:${x+80}px;--top:${top}"><img src="img/${img}" alt="${alt}"></div>
+      <span class="gdot g${i+1}" style="left:${x+40}px"></span>
+      <div class="gnote" style="left:${x+80}px"><h3>${f}</h3><p>${l}</p></div>`}).join('')}
+    <svg class="gthread" viewBox="0 0 1280 720" aria-hidden="true">${a.shots.map(([,,[rx,ry,rw,rh]],i)=>{const X=86+400*i,L=120+400*i,cy=228+ry+rh/2;
+      return `<path d="M${X} 204V556M${X} ${cy}H${L+rx}"/><rect class="halo" x="${L+rx}" y="${228+ry}" width="${rw}" height="${rh}" rx="8"/><rect x="${L+rx}" y="${228+ry}" width="${rw}" height="${rh}" rx="8"/><circle cx="${X}" cy="${cy}" r="3"/>`}).join('')}</svg>`);
+  S.push(`<div class="ctr"><div class="vhd"><h2>${a.name}&rsquo;s value comes from 2 main processes:</h2><p class="vsub"><span>Primary users:</span> ${a.users}</p></div>
+    <div class="vc"><svg viewBox="0 0 1088 288" aria-hidden="true"><path class="p" d="M0 0H424L480 144L424 288H0Z"/><path class="k" d="M432 0H576L632 144L576 288H432L488 144Z"/><path class="p" d="M584 0H1032L1088 144L1032 288H584L640 144Z"/></svg>
+    ${[a.a,a.z].map(([t,b],i)=>`<div class="vs ${i?'r':'l'}"><h3>${t}</h3><div class="vb">${b.map(x=>`<p>${x}</p>`).join('')}</div></div>`).join('')}
+    <p class="vk"><span>${a.bridge}</span></p></div></div>`);
+});
 
-const built=S.map(d=>BUILD[d.type](d));
-const secs=built.map(b=>{const el=document.createElement('section');el.className='sl';el.innerHTML=b.html;deck.appendChild(el);return el});
-let s=0,step=0,busy=false;
-const all=new URLSearchParams(location.search).has('all');
-function paintSteps(){
-  const el=secs[s];
-  el.querySelectorAll('.rg,.mk,.fn').forEach(x=>x.classList.toggle('shown',+x.dataset.n<=step));
-  const later=el.querySelector('.later'); if(later) later.classList.toggle('shown',step>built[s].steps-1&&step>=built[s].steps);
-  const total=built.reduce((a,b)=>a+b.steps+1,0);let done=0;for(let i=0;i<s;i++)done+=built[i].steps+1;done+=step+1;
-  document.querySelector('#bar i').style.width=(100*done/total)+'%';
-  history.replaceState(null,'','#'+(s+1)+(location.search?'':''));
-}
-const anim=(el,kf,o)=>el.animate(kf,{easing:'cubic-bezier(.45,0,.15,1)',fill:'none',...o}).finished;
-async function go(b,toStep=0){
-  if(busy||b<0||b>=S.length) return;
-  if(b===s){step=toStep;paintSteps();return;}
-  busy=true;const a=s,dir=b>a?1:-1;secs[b].classList.add('on');s=b;step=toStep;paintSteps();
-  await Promise.all([anim(secs[a],[{transform:'translateX(0)'},{transform:`translateX(${-1280*dir}px)`}],{duration:700}),
-                     anim(secs[b],[{transform:`translateX(${1280*dir}px)`},{transform:'translateX(0)'}],{duration:700})]);
+/* the opening slide goes first; each tile opens its app's title slide (1, 5 and 9 once this slide sits at 0) */
+S.unshift(`<div class="icons">${APPS.map((a,i)=>`<button class="tile" data-go="${1+i*4}" aria-label="Go to ${a.name}"><img src="img/r2/icon-${a.k}.png" alt=""></button>`).join('')}</div>`);
+
+const secs=S.map(h=>{const el=document.createElement('section');el.className='sl';el.innerHTML=h;deck.appendChild(el);return el});let s=0,busy=false;
+const paint=()=>{document.querySelector('#bar i').style.width=(100*(s+1)/S.length)+'%';history.replaceState(null,'','#'+(s+1));};
+const anim=(el,kf)=>el.animate(kf,{duration:700,easing:'cubic-bezier(.45,0,.15,1)'}).finished;
+async function go(b){
+  if(busy||b<0||b>=S.length||b===s) return;
+  busy=true;const a=s,dir=b>a?1:-1;secs[b].classList.add('on');s=b;paint();
+  await Promise.all([anim(secs[a],[{transform:'translateX(0)'},{transform:`translateX(${-1280*dir}px)`}]),
+                     anim(secs[b],[{transform:`translateX(${1280*dir}px)`},{transform:'translateX(0)'}])]);
   secs[a].classList.remove('on');busy=false;
 }
-function next(){ if(busy) return; if(step<built[s].steps){step++;paintSteps();} else go(s+1); }
-function prev(){ if(busy) return; if(step>0){step--;paintSteps();} else go(s-1,built[s-1]?built[s-1].steps:0); }
-addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();next();}else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev();}});
-addEventListener('click',next);
-const start=Math.max(0,Math.min(S.length-1,(parseInt(location.hash.slice(1))||1)-1));
-s=start;secs[s].classList.add('on');step=all?built[s].steps:0;paintSteps();
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(s+1);}else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(s-1);}});
+addEventListener('click',()=>go(s+1));
+/* the opening tiles as a magnetic field. Every tile feels the pointer by its distance (full at its centre, none past
+   260px, eased by a smoothstep), so there are no thresholds to snap across: the nearest tile lifts and leans toward the
+   pointer, and each tile is pushed sideways by its neighbours' pull. A spring (lerp per frame) carries every tile to its
+   target, so moving between icons flows. A press dips the tile to .96; a click jumps to that app's title slide. */
+const tiles=[...document.querySelectorAll('.tile')],field=document.querySelector('.icons');
+const canHover=matchMedia('(hover: hover)').matches&&!matchMedia('(prefers-reduced-motion: reduce)').matches;
+const st=tiles.map(()=>({x:0,y:0,s:1,tx:0,ty:0,ts:1}));let raf=0,press=-1;
+const smooth=v=>v*v*(3-2*v);
+function step(){
+  let moving=false;
+  st.forEach((o,i)=>{const ts=o.ts*(press===i?.96:1);
+    o.x+=(o.tx-o.x)*.14;o.y+=(o.ty-o.y)*.14;o.s+=(ts-o.s)*.18;
+    if(Math.abs(o.tx-o.x)>.05||Math.abs(o.ty-o.y)>.05||Math.abs(ts-o.s)>.0005)moving=true;
+    tiles[i].style.transform=`translate(${o.x.toFixed(2)}px,${o.y.toFixed(2)}px) scale(${o.s.toFixed(4)})`;});
+  raf=moving?requestAnimationFrame(step):0;
+}
+const kick=()=>{if(!raf)raf=requestAnimationFrame(step)};
+function aim(px,py){
+  const cs=tiles.map(t=>({cx:t.offsetLeft+t.offsetWidth/2,cy:t.offsetTop+t.offsetHeight/2}));
+  const f=cs.map(c=>px==null?0:smooth(Math.max(0,1-Math.hypot(px-c.cx,py-c.cy)/260)));
+  cs.forEach((c,i)=>{const o=st[i];let push=0;
+    cs.forEach((d,j)=>{if(j!==i)push+=Math.sign(c.cx-d.cx)*18*f[j]});
+    o.tx=(px==null?0:(px-c.cx)*.12*f[i])+push*(1-f[i]);
+    o.ty=px==null?0:(py-c.cy)*.12*f[i]-14*f[i];
+    o.ts=1+.05*f[i]-.03*Math.max(0,...f.filter((_,j)=>j!==i))*(1-f[i]);
+    tiles[i].classList.toggle('lift',f[i]>.4);});
+  kick();
+}
+const rest=()=>{st.forEach(o=>{o.x=o.y=o.tx=o.ty=0;o.s=o.ts=1});press=-1;tiles.forEach(t=>{t.style.transform='';t.classList.remove('lift')});};
+tiles.forEach((t,i)=>{
+  t.addEventListener('click',e=>{e.stopPropagation();rest();go(+t.dataset.go);});
+  if(!canHover)return;
+  t.addEventListener('pointerdown',()=>{press=i;kick()});
+  t.addEventListener('pointerup',()=>{press=-1;kick()});
+  t.addEventListener('pointerleave',()=>{if(press===i){press=-1;kick()}});
+});
+if(canHover){
+  field.addEventListener('pointermove',e=>{const r=stage.getBoundingClientRect(),k=r.width/1280;aim((e.clientX-r.left)/k,(e.clientY-r.top)/k)});
+  field.addEventListener('pointerleave',()=>aim(null));
+}
+s=Math.max(0,Math.min(S.length-1,(parseInt(location.hash.slice(1))||1)-1));secs[s].classList.add('on');paint();
 })();
 </script>
 </body></html>

@@ -1,0 +1,5 @@
+# Journal: Does art need an intention?
+
+Intention matters more for making art than for a thing being art. A piece of driftwood that happens to look like a heron can be put on a plinth and valued as sculpture, and the sea's indifference does not lower the price. What the viewer values is the shape and the room it leaves for interpretation, and neither depends on anyone having meant them. I concede that we usually read a work by asking what its maker was after, and that this is a fair question. Yet it tells us about the artist. It is not a test the object must pass.
+
+AI art sits between the two cases. The model intends nothing, so by the first reading it is driftwood, and whatever value the image has was found rather than meant. The prompt writer, on the other hand, did intend something, even if only a mood, and chose to keep this picture over the rest. Hence the intention has not disappeared; it has moved to the person doing the choosing. That is thin authorship, though it is the authorship Duchamp claimed for a urinal in 1917.

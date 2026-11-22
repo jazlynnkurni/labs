@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Journey lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Five ways to draw Maya's day (Clover slide 11) in the deck's own language: the green line, plum glass beads,
+   cream glass cards, liquid-glass icons, chips, few words, things arriving in order, content on the 180 line. */
+:root{--ink:#14171B;--plum:#340414;--gold:#A99939;--green:#6F7C70;--cream:#F5F1E1;--hair:rgba(20,23,27,.12);--mute:#6f6b64;
+  --jak:"Plus Jakarta Sans",sans-serif;--hel:"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E7E5E0;color:var(--ink);font:15px/1.45 var(--hel)}
+.wrap{max-width:1340px;margin:0 auto;padding:36px 30px 90px}
+h1{font:600 24px var(--jak);margin:0 0 6px}
+.lede{color:#6f6b64;margin:0 0 26px;max-width:90ch}
+.opt{margin-bottom:40px}
+.lab{font:600 12px var(--jak);letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin:0 0 10px}
+.lab small{font:400 13px var(--hel);letter-spacing:0;text-transform:none;color:#6f6b64;margin-left:8px}
+.lab button{margin-left:10px;font:600 11.5px var(--jak);padding:6px 11px;border-radius:999px;border:1.5px solid var(--plum);background:#fff;color:var(--plum);cursor:pointer;text-transform:none;letter-spacing:0}
+.frame{width:100%;aspect-ratio:16/9;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 18px 40px -24px rgba(0,0,0,.3);overflow:hidden;position:relative}
+.sl{width:1280px;height:720px;transform-origin:0 0;padding:52px 72px 0;position:absolute;left:0;top:0}
+.hd{font:500 42px/1.12 var(--jak);letter-spacing:-.02em;margin:0;max-width:30ch;height:96px}
+.hd em{font-style:normal;color:var(--plum)}
+.ft{position:absolute;left:72px;right:72px;bottom:40px;border-top:1px solid var(--hair);padding-top:12px;display:flex;justify-content:space-between;font:400 13px var(--hel)}
+.ft span:first-child{color:var(--plum)}
+/* Maya's card, as on the slide */
+.card{position:absolute;left:72px;top:180px;width:250px;background:linear-gradient(180deg,#fff,#F5F1E1 62%,#EDE5C6);border-radius:24px;padding:18px 18px 12px;
+  box-shadow:inset 0 1px 0 #fff,0 0 0 1px rgba(169,153,57,.35),0 26px 48px -24px rgba(52,4,20,.35)}
+.card .pic{height:126px;display:inline-block;border-radius:20px;padding:5px;background:linear-gradient(145deg,#fff,rgba(169,153,57,.45));box-shadow:inset 1.5px 1.5px 1px rgba(255,255,255,.9),0 10px 22px -10px rgba(52,4,20,.4);margin-bottom:10px}
+.card .pic img{display:block;height:100%;aspect-ratio:345/538;object-fit:contain;border-radius:15px;background:#fff}
+.card .who{margin:0;font:600 13px var(--jak);letter-spacing:.06em;text-transform:uppercase;color:#8a8780}
+.card .nm{margin:0 0 8px;font:500 30px/1.1 var(--jak);color:var(--plum);letter-spacing:-.02em}
+.card .fx{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}.card .fx span{font:600 11.5px/1 var(--jak);padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.75);box-shadow:0 0 0 1px rgba(52,4,20,.14)}
+.card .tl{margin:0 0 4px;font:600 13px var(--jak);letter-spacing:.06em;text-transform:uppercase;color:var(--plum)}
+.card .tr{display:flex;gap:10px;margin:0;padding:6px 0;border-top:1px solid rgba(52,4,20,.14);font:400 14.5px/1.4 var(--hel)}
+.card .tr i{flex:none;width:8px;height:8px;margin-top:6px;border-radius:50%;background:var(--plum)}
+/* the journey area: right of the card */
+.jr{position:absolute;left:358px;right:72px;top:180px;height:440px}
+/* shared pieces */
+.tag{font:600 13px/1.4 var(--jak);letter-spacing:.06em;text-transform:uppercase;color:var(--plum)}
+.tm{font:600 15px/1 var(--jak);color:var(--ink)}.tm small{display:block;font:400 12.5px/1.3 var(--hel);color:var(--mute);margin-top:4px}
+.bead{display:block;width:22px;height:22px;border-radius:50%;flex:none;
+  background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.85),rgba(255,255,255,0) 70%),radial-gradient(circle at 50% 65%,#6a2a3f,#340414 70%);
+  box-shadow:inset 0 -2px 3px rgba(0,0,0,.35),0 0 0 1px rgba(52,4,20,.25),0 6px 12px -4px rgba(52,4,20,.55)}
+.bead.t{background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.95),rgba(255,255,255,0) 70%),radial-gradient(circle at 50% 65%,#fff,#EDE5C6 75%);box-shadow:inset 0 -2px 3px rgba(169,153,57,.35),0 0 0 1.5px rgba(52,4,20,.55),0 6px 12px -4px rgba(52,4,20,.35)}
+.bead.f{background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.85),rgba(255,255,255,0) 70%),radial-gradient(circle at 50% 65%,#c9a33a,#A99939 75%);box-shadow:inset 0 -2px 3px rgba(0,0,0,.25),0 0 0 3px rgba(169,153,57,.25),0 6px 12px -4px rgba(52,4,20,.45)}
+.pill{display:inline-block;font:500 13.5px/1.3 var(--jak);padding:8px 12px;border-radius:14px;background:linear-gradient(180deg,#fff,#F5F1E1);box-shadow:inset 0 1px 0 #fff,0 0 0 1px rgba(169,153,57,.32),0 10px 20px -14px rgba(52,4,20,.35);color:var(--ink)}
+.pill.f{box-shadow:inset 0 1px 0 #fff,0 0 0 1.5px var(--gold),0 10px 20px -14px rgba(52,4,20,.35)}
+.q{display:inline-flex;align-items:center;font:600 13px/1 var(--jak);padding:9px 14px;border-radius:999px;background:var(--plum);color:#fff;white-space:nowrap}
+.gl{position:relative;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;isolation:isolate;color:var(--plum);flex:none;
+  background:rgba(255,255,255,.2);box-shadow:inset 1.5px 1.5px 1px rgba(255,255,255,.85),0 0 0 1px rgba(255,255,255,.5),0 8px 18px -8px rgba(52,4,20,.35)}
+.gl::before{content:"";position:absolute;inset:-6px;border-radius:50%;z-index:-1;background:radial-gradient(circle,#E2D8AE 0,rgba(169,153,57,.45) 48%,rgba(169,153,57,0) 71%)}
+.gl.r::before{background:radial-gradient(circle,#E8D3DA 0,rgba(52,4,20,.22) 48%,rgba(52,4,20,0) 71%)}
+.gl svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.key{display:flex;gap:18px;align-items:center;font:400 12.5px var(--hel);color:var(--mute)}.key span{display:inline-flex;align-items:center;gap:7px}.key .bead{width:13px;height:13px}
+.key .ho{display:inline-block;width:22px;border-top:2px dashed var(--green)}
+@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.play .an{animation:up .5s ease both}.play .pp{animation:pop .55s cubic-bezier(.33,1.18,.37,1) both}.play .gr{transform-origin:left;animation:grow .9s cubic-bezier(.3,.7,.2,1) both}
+
+/* 01 the green line is her day: glasses events float above it, phone events hang below, the handover drops down */
+.o1 .line{position:absolute;left:0;right:0;top:200px;height:3px;background:var(--green)}
+.o1 .stop{position:absolute;top:189px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center}
+.o1 .tmw{position:absolute;top:220px;transform:translateX(-50%);text-align:center}
+.o1 .ev{position:absolute;transform:translateX(-50%);width:132px;text-align:center}
+.o1 .ev.up{bottom:282px}.o1 .ev.dn{top:276px}
+.o1 .lane{position:absolute;left:-6px;font:600 12px var(--jak);letter-spacing:.06em;text-transform:uppercase;color:#8a8780}
+.o1 .ho{position:absolute;border-left:2px dashed var(--green)}
+.o1 .qs{position:absolute;left:0;right:0;bottom:6px;display:flex;gap:10px;align-items:center}
+
+/* 02 six glass columns, one per moment: a glasses half on top, a phone half below */
+.o2 .cols{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;height:380px}
+.o2 .c{display:grid;grid-template-rows:auto 1fr 1fr;gap:8px}
+.o2 .h{padding:2px 2px 6px;border-bottom:3px solid var(--green)}
+.o2 .cell{border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:8px;font:500 13px/1.3 var(--jak)}
+.o2 .cell.on{background:linear-gradient(180deg,#fff,#F5F1E1 70%,#EDE5C6);box-shadow:inset 0 1px 0 #fff,0 0 0 1px rgba(169,153,57,.32),0 12px 24px -16px rgba(52,4,20,.35)}
+.o2 .cell.off{border:1.5px dashed rgba(20,23,27,.10)}
+.o2 .cell.fr{box-shadow:inset 0 1px 0 #fff,0 0 0 2px var(--gold),0 12px 24px -16px rgba(52,4,20,.35)}
+.o2 .lab2{position:absolute;left:-2px;font:600 11px var(--jak);letter-spacing:.06em;text-transform:uppercase;color:#8a8780;writing-mode:vertical-rl;transform:rotate(180deg)}
+.o2 .qs{display:flex;gap:10px;margin-top:14px}
+
+/* 03 two frosted lanes, beads on a gold thread in each; questions hang underneath on green stems */
+.o3 .pane{position:relative;height:118px;border-radius:20px;margin-bottom:14px;background:linear-gradient(180deg,rgba(255,255,255,.95),#F5F1E1);box-shadow:inset 0 1px 0 #fff,0 0 0 1px rgba(169,153,57,.3),0 16px 30px -20px rgba(52,4,20,.3)}
+.o3 .pane .nm3{position:absolute;left:16px;top:12px;display:flex;align-items:center;gap:10px}
+.o3 .thread{position:absolute;left:150px;right:20px;top:58px;height:2px;background:rgba(169,153,57,.55)}
+.o3 .b3{position:absolute;top:47px;transform:translateX(-50%)}
+.o3 .t3{position:absolute;top:78px;transform:translateX(-50%);width:120px;text-align:center;font:500 12.5px/1.3 var(--jak)}
+.o3 .times{position:relative;height:40px;margin-left:150px}
+.o3 .times span{position:absolute;transform:translateX(-50%);text-align:center}
+.o3 .qrow{position:relative;height:70px;margin-left:150px}
+.o3 .qrow .q{position:absolute;transform:translateX(-50%);top:26px}
+.o3 .qrow i{position:absolute;top:0;height:26px;border-left:2px solid var(--green);transform:translateX(-1px)}
+
+/* 04 a day dial: an arc from morning to night, glasses moments outside it, phone moments inside */
+.o4 svg{position:absolute;left:0;top:0}
+.o4 .lbl{position:absolute;transform:translate(-50%,-50%);text-align:center;width:118px;font:500 12.5px/1.3 var(--jak)}
+.o4 .lbl b{display:block;font:600 14px var(--jak)}
+.o4 .ctr{position:absolute;left:0;right:0;top:372px;display:flex;justify-content:center;gap:10px}
+.o4 .ctr .q{margin:4px}
+
+/* 05 a story strip: six moments as cards on the line, each with one icon and a few words, friction lit gold */
+.o5 .line{position:absolute;left:0;right:0;top:118px;height:3px;background:var(--green)}
+.o5 .row{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;position:relative}
+.o5 .m{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
+.o5 .m .tm{height:38px}
+.o5 .m .bead{margin:20px 0 14px;position:relative;z-index:1}
+.o5 .m .cd{width:100%;border-radius:16px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;font:500 13px/1.3 var(--jak);
+  background:linear-gradient(180deg,#fff,#F5F1E1 70%,#EDE5C6);box-shadow:inset 0 1px 0 #fff,0 0 0 1px rgba(169,153,57,.32),0 12px 24px -16px rgba(52,4,20,.35)}
+.o5 .m .cd.fr{box-shadow:inset 0 1px 0 #fff,0 0 0 2px var(--gold),0 12px 24px -16px rgba(52,4,20,.35)}
+.o5 .m .cd .dv{font:600 11px var(--jak);letter-spacing:.06em;text-transform:uppercase;color:#8a8780}
+.o5 .qs{position:absolute;left:0;right:0;top:362px;display:flex;justify-content:space-between}
+</style></head><body>
+<div class="wrap">
+<h1>Journey lab</h1>
+<p class="lede">Five ways to draw Maya's day on slide 11 in the deck's own language: the green line, plum glass beads, cream glass cards, liquid-glass icons and chips, with the words cut down. Each sits beside her card as on the slide. Press Play to see it arrive. Tell me the number.</p>
+<div id="opts"></div>
+</div>
+<script>
+const I={g:'<svg viewBox="0 0 48 48"><rect x="4" y="17" width="17" height="13" rx="5.5"/><rect x="27" y="17" width="17" height="13" rx="5.5"/><path d="M21 22q3-3 6 0M4 21 1 19M44 21l3-2"/></svg>',
+ p:'<svg viewBox="0 0 48 48"><rect x="14" y="4" width="20" height="40" rx="5"/><path d="M21 9h6"/></svg>'};
+const gl=(k,c='')=>`<span class="gl ${c}">${I[k]}</span>`;
+/* her day, from the slide, cut to the words that carry it */
+const T=[['Day 1','Unboxing'],['8:30','Leaving home'],['9:00','Commute'],['13:00','Sign-in expires'],['17:00','Focus time'],['22:00','In bed']];
+const G={1:['e','What to know before work?'],2:['t','Directions at a glance'],3:['f','Needs a connector the glasses lack']};
+const P={0:['e','Pairs and sets up Clover'],3:['t','Signs in on the app'],4:['t','Chooses what may interrupt'],5:['t','Reviews her day, glasses off']};
+const Q=[['How does she get started?',0,0],['When does she need the app?',3,4],['Does it feel like one product?',4,5]];
+const bead=k=>`<span class="bead ${k==='e'?'':k}"></span>`;
+const key=`<div class="key"><span>${bead('e')}Entry point</span><span>${bead('t')}Touchpoint</span><span>${bead('f')}Friction</span><span><i class="ho"></i>Handover to the app</span></div>`;
+const card=`<div class="card"><span class="pic"><img src="maya.jpg" alt=""></span><p class="who">Our user profile</p><p class="nm">Maya</p><div class="fx"><span>25</span><span>Product marketer</span><span>New York</span></div><p class="tl">How she lives</p><p class="tr"><i></i>Runs her day from her calendar</p><p class="tr"><i></i>Wants summaries over scrolling</p><p class="tr"><i></i>Trying to spend less time on screens</p></div>`;
+const frame=b=>`<div class="frame"><div class="sl"><p class="hd">While the founders debated the glasses, <em>I made the case for the app.</em></p>${card}<div class="jr">${b}</div><div class="ft"><span>11 &nbsp; Discovery</span><span>Eden Case Study</span></div></div></div>`;
+const W=850, X=n=>Math.round(55+n*(W-110)/5), d=(n,b=.2,s=.12)=>`style="animation-delay:${(b+n*s).toFixed(2)}s"`;
+const O=[
+ ['01','The green line is her day','The line runs through her six moments; glasses moments float above it, phone moments hang below, the handover drops between them.',
+  `<div class="o1"><span class="lane" style="top:0">Glasses</span><span class="lane" style="top:400px;display:none"></span>
+   <i class="line gr" ${d(0,.1)}></i>
+   ${T.map((t,n)=>`<span class="stop pp" style="left:${X(n)}px;animation-delay:${(.3+n*.1).toFixed(2)}s">${bead(G[n]?G[n][0]:P[n]?P[n][0]:'t')}</span><span class="tmw an" style="left:${X(n)}px;animation-delay:${(.35+n*.1).toFixed(2)}s"><span class="tm">${t[0]}<small>${t[1]}</small></span></span>`).join('')}
+   ${Object.entries(G).map(([n,[k,w]])=>`<div class="ev up an" style="left:${X(+n)}px;animation-delay:${(.9+n*.1).toFixed(2)}s"><span class="pill ${k==='f'?'f':''}">${w}</span></div>`).join('')}
+   ${Object.entries(P).map(([n,[k,w]])=>`<div class="ev dn an" style="left:${X(+n)}px;animation-delay:${(1.2+n*.1).toFixed(2)}s"><span class="pill">${w}</span></div>`).join('')}
+   <i class="ho an" style="left:${X(3)+40}px;top:120px;height:150px;animation-delay:1.7s"></i>
+   <span class="lane" style="top:400px"></span>
+   <div class="qs an" style="animation-delay:1.9s">${Q.map(q=>`<span class="q">${q[0]}</span>`).join('')}</div></div>`],
+ ['02','Six glass columns','One column per moment: the time on the green line, a glasses cell above and a phone cell below. Empty moments stay a faint outline.',
+  `<div class="o2"><div class="cols">${T.map((t,n)=>`<div class="c an" ${d(n)}><div class="h"><span class="tm">${t[0]}<small>${t[1]}</small></span></div>
+   <div class="cell ${G[n]?(G[n][0]==='f'?'on fr':'on'):'off'}">${G[n]?gl('g',G[n][0]==='f'?'':'')+G[n][1]:''}</div>
+   <div class="cell ${P[n]?'on':'off'}">${P[n]?gl('p','r')+P[n][1]:''}</div></div>`).join('')}</div>
+   <div class="qs an" ${d(7)}>${Q.map(q=>`<span class="q">${q[0]}</span>`).join('')}</div></div>`],
+ ['03','Two frosted lanes','A glass pane each for the glasses and the phone, beads on a gold thread; the questions hang under the times they ask about.',
+  `<div class="o3"><div class="times an" ${d(0)}>${T.map((t,n)=>`<span style="left:${15+n*125}px"><span class="tm">${t[0]}<small>${t[1]}</small></span></span>`).join('')}</div>
+   ${[['Glasses','g',G],['iPhone app','p',P]].map(([nm,ic,E],r)=>`<div class="pane an" ${d(r+1)}><span class="nm3">${gl(ic,r?'r':'')}<span class="tag">${nm}</span></span><i class="thread"></i>
+     ${Object.entries(E).map(([n,[k,w]])=>`<span class="b3 pp" style="left:${165+n*125}px;animation-delay:${(.7+r*.3+n*.08).toFixed(2)}s">${bead(k)}</span><span class="t3" style="left:${165+n*125}px">${w}</span>`).join('')}</div>`).join('')}
+   <div class="qrow an" ${d(4)}>${Q.map(([w,a,b])=>{const x=[15,15+3*125,15+5*125-40][Q.findIndex(q=>q[0]===w)];return `<i style="left:${x}px"></i><span class="q" style="left:${x}px">${w}</span>`}).join('')}</div></div>`],
+ ['04','A day dial','Her day as an arc from morning to night: glasses moments outside it, phone moments inside, the three questions in the middle.',
+  (()=>{const cx=425,cy=300,R=210,ang=n=>Math.PI*(1-n/5),P2=(n,r)=>[cx+Math.cos(ang(n))*r,cy-Math.sin(ang(n))*r];
+   const arc=`<svg width="850" height="440"><path d="M${cx-R} ${cy} A${R} ${R} 0 0 1 ${cx+R} ${cy}" fill="none" stroke="#6F7C70" stroke-width="3" stroke-linecap="round" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.2s cubic-bezier(.3,.7,.2,1) .2s forwards"/><style>@keyframes draw{to{stroke-dashoffset:0}}</style></svg>`;
+   return `<div class="o4">${arc}${T.map((t,n)=>{const [x,y]=P2(n,R);return `<span class="pp" style="position:absolute;left:${x-11}px;top:${y-11}px;animation-delay:${(.5+n*.12).toFixed(2)}s">${bead(G[n]?G[n][0]:P[n]?P[n][0]:'t')}</span><span class="lbl an" style="left:${P2(n,R+92)[0]+(n===1?-34:0)}px;top:${P2(n,R+92)[1]+(n===0||n===5?28:0)}px;animation-delay:${(.6+n*.12).toFixed(2)}s"><b>${t[0]}</b>${G[n]?G[n][1]:t[1]}</span>${P[n]?`<span class="lbl an" style="left:${({0:[312,262],3:[404,160],4:[462,214],5:[488,270]})[n][0]}px;top:${({0:[312,262],3:[404,160],4:[462,214],5:[488,270]})[n][1]}px;color:#340414;animation-delay:${(1.1+n*.1).toFixed(2)}s">${P[n][1]}</span>`:''}`}).join('')}
+   <div class="ctr an" style="animation-delay:1.8s">${Q.map(q=>`<span class="q">${q[0]}</span>`).join('')}</div></div>`})()],
+ ['05','A story strip','Six moment cards on the green line, each one icon (glasses or phone) and a few words; the friction card is lit gold.',
+  `<div class="o5"><i class="line gr" ${d(0,.1)}></i><div class="row">${T.map((t,n)=>{const e=G[n]||P[n],dv=G[n]?'g':'p',k=e[0];
+   return `<div class="m an" ${d(n,.3)}><span class="tm">${t[0]}<small>${t[1]}</small></span>${bead(k)}<div class="cd ${k==='f'?'fr':''}">${gl(dv,dv==='p'?'r':'')}<span class="dv">${dv==='g'?'Glasses':'iPhone app'}</span>${e[1]}${G[n]&&P[n]?`<span class="dv" style="margin-top:4px">then</span>${P[n][1]}`:''}</div></div>`}).join('')}</div>
+   <div class="qs an" ${d(8)}>${Q.map(q=>`<span class="q">${q[0]}</span>`).join('')}</div></div>`]];
+document.getElementById('opts').innerHTML=O.map(([n,t,dsc,h],k)=>`<section class="opt" id="o${k}"><p class="lab">${n} ${t}<small>${dsc}</small><button data-k="${k}">Play</button></p>${frame(h)}</section>`).join('');
+const fit=()=>document.querySelectorAll('.frame').forEach(f=>{f.firstElementChild.style.transform=`scale(${f.clientWidth/1280})`});
+addEventListener('resize',fit);fit();
+document.querySelectorAll('.lab button').forEach(b=>b.onclick=()=>{const s=document.getElementById('o'+b.dataset.k);s.classList.remove('play');void s.offsetWidth;s.classList.add('play');});
+document.querySelectorAll('.opt').forEach(s=>s.classList.add('play'));
+</script>
+</body></html>
