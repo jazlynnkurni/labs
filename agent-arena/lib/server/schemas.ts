@@ -36,3 +36,18 @@ export const importSchema = z.object({
   patch: z.string().min(1).max(20_000_000),
   note: z.string().max(2000).default(""),
 });
+
+export const continueSchema = z.object({
+  note: z.string().max(4000).optional(),
+  /** The person confirmed that every direction is a paid agent run. */
+  confirmedPaid: z.literal(true, { message: "Confirm the paid runs first." }),
+});
+
+export const jevPickSchema = z.object({
+  confirmed: z.literal(true, { message: "Confirm the Jev call first." }),
+});
+
+export const grillSchema = z.object({
+  message: z.string().max(8000).optional(),
+  confirmedPaid: z.literal(true, { message: "Confirm the paid reply first." }),
+});

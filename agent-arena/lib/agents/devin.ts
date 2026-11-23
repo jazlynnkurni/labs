@@ -56,6 +56,8 @@ const OUTPUT_SCHEMA = {
 
 const DEVIN_SUFFIX = `
 
+Files: every path above under .arena/attachments/ (the design context included) is attached to this session under the same file name. Read the attachment wherever the brief names that path.
+
 Delivery for this comparison: do not open a pull request and do not push any branch. When you are finished, put the complete unified diff of all your changes (git diff format, new files included) in the structured output field unified_diff, plus a short summary.`;
 
 const sleep = (ms: number, signal: AbortSignal) =>

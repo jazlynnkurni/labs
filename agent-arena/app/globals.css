@@ -4,6 +4,18 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Motion (2026-11-22): Jaz's ease-out, a bezier that feels like a spring, at 250ms.
+   The last ending bit of delight takes 400ms on the same curve. Menus, dropdowns and
+   popovers still open in under 200ms. When in doubt, ease-out. Loops (spin, pulse) keep
+   their own timing. */
+@theme {
+  --ease-out: cubic-bezier(0.2, 0.8, 0.1, 1);
+  --default-transition-duration: 250ms;
+  --default-transition-timing-function: cubic-bezier(0.2, 0.8, 0.1, 1);
+  --animate-in: enter var(--tw-animation-duration,var(--tw-duration,.15s)) var(--tw-ease,cubic-bezier(0.2, 0.8, 0.1, 1)) var(--tw-animation-delay,0s) var(--tw-animation-iteration-count,1) var(--tw-animation-direction,normal) var(--tw-animation-fill-mode,none);
+  --animate-out: exit var(--tw-animation-duration,var(--tw-duration,.15s)) var(--tw-ease,cubic-bezier(0.2, 0.8, 0.1, 1)) var(--tw-animation-delay,0s) var(--tw-animation-iteration-count,1) var(--tw-animation-direction,normal) var(--tw-animation-fill-mode,none);
+}
+
 @theme inline {
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
@@ -190,7 +202,7 @@
   html.theme-switching * {
     transition-property: color, background-color, border-color, outline-color, fill, stroke, box-shadow !important;
     transition-duration: 150ms !important;
-    transition-timing-function: ease-out !important;
+    transition-timing-function: var(--ease-out) !important;
   }
   body {
     @apply bg-background text-foreground;
@@ -215,7 +227,7 @@
     font-variant-numeric: tabular-nums;
   }
   .press {
-    transition: transform 120ms ease-out;
+    transition: transform 120ms var(--ease-out);
   }
   .press:active {
     transform: scale(0.96);
@@ -228,9 +240,9 @@
   .chev > svg {
     grid-area: 1 / 1;
     transition:
-      opacity 160ms cubic-bezier(0.23, 1, 0.32, 1),
-      transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
-      filter 160ms cubic-bezier(0.23, 1, 0.32, 1);
+      opacity 160ms var(--ease-out),
+      transform 160ms var(--ease-out),
+      filter 160ms var(--ease-out);
   }
   .chev > .chev-up,
   .chev[data-open="true"] > .chev-down,
@@ -257,14 +269,14 @@
   .theme-icon > svg {
     grid-area: 1 / 1;
     transition:
-      opacity 200ms cubic-bezier(0.23, 1, 0.32, 1),
-      transform 200ms cubic-bezier(0.23, 1, 0.32, 1),
-      filter 200ms cubic-bezier(0.23, 1, 0.32, 1);
+      opacity 250ms var(--ease-out),
+      transform 250ms var(--ease-out),
+      filter 250ms var(--ease-out);
   }
   html.theme-switching .theme-icon > svg {
     transition-property: opacity, transform, filter, color !important;
-    transition-duration: 200ms !important;
-    transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1) !important;
+    transition-duration: 250ms !important;
+    transition-timing-function: var(--ease-out) !important;
   }
   /* Keyed off html.dark, which is set before first paint, so the right glyph shows from frame one. */
   html:not(.dark) .theme-icon > .theme-icon-moon,

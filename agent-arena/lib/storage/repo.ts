@@ -31,6 +31,8 @@ export interface ExperimentConfig {
   remote?: { repo?: string; branch?: string };
   /** Design context given to every agent. hash, bytes and removedLines are filled in when the run starts. */
   context?: { ids: string[]; hash?: string; bytes?: number; removedLines?: number };
+  /** Set when this experiment continues one run of an earlier experiment as several directions. */
+  continuation?: { fromExperimentId: string; fromRunId: string; fromLabel: string; count: number; task: string; note?: string };
 }
 
 export type SourceInfo =
@@ -77,6 +79,8 @@ export interface AgentRun {
   retries: number;
   envNotes: string[];
   evalStatus: EvalStatus;
+  /** 1-based direction number when the experiment continues a run as several directions. */
+  direction?: number;
 }
 
 export interface Artifact {
@@ -171,6 +175,7 @@ function toRun(r: Row): AgentRun {
     retries: (r.retries as number) ?? 0,
     envNotes: parse(r.env_notes_json, [] as string[]),
     evalStatus: (r.eval_status as EvalStatus) ?? "pending",
+    direction: opt(r.direction as number | null),
   };
 }
 
@@ -247,11 +252,11 @@ const RUN_COLUMNS: Record<string, string> = {
 };
 
 export const runs = {
-  async create(r: Pick<AgentRun, "experimentId" | "agentId" | "agentName" | "model">) {
+  async create(r: Pick<AgentRun, "experimentId" | "agentId" | "agentName" | "model" | "direction">) {
     const id = `run_${randomUUID().slice(0, 12)}`;
     await db().run(
-      `INSERT INTO agent_runs (id, experiment_id, agent_id, agent_name, model, status) VALUES (?, ?, ?, ?, ?, 'queued')`,
-      [id, r.experimentId, r.agentId, r.agentName, r.model ?? null],
+      `INSERT INTO agent_runs (id, experiment_id, agent_id, agent_name, model, status, direction) VALUES (?, ?, ?, ?, ?, 'queued', ?)`,
+      [id, r.experimentId, r.agentId, r.agentName, r.model ?? null, r.direction ?? null],
     );
     return id;
   },
@@ -455,6 +460,68 @@ export const jobs = {
     await db().run(
       "UPDATE experiments SET status = 'interrupted', finished_at = ? WHERE status IN ('queued', 'preparing', 'running', 'evaluating')",
       [stamp],
+    );
+  },
+};
+
+export interface Decision<T = Record<string, unknown>> {
+  id: string;
+  experimentId: string;
+  kind: string;
+  payload: T;
+  createdAt: string;
+}
+
+/** Judgments made about an experiment (Jev's pick among directions). Opinions, never metrics. */
+export const decisions = {
+  async add<T>(experimentId: string, kind: string, payload: T) {
+    const id = `dec_${randomUUID().slice(0, 12)}`;
+    const createdAt = now();
+    await db().run("INSERT INTO decisions (id, experiment_id, kind, payload_json, created_at) VALUES (?, ?, ?, ?, ?)", [id, experimentId, kind, payload, createdAt]);
+    return { id, experimentId, kind, payload, createdAt } as Decision<T>;
+  },
+  async latest<T>(experimentId: string, kind: string) {
+    const r = await db().get<Row>("SELECT * FROM decisions WHERE experiment_id = ? AND kind = ? ORDER BY created_at DESC LIMIT 1", [experimentId, kind]);
+    if (!r) return undefined;
+    return { id: r.id as string, experimentId, kind, payload: parse(r.payload_json, {} as T), createdAt: r.created_at as string } as Decision<T>;
+  },
+};
+
+export interface GrillMessage {
+  id: string;
+  experimentId: string;
+  role: "grill" | "you";
+  content: string;
+  meta?: { model?: string; usage?: Usage; fixture?: boolean; error?: boolean };
+  createdAt: string;
+}
+
+/** The Grill me thread for one experiment. */
+export const grill = {
+  async add(m: Omit<GrillMessage, "id" | "createdAt">) {
+    const id = `grl_${randomUUID().slice(0, 12)}`;
+    const createdAt = now();
+    await db().run("INSERT INTO grill_messages (id, experiment_id, role, content, meta_json, created_at) VALUES (?, ?, ?, ?, ?, ?)", [
+      id,
+      m.experimentId,
+      m.role,
+      m.content,
+      m.meta ?? null,
+      createdAt,
+    ]);
+    return { ...m, id, createdAt } as GrillMessage;
+  },
+  async forExperiment(experimentId: string) {
+    const rows = await db().all<Row>("SELECT * FROM grill_messages WHERE experiment_id = ? ORDER BY created_at, rowid", [experimentId]);
+    return rows.map(
+      (r): GrillMessage => ({
+        id: r.id as string,
+        experimentId,
+        role: r.role as GrillMessage["role"],
+        content: r.content as string,
+        meta: parse(r.meta_json, undefined as GrillMessage["meta"]),
+        createdAt: r.created_at as string,
+      }),
     );
   },
 };

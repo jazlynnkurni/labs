@@ -156,7 +156,7 @@ export function HistoryView() {
           <ul className="flex flex-col divide-y divide-hairline overflow-hidden rounded-xl bg-surface shadow-raised">
             {list.map((e) => (
               <li key={e.id}>
-                <Link href={`/experiments/${e.id}`} className="flex min-h-16 flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 transition-colors duration-150 [@media(hover:hover)]:hover:bg-accent">
+                <Link href={`/experiments/${e.id}`} className="flex min-h-16 flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 transition-colors [@media(hover:hover)]:hover:bg-accent">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{e.title}</p>
                     <p className="mt-0.5 text-xs text-faint">{relative(e.createdAt)}</p>

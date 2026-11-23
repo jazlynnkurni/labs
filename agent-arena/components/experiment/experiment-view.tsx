@@ -14,7 +14,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AgentMark, StatusPill } from "@/components/status";
 import { SwapChevron } from "@/components/chevron";
 import { AgentPanel } from "./agent-panel";
+import { directionLine } from "@/lib/directions/brief";
 import { EvalDashboard } from "./eval-dashboard";
+import { DirectionsBar, useDirections } from "./directions-bar";
 
 export function ExperimentView() {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +27,8 @@ export function ExperimentView() {
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState("agents");
   const now = useNow(Boolean(detail?.active));
+  const isDirections = Boolean(detail?.experiment.config.continuation);
+  const { info: directions, setInfo: setDirections } = useDirections(id, isDirections, detail?.experiment.status);
 
   const visibleRuns = useMemo(() => detail?.runs.filter((r) => !hidden.has(r.id)) ?? [], [detail, hidden]);
 
@@ -113,6 +117,8 @@ export function ExperimentView() {
         )}
       </header>
 
+      {isDirections && <DirectionsBar detail={detail} info={directions} setInfo={setDirections} />}
+
       <Tabs value={tab} onValueChange={(v) => setTab(String(v))}>
         <TabsList>
           <TabsTrigger value="agents">Agents</TabsTrigger>
@@ -136,7 +142,7 @@ export function ExperimentView() {
                       else next.delete(r.id);
                       if (runs.length - next.size >= 1) setHidden(next);
                     }}
-                    className={cn("flex h-7 items-center gap-1.5 rounded-full px-3 text-xs transition-colors duration-150", on ? "bg-surface-2 text-foreground" : "text-faint")}
+                    className={cn("flex h-7 items-center gap-1.5 rounded-full px-3 text-xs transition-colors", on ? "bg-surface-2 text-foreground" : "text-faint")}
                   >
                     <AgentMark color={agentColor(r.agentId)} className={cn(!on && "opacity-40")} />
                     {runLabel(r)}
@@ -147,7 +153,17 @@ export function ExperimentView() {
           )}
           <div className={cn("grid gap-4", visibleRuns.length === 1 ? "grid-cols-1" : "grid-cols-1 xl:grid-cols-2", visibleRuns.length >= 3 && "2xl:grid-cols-3")}>
             {visibleRuns.map((r) => (
-              <AgentPanel key={r.id} run={r} feed={feeds[r.id] ?? []} steps={evalSteps[r.id] ?? []} runner={runner} onChange={reload} />
+              <AgentPanel
+                key={r.id}
+                run={r}
+                feed={feeds[r.id] ?? []}
+                steps={evalSteps[r.id] ?? []}
+                runner={runner}
+                onChange={reload}
+                name={directions?.names[r.id]}
+                picked={directions?.jev?.payload.runId === r.id}
+                canContinue={!detail.active}
+              />
             ))}
           </div>
         </TabsContent>
@@ -160,8 +176,15 @@ export function ExperimentView() {
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
             <section>
               <h3 className="mb-2 text-sm font-medium">Frozen brief</h3>
-              <p className="mb-3 text-xs text-muted-foreground">Every agent received exactly these bytes. Config hash {exp.configHash}.</p>
+              <p className="mb-3 text-xs text-muted-foreground">
+                {exp.config.continuation
+                  ? `Every direction received these bytes plus one line naming its number, shown below. Config hash ${exp.configHash}.`
+                  : `Every agent received exactly these bytes. Config hash ${exp.configHash}.`}
+              </p>
               <pre className="scrollbar-thin max-h-[40rem] overflow-auto rounded-xl bg-surface p-4 font-mono text-[12.5px] leading-relaxed whitespace-pre-wrap shadow-raised">{exp.brief}</pre>
+              {exp.config.continuation && (
+                <pre className="mt-3 rounded-xl bg-surface-2 p-4 font-mono text-[12.5px] leading-relaxed whitespace-pre-wrap text-muted-foreground">{directionLine(1, exp.config.continuation.count).replace("Direction 1 of", "Direction N of")}</pre>
+              )}
             </section>
             <aside className="flex flex-col gap-6 text-[13px]">
               <Meta title="Starting point">

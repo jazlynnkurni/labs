@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { History, Plus, Settings2 } from "lucide-react";
+import { History, ListChecks, Plus, Settings2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/client/api";
 import { StatusDot } from "@/components/status";
@@ -19,6 +19,7 @@ const NAV = [
   { href: "/", label: "New comparison", icon: Plus, match: (p: string) => p === "/" },
   { href: "/experiments", label: "History", icon: History, match: (p: string) => p === "/experiments" },
   { href: "/settings", label: "Agents", icon: Settings2, match: (p: string) => p.startsWith("/settings") },
+  { href: "/qa", label: "Design QA", icon: ListChecks, match: (p: string) => p.startsWith("/qa") },
 ];
 
 /** The URL is request-time data in Next 16, so everything that reads it sits in Suspense. */
@@ -78,7 +79,7 @@ function Sidebar({ pathname }: { pathname: string }) {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex h-8 items-center gap-2.5 rounded-md px-2 text-sm text-muted-foreground transition-colors duration-150 [@media(hover:hover)]:hover:text-foreground",
+                  "flex h-8 items-center gap-2.5 rounded-md px-2 text-sm text-muted-foreground transition-colors [@media(hover:hover)]:hover:text-foreground",
                   active && "bg-sidebar-accent text-foreground",
                 )}
               >
@@ -100,7 +101,7 @@ function Sidebar({ pathname }: { pathname: string }) {
                     <Link
                       href={href}
                       className={cn(
-                        "flex h-8 min-w-0 items-center gap-2.5 rounded-md px-2 text-sm text-muted-foreground transition-colors duration-150 [@media(hover:hover)]:hover:text-foreground",
+                        "flex h-8 min-w-0 items-center gap-2.5 rounded-md px-2 text-sm text-muted-foreground transition-colors [@media(hover:hover)]:hover:text-foreground",
                         active && "bg-sidebar-accent text-foreground",
                       )}
                     >

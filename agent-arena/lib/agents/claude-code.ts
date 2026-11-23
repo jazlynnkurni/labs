@@ -5,7 +5,7 @@ import { artifactDir } from "@/lib/storage/paths";
 import { agentEnv, describeInput, failureText, num, runCli, versionOf, which } from "./cli";
 import type { AgentAdapter, Usage } from "./types";
 
-const CRED_ENV = ["ANTHROPIC_API_KEY", "ANTHROPIC_BASE_URL", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_USE_BEDROCK", "CLAUDE_CODE_USE_VERTEX"];
+export const CLAUDE_CRED_ENV = ["ANTHROPIC_API_KEY", "ANTHROPIC_BASE_URL", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_USE_BEDROCK", "CLAUDE_CODE_USE_VERTEX"];
 
 /**
  * Bash runs inside Claude Code's own OS sandbox (writes confined to the
@@ -41,7 +41,7 @@ export const claudeCode: AgentAdapter = {
     { label: "Sign in (or set ANTHROPIC_API_KEY in .env.local)", command: "claude auth login" },
     { label: "Check", command: "claude auth status" },
   ],
-  credentialEnv: CRED_ENV,
+  credentialEnv: CLAUDE_CRED_ENV,
   models: [
     { id: "", label: "CLI default" },
     { id: "opus", label: "Opus (latest)" },
@@ -55,7 +55,7 @@ export const claudeCode: AgentAdapter = {
     if (!bin) return { agentId: "claude-code", installed: false, auth: "unknown", checkedAt };
     const version = await versionOf(bin);
     // `claude auth status` is local and free. Only non-identifying fields are kept.
-    const r = await quick(bin, ["auth", "status"], os.tmpdir(), agentEnv(CRED_ENV));
+    const r = await quick(bin, ["auth", "status"], os.tmpdir(), agentEnv(CLAUDE_CRED_ENV));
     let auth: "authenticated" | "missing" | "unknown" = "unknown";
     let authDetail: string | undefined;
     try {
@@ -116,7 +116,7 @@ export const claudeCode: AgentAdapter = {
       bin,
       args,
       stdin: ctx.brief,
-      env: agentEnv(CRED_ENV),
+      env: agentEnv(CLAUDE_CRED_ENV),
       transcriptFile: path.join(artifactDir(ctx.experimentId, ctx.runId), "transcript.jsonl"),
       onJson: (o) => {
         const type = o.type as string;

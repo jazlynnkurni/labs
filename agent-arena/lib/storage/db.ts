@@ -141,6 +141,26 @@ const MIGRATIONS: string[] = [
   );
   `,
   `ALTER TABLE agent_runs ADD COLUMN reported_model TEXT;`,
+  `ALTER TABLE agent_runs ADD COLUMN direction INTEGER;`,
+  `
+  CREATE TABLE IF NOT EXISTS decisions (
+    id TEXT PRIMARY KEY,
+    experiment_id TEXT NOT NULL REFERENCES experiments(id) ON DELETE CASCADE,
+    kind TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS decisions_experiment ON decisions(experiment_id, created_at);
+  CREATE TABLE IF NOT EXISTS grill_messages (
+    id TEXT PRIMARY KEY,
+    experiment_id TEXT NOT NULL REFERENCES experiments(id) ON DELETE CASCADE,
+    role TEXT NOT NULL,
+    content TEXT NOT NULL,
+    meta_json TEXT,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS grill_experiment ON grill_messages(experiment_id, created_at);
+  `,
 ];
 
 const g = globalThis as unknown as { __arenaDb?: Db; __arenaRaw?: DatabaseSync };

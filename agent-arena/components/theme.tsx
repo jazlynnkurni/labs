@@ -84,7 +84,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       aria-label={`Switch to ${next} mode`}
       onClick={() => setThemePref(next)}
       className={cn(
-        "theme-icon press grid size-10 place-items-center text-muted-foreground transition-colors duration-150 [@media(pointer:coarse)]:size-11 [@media(hover:hover)]:hover:text-foreground",
+        "theme-icon press grid size-10 place-items-center text-muted-foreground transition-colors [@media(pointer:coarse)]:size-11 [@media(hover:hover)]:hover:text-foreground",
         className,
       )}
     >

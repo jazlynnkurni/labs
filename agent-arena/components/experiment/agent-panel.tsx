@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Square } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/client/api";
-import { agentColor, duration, tokens, usd } from "@/lib/client/format";
+import { agentColor, duration, runLabel, tokens, usd } from "@/lib/client/format";
 import type { EvalStep, FeedItem, RunView } from "@/lib/client/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import { DiffView } from "./diff-view";
 import { FileBrowser } from "./file-browser";
 import { PreviewPane } from "./preview-pane";
 import { RunSummary } from "./run-summary";
+import { ContinueDirections } from "./continue-directions";
 
 const LIVE = new Set(["queued", "preparing", "running"]);
 
@@ -36,12 +37,20 @@ export function AgentPanel({
   steps,
   runner,
   onChange,
+  name,
+  picked,
+  canContinue,
 }: {
   run: RunView;
   feed: FeedItem[];
   steps: EvalStep[];
   runner: "docker" | "host-sandbox";
   onChange: () => void;
+  /** The direction's own name, from the first line of its final message. */
+  name?: string | null;
+  /** Jev picked this direction. */
+  picked?: boolean;
+  canContinue?: boolean;
 }) {
   const elapsed = useElapsed(run);
   const live = LIVE.has(run.status);
@@ -64,21 +73,24 @@ export function AgentPanel({
   }
 
   return (
-    <article className="flex min-w-0 flex-col rounded-2xl bg-surface shadow-raised" aria-label={run.agentName}>
+    <article className="flex min-w-0 flex-col rounded-2xl bg-surface shadow-raised" aria-label={runLabel(run)}>
       <header className="flex flex-col gap-3 border-b border-hairline p-4">
         <div className="flex min-w-0 items-center gap-2.5">
           <AgentMark color={agentColor(run.agentId)} />
-          <h3 className="min-w-0 truncate text-[15px] font-semibold tracking-tight">{run.agentName}</h3>
+          <h3 className="min-w-0 shrink-0 truncate text-[15px] font-semibold tracking-tight">{run.direction ? `Direction ${run.direction}` : run.agentName}</h3>
+          {picked && <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">Jev&apos;s pick</span>}
           <span className="min-w-0 truncate font-mono text-xs text-faint" title={run.model ? "Model you picked" : run.reportedModel ? "Default model, as reported by the agent" : "Default model; the agent did not report which"}>
             {run.model ?? (run.reportedModel ? `${run.reportedModel} (default)` : "default model")}
           </span>
           <StatusPill status={run.status} className="ml-auto" />
+          {canContinue && !live && <ContinueDirections run={run} size="sm" className="shrink-0" />}
           {run.status === "running" && (
             <Button size="icon-xs" variant="ghost" aria-label={`Cancel ${run.agentName}`} onClick={cancel} className="press text-muted-foreground">
               <Square className="size-3" />
             </Button>
           )}
         </div>
+        {run.direction && name && <p className="-mt-1 truncate text-[13px] text-muted-foreground" title={name}>{name}</p>}
         {run.agentId === "dev-fixture" && <p className="rounded-md bg-warning/10 px-2 py-1 text-xs text-warning">Development fixture. Not an AI agent; its output is canned.</p>}
         <dl className="grid grid-cols-4 gap-2 text-xs">
           <Stat label="Time" value={elapsed !== undefined ? duration(elapsed) : "n/a"} />

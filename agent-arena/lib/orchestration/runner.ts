@@ -21,12 +21,15 @@ import { publish } from "./bus";
 import { composeBrief, hashConfig, titleFrom } from "./brief";
 import { evaluateRun } from "@/lib/evaluation/evaluate";
 import { CONTEXT_FILE_NAME, composeContext } from "@/lib/context/design-context";
+import { DIRECTION_COUNT, briefForDirection, continuationPrompt } from "@/lib/directions/brief";
+import { runLabel } from "@/lib/client/format";
 
 export interface StartInput {
   prompt: string;
   config: ExperimentConfig;
   source: { kind: "empty" } | { kind: "local-repo"; path: string };
   files: { name: string; mime: string; data: Buffer }[];
+  title?: string;
 }
 
 const g = globalThis as unknown as { __arenaControllers?: Map<string, AbortController> };
@@ -87,6 +90,8 @@ export async function startExperiment(input: StartInput) {
   });
   const ids = new Set(input.config.agents.map((a) => `${a.agentId}:${a.model ?? ""}`));
   if (ids.size !== input.config.agents.length) throw new Error("The same agent and model is selected twice.");
+  const directions = input.config.continuation?.count;
+  if (directions && chosen.length !== 1) throw new Error("Directions continue exactly one agent.");
   for (const f of input.files) if (f.data.length > MAX_ATTACHMENT_BYTES) throw new Error(`${f.name} is larger than 20 MB.`);
 
   const id = `exp_${new Date().toISOString().slice(0, 10).replace(/-/g, "")}_${randomUUID().slice(0, 6)}`;
@@ -130,10 +135,15 @@ export async function startExperiment(input: StartInput) {
   const brief = composeBrief(prompt, config.constraints, relPaths, contextRel);
   const configHash = hashConfig(brief, config, source.commit);
   const differences = differencesFor(chosen, config, source);
+  if (directions) {
+    differences.unshift(
+      `All ${directions} directions are the same agent and model. Each got the same brief plus one line naming its direction number (shown on the Brief tab); nothing else differs.`,
+    );
+  }
 
   await experiments.create({
     id,
-    title: titleFrom(prompt),
+    title: input.title ?? titleFrom(prompt),
     prompt,
     brief,
     config,
@@ -144,8 +154,15 @@ export async function startExperiment(input: StartInput) {
   for (const s of stored) {
     await attachmentsRepo.add({ experimentId: id, name: s.name, mime: s.mime, size: fs.statSync(s.abs).size, path: toDataRel(s.abs) });
   }
-  for (const c of chosen) {
-    await runs.create({ experimentId: id, agentId: c.adapter.id, agentName: c.adapter.name, model: c.model });
+  if (directions) {
+    const c = chosen[0];
+    for (let n = 1; n <= directions; n++) {
+      await runs.create({ experimentId: id, agentId: c.adapter.id, agentName: c.adapter.name, model: c.model, direction: n });
+    }
+  } else {
+    for (const c of chosen) {
+      await runs.create({ experimentId: id, agentId: c.adapter.id, agentName: c.adapter.name, model: c.model });
+    }
   }
   fs.writeFileSync(path.join(experimentDir(id), "brief.md"), brief);
   fs.writeFileSync(path.join(experimentDir(id), "config.json"), JSON.stringify({ config, source, configHash }, null, 2));
@@ -160,6 +177,9 @@ async function setRun(run: AgentRun, patch: Partial<AgentRun>) {
   Object.assign(run, patch);
   await publish(run.experimentId, run.id, "run", { ...patch, agentId: run.agentId });
 }
+
+const briefFor = (exp: { brief: string; config: ExperimentConfig }, run: AgentRun) =>
+  briefForDirection(exp.brief, run.direction, exp.config.continuation?.count);
 
 async function executeExperiment(id: string, jobId: string) {
   const controller = new AbortController();
@@ -202,14 +222,14 @@ async function executeExperiment(id: string, jobId: string) {
 
     const runnable = list.filter((r) => r.status === "preparing");
     if (exp.config.parallel) {
-      await Promise.all(runnable.map((r) => runAgent(exp.id, r, exp.brief, exp.config, controller.signal)));
+      await Promise.all(runnable.map((r) => runAgent(exp.id, r, briefFor(exp, r), exp.config, controller.signal)));
     } else {
       for (const r of runnable) {
         if (controller.signal.aborted) {
           await setRun(r, { status: "cancelled" });
           continue;
         }
-        await runAgent(exp.id, r, exp.brief, exp.config, controller.signal);
+        await runAgent(exp.id, r, briefFor(exp, r), exp.config, controller.signal);
       }
     }
 
@@ -378,4 +398,43 @@ export async function importPatch(runId: string, patch: string, note: string, ev
   await runs.update(run.id, { error: "" });
   await collect(run);
   if (evalRunner !== "off") void evaluateRun(run.id, evalRunner, new AbortController().signal);
+}
+
+/**
+ * "Continue directions": start a new experiment whose starting files are one
+ * finished run's result, run by the same agent and model several times over.
+ * Every direction is a paid agent run; the caller must have the person's confirmation.
+ */
+export async function continueDirections(runId: string, opts: { note?: string; count?: number } = {}) {
+  const run = await runs.get(runId);
+  if (!run) throw new Error("Run not found.");
+  if (controllers.has(runId)) throw new Error("This agent is still running.");
+  if (!run.workspaceDir || !run.resultCommit || !fs.existsSync(run.workspaceDir)) throw new Error("This run has no captured result to continue from.");
+  const parent = await experiments.get(run.experimentId);
+  if (!parent) throw new Error("Experiment not found.");
+  const count = Math.min(Math.max(opts.count ?? DIRECTION_COUNT, 2), 8);
+  const fromLabel = run.direction ? `${run.agentName}, direction ${run.direction}` : runLabel(run);
+
+  // Carry the earlier attachments over; the design context is rebuilt from the same sources.
+  const files: StartInput["files"] = [];
+  for (const a of await attachmentsRepo.forExperiment(parent.id)) {
+    if (a.name === CONTEXT_FILE_NAME) continue;
+    const abs = path.join(experimentDir(parent.id), "attachments", a.name);
+    if (fs.existsSync(abs)) files.push({ name: a.name, mime: a.mime, data: fs.readFileSync(abs) });
+  }
+
+  const original = parent.config.continuation?.task ?? parent.prompt;
+  return startExperiment({
+    prompt: continuationPrompt(original, fromLabel, opts.note),
+    source: { kind: "local-repo", path: run.workspaceDir },
+    files,
+    config: {
+      ...parent.config,
+      agents: [{ agentId: run.agentId, model: run.model }],
+      parallel: true,
+      context: parent.config.context?.ids.length ? { ids: parent.config.context.ids } : undefined,
+      continuation: { fromExperimentId: parent.id, fromRunId: run.id, fromLabel, count, task: original, note: opts.note?.trim() || undefined },
+    },
+    title: `Directions from ${parent.title.replace(/^Directions from /, "")}`,
+  });
 }

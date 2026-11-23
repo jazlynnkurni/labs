@@ -47,7 +47,8 @@ const AGENT_COLOR: Record<string, string> = {
 export const agentColor = (id: string) => AGENT_COLOR[id] ?? "var(--agent-6)";
 
 /** The model asked for wins; otherwise whatever the agent reported it used. */
-export function runLabel(r: { agentName: string; model?: string; reportedModel?: string }) {
+export function runLabel(r: { agentName: string; model?: string; reportedModel?: string; direction?: number }) {
+  if (r.direction) return `Direction ${r.direction}`;
   const m = r.model || r.reportedModel;
   return m ? `${r.agentName} (${m})` : r.agentName;
 }

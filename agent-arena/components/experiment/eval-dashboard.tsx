@@ -295,7 +295,7 @@ function Chip({ on, onClick, children, title }: { on: boolean; onClick: () => vo
       title={title}
       aria-pressed={on}
       className={cn(
-        "inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-xs whitespace-nowrap transition-colors duration-150",
+        "inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-xs whitespace-nowrap transition-colors",
         on ? "bg-foreground text-background" : "bg-surface-2 text-muted-foreground [@media(hover:hover)]:hover:text-foreground",
       )}
     >
@@ -415,7 +415,7 @@ function Rating({ run, dimension, label, onChange }: { run: RunView; dimension: 
           onClick={() => set(current === n ? null : n)}
           className="grid size-7 place-items-center"
         >
-          <span className={cn("size-2.5 rounded-full transition-colors duration-150", n <= shown ? "bg-warning" : "bg-surface-2 ring-1 ring-hairline")} />
+          <span className={cn("size-2.5 rounded-full transition-colors", n <= shown ? "bg-warning" : "bg-surface-2 ring-1 ring-hairline")} />
         </button>
       ))}
     </div>

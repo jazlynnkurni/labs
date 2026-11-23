@@ -380,7 +380,7 @@ export function Composer() {
                 aria-checked={sourceKind === o.id}
                 onClick={() => setSourceKind(o.id)}
                 className={cn(
-                  "h-8 flex-1 rounded-md text-sm text-muted-foreground transition-colors duration-150",
+                  "h-8 flex-1 rounded-md text-sm text-muted-foreground transition-colors",
                   sourceKind === o.id && "bg-background text-foreground shadow-raised",
                 )}
               >
