@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ContinueDirections } from "./continue-directions";
+import { Markdown } from "@/components/markdown";
 
 export interface DirectionsInfo {
   finished: boolean;
@@ -97,7 +98,7 @@ export function DirectionsBar({ detail, info, setInfo }: { detail: ExperimentDet
           <div className="flex flex-wrap items-center gap-3">
             <div className="min-w-0 flex-1">
               <h3 className="truncate text-[15px] font-semibold tracking-tight">
-                {pick.choice && pick.labels[pick.choice] ? `Jev picks ${pick.labels[pick.choice]}` : "Jev gave no clear pick"}
+                {pick.choice && pick.labels[pick.choice] ? `Jev picks Direction ${pick.choice.slice(1)}` : "Jev gave no clear pick"}
               </h3>
               <p className="text-xs text-muted-foreground">
                 {pick.fixture
@@ -108,7 +109,11 @@ export function DirectionsBar({ detail, info, setInfo }: { detail: ExperimentDet
             {pickedRun && <ContinueDirections run={pickedRun} size="default" />}
           </div>
           <ul className="flex flex-col gap-2">
-            {Object.entries(pick.labels).map(([key, label]) => {
+            {Object.entries(pick.labels).map(([key, stored]) => {
+              const n = Number(key.slice(1));
+              const run = detail.runs.find((r) => r.direction === n);
+              const fresh = run ? info?.names[run.id] : undefined;
+              const label = fresh ? `Direction ${n}: ${fresh}` : stored;
               const p = pick.probabilities[key] ?? 0;
               return (
                 <li key={key} className="grid grid-cols-[minmax(0,1fr)_8rem_3rem] items-center gap-3 text-[13px]">
@@ -302,15 +307,13 @@ function Bubble({ m }: { m: GrillMessage }) {
   const u = m.meta?.usage;
   return (
     <div className={cn("flex max-w-[85%] flex-col gap-1", mine ? "items-end self-end" : "items-start self-start")}>
-      <p
-        className={cn(
-          "rounded-2xl px-3 py-2 text-[13.5px] leading-relaxed whitespace-pre-wrap text-pretty",
-          mine ? "rounded-br-md bg-primary text-primary-foreground" : "rounded-bl-md bg-surface-2",
-          m.meta?.error && "text-danger",
-        )}
-      >
-        {m.content}
-      </p>
+      {mine ? (
+        <p className="rounded-2xl rounded-br-md bg-primary px-3 py-2 text-[13.5px] leading-relaxed whitespace-pre-wrap text-pretty text-primary-foreground">{m.content}</p>
+      ) : (
+        <div className={cn("min-w-0 rounded-2xl rounded-bl-md bg-surface-2 px-3 py-2 text-[13.5px] leading-relaxed text-pretty", m.meta?.error && "text-danger")}>
+          <Markdown text={m.content} />
+        </div>
+      )}
       {!mine && (m.meta?.fixture || m.meta?.model || u) && (
         <span className="px-1 text-[11px] text-faint tnum">
           {m.meta?.fixture

@@ -31,7 +31,16 @@ export function briefForDirection(brief: string, n: number | undefined, count: n
 
 /** The first line of a direction's final message, which the brief asks to be its name. */
 export function directionName(summary: string | undefined) {
-  const line = summary?.split("\n").map((l) => l.replace(/^[#*\s>-]+|[*\s]+$/g, "")).find(Boolean);
-  if (!line) return undefined;
-  return line.length > 90 ? `${line.slice(0, 89)}…` : line;
+  const first = summary?.split("\n").map((l) => l.trim()).find(Boolean);
+  if (!first) return undefined;
+  // Prefer a leading bold phrase ("**Direction 4: the receipt.** The result is...").
+  const bold = first.match(/^\*\*(.+?)\*\*/)?.[1] ?? first;
+  const name = bold
+    .replace(/^[#>\s*_-]+|[*_\s]+$/g, "")
+    .replace(/^direction(\s+\d+)?(\s+of\s+\d+)?\s*[:.,-]\s*/i, "")
+    .replace(/\.$/, "")
+    .trim();
+  if (!name) return undefined;
+  const capped = name.charAt(0).toUpperCase() + name.slice(1);
+  return capped.length > 90 ? `${capped.slice(0, 89)}…` : capped;
 }

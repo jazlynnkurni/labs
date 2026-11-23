@@ -42,6 +42,9 @@ describe("direction texts", () => {
 
   it("names a direction from the first line of its final message", () => {
     expect(directionName("**Quiet paper**\n\nI built...")).toBe("Quiet paper");
+    expect(directionName("**Direction: the check itself.** The calculator is now a paper receipt")).toBe("The check itself");
+    expect(directionName("**Direction 4: the receipt.** The result is a printed receipt")).toBe("The receipt");
+    expect(directionName("Direction 2: a printed till receipt, with an exact-cent split")).toBe("A printed till receipt, with an exact-cent split");
     expect(directionName("")).toBeUndefined();
   });
 });
