@@ -1,0 +1,66 @@
+{
+  "name": "RobP",
+  "people": [
+    {
+      "x": "emilkowalski",
+      "github": "emilkowalski"
+    },
+    {
+      "x": "evilrabbit_",
+      "github": null
+    },
+    {
+      "x": "raunofreiberg",
+      "github": null
+    },
+    {
+      "x": "jh3yy",
+      "github": null
+    },
+    {
+      "x": "pacocoursey",
+      "github": null
+    },
+    {
+      "x": "jakubkrehel",
+      "github": "jakubkrehel"
+    }
+  ],
+  "scoutHours": [
+    8,
+    10,
+    12,
+    14,
+    16,
+    18,
+    20,
+    22
+  ],
+  "digestTime": {
+    "hour": 22,
+    "minute": 30
+  },
+  "feedScrolls": 25,
+  "profileScrolls": 4,
+  "maxStagedPerDay": 5,
+  "headless": true,
+  "model": "sonnet",
+  "designRepos": [
+    "~/Desktop/portfolio",
+    "~/Desktop/portfolio-experiments",
+    "~/Desktop/labs",
+    "~/autumn-app",
+    "~/autumn-motion-studio",
+    "~/spark",
+    "~/Desktop/Fostr_Jaz",
+    "~/Desktop/SocialBricks-abraham"
+  ],
+  "jev": {
+    "enabled": true,
+    "envFile": "~/Desktop/labs/agent-arena/.env.local",
+    "model": "typesafe/jev-1.13",
+    "keep": 0.5,
+    "keepPriority": 0.3,
+    "concurrency": 4
+  }
+}

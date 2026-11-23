@@ -1,0 +1,5 @@
+# X session cookies live in profile/, never commit them
+profile/
+data/
+node_modules/
+.env

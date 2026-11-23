@@ -1,0 +1,14 @@
+{
+  "name": "robp",
+  "private": true,
+  "description": "RobP (aka Robert Pattinson): reads the X For You feed for design engineering tips and loads matching npx skills",
+  "type": "module",
+  "scripts": {
+    "login": "node robp.mjs login",
+    "scout": "node robp.mjs scout",
+    "digest": "node robp.mjs digest"
+  },
+  "dependencies": {
+    "playwright-core": "^1.55.0"
+  }
+}
