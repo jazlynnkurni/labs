@@ -11,7 +11,7 @@ Read `README.md` for the full architecture, agent guide and security model. This
 ```bash
 pnpm dev              # http://localhost:6700
 pnpm dev:fixtures     # same, plus the scripted fixture (a fake, free agent for testing the pipeline)
-pnpm test             # Vitest, 29 tests
+pnpm test             # Vitest, 51 tests
 pnpm build && pnpm test:e2e   # Playwright, 9 tests on port 6710 with a temp data dir
 pnpm lint && pnpm typecheck
 ```
@@ -42,6 +42,8 @@ Run data lives in `~/.agent-arena` (SQLite `arena.sqlite`, workspaces, artifacts
 ## State (2026-11-21)
 
 Done and verified:
+* Directions layer (2026-11-23): "Continue directions" on any finished run starts a new experiment of 5 runs by the same agent and model from that run's result (`continueDirections` in runner.ts, `lib/directions/`). On it, "Let Jev handle" asks Jev one `choice` over the directions (RobP's client `lib/qa/jev.ts`, stored in `decisions`), and "Grill me" is a docked chat on Claude Code (Read, Glob, Grep only, cwd = the workspaces) built on her grill-me skill plus her jaz-agent notes (`/grilling` is not installed). Fixture experiments get labelled canned answers. Verified with fixtures only; no real run, Jev call or Grill reply yet.
+
 * Full app: composer (several models per agent), live run view, diffs, file tree, screenshots, live preview, evaluation, dashboard with leaders, trade-offs, head to head, ratings, history, agent settings.
 * Claude Code 2.1.312, Codex CLI 0.171.0 and Cursor Agent 2026.11.22 verified with real paid runs (`exp_20261122_71fc3e` two agents, `exp_20261122_b2785c` all three, same tip calculator brief). Codex is signed in to Jaz's personal ChatGPT account (free plan), not the company plan. Cursor is signed in through `agent login` (model "Auto"); it reports no tokens or cost.
 
