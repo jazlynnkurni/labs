@@ -99,10 +99,10 @@ body.edit3 .hi .pic.flip .flip-stage{pointer-events:none}
 .stack .tools{display:flex;justify-content:center;align-items:flex-start;gap:34px;padding:8px 0}
 .stack .tool{display:flex;flex-direction:column;align-items:center;gap:12px;width:120px}
 .stack .tool .icon{width:112px;height:112px;border-radius:26px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px rgba(20,23,27,.08),0 18px 36px -20px rgba(20,23,27,.45)}
-.stack .tool .icon img{display:block;width:100%;height:100%;object-fit:cover}
+.stack .tool .icon img{display:block;width:100%;height:100%;object-fit:cover}.stack .tool .icon img[src$="tool-jev.png"]{box-sizing:border-box;padding:12px;object-fit:contain}
 .stack .tool span{font:400 13.5px var(--hel);color:var(--ink2)}
 .stack.on .tool{animation:toolin .7s var(--ease) both}
-.stack.on .tool:nth-child(1){animation-delay:.4s}.stack.on .tool:nth-child(2){animation-delay:.55s}.stack.on .tool:nth-child(3){animation-delay:.7s}.stack.on .tool:nth-child(4){animation-delay:.85s}
+.stack.on .tool:nth-child(1){animation-delay:.4s}.stack.on .tool:nth-child(2){animation-delay:.55s}.stack.on .tool:nth-child(3){animation-delay:.7s}.stack.on .tool:nth-child(4){animation-delay:.85s}.stack.on .tool:nth-child(5){animation-delay:1s}
 @keyframes toolin{from{opacity:0;transform:translateY(22px) scale(.92)}to{opacity:1;transform:none}}
 .stamp{position:relative;transform:rotate(var(--r,0deg))}.stamp .label{color:var(--oxblood)}.stamp p{margin:4px 0 0}
 .stack .note{text-align:center;font-weight:400;color:var(--ink)}
@@ -110,7 +110,7 @@ body.edit3 .hi .pic.flip .flip-stage{pointer-events:none}
    half its width on a loop, so the join is seamless; it keeps moving for as long as the slide is up. */
 .art .say{padding:0 120px;font-size:28px}
 .art .rowclip{left:0;right:0;top:var(--below);height:280px;overflow:hidden}
-.art .row{position:absolute;left:0;top:0;display:flex;align-items:flex-start;gap:34px;height:280px;width:max-content;padding-left:34px;animation:glide 56s linear infinite;will-change:transform}
+.art .row{position:absolute;left:0;top:2px;display:flex;align-items:flex-start;gap:34px;height:280px;width:max-content;padding-left:34px;animation:glide 56s linear infinite;will-change:transform}
 @keyframes glide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .art .row .pr{--r:0deg;height:260px;flex:0 0 auto;background:var(--paper);outline:1px solid var(--hair);padding:7px 7px 9px;box-shadow:0 1px 2px rgba(20,23,27,.06);border-radius:4px}
 .art .row .pr img{height:100%;width:auto;display:block}.art .row .pr.s{height:210px;align-self:center}
@@ -122,12 +122,12 @@ body.edit3 .hi .pic.flip .flip-stage{pointer-events:none}
 .xp.on .one{animation:fadein .7s ease both}
 /* the photographs of her, and the two lines she marked */
 .care .say{position:static;height:auto;padding:0 120px}
-.care .deal{position:static;display:flex;align-items:flex-end;justify-content:center;gap:56px}
+.care .deal{position:static;display:flex;align-items:flex-end;justify-content:center;gap:44px}
 .care .one{position:static;display:flex;flex-direction:column;align-items:center;gap:22px;opacity:0}
 .care .one>*{position:static}.care .cap{text-align:center;max-width:300px;line-height:1.7}
 .care .ph{padding:0;display:block;border-radius:20px;overflow:hidden;background:#EFEDE8;box-shadow:0 0 0 1px rgba(20,23,27,.08),0 24px 48px -24px rgba(20,23,27,.5);transform:rotate(var(--r,0deg))}
 @keyframes dealup{0%{opacity:0;transform:translateY(420px)}60%{opacity:1}100%{opacity:1;transform:none}}
-.care.on .one{animation:dealup 1s cubic-bezier(.2,.8,.2,1) both}.care.on .one:nth-child(1){animation-delay:.4s}.care.on .one:nth-child(2){animation-delay:1.3s}.care.on .one:nth-child(3){animation-delay:2.2s}
+.care.on .one{animation:dealup 1s cubic-bezier(.2,.8,.2,1) both}.care.on .one:nth-child(1){animation-delay:.4s}.care.on .one:nth-child(2){animation-delay:1.3s}.care.on .one:nth-child(3){animation-delay:2.2s}.care.on .one:nth-child(4){animation-delay:3.1s}
 .pile .two{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:64px}
 .pile .one{position:static;display:flex;flex-direction:column;align-items:center;gap:28px}
 .pile .one>*{position:static}.pile .cap{width:auto;max-width:380px;text-align:center;line-height:1.7}
@@ -189,7 +189,7 @@ const S=[
    <div class="apps"><div class="app manus" aria-label="Manus">${img('aster/marks/manus-glyph.svg','Manus')}</div><div class="app self" aria-label="Second Self, YHacks">${img('aster/marks/second-self-fit.svg','Second Self')}</div></div>`},
  {cls:'knack',html:`<div class="say h">I have a knack for recognizing what people might want <span class="hl">before they even realize they need it.</span></div>`},
  {cls:'stack',html:`<div class="say h">Design comes to me <span class="hl">instinctively</span>, but coding is something I’ve grown to <span class="hl">love.</span></div>
-   <div class="tools">${[['Claude Code','claude'],['Cursor','cursor'],['Cognition','cognition'],['Blackbox AI','blackbox']].map(t=>`<div class="tool"><div class="icon">${img('aster/pics/tool-'+t[1]+'.png',t[0])}</div><span>${t[0]}</span></div>`).join('')}</div>
+   <div class="tools">${[['Claude Code','claude'],['Cursor','cursor'],['Cognition','cognition'],['Blackbox AI','blackbox'],['Jev','jev']].map(t=>`<div class="tool"><div class="icon">${img('aster/pics/tool-'+t[1]+'.png',t[0])}</div><span>${t[0]}</span></div>`).join('')}</div>
    <div class="note">+ my own custom AI tools</div>`},
  {cls:'art',html:`<div class="say h">I had my artworks <span class="hl">exhibited, auctioned, and sold</span> when I was 15 years old.</div>
    <div class="rowclip"><div class="row">${WORKS.concat(WORKS).map(w=>`<div class="pr ${w[1]}">${img('aster/pics/'+w[0]+'.jpg')}</div>`).join('')}</div></div>`},
@@ -197,8 +197,8 @@ const S=[
    <div class="one"><div class="ph2 vid" data-src="aster/pics/columbia.mp4" data-ink="plum" data-w="500" data-h="400" style="--r:-2deg"></div><div class="cap lab">Co-President at Design@Columbia</div></div>
    <div class="one"><div class="ph2" data-src="aster/pics/core.jpg" data-ink="black" data-w="500" data-h="400" style="--r:1.5deg"></div><div class="cap lab">CORE PM Lead at Columbia’s best Startup Entrepreneurship Club</div></div></div>`},
  {cls:'care',html:`<div class="say h">Constantly understanding and learning new forms of knowledge with <span class="hl">empathy, care, and intent</span> is a key quality that I carry in my work.</div>
-   <div class="deal"><div class="one"><div class="ph ph2" data-src="aster/pics/me1.jpg" data-ink="black" data-w="270" data-h="360" data-fit="cover" style="width:270px;height:360px;--r:-3deg"></div><div class="cap lab">Django bar</div></div><div class="one"><div class="ph ph2" data-src="aster/pics/me2.jpg" data-ink="plum" data-w="400" data-h="300" data-fit="cover" style="width:400px;height:300px;--r:2deg"></div><div class="cap lab">Sapar Contemporary</div></div><div class="one"><div class="ph ph2" data-src="aster/pics/snow.jpg" data-ink="black" data-w="300" data-h="300" data-fit="cover" style="width:300px;height:300px;--r:-2deg"></div><div class="cap lab">ripped my ACL from this lol</div></div></div>`},
- {cls:'xp',html:`<div class="one"><div class="shot">${img('aster/pics/xpost.jpg')}</div><div class="cap lab">chronic poster on X</div></div>`},
+   <div class="deal"><div class="one"><div class="ph ph2" data-src="aster/pics/me1.jpg" data-ink="black" data-w="230" data-h="306" data-fit="cover" style="width:230px;height:306px;--r:-3deg"></div><div class="cap lab">Django bar</div></div><div class="one"><div class="ph ph2" data-src="aster/pics/me2.jpg" data-ink="plum" data-w="340" data-h="255" data-fit="cover" style="width:340px;height:255px;--r:2deg"></div><div class="cap lab">Sapar Contemporary</div></div><div class="one"><div class="ph ph2" data-src="aster/pics/snow.jpg" data-ink="black" data-w="255" data-h="255" data-fit="cover" style="width:255px;height:255px;--r:-2deg"></div><div class="cap lab">ripped my ACL from this lol</div></div><div class="one"><div class="ph ph2" data-src="aster/pics/reading.jpg" data-ink="plum" data-w="230" data-h="306" data-fit="cover" style="width:230px;height:306px;--r:2.5deg"></div><div class="cap lab">Kaveh Akbar’s my favorite</div></div></div>`},
+ {cls:'xp',html:`<div class="one"><div class="shot">${img('aster/pics/xpost.jpg')}</div><div class="cap lab">chronic poster on social media</div></div>`},
  {cls:'labs',html:`<div class="ring" id="ring">${[['out-of-office'],['v','oranges'],['billiards'],['tin-toggle'],['v','rad'],['bubbles'],['pear'],['v','directions'],['skier-slope'],['v','parallax']].map(c=>c[0]==='v'
      ?`<div class="orb vid"><video src="aster/pics/motion-${c[1]}.mp4" muted loop playsinline preload="auto"></video></div>`
      :`<div class="orb"><iframe class="frame" data-src="https://portfolio-experiments.vercel.app/experiments/${c[0]}" title="${c[0]}" allow="autoplay" scrolling="no"></iframe></div>`).join('')}</div>
