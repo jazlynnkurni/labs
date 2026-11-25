@@ -8,6 +8,10 @@ It also watches how you design: your messages in Claude Code sessions and your c
 
 At 22:30 it opens the day's digest and asks which staged skills are good. Each yes is installed globally for Claude Code and added to `~/.claude/agents/jaz.md` under "From X, passed on by RobP" (jaz.md is backed up to `data/backups/` first). Each no is dropped. "Later" keeps them for tomorrow.
 
+## Schedule
+
+RobP runs as two Claude app scheduled tasks, `robp-scout` (every 2 hours, 8 AM to 10 PM) and `robp-digest` (10:30 PM), in the sidebar under Scheduled. They run while the Claude app is open. The launchd jobs in `setup.sh` do not work from `~/Desktop` (macOS blocks background shells from reading it), so `./setup.sh` is now only for signing in.
+
 ## Start
 
     ./setup.sh
