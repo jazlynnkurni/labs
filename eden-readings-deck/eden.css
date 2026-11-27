@@ -1,0 +1,42 @@
+/* Eden CPT deck: the few additions to the Clover CSS (base.css and clover.css are copied unchanged). */
+
+/* placeholders for Jaz's own words: shown as bracketed, in a muted ink */
+#slide .phd{color:rgba(20,23,27,.45)}
+
+/* Clover's bullet lists hold three points; these slides hold four. The fourth follows on the same 0.2s beat. */
+#slide section.s.on .ea3t li:nth-child(4){animation-delay:1.75s}
+#slide section.s.on .ed4 .ea3t li:nth-child(4){animation-delay:2.3s}
+#slide section.s.on .pt31 li:nth-child(4){animation-delay:1.25s!important}
+/* text only slides: the ea3 bullet list on its own, on the content line, on the left grid */
+#slide .ea3.solo{grid-template-columns:1fr;max-width:760px}
+
+/* dark screenshots stay whole: letterboxed on their own black instead of cropped */
+#slide .shot4.ct{background:#000}
+#slide .shot4.ct img{object-fit:contain}
+
+/* Clover slide 38's photo pile, placed in the ea3 media column */
+#slide .ea3 .pr38{position:relative;width:380px;height:400px;overflow:visible}
+
+/* the closing slide takes Clover's Findings discs (layout in discs.json, swatch order from its 06); the number itself stays hidden */
+#slide .sh60 .no.ghost{visibility:hidden}
+
+/* slide 2: one photo printed as the intro deck's living print, its card style from the intro deck's pile */
+#slide .ed4i.bagel{display:flex;align-items:center;justify-content:center}
+#slide .ph2{border-radius:20px;overflow:hidden;background:#EFEDE8;box-shadow:0 0 0 1px rgba(20,23,27,.08),0 24px 48px -24px rgba(20,23,27,.5);transform:rotate(var(--r,0deg))}
+
+/* cover: the 54px title sits 3.3px (B) and 1.5px (a) further in than the subtitle's M because of its glyph side bearing;
+   pulling it 0.045em left lands both title lines within 1px of the subtitle's left edge */
+#slide .cover .cv-l h1{margin-left:-.045em}
+
+/* the print renders 4px past the card on every side and the card trims it, so the print's outer rows never show as a strip */
+#slide .ph2 canvas{margin:-4px}
+
+/* slide 6: the cover's HUD and iPhone pair, as it sits on the cover, in the media column left of the list */
+#slide .ph31 .cover.hud6{position:absolute;left:0;top:0;width:568px;height:440px;display:flex;align-items:center;justify-content:flex-start;padding:0;margin:0}
+#slide .ph31 .hud6 .cv-r{width:520px}
+
+/* the deck is a light deck: when a host (Claude's artifact viewer) sets data-theme="dark" on the page, the portfolio's dark tokens in
+   base.css would turn the ink near white on the white slides, so the light tokens hold under either theme */
+[data-theme="dark"]{--paper:#FAF9F7;--ink:#14171B;--ink2:rgba(20,23,27,.66);--ink3:rgba(20,23,27,.42);
+  --hair:rgba(20,23,27,.16);--touch:#340414;--flick-a:#A99939;--flick-b:#340414;--plate:#FAF9F7;
+  --outline:oklch(0 0 0 / 0.1);--pill:#fff;--pill-shadow:0 1px 2px rgba(20,23,27,.04),0 6px 20px rgba(20,23,27,.07);color-scheme:light}

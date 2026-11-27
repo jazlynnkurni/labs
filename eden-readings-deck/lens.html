@@ -1,0 +1,21 @@
+<!-- from the Manus deck: the liquid-glass lens for the arrows -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<filter id="lens" filterUnits="objectBoundingBox" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+  <feImage id="lensmap" href="" x="0" y="0" width="42" height="42" preserveAspectRatio="none" result="map"/>
+  <feDisplacementMap in="SourceGraphic" in2="map" scale="22" xChannelSelector="R" yChannelSelector="G"/>
+</filter>
+<filter id="lens96" filterUnits="objectBoundingBox" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+  <feImage id="lensmap96" href="" x="0" y="0" width="96" height="96" preserveAspectRatio="none" result="map"/>
+  <feDisplacementMap in="SourceGraphic" in2="map" scale="30" xChannelSelector="R" yChannelSelector="G"/>
+</filter></defs></svg>
+<script>
+/* THE MAP. For every pixel of the disc: its direction from the centre, and a shift that is zero
+   in the flat middle and grows toward the rim, the way a lens bends more at its edge. Red is x,
+   green is y, 128 is no shift. */
+(function(){ const N=112, cv=document.createElement('canvas'); cv.width=cv.height=N; const x=cv.getContext('2d'); const img=x.createImageData(N,N), d=img.data;
+  for(let j=0;j<N;j++) for(let i=0;i<N;i++){ const u=(i+.5)/N*2-1, v=(j+.5)/N*2-1; const r=Math.hypot(u,v); const o=(j*N+i)*4;
+    let k=0; if(r<1){ const t=Math.max(0,(r-.5)/.5); k=t*t; }               /* flat to 50%, then a rising bend */
+    const nx=r>0?u/r:0, ny=r>0?v/r:0;
+    d[o]=Math.round(128+nx*127*k); d[o+1]=Math.round(128+ny*127*k); d[o+2]=128; d[o+3]=255; }
+  x.putImageData(img,0,0); document.getElementById('lensmap').setAttribute('href',cv.toDataURL()); document.getElementById('lensmap96').setAttribute('href',cv.toDataURL()); })();
+</script>

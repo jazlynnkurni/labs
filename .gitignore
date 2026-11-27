@@ -24,3 +24,6 @@ cpt-deck/img/
 *.MP4
 *.webm
 manus-compare/old/*.pdf
+
+# Eden CPT deck: Vercel project link (local only)
+eden-readings-deck/eden-cpt/.vercel/
