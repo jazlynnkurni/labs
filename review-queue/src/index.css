@@ -1,0 +1,2130 @@
+:root {
+  /* Ground and ink */
+  --ground: #f6f6f4;
+  --surface: #fff;
+  --ink: #141414;
+  --ink-2: #5c5c5c;
+  --ink-3: #696969;
+  --line: rgba(0, 0, 0, 0.08);
+  --fill: rgba(0, 0, 0, 0.05);
+  --fill-hover: rgba(0, 0, 0, 0.08);
+  --slab: rgba(0, 0, 0, 0.05);
+
+  /* The signature colour: a soft, feathery pastel blue. The primary action, the toggle thumbs, focus and chosen states. Ink on it is 12:1 or better. */
+  --accent: #cfe3ff;
+  --accent-hover: #b8d3fb;
+  /* Deeper blue for the check inside a chosen answer: white check at 4.9:1 */
+  --accent-ring: #3f6fc2;
+  --accent-ring-fade: #4a78c9;
+  /* Focus and chosen states: a feathered pastel blue, never a black outline */
+  --focus-ring: 0 0 6px 1px rgba(207, 227, 255, 0.5), 0 0 18px 3px rgba(184, 211, 251, 0.9);
+  --on-accent: #141414;
+
+  /* States: ink for glyphs and text (5.2:1 or better on their tint), tint for fills, glow for the soft body */
+  --approve-ink: #1e6b3b;
+  --approve-tint: #e3efe0;
+  --approve-glow: #c6e4bf;
+  --input-ink: #8a5100;
+  --input-tint: #f7e9d1;
+  --input-glow: #f6d9a6;
+  --failed-ink: #b0291f;
+  --failed-tint: #f8dfdb;
+  --failed-glow: #f6c2ba;
+
+  /* The agent's own words: a quiet purple to blue to rose line, every stop 5.2:1 or better on white */
+  --agent-1: #5a4ba0;
+  --agent-2: #3d62b5;
+  --agent-3: #a44f7e;
+
+  /* Avatars: soft tints that only tell people apart, ink initials at 14:1 or better */
+  --avatar-0: #e3ebe1;
+  --avatar-1: #f4e2e6;
+  --avatar-2: #eae3f0;
+  --avatar-3: #e0e8f4;
+  --avatar-4: #f7e5d5;
+  --avatar-5: #ecebd6;
+
+  /* Colour fades, after Ramp's charts: full tint at the top, near white at the base. Matte. */
+  --thumb-top: var(--accent);
+  --thumb-bottom: #f5f9ff;
+  --accent-top: var(--accent);
+  --accent-bottom: #f5f9ff;
+  --accent-hover-top: var(--accent-hover);
+  --approve-fade: #f6faf5;
+  --input-fade: #fdf8ef;
+  --failed-fade: #fdf5f3;
+  --neutral-top: #fff;
+  --neutral-bottom: #f1f1ef;
+
+  --shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.06),
+    0 2px 4px 0 rgba(0, 0, 0, 0.04);
+  --shadow-lift: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.08),
+    0 4px 8px 0 rgba(0, 0, 0, 0.05);
+
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -1.2 1.1'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  /* Type: nothing is ever heavier than medium. Hierarchy comes from size, ink and space. */
+  --w-regular: 400;
+  --w-medium: 500;
+
+  /* Joined slabs: outer corners round, inner joints nearly square, a hairline gap between */
+  --r-outer: 16px;
+  --r-joint: 4px;
+  --joint: 4px;
+  /* The toggle thumb sits --inset inside its slab, so its corners are concentric with the slab's */
+  --r-slab: var(--r-outer);
+  --inset: 4px;
+  --r-thumb: calc(var(--r-slab) - var(--inset));
+  /* Every card's inner padding, all four sides */
+  --card-pad: 20px;
+  /* Scroll edges feather instead of cutting */
+  --feather: 20px;
+
+  /* Motion, one set. JS reads these too (src/motion.js). */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.1, 1); /* every enter, exit, state change and slide */
+  --ease-move: cubic-bezier(0.77, 0, 0.175, 1); /* rows travelling to close a gap */
+  --dur-state: 250ms; /* state changes, the pane, the toast, the toggle glass */
+  --dur-menu: 180ms; /* menus and popovers, none in this build yet */
+  --dur-fast: 160ms; /* icon swaps, hover in */
+  --dur-exit: 150ms; /* exits are shorter than enters */
+  --dur-close: 320ms; /* the focus sheet closing: one unhurried fade, everything together */
+  --dur-open: 320ms; /* the focus sheet opening: the same, everything arrives as one */
+  --dur-delight: 400ms; /* the last ending bit: queue clear */
+  --t: var(--dur-state) var(--ease-out);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "DM Sans", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: var(--w-regular);
+}
+
+h1,
+h2 {
+  font-family: "Plus Jakarta Sans", "DM Sans", system-ui, sans-serif;
+  font-weight: var(--w-medium);
+}
+
+h3,
+h4,
+b,
+strong,
+dt,
+th {
+  font-weight: var(--w-medium);
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+dl,
+dd,
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 0;
+}
+
+:focus-visible {
+  outline: 0;
+  box-shadow: var(--focus-ring);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+.late {
+  color: var(--failed-ink);
+}
+
+.strong {
+  font-weight: var(--w-medium);
+}
+
+/* Icon family: frosted marks. A glow body, a glass highlight, static grain, a crisp glyph. */
+
+.mark {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  border-radius: 50%;
+  color: var(--mark-ink);
+  background: linear-gradient(to bottom, var(--mark-glow), var(--mark-fade));
+  box-shadow: inset 0 0 0 1px var(--mark-rim), 0 0 6px 0 var(--mark-halo);
+}
+
+.mark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: var(--grain);
+  background-size: 70px;
+  opacity: 0.22;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.mark .glyph {
+  position: relative;
+  z-index: 1;
+}
+
+.glyph path {
+  vector-effect: non-scaling-stroke;
+  stroke-width: 1.4px;
+}
+
+.tone-approval {
+  --mark-ink: var(--approve-ink);
+  --mark-glow: var(--approve-glow);
+  --mark-tint: var(--approve-tint);
+  --mark-rim: color-mix(in srgb, var(--approve-ink) 16%, transparent);
+  --mark-halo: color-mix(in srgb, var(--approve-glow) 60%, transparent);
+  --mark-fade: var(--approve-fade);
+}
+
+.tone-input {
+  --mark-ink: var(--input-ink);
+  --mark-glow: var(--input-glow);
+  --mark-tint: var(--input-tint);
+  --mark-rim: color-mix(in srgb, var(--input-ink) 16%, transparent);
+  --mark-halo: color-mix(in srgb, var(--input-glow) 60%, transparent);
+  --mark-fade: var(--input-fade);
+}
+
+.tone-failed {
+  --mark-ink: var(--failed-ink);
+  --mark-glow: var(--failed-glow);
+  --mark-tint: var(--failed-tint);
+  --mark-rim: color-mix(in srgb, var(--failed-ink) 16%, transparent);
+  --mark-halo: color-mix(in srgb, var(--failed-glow) 60%, transparent);
+  --mark-fade: var(--failed-fade);
+}
+
+/* Clear glass: icon buttons and an empty radio. No grey tile, the glyph colour is the feedback. */
+.tone-neutral {
+  --mark-ink: currentColor;
+  --mark-glow: var(--neutral-top);
+  --mark-fade: var(--neutral-bottom);
+  --mark-rim: var(--line);
+  --mark-halo: transparent;
+}
+
+/* Grey: a chosen radio, white check at 4.3:1 */
+.tone-ink {
+  --mark-ink: #fff;
+  --mark-glow: #7a7a7a;
+  --mark-fade: #8a8a8a;
+  --mark-rim: transparent;
+  --mark-halo: rgba(0, 0, 0, 0.12);
+}
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 11px;
+  line-height: 1;
+  font-weight: var(--w-medium);
+  color: var(--ink);
+}
+
+.avatar[data-tone="0"] {
+  background: var(--avatar-0);
+}
+.avatar[data-tone="1"] {
+  background: var(--avatar-1);
+}
+.avatar[data-tone="2"] {
+  background: var(--avatar-2);
+}
+.avatar[data-tone="3"] {
+  background: var(--avatar-3);
+}
+.avatar[data-tone="4"] {
+  background: var(--avatar-4);
+}
+.avatar[data-tone="5"] {
+  background: var(--avatar-5);
+}
+
+/* Layout */
+
+.app {
+  height: 100dvh;
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  column-gap: 24px;
+  padding: 24px;
+}
+
+/* The title sits on the queue column's edge, the same line as the slabs */
+.top {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 40px;
+  padding: 0 0 16px;
+}
+
+.brand {
+  flex: none;
+  font-size: 20px;
+  line-height: 28px;
+  letter-spacing: -0.02em;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  min-width: 0;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.stat {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.stat-n {
+  color: var(--ink);
+  font-weight: var(--w-medium);
+}
+
+.reset,
+.back,
+.step {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--ink-3);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.reset {
+  margin: -8px -8px -8px 0;
+}
+
+.step:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+@media (hover: hover) {
+  .reset:hover,
+  .back:hover,
+  .step:not(:disabled):hover {
+    color: var(--ink);
+  }
+}
+
+/* Queue */
+
+.queue {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.slabs {
+  display: grid;
+  gap: var(--joint);
+  margin-bottom: 16px;
+}
+
+.slab {
+  position: relative;
+  padding: var(--inset);
+  background: var(--slab);
+  border-radius: var(--r-joint);
+}
+
+.slab:first-child {
+  border-top-left-radius: var(--r-outer);
+  border-top-right-radius: var(--r-outer);
+}
+
+.slab:last-child {
+  border-bottom-left-radius: var(--r-outer);
+  border-bottom-right-radius: var(--r-outer);
+}
+
+/* Segmented: one glass pill glides under the labels (src/components/Segmented.jsx) */
+
+/* Equal cells that fill the slab, label and count centred together as one unit */
+.seg {
+  position: relative;
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 4px;
+}
+
+/* The thumb: pastel blue fading to near white, one soft shadow that hugs it */
+.seg-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 0 0.5px rgba(0, 0, 0, 0.18)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.08));
+}
+
+.seg-pill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, var(--thumb-top), var(--thumb-bottom));
+  transition: clip-path var(--dur-state) var(--ease-out);
+}
+
+.seg-opt {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 8px;
+  border-radius: var(--r-thumb);
+  font-size: 13px;
+  font-weight: var(--w-medium);
+  white-space: nowrap;
+  color: var(--ink-2);
+  transition: color var(--t);
+}
+
+.seg-opt[aria-checked="true"] {
+  color: var(--ink);
+}
+
+@media (hover: hover) {
+  .seg-opt[aria-checked="false"]:hover {
+    color: var(--ink);
+  }
+}
+
+.seg-count {
+  display: inline-flex;
+  color: var(--ink-3);
+  font-weight: var(--w-regular);
+  transition: color var(--t);
+}
+
+/* Odometer digits: a fixed box each, the roll is clipped inside it */
+.digit {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  height: 20px;
+}
+
+.digit .d {
+  display: block;
+}
+
+.digit .ghost {
+  position: absolute;
+  inset: 0;
+}
+
+.seg-opt[aria-checked="true"] .seg-count {
+  color: var(--ink-2);
+}
+
+/* Feathered scroll edges, set by App only when an edge has content beyond it */
+[data-fade="top"] {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 var(--feather));
+  mask-image: linear-gradient(to bottom, transparent, #000 var(--feather));
+}
+
+[data-fade="bottom"] {
+  -webkit-mask-image: linear-gradient(to top, transparent, #000 var(--feather));
+  mask-image: linear-gradient(to top, transparent, #000 var(--feather));
+}
+
+[data-fade="both"] {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 var(--feather),
+    #000 calc(100% - var(--feather)),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 var(--feather),
+    #000 calc(100% - var(--feather)),
+    transparent
+  );
+}
+
+.rows {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  /* A hairline scrollbar: 4px, faint thumb, no track (WebKit below, Firefox falls back to thin) */
+  margin: 0 -8px;
+  padding: 0 8px 8px;
+}
+
+.rows li + li {
+  margin-top: 4px;
+}
+
+/* Selection is instant: rows are moved through with j and k many times a day */
+.row {
+  width: 100%;
+  min-height: 64px;
+  display: grid;
+  gap: 4px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.row[aria-current="true"] {
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+@media (hover: hover) {
+  .row[aria-current="false"]:hover {
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    transition: box-shadow var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out);
+  }
+  .row[aria-current="true"]:hover {
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+.row.ghost {
+  position: absolute;
+  pointer-events: none;
+}
+
+.row-title {
+  font-weight: var(--w-medium);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.row-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--ink-2);
+}
+
+.row-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.row-status span:not(.mark) {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Empty and old panes share the white card */
+
+.detail {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.detail.empty {
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: var(--w-medium);
+}
+
+.detail-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  /* A hairline scrollbar: 4px, faint thumb, no track (WebKit below, Firefox falls back to thin) */
+  container-type: inline-size;
+  padding: 48px 56px 56px;
+}
+
+.detail-inner {
+  max-width: 880px;
+}
+
+/* After a resolve the next case arrives from the right, after an undo from the left */
+.enter-forward .detail-inner {
+  animation: pane-forward var(--dur-state) var(--ease-out) backwards;
+}
+
+.enter-back .detail-inner {
+  animation: pane-back var(--dur-state) var(--ease-out) backwards;
+}
+
+@keyframes pane-forward {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+}
+
+@keyframes pane-back {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+
+.back {
+  display: none;
+  margin: -8px 0 8px -8px;
+}
+
+/* Case pane: structured like a review page. Header, key facts with the reason docked under
+   them, the agent's recommendation card with its action bar, then evidence modules. */
+
+.detail.case {
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.detail.case .detail-scroll {
+  margin: -4px -8px 0;
+  padding: 4px 8px 48px;
+}
+
+.detail.case .detail-inner {
+  max-width: 1040px;
+}
+
+/* The headline's left edge and every card's outer edge share one line; card content is
+   indented by --card-pad on all four sides. */
+.case-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: 24px;
+  padding: 0;
+}
+
+.case-head .decision {
+  grid-column: 1;
+}
+
+.case-tools {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+}
+
+.case-sub {
+  grid-column: 1 / -1;
+  max-width: 720px;
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.decision {
+  font-size: 28px;
+  line-height: 36px;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.pill-state,
+.pill-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: var(--w-medium);
+  white-space: nowrap;
+}
+
+.pill-state.tone-approval {
+  background: linear-gradient(to bottom, var(--approve-tint), var(--approve-fade));
+  color: var(--approve-ink);
+}
+.pill-state.tone-input {
+  background: linear-gradient(to bottom, var(--input-tint), var(--input-fade));
+  color: var(--input-ink);
+}
+.pill-state.tone-failed {
+  background: linear-gradient(to bottom, var(--failed-tint), var(--failed-fade));
+  color: var(--failed-ink);
+}
+
+.pill-time {
+  background: var(--slab);
+  color: var(--ink-2);
+}
+
+.steps {
+  display: flex;
+  margin-right: -8px;
+}
+
+.case-stack {
+  display: grid;
+  gap: var(--joint);
+  margin-top: 24px;
+}
+
+/* Key facts: one card cut into cells by hairlines, never two lines in a row */
+.facts-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border-radius: var(--r-outer) var(--r-outer) var(--r-joint) var(--r-joint);
+  background: var(--line);
+  box-shadow: var(--shadow);
+}
+
+.cell {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px var(--card-pad);
+  background: var(--surface);
+}
+
+.cell-label {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-2);
+}
+
+.cell-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.cell-value > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The mark sits inline at the start, so the callout text block keeps the pane's one text edge */
+.callout {
+  display: block;
+  padding: 12px var(--card-pad);
+  border-radius: var(--r-joint) var(--r-joint) var(--r-outer) var(--r-outer);
+  box-shadow: var(--shadow);
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: var(--w-medium);
+  text-wrap: pretty;
+}
+
+.callout .mark {
+  margin-right: 8px;
+  vertical-align: -4px;
+}
+
+.callout.tone-approval {
+  background: linear-gradient(to bottom, var(--approve-tint), var(--approve-fade));
+}
+.callout.tone-input {
+  background: linear-gradient(to bottom, var(--input-tint), var(--input-fade));
+}
+.callout.tone-failed {
+  background: linear-gradient(to bottom, var(--failed-tint), var(--failed-fade));
+}
+
+.case-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  margin-top: 16px;
+}
+
+.case-col {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.card {
+  min-width: 0;
+  padding: var(--card-pad);
+  border-radius: var(--r-outer);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.card-title {
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--ink-2);
+}
+
+/* The recommendation card and its docked action bar */
+.rec {
+  display: grid;
+  gap: var(--joint);
+}
+
+.rec > .card {
+  border-radius: var(--r-outer) var(--r-outer) var(--r-joint) var(--r-joint);
+}
+
+.rec-title {
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: var(--w-medium);
+}
+
+.rec-note {
+  margin-top: 4px;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.agent-voice {
+  width: fit-content;
+  background: linear-gradient(90deg, var(--agent-1), var(--agent-2) 55%, var(--agent-3));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--joint);
+  padding: var(--card-pad);
+  border-radius: var(--r-joint) var(--r-joint) var(--r-outer) var(--r-outer);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+/* The bar is a card: its first button's edge sits on the card text edge */
+.bar .btn {
+  border-radius: var(--r-joint);
+}
+
+.bar .btn:first-child {
+  border-radius: 12px var(--r-joint) var(--r-joint) 12px;
+}
+
+.bar .btn:last-child {
+  border-radius: var(--r-joint) 12px 12px var(--r-joint);
+}
+
+.bar .btn:only-child {
+  border-radius: 12px;
+}
+
+/* Key and value list inside a module: lines only between rows */
+.kv > div {
+  display: grid;
+  grid-template-columns: minmax(96px, 0.8fr) minmax(0, 1.4fr);
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.kv > div + div {
+  border-top: 1px solid var(--line);
+}
+
+.kv > div:first-child {
+  padding-top: 0;
+}
+
+.kv > div:last-child {
+  padding-bottom: 0;
+}
+
+.kv dt {
+  font-weight: var(--w-regular);
+  color: var(--ink-2);
+}
+
+/* Fields */
+
+.proposal {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: var(--w-medium);
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: var(--w-medium);
+  color: var(--ink-2);
+}
+
+.field {
+  display: block;
+  margin-top: 16px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.hint {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--ink-2);
+}
+
+.hint.error {
+  color: var(--failed-ink);
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: var(--fill);
+}
+
+.control.money {
+  gap: 4px;
+  font-weight: var(--w-medium);
+}
+
+.control input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: none;
+  padding: 0;
+  font-weight: var(--w-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+.control input:focus-visible {
+  outline: 0;
+}
+
+.control:focus-within {
+  /* Text fields change nothing on focus: the caret is the signal */
+  outline: 0;
+  box-shadow: none;
+}
+
+.control.static {
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  line-height: 40px;
+}
+
+.control.area {
+  display: block;
+  padding: 12px;
+  border: 0;
+  resize: none;
+  line-height: 22px;
+  font-size: 15px;
+}
+
+.control.area:focus-visible {
+  /* Text fields change nothing on focus: the caret is the signal */
+  outline: 0;
+  box-shadow: none;
+}
+
+.options {
+  display: grid;
+  gap: 8px;
+}
+
+.option {
+  /* The chosen outline is feathered: a thin blue line, a soft halo, then a wider glow fading out */
+  --ring: rgba(63, 111, 194, 0);
+  --ring-halo: rgba(207, 227, 255, 0);
+  --ring-glow: rgba(184, 211, 251, 0);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 48px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  text-align: left;
+  font-size: 15px;
+  /* The chosen ring fades in: both states keep the same shadow layers, so the colour interpolates */
+  box-shadow: 0 0 0 1px var(--ring), 0 0 6px 1px var(--ring-halo), 0 0 18px 3px var(--ring-glow), var(--shadow);
+  transition: box-shadow var(--t);
+}
+
+@media (hover: hover) {
+  .option:hover {
+    box-shadow: 0 0 0 1px var(--ring), 0 0 6px 1px var(--ring-halo), 0 0 18px 3px var(--ring-glow), var(--shadow-lift);
+  }
+}
+
+.option[aria-checked="true"] {
+  /* A thin grey outline, the scrollbar thumb's grey, no glow */
+  --ring: rgba(0, 0, 0, 0.18);
+  --ring-halo: rgba(207, 227, 255, 0);
+  --ring-glow: rgba(184, 211, 251, 0);
+  box-shadow: 0 0 0 1px var(--ring), 0 0 6px 1px var(--ring-halo), 0 0 18px 3px var(--ring-glow), var(--shadow);
+}
+
+.option > .mark {
+  margin-top: 3px;
+}
+
+.option-body {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.option-label {
+  font-weight: var(--w-medium);
+}
+
+.next {
+  display: grid;
+  gap: 2px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-2);
+}
+
+/* Buttons. The primary action of a case is the only blue button on screen. */
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--joint);
+  margin-top: 32px;
+}
+
+.btn {
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: var(--w-medium);
+  white-space: nowrap;
+  transition: background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.buttons.joined .btn:not(:only-child):first-child {
+  border-radius: 999px var(--r-joint) var(--r-joint) 999px;
+}
+
+.buttons.joined .btn:not(:only-child):last-child {
+  border-radius: var(--r-joint) 999px 999px var(--r-joint);
+}
+
+.buttons.joined .btn:not(:first-child):not(:last-child) {
+  border-radius: var(--r-joint);
+}
+
+.btn.primary {
+  background: linear-gradient(to bottom, var(--accent-top), var(--accent-bottom));
+  color: var(--on-accent);
+}
+
+.btn.quiet {
+  background: var(--fill);
+}
+
+/* Disabled reads as off: grey, not a faded blue */
+.btn:disabled,
+.btn.primary:disabled {
+  background: var(--fill);
+  color: var(--ink-3);
+  cursor: default;
+}
+
+@media (hover: hover) {
+  .btn.primary:not(:disabled):hover {
+    background: linear-gradient(to bottom, var(--accent-hover-top), var(--accent-top));
+  }
+  .btn.quiet:not(:disabled):hover {
+    background: var(--fill-hover);
+  }
+}
+
+/* Evidence */
+
+.receipt .line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.receipt .line:first-child {
+  padding-top: 0;
+}
+
+.receipt .line:last-child {
+  padding-bottom: 0;
+}
+
+.receipt .line + .line {
+  border-top: 1px solid var(--line);
+}
+
+.line-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+}
+
+.line-flag {
+  padding: 0 8px;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, var(--failed-tint), var(--failed-fade));
+  color: var(--failed-ink);
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: var(--w-medium);
+}
+
+.line.missing,
+.line.total {
+  font-weight: var(--w-medium);
+}
+
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--joint);
+}
+
+.compare-side {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  padding: 12px 16px;
+  border-radius: var(--r-joint);
+  /* No grey fill: a thin translucent outline, unobtrusive */
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.compare-side:first-child {
+  border-radius: 12px var(--r-joint) var(--r-joint) 12px;
+}
+
+.compare-side:last-child {
+  border-radius: var(--r-joint) 12px 12px var(--r-joint);
+}
+
+.compare-label {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-2);
+}
+
+.compare-value {
+  font-family: "Plus Jakarta Sans", "DM Sans", system-ui, sans-serif;
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: var(--w-medium);
+  letter-spacing: -0.01em;
+}
+
+.compare-note {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-2);
+}
+
+.pay {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.pay .label {
+  margin: 0;
+}
+
+.pay-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: var(--w-medium);
+}
+
+/* Timeline: a quiet list, times on a fixed column, no row lines */
+.log-item {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  padding: 4px 0;
+  color: var(--ink-2);
+}
+
+.log-time {
+  color: var(--ink-3);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  vertical-align: bottom;
+  font-weight: var(--w-medium);
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* The status check answering: new log rows rise in, the text and the glyph swap */
+.log-item.arrive {
+  animation: arrive var(--dur-state) var(--ease-out) backwards;
+}
+
+.arrive-text {
+  animation: fade var(--dur-state) var(--ease-out) backwards;
+}
+
+.swap-in {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: swap var(--dur-fast) var(--ease-out) backwards;
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes swap {
+  from {
+    opacity: 0;
+    transform: scale(0.25);
+    filter: blur(4px);
+  }
+}
+
+.sent {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--fill);
+  font-size: 15px;
+  line-height: 22px;
+  white-space: pre-wrap;
+}
+
+/* Old pane, kept at ?pane=old for comparison */
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 24px;
+  margin-top: 12px;
+  color: var(--ink-2);
+}
+
+.meta-strong {
+  color: var(--ink);
+  font-weight: var(--w-medium);
+}
+
+.q {
+  margin-top: 24px;
+}
+
+.meta + .q {
+  margin-top: 32px;
+}
+
+.q-act {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.body {
+  max-width: 640px;
+  font-size: 16px;
+  line-height: 24px;
+  text-wrap: pretty;
+}
+
+.why {
+  position: relative;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: var(--w-medium);
+  text-wrap: pretty;
+}
+
+.q + .q:not(.q-act) {
+  margin-top: 10px;
+}
+
+.why .mark {
+  position: absolute;
+  left: -24px;
+  top: 4px;
+}
+
+.act {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 56px;
+  align-items: start;
+}
+
+.evidence > :not(.sr-only) ~ :not(.sr-only) {
+  margin-top: 24px;
+}
+
+.evidence .receipt {
+  padding: 8px 16px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.evidence .receipt .line:first-child {
+  padding-top: 8px;
+}
+
+.evidence .receipt .line:last-child {
+  padding-bottom: 8px;
+}
+
+.facts .fact {
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.facts .fact:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+.fact dt {
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: var(--w-regular);
+}
+
+.fact dd {
+  margin-top: 4px;
+}
+
+/* Toast: rises 8px on the way in, sinks the same 8px faster on the way out */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: calc(100vw - 32px);
+  padding: 4px 4px 4px 20px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  box-shadow: var(--shadow-lift);
+  transition: opacity var(--dur-state) var(--ease-out),
+    transform var(--dur-state) var(--ease-out), visibility 0s;
+}
+
+@starting-style {
+  .toast[data-open="true"] {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.toast[data-open="false"] {
+  opacity: 0;
+  transform: translateY(8px);
+  visibility: hidden;
+  pointer-events: none;
+  transition-duration: var(--dur-exit), var(--dur-exit), 0s;
+  transition-delay: 0s, 0s, var(--dur-exit);
+}
+
+.toast-text {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.toast button {
+  flex: none;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  font-weight: var(--w-medium);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .toast button:hover {
+    background: rgba(255, 255, 255, 0.22);
+  }
+}
+
+/* Queue clear: frosted glass docked as a disc and a pill, over one soft glow per state */
+
+.detail.clear {
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.clear-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.aura {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 480px;
+  height: 280px;
+  translate: -50% -50%;
+  pointer-events: none;
+}
+
+.glow {
+  position: absolute;
+  width: 168px;
+  height: 168px;
+}
+
+/* Each glow sits off an edge of the glass, so the centre stays clear and only the rim takes colour */
+.glow-approval {
+  left: 40px;
+  top: 64px;
+}
+
+.glow-input {
+  right: 56px;
+  top: 0;
+}
+
+.glow-failed {
+  right: 96px;
+  bottom: 0;
+}
+
+.glow-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  filter: blur(36px);
+  opacity: 0.85;
+  will-change: transform;
+  transition: transform var(--dur-delight) var(--ease-out);
+}
+
+.glow-approval .glow-fill {
+  background: var(--approve-glow);
+}
+
+.glow-input .glow-fill {
+  background: var(--input-glow);
+}
+
+.glow-failed .glow-fill {
+  background: var(--failed-glow);
+}
+
+/* Static grain on the glow only, never over the type */
+.grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  background-image: var(--grain);
+  -webkit-mask-image: radial-gradient(closest-side, #000 40%, transparent);
+  mask-image: radial-gradient(closest-side, #000 40%, transparent);
+}
+
+.glass {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--joint);
+}
+
+.glass-disc,
+.glass-pill {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  backdrop-filter: blur(20px) saturate(1.5);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45), 0 1px 2px -1px rgba(0, 0, 0, 0.06),
+    0 4px 12px 0 rgba(0, 0, 0, 0.04);
+}
+
+.glass-disc {
+  justify-content: center;
+  width: 56px;
+  border-radius: 999px var(--r-joint) var(--r-joint) 999px;
+  color: var(--approve-ink);
+}
+
+.glass-pill {
+  padding: 0 28px 0 22px;
+  border-radius: var(--r-joint) 999px 999px var(--r-joint);
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: var(--w-medium);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+/* Only when the last case is resolved here: the glow blooms and the glass settles, 400ms, then still */
+.clear-stage.play .glow {
+  animation: bloom var(--dur-delight) var(--ease-out) backwards;
+}
+
+.clear-stage.play .glass-disc,
+.clear-stage.play .glass-pill {
+  animation: settle var(--dur-delight) var(--ease-out) backwards;
+}
+
+@keyframes bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+/* Narrow pane container */
+
+@container (max-width: 720px) {
+  .act,
+  .case-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .act {
+    gap: 32px;
+  }
+
+  .evidence {
+    order: -1;
+  }
+
+  .q-act {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .case-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .case-tools {
+    grid-column: 1;
+    grid-row: auto;
+    order: -1;
+    margin-bottom: 12px;
+  }
+
+  .case-head .back {
+    order: -2;
+  }
+
+  .field-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+}
+
+/* Narrow screens: list first, case on top of it */
+
+@media (max-width: 860px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 16px;
+  }
+
+  .app .detail {
+    display: none;
+  }
+
+  .app.show-detail .detail {
+    display: flex;
+  }
+
+  .app.show-detail .queue {
+    display: none;
+  }
+
+  /* Nothing to list: the empty pane takes the space under the switch */
+  .app.is-empty {
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+
+  .app.is-empty .detail {
+    display: flex;
+  }
+
+  .back {
+    display: flex;
+  }
+
+  .steps {
+    display: none;
+  }
+
+  .detail-scroll {
+    padding: 24px;
+  }
+
+  .detail.case .detail-scroll {
+    padding: 4px 8px 32px;
+  }
+
+  .case-head {
+    padding: 0;
+  }
+
+  .decision {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  /* No margin to hang the glyph in, so it sits at the start of the line */
+  .why .mark {
+    position: static;
+    display: inline-grid;
+    margin-right: 8px;
+    vertical-align: -3px;
+  }
+}
+
+/* Reduced motion: nothing travels, scales or blurs; opacity still carries the change */
+
+@media (prefers-reduced-motion: reduce) {
+  .seg-pill {
+    transition-property: opacity;
+  }
+
+  .glow-fill {
+    transition: none;
+  }
+
+  .toast,
+  .toast[data-open="false"] {
+    transform: none;
+  }
+
+  @starting-style {
+    .toast[data-open="true"] {
+      transform: none;
+    }
+  }
+
+  @keyframes pane-forward {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes pane-back {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes arrive {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes swap {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes bloom {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes settle {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+/* Focus sheet. Cast: the sheet leads, the docked cluster supports, the scrim decorates,
+   the app behind is still. Open: scrim and sheet start together, 250ms on her ease-out,
+   the sheet rising 16px from its trigger, scale 0.96 and blur 8px to rest. The cluster lands
+   from 80ms, 40ms apart, the last on the 400ms delight tail. Close: all together, 150ms,
+   the way it came. Size: a clip-path. The cluster travels on transform. */
+
+.focus {
+  --sheet-y: 72px;
+  --sheet-x: max(72px, calc((100vw - 1180px) / 2));
+  --dock: 44px;
+  --kiss: 3px;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.focus[data-open="true"] {
+  pointer-events: auto;
+}
+
+.focus-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.6);
+  opacity: 0;
+  -webkit-backdrop-filter: blur(0);
+  backdrop-filter: blur(0);
+  /* Feather out mirrors the feather in: same length, the scrim lifts as the sheet goes */
+  transition: opacity var(--dur-state) var(--ease-out), backdrop-filter var(--dur-state) var(--ease-out),
+    -webkit-backdrop-filter var(--dur-state) var(--ease-out);
+}
+
+.focus-sheet {
+  position: absolute;
+  inset: 0;
+  background: var(--ground);
+  /* The corner the cluster docks to takes the same joint radius as the pill and buttons, for one cohesive shape */
+  clip-path: inset(var(--sheet-y) var(--sheet-x) round 24px var(--r-joint) 24px 24px);
+  transform-origin: var(--origin, 50% 50%);
+  /* Closed: the intro in reverse, so it feathers out the way it came in */
+  opacity: 0;
+  transform: translateY(16px) scale(0.96);
+  filter: blur(8px);
+  transition: opacity var(--dur-state) var(--ease-out), transform var(--dur-state) var(--ease-out),
+    filter var(--dur-state) var(--ease-out), clip-path var(--dur-state) var(--ease-out);
+}
+
+/* Enter start values, applied for one frame with no transition */
+.focus[data-phase="pre"] .focus-sheet {
+  transform: translateY(16px) scale(0.96);
+  filter: blur(8px);
+  transition: none;
+}
+
+.focus[data-phase="open"] .focus-scrim {
+  opacity: 1;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  transition-duration: var(--dur-open);
+}
+
+.focus[data-phase="open"] .focus-sheet {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  transition-duration: var(--dur-open), var(--dur-open), var(--dur-open), var(--dur-state);
+}
+
+.focus[data-full="true"] .focus-sheet {
+  clip-path: inset(0 round 0);
+}
+
+/* The content keeps one inset in both sizes, so nothing reflows when the sheet grows */
+.focus-sheet .detail.case {
+  height: 100%;
+}
+
+.focus-sheet .detail.case .detail-scroll {
+  margin: 0;
+  padding: calc(var(--sheet-y) + 40px) calc(var(--sheet-x) + 40px) calc(var(--sheet-y) + 40px);
+}
+
+.focus-sheet .detail.case .detail-inner {
+  margin: 0 auto;
+}
+
+/* Open in focus: the one control with a spring, at her ask. It rests a touch small, springs up
+   with a small overshoot when pointed at or focused, dips on press, then springs back. The glyph
+   scales, the 40px hit area does not. */
+.focus-open > .mark {
+  transform: scale(0.88);
+  transition: transform 380ms linear(0, 0.157 7.6%, 0.551 17.5%, 0.94 29.4%, 1.075 38.2%, 1.11 44.3%, 1.096 51.5%, 1.012 68.6%, 0.99 78%, 1);
+}
+
+@media (hover: hover) {
+  .focus-open:hover > .mark {
+    transform: scale(1);
+  }
+}
+
+.focus-open:focus-visible > .mark {
+  transform: scale(1);
+}
+
+.focus-open:active > .mark {
+  transform: scale(0.9);
+  transition-duration: 90ms;
+  transition-timing-function: var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .focus-open > .mark,
+  .focus-open:active > .mark {
+    transform: none;
+    transition: none;
+  }
+}
+
+.focus-sheet .focus-open {
+  display: none;
+}
+
+/* The docked cluster. Its cross point is the sheet's top right corner: the prompt pill sits
+   above the sheet ending on its right edge, close sits right of the pill, expand sits under
+   close beside the sheet. Kissing shapes, 3px of scrim between them, square at the joints. */
+.focus-dock {
+  position: absolute;
+  top: var(--sheet-y);
+  right: var(--sheet-x);
+  width: 0;
+  height: 0;
+  transition: transform var(--dur-state) var(--ease-out);
+}
+
+.focus[data-full="true"] .focus-dock {
+  transform: translate(
+    calc(var(--sheet-x) - 16px - var(--dock) - var(--kiss)),
+    calc(16px + var(--dock) + var(--kiss) - var(--sheet-y))
+  );
+}
+
+.dock-shape {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  height: var(--dock);
+  background: linear-gradient(to bottom, var(--neutral-top), var(--neutral-bottom));
+  box-shadow: 0 1px 2px -1px rgba(0, 0, 0, 0.12), 0 2px 6px 0 rgba(0, 0, 0, 0.06);
+  color: var(--ink-2);
+  pointer-events: auto;
+  opacity: 0;
+  transform: scale(0.9);
+  filter: blur(4px);
+  transition: opacity var(--dur-state) var(--ease-out), transform var(--dur-state) var(--ease-out),
+    filter var(--dur-state) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+/* Leaving, everything goes as one: sheet, cluster and scrim on the same slower, softer fade,
+   so no button is left behind */
+.focus[data-phase="closed"] .dock-shape,
+.focus[data-phase="closed"] .focus-sheet,
+.focus[data-phase="closed"] .focus-scrim {
+  transition-duration: var(--dur-close);
+  transition-delay: 0s;
+}
+
+.focus[data-phase="pre"] .dock-shape {
+  transform: scale(0.9);
+  filter: blur(4px);
+  transition: none;
+}
+
+.focus[data-phase="open"] .dock-shape {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  /* Opens with the sheet, as one: no button lands late */
+  transition-duration: var(--dur-open), var(--dur-open), var(--dur-open), var(--dur-fast);
+  transition-delay: 0s;
+}
+
+.dock-ask {
+  right: 0;
+  bottom: var(--kiss);
+  width: auto;
+  max-width: min(420px, calc(100vw - 2 * var(--sheet-x) - 24px));
+  gap: 10px;
+  padding: 0 20px 0 16px;
+  border-radius: 22px 22px var(--r-joint) 22px;
+  transform-origin: 100% 100%;
+  color: var(--agent-1);
+}
+
+.dock-close,
+.dock-size {
+  justify-content: center;
+  width: var(--dock);
+}
+
+.dock-close {
+  left: var(--kiss);
+  bottom: var(--kiss);
+  border-radius: 22px 22px 22px var(--r-joint);
+  transform-origin: 0 100%;
+}
+
+.dock-size {
+  left: var(--kiss);
+  top: var(--kiss);
+  border-radius: var(--r-joint) 22px 22px 22px;
+  transform-origin: 0 0;
+}
+
+@media (hover: hover) {
+  .dock-close:hover,
+  .dock-size:hover {
+    color: var(--ink);
+  }
+}
+
+.ask-input {
+  /* Sits over the hint and spans the text area; the hint sets the width */
+  position: absolute;
+  z-index: 1;
+  left: 44px;
+  right: 20px;
+  top: 0;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: none;
+  padding: 0;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.ask-input:focus-visible {
+  outline: 0;
+}
+
+.dock-ask:focus-within {
+  /* Text fields change nothing on focus: the caret is the signal */
+  outline: 0;
+  box-shadow: none;
+}
+
+.ask-hint {
+  /* In flow, so the pill hugs the placeholder with no dead space after it */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 15px;
+  pointer-events: none;
+}
+
+/* Phone: the sheet is the whole screen and the cluster sits inside its top right */
+@media (max-width: 860px) {
+  .focus {
+    --sheet-y: 0px;
+    --sheet-x: 0px;
+  }
+
+  .focus-sheet,
+  .focus[data-full="true"] .focus-sheet {
+    clip-path: inset(0 round 0);
+  }
+
+  .focus-dock,
+  .focus[data-full="true"] .focus-dock {
+    transform: translate(calc(-12px - var(--dock) - var(--kiss)), calc(12px + var(--dock) + var(--kiss)));
+  }
+
+  .dock-ask {
+    width: calc(100vw - 24px - var(--dock) - 2 * var(--kiss) - 12px);
+  }
+
+  .dock-size {
+    display: none;
+  }
+
+  .focus-sheet .detail.case .detail-scroll {
+    padding: calc(24px + var(--dock)) 16px 32px;
+  }
+}
+
+/* Reduced motion for the focus sheet: fades only, no rise, scale, blur or travel */
+@media (prefers-reduced-motion: reduce) {
+  .focus .focus-sheet,
+  .focus[data-phase] .focus-sheet {
+    transform: none;
+    filter: none;
+    transition-property: opacity;
+  }
+
+  .focus .dock-shape,
+  .focus[data-phase] .dock-shape {
+    transform: none;
+    transition-property: opacity, color;
+  }
+
+  .focus-dock {
+    transition: none;
+  }
+}
+
+/* Inside the sheet the docked close does the back button's job */
+.focus-sheet .back {
+  display: none;
+}
+
+/* Scrollbars, everywhere: a 4px hairline thumb with no track */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.14);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.24);
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.14) transparent;
+  }
+}

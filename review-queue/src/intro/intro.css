@@ -1,0 +1,158 @@
+/* Intro: pure white, three marshmallow capsules, one line of copy and one CTA. Scoped under .rq-intro so nothing leaks into the app. */
+
+.rq-intro {
+  --rq-ink: #141414;
+  --rq-ink-2: #5c5c5c;
+  --rq-accent-top: var(--accent);
+  --rq-accent-bottom: var(--accent-bottom);
+  --rq-accent-hover: var(--accent-hover);
+  --rq-ease: cubic-bezier(0.2, 0.8, 0.1, 1);
+  --rq-stroke: 1.5px;
+
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  background: #ffffff;
+  color: var(--rq-ink);
+  font-family: "DM Sans", system-ui, sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Exit on the CTA press: Intro.jsx drives the capsules, the copy and this field's
+   opacity on one timeline, so nothing here animates. */
+.rq-intro.is-leaving {
+  pointer-events: none;
+}
+
+.rq-intro-stage,
+.rq-intro-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* the capsules can be pulled with a finger; the browser must not pan or zoom */
+.rq-intro-stage {
+  touch-action: none;
+}
+
+.rq-intro-copy {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--rq-copy-top, 70%);
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+}
+
+.rq-intro-title {
+  margin: 0;
+  max-width: 22em;
+  font-family: "Plus Jakarta Sans", "DM Sans", system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 28px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--rq-ink);
+  text-wrap: balance;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Same face as the app's primary action: the signature pastel blue, ink text, a full pill. The label never
+   moves in any state, and there is no press scale on a capsule with text. */
+/* each sentence keeps its own line when the line has to break */
+.rq-intro-title span {
+  white-space: nowrap;
+}
+
+.rq-intro-cta {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  min-height: 48px;
+  padding: 0 28px;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, var(--rq-accent-top), var(--rq-accent-bottom));
+  color: var(--rq-ink);
+  font: 500 15px/1 "DM Sans", system-ui, sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 160ms var(--rq-ease);
+}
+
+.rq-intro-cta:disabled {
+  cursor: default;
+}
+
+.rq-intro-cta:focus-visible {
+  outline: 2px solid var(--rq-ink);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) {
+  .rq-intro-cta:not(:disabled):hover {
+    background: linear-gradient(to bottom, var(--rq-accent-hover), var(--rq-accent-top));
+  }
+}
+
+@media (max-width: 639px) {
+  .rq-intro-title {
+    font-size: 22px;
+  }
+  .rq-intro-copy {
+    gap: 20px;
+  }
+  .rq-intro-cta {
+    min-height: 44px;
+  }
+}
+
+/* Entrance after the capsules: the line of copy, then the CTA. */
+@keyframes rq-intro-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(8px);
+  }
+}
+
+/* They arrive while the capsules are still settling, so nothing waits on white. */
+.rq-intro-title {
+  animation: rq-intro-in 600ms var(--rq-ease) 820ms both;
+}
+
+.rq-intro-cta {
+  animation: rq-intro-in 600ms var(--rq-ease) 920ms both;
+}
+
+/* Reduced motion: the still composition, one fade for the whole screen. */
+@keyframes rq-intro-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.rq-intro.is-reduced {
+  animation: rq-intro-fade 400ms var(--rq-ease) both;
+}
+
+.rq-intro.is-reduced .rq-intro-title,
+.rq-intro.is-reduced .rq-intro-cta {
+  animation: none;
+}
+
+/* Reduced motion exit: one 200ms crossfade to the queue. */
+.rq-intro.is-reduced.is-leaving {
+  animation: none;
+  opacity: 0;
+  transition: opacity 200ms var(--rq-ease);
+}
+
